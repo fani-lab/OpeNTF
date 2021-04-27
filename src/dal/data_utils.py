@@ -1,4 +1,3 @@
-
 import json
 from cmn.member import Member
 from cmn.author import Author
