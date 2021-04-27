@@ -2,3 +2,5 @@ dblp.v12.json
 dblp.txt
 /.ipynb_checkpoints
 /.vscode
+.idea/
+*.pyc

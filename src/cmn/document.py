@@ -1,4 +1,4 @@
-from common.team import Team
+from cmn.team import Team
 class Document(Team):
     def __init__(self, id, authors, title, doc_type, year, venue, references, fos, keywords):
         super().__init__(id, authors)
