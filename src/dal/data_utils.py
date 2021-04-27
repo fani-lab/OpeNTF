@@ -1,8 +1,9 @@
+
 import json
-from common.member import Member
-from common.author import Author
-from common.team import Team
-from common.document import Document
+from cmn.member import Member
+from cmn.author import Author
+from cmn.team import Team
+from cmn.document import Document
 
 def read_data(data_path):
     counter = 0
