@@ -1,30 +1,33 @@
 import sys
 sys.path.extend(['../cmn'])
 from scipy.sparse.data import _data_matrix
-from dal.data_utils import *
-from cmn.fnn import FNN
-from cmn.custom_dataset import TFDataset
 import torch
 from torch import optim 
 from torch import nn 
 from torch.utils.data import Dataset, DataLoader 
 from tqdm import tqdm  # For nice progress bar!
-
 from scipy.sparse import hstack
 import numpy as np
+
+from cmn.team import Team
+from cmn.document import Document
+import mdl.param
+from dal.data_utils import *
+from mdl.fnn import FNN
+from mdl.custom_dataset import TFDataset
 
 # Set device cuda for GPU if it's available otherwise run on the CPU
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 data_path = "../data/raw/dblp.v12.json"
 
-all_authors, all_docs, input_data, output_data = read_data(data_path)
+all_members, teams, input_data, output_data = Document.read_data(data_path, topn=1000)
 
-index_to_author, author_to_index = build_index_authors(all_authors)
+index_to_member, member_to_index = Team.build_index_members(all_members)
 
-index_to_skill, skill_to_index = build_index_skills(all_docs)
+index_to_skill, skill_to_index = Team.build_index_skills(teams)
 
-input_matrix, output_matrix = build_dataset(all_docs, skill_to_index, author_to_index)
+input_matrix, output_matrix = Team.build_dataset(teams, skill_to_index, member_to_index)
 
 # print(output_matrix.shape)
 
@@ -32,29 +35,33 @@ input_matrix, output_matrix = build_dataset(all_docs, skill_to_index, author_to_
 
 # Setting the hyperparameters
 input_size = len(index_to_skill)
-output_size = len(index_to_author) + 1
-learning_rate = 0.001
-batch_size = 100
-num_epochs = 3
+output_size = len(index_to_member) + 1
+learning_rate = mdl.param.fnn['lr']
+batch_size = mdl.param.fnn['b']
+num_epochs = mdl.param.fnn['e']
 
 
 # data_matrix = hstack([input_matrix, output_matrix]).tocsr()
 # print(data_matrix.shape)
 
 
-data_matrix = TFDataset(input_matrix, output_matrix)
+# data_matrix = TFDataset(input_matrix, output_matrix)
 
-training_matrix = data_matrix[:700]
-validation_matrix = data_matrix[700:850]
-test_matrix = data_matrix[850:]
+#here is the bug!! the return value after the indexing is NOT of type Dataset. The following indexes calls the __getitem__ function of the TFDataset
+# training_matrix = data_matrix[:700]
+# validation_matrix = data_matrix[700:850]
+# test_matrix = data_matrix[850:]
 
+training_matrix = TFDataset(input_matrix[:700], output_matrix[:700])
+validation_matrix = TFDataset(input_matrix[700:850], output_matrix[700:850])
+test_matrix = TFDataset(input_matrix[850:], output_matrix[850:])
 
 # print(training_matrix.shape)
 
 
-training_dataloader = DataLoader(training_matrix, batch_size=batch_size, shuffle=False, num_workers=0)
-validation_dataloader = DataLoader(validation_matrix, batch_size=batch_size, shuffle=False, num_workers=0)
-testing_dataloader = DataLoader(test_matrix, batch_size=batch_size, shuffle=False, num_workers=0)
+training_dataloader = DataLoader(training_matrix, batch_size=batch_size, shuffle=True, num_workers=0)
+validation_dataloader = DataLoader(validation_matrix, batch_size=batch_size, shuffle=True, num_workers=0)
+testing_dataloader = DataLoader(test_matrix, batch_size=batch_size, shuffle=True, num_workers=0)
 
 # print(training_dataloader.dataset)
 
@@ -62,7 +69,10 @@ data_loaders = {"train": training_dataloader, "val": validation_dataloader}
 
 
 # Initialize network
-model = FNN(input_size=input_size, output_size=output_size).to(device)
+model = FNN(input_size=input_size, output_size=output_size, param=mdl.param.fnn).to(device)
+
+
+##Hossein: Reviewed up to here!
 
 # Loss and optimizer
 
