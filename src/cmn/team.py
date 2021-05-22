@@ -1,4 +1,4 @@
-from scipy.sparse import csr_matrix, lil_matrix
+from scipy.sparse import csr_matrix, lil_matrix, save_npz, load_npz
 import numpy as np
 from datetime import datetime
 
@@ -72,63 +72,60 @@ class Team(object):
         pass
 
     @staticmethod
-    def build_dataset(teams, skill_to_index, member_to_index):
-
+    def build_dataset_fnn(teams, skill_to_index, member_to_index):
         training_size = len(teams)
         BUCKET_SIZE = 100
         SKILL_SIZE = len(skill_to_index)
         AUTHOR_SIZE = len(member_to_index)
+        try:
+            data = load_npz(f'./../data/preprocessed/baseline_fnn_data_{training_size}.npz')
+        except:
+            # Sparse Matrix and bucketing
+            data = lil_matrix((training_size, SKILL_SIZE + AUTHOR_SIZE))
+            data_ = np.zeros((BUCKET_SIZE, SKILL_SIZE + AUTHOR_SIZE))
+            j = -1
+            for i, team in enumerate(teams.values()):
+                if i >= training_size: break
 
-        # Sparse Matrix and bucketing
-        data = lil_matrix((training_size, SKILL_SIZE + AUTHOR_SIZE + 1))
-        data_ = np.zeros((BUCKET_SIZE, SKILL_SIZE + AUTHOR_SIZE + 1))
-        j = -1
-        for i, team in enumerate(teams.values()):
-            if i >= training_size: break
+                # Generating one hot encoded vector for input
+                X = np.zeros((1, SKILL_SIZE))
+                input_fields = team.get_skills()
+                for field in input_fields:
+                    X[0, skill_to_index[field]] = 1
 
-            # Generating one hot encoded vector for input
-            X = np.zeros((1, SKILL_SIZE))
-            input_fields = team.get_skills()
-            for field in input_fields:
-                X[0, skill_to_index[field]] = 1
+                # This does not work since the number of authors are different for each sample, therefore we need to build the output as a one hot encoding
+                # y_index = []
+                # for id in output_ids:
+                #     y_index.append(member_to_index[id])
+                # y_index.append(len(output_ids))
+                # y = np.asarray([y_index])
 
-            # This does not work since the number of authors are different for each sample, therefore we need to build the output as a one hot encoding
-            # y_index = []
-            # for id in output_ids:
-            #     y_index.append(member_to_index[id])
-            # y_index.append(len(output_ids))
-            # y = np.asarray([y_index])
+                # Generating one hot encoded vector for output
+                y = np.zeros((1, AUTHOR_SIZE))
+                output_ids = team.get_members_ids()
+                for id in output_ids:
+                    y[0, member_to_index[id]] = 1
+                
+                # Building a training instance
+                X_y = np.hstack([X, y])
 
-            # Generating one hot encoded vector for output
-            y = np.zeros((1, AUTHOR_SIZE + 1))
-            output_ids = team.get_members_ids()
-            for id in output_ids:
-                y[0, member_to_index[id]] = 1
-            y[0, -1] = len(output_ids)
+                # Bucketing
+                try:
+                    j += 1
+                    data_[j] = X_y
+                except:
+                    s = int(((i / BUCKET_SIZE) - 1) * BUCKET_SIZE)
+                    e = int(s + BUCKET_SIZE)
+                    data[s: e] = data_
+                    j = 0
+                    data_[j] = X_y
+                if (i % BUCKET_SIZE == 0):
+                    print(f'Loading {i}/{len(teams)} instances! {datetime.now()}')
+            if j > -1:
+                data[-j:] = data_[0:j]
 
-            # Building a training instance
-            X_y = np.hstack([X, y])
-
-            # Bucketing
-            try:
-                j += 1
-                data_[j] = X_y
-            except:
-                s = int(((i / BUCKET_SIZE) - 1) * BUCKET_SIZE)
-                e = int(s + BUCKET_SIZE)
-                data[s: e] = data_
-                j = 0
-                data_[j] = X_y
-            if (i % BUCKET_SIZE == 0):
-                print(f'Loading {i}/{len(teams)} instances!{datetime.now()}')
-        if j > -1:
-            data[-j - 1:] = data_[0:j + 1]
+            save_npz(f'./../data/preprocessed/baseline_fnn_data_{training_size}.npz', data.tocsr())
 
         input_matrix = data[:, :SKILL_SIZE]
-        output_matrix = data[:, -1 - AUTHOR_SIZE:]
-        print(input_matrix.shape)
-        print(output_matrix.shape)
-        # input_matrix = torch.rand(100,100)
-        # output_matrix = torch.rand(100,100)
-
+        output_matrix = data[:, - AUTHOR_SIZE:]
         return input_matrix, output_matrix

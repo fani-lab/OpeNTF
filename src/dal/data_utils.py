@@ -1,114 +1,169 @@
-import json
-from scipy.sparse import csr_matrix, lil_matrix
 import torch
 import numpy as np
-from cmn.member import Member
-from cmn.author import Author
-from cmn.team import Team
-from cmn.document import Document
 from datetime import datetime
+from sklearn.metrics import multilabel_confusion_matrix, f1_score, classification_report, roc_auc_score, precision_recall_curve, auc
+from sklearn.model_selection import train_test_split, KFold
+import mdl.param
+import numpy as np
+
+def create_evaluation_splits(n_sample, n_folds):
+    train, test = train_test_split(np.arange(n_sample), train_size=0.9, test_size=0.1, random_state=0, shuffle=True)
+    splits = dict()
+    splits['test'] = test
+    splits['folds'] = dict()
+    skf = KFold(n_splits=n_folds, random_state=0, shuffle=True)
+    for k, (trainIdx, validIdx) in enumerate(skf.split(train)):
+        splits['folds'][k] = dict()
+        splits['folds'][k]['train'] = train[trainIdx]
+        splits['folds'][k]['valid'] = train[validIdx]
+
+    return splits
 
 
+def eval_metrics(loader, model, device):
+    C = loader.dataset.output.shape[1]
+    with torch.no_grad():
+        y_true = torch.empty(0, C)
+        y_pred = torch.empty(0, C)
+
+        for x, y in loader:
+            x = x.to(device=device)
+            y = y.to(device=device)
+            
+            scores = model(x)
+            scores = torch.sigmoid(scores)
+            scores = torch.round(scores)
+
+            y = y.squeeze(1).cpu().numpy()
+            scores = scores.squeeze(1).cpu().numpy()
+
+            y_true = np.vstack((y_true, y))
+            y_pred = np.vstack((y_pred, scores))
+
+        auc = roc_auc_score(y_true, y_pred, average='micro', multi_class = "ovr")
+        cls_rep = classification_report(y_true, y_pred, zero_division=0)
+        return str(auc), cls_rep
 
 
-# def build_dataset(teams, skill_to_index, member_to_index):
-    
-#     counter = 0
+def prc_auc(loader, model, device):
+    C = loader.dataset.output.shape[1]
+    with torch.no_grad():
+        y_true = torch.empty(0, C)
+        y_pred = torch.empty(0, C)
 
-#     input_data = []
-#     skill_row = []
-#     skill_col = []
+        for x, y in loader:
+            x = x.to(device=device)
+            y = y.to(device=device)
+            
+            scores = model(x)
+            scores = torch.sigmoid(scores)
+            scores = torch.round(scores)
 
-#     output_data = []
-#     auth_row = []
-#     auth_col = []
-    
-#     for doc in teams.values():
+            y = y.squeeze(1).cpu().numpy()
+            scores = scores.squeeze(1).cpu().numpy()
 
-#         inp_fields = doc.get_fields()
-#         for field in inp_fields:
-#             skill_row.append(counter)
-#             skill_col.append(skill_to_index[field])
-#             input_data.append(1)
+            y_true = np.vstack((y_true, y))
+            y_pred = np.vstack((y_pred, scores))
 
-#         out_ids = doc.get_members_ids()
-#         for id in out_ids:
-#             auth_row.append(counter)
-#             auth_col.append(member_to_index[id])
-#             output_data.append(1)
-        
-#         auth_row.append(counter)
-#         auth_col.append(len(member_to_index))
-#         output_data.append(len(out_ids))
+        precision, recall, _ = precision_recall_curve(y_true, y_pred)
+        auc = auc(precision, recall)
+        return auc
 
-#         counter += 1
+def roc_auc(loader, model, device):
+    C = loader.dataset.output.shape[1]
+    with torch.no_grad():
+        y_true = torch.empty(0, C)
+        y_pred = torch.empty(0, C)
 
-    
-#     input_matrix = csr_matrix((input_data, (skill_row, skill_col)), shape=(len(teams), len(skill_to_index)))
-#     output_matrix = csr_matrix((output_data, (auth_row, auth_col)), shape=(len(teams), len(member_to_index)+1))
+        for x, y in loader:
+            x = x.to(device=device)
+            y = y.to(device=device)
+            
+            scores = model(x)
+            scores = torch.sigmoid(scores)
+            scores = torch.round(scores)
 
-#     # input_matrix = torch.sparse.LongTensor(torch.LongTensor([input_matrix.tocoo().row.tolist(), input_matrix.tocoo().col.tolist()]), torch.LongTensor(input_matrix.tocoo().data.astype(np.int32)))
-#     # output_matrix = torch.sparse.LongTensor(torch.LongTensor([output_matrix.tocoo().row.tolist(), output_matrix.tocoo().col.tolist()]), torch.LongTensor(output_matrix.tocoo().data.astype(np.int32)))
+            y = y.squeeze(1).cpu().numpy()
+            scores = scores.squeeze(1).cpu().numpy()
 
-#     return input_matrix, output_matrix
+            y_true = np.vstack((y_true, y))
+            y_pred = np.vstack((y_pred, scores))
 
+        auc = roc_auc_score(y_true, y_pred, average='micro', multi_class = "ovr")
+        return str(auc)
 
-# def build_dataset(teams, skill_to_index, member_to_index):
-    
-#     counter = 0
+def cls_rep(loader, model, device):
+    C = loader.dataset.output.shape[1]
+    with torch.no_grad():
+        y_true = torch.empty(0, C)
+        y_pred = torch.empty(0, C)
 
-#     input_data = []
-#     skill_row = []
-#     skill_col = []
+        for x, y in loader:
+            x = x.to(device=device)
+            y = y.to(device=device)
+            
+            scores = model(x)
+            scores = torch.sigmoid(scores)
+            scores = torch.round(scores)
 
-#     output_data = []
-#     auth_row = []
-#     auth_col = []
-    
-#     for doc in teams.values():
+            y = y.squeeze(1).cpu().numpy()
+            scores = scores.squeeze(1).cpu().numpy()
 
-#         inp_fields = doc.get_fields()
-#         for field in inp_fields:
-#             skill_row.append(counter)
-#             skill_col.append(skill_to_index[field])
-#             input_data.append(1)
+            y_true = np.vstack((y_true, y))
+            y_pred = np.vstack((y_pred, scores))
 
-#         out_ids = doc.get_members_ids()
-#         for id in out_ids:
-#             auth_row.append(counter)
-#             auth_col.append(member_to_index[id])
-#             output_data.append(1)
-        
-#         auth_row.append(counter)
-#         auth_col.append(len(member_to_index))
-#         output_data.append(len(out_ids))
+        f1 = classification_report(y_true, y_pred, zero_division=0)
+        return f1
 
-#         counter += 1
+def f_score(loader, model, device, average = 'micro'):
+    C = loader.dataset.output.shape[1]
+    with torch.no_grad():
+        y_true = torch.empty(0, C)
+        y_pred = torch.empty(0, C)
 
-#     # skill_row_tensor = torch.tensor(skill_row)
-#     # skill_col_tensor = torch.tensor(skill_col)
-#     # auth_row_tensor = torch.tensor(auth_row)
-#     # auth_col_tensor = torch.tensor(auth_col)
-#     # input_data_tensor = torch.tensor(input_data)
-#     # output_data_tensor = torch.tensor(output_data)
+        for x, y in loader:
+            x = x.to(device=device)
+            y = y.to(device=device)
+            
+            scores = model(x)
+            scores = torch.sigmoid(scores)
+            scores = torch.round(scores)
 
-#     input_matrix = csr_matrix((input_data, (skill_row, skill_col)), shape=(len(teams), len(skill_to_index)))
-#     output_matrix = csr_matrix((output_data, (auth_row, auth_col)), shape=(len(teams), len(member_to_index)+1))
-#     # input_matrix = torch.sparse_csr_tensor(skill_row_tensor, skill_col_tensor, input_data_tensor)
-#     # output_matrix = torch.sparse_csr_tensor(auth_row_tensor, auth_col_tensor, output_data_tensor)
-#     # input_matrix = torch.sparse_coo_tensor([skill_row_tensor, skill_col_tensor], input_data_tensor)
-#     # output_matrix = torch.sparse_coo_tensor([auth_row_tensor, auth_col_tensor], output_data_tensor)
-#     # input_matrix = torch.sparse_coo_tensor([skill_row, skill_col], input_data)
-#     # output_matrix = torch.sparse_coo_tensor([auth_row, auth_col], output_data)
-    
-    
-#     return input_matrix, output_matrix
+            y = y.squeeze(1).cpu().numpy()
+            scores = scores.squeeze(1).cpu().numpy()
 
+            y_true = np.vstack((y_true, y))
+            y_pred = np.vstack((y_pred, scores))
+        f1 = f1_score(y_true, y_pred, zero_division=0, average=average)
+        return f1
 
-# Check accuracy on training & test to see how good our model
-def check_accuracy(loader, model, device):
-    num_correct = 0
-    num_samples = 0
+def confusion_mat(loader, model, device):
+    C = loader.dataset.output.shape[1]
+    with torch.no_grad():
+        y_true = torch.empty(0, C)
+        y_pred = torch.empty(0, C)
+        for x, y in loader:
+            x = x.to(device=device)
+            y = y.to(device=device)
+            
+            scores = model(x)
+            scores = torch.sigmoid(scores)
+            scores = torch.round(scores)
+
+            y = y.squeeze(1).cpu().numpy()
+            scores = scores.squeeze(1).cpu().numpy()
+
+            y_true = np.vstack((y_true, y))
+            y_pred = np.vstack((y_pred, scores))
+
+        cm = multilabel_confusion_matrix(y_true, y_pred)
+        return cm
+
+def micro_f1(loader, model, device):
+    true_pos = 0
+    true_neg = 0
+    false_pos = 0
+    false_neg = 0
     model.eval()
 
     with torch.no_grad():
@@ -116,10 +171,122 @@ def check_accuracy(loader, model, device):
             x = x.to(device=device)
             y = y.to(device=device)
 
+            N = y.shape[0]
+            C = y.shape[2]
+            
             scores = model(x)
-            _, predictions = scores.max(1)
-            num_correct += (predictions == y).sum()
-            num_samples += predictions.size(0)
+            scores = torch.sigmoid(scores)
+            scores = torch.round(scores)
 
-    model.train()
-    return num_correct/num_samples
+            y = y.squeeze(1).cpu().numpy()
+            scores = scores.squeeze(1).cpu().numpy()
+
+            for i in range(N):
+                for j in range(C):
+                    if y[i,j] == 0.0 and scores[i,j] == 0.0:
+                        true_neg += 1
+                    elif y[i,j] == 1.0 and scores[i,j] == 1.0:
+                        true_pos += 1
+                    elif y[i,j] == 0.0 and scores[i,j] == 1.0:
+                        false_pos += 1
+                    elif y[i,j] == 1.0 and scores[i,j] == 0.0:
+                        false_neg += 1  
+
+            print("true pos", true_pos)
+            print("true neg", true_neg)
+            print("false pos", false_pos)
+            print("false neg", false_neg)  
+                # report all four for each instance
+                # zero all four
+                # average them
+            # accuracy = (scores == y).sum() / (N*C) * 100
+            # accuracy = torch.true_divide((scores == y).sum(),(N*C))
+
+            
+    precision = true_pos/(true_pos+false_pos)
+    recall = true_pos/(true_pos+false_neg)
+    f1_score = 2 * precision * recall / (precision + recall)
+    # model.train()
+    return f1_score
+    # return accuracy
+
+
+def special_f1(loader, model, device):
+    true_pos = 0
+    true_neg = 0
+    false_pos = 0
+    false_neg = 0
+    true_negs = []
+    true_poss = []
+    false_poss = []
+    false_negs = []
+    model.eval()
+
+    with torch.no_grad():
+        
+        for x, y in loader:
+            x = x.to(device=device)
+            y = y.to(device=device)
+
+            N = y.shape[0]
+            C = y.shape[2]
+            
+            scores = model(x)
+            scores = torch.sigmoid(scores)
+            scores = torch.round(scores)
+            
+            # precisions = []
+            # recalls = []
+            # f1s = []
+            y = y.squeeze(1).cpu().numpy()
+            scores = scores.squeeze(1).cpu().numpy()
+            for i in range(N):
+                for j in range(C):
+                    if y[i,j] == 0.0 and scores[i,j] == 0.0:
+                        true_neg += 1
+                    elif y[i,j] == 1.0 and scores[i,j] == 1.0:
+                        true_pos += 1
+                    elif y[i,j] == 0.0 and scores[i,j] == 1.0:
+                        false_pos += 1
+                    elif y[i,j] == 1.0 and scores[i,j] == 0.0:
+                        false_neg += 1   
+
+                true_negs.append(true_neg)
+                true_poss.append(true_pos)
+                false_poss.append(false_pos)
+                false_negs.append(false_neg)
+
+                # precision = true_pos/(true_pos+false_pos)
+                # recall = true_pos/(true_pos+false_neg)
+                # f1_score = 2 * precision * recall / (precision + recall)
+
+                # precisions.append(precision)
+                # recalls.append(recall)
+                # f1s.append(f1_score)
+
+                true_neg, true_pos, false_pos, false_neg = 0, 0, 0, 0
+
+        average_tn = sum(true_negs)/len(true_negs)
+        average_tp = sum(true_poss)/len(true_poss)
+        average_fp = sum(false_poss)/len(false_poss)
+        average_fn = sum(false_negs)/len(false_negs)
+
+        # average_precision = sum(precisions)/len(precisions)
+        # average_recall = sum(recalls)/len(recalls)
+        # average_f1 = sum(f1s)/len(f1s)
+
+        ave_pre = average_tp/(average_tp + average_fp)
+        ave_rec = average_tp/(average_tp + average_fn)
+        ave_f1 = 2 * ave_pre * ave_rec / (ave_pre + ave_rec)
+
+        print(average_tn)
+        print(average_tp)
+        print(average_fp)
+        print(average_fn)
+        # print(average_precision)
+        # print(average_recall)
+        # print(average_f1)
+        print(ave_pre)
+        print(ave_rec)
+        print(ave_f1)        
+            
