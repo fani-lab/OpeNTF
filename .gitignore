@@ -5,3 +5,4 @@ dblp.v12.json
 *.pyc
 tmp.py
 /output
+/data/preprocessed
