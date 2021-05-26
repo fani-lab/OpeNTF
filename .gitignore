@@ -4,5 +4,3 @@ dblp.v12.json
 .idea/
 *.pyc
 tmp.py
-/output
-/data/preprocessed

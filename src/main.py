@@ -13,6 +13,6 @@ index_to_member, member_to_index = Team.build_index_members(all_members)
 index_to_skill, skill_to_index = Team.build_index_skills(teams)
 splits = create_evaluation_splits(len(teams), 5)
 
-dnn.main(splits, teams, skill_to_index, member_to_index, index_to_skill, index_to_member, cmd=['eval', 'test'])
+dnn.main(splits, teams, skill_to_index, member_to_index, index_to_skill, index_to_member, cmd=['train', 'test', 'plot', 'eval'])
 
-# nmt.main(splits, input_data, output_data, cmd=['train', 'eval', 'test'])
+# nmt.main(splits, input_data, output_data, cmd=['train', 'test', 'eval'])
