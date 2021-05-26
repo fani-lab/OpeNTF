@@ -72,13 +72,13 @@ class Team(object):
         pass
 
     @staticmethod
-    def build_dataset_fnn(teams, skill_to_index, member_to_index):
+    def load_sparse_vectors(teams, skill_to_index, member_to_index, output):
         training_size = len(teams)
         BUCKET_SIZE = 100
         SKILL_SIZE = len(skill_to_index)
         AUTHOR_SIZE = len(member_to_index)
         try:
-            data = load_npz(f'./../data/preprocessed/baseline_fnn_data_{training_size}.npz')
+            data = load_npz(output)
         except:
             # Sparse Matrix and bucketing
             data = lil_matrix((training_size, SKILL_SIZE + AUTHOR_SIZE))
@@ -124,8 +124,8 @@ class Team(object):
             if j > -1:
                 data[-j:] = data_[0:j]
 
-            save_npz(f'./../data/preprocessed/baseline_fnn_data_{training_size}.npz', data.tocsr())
+            save_npz(output, data.tocsr())
 
-        input_matrix = data[:, :SKILL_SIZE]
-        output_matrix = data[:, - AUTHOR_SIZE:]
-        return input_matrix, output_matrix
+        skill_sparse_vecs = data[:, :SKILL_SIZE]
+        member_sparse_vecs = data[:, - AUTHOR_SIZE:]
+        return skill_sparse_vecs, member_sparse_vecs
