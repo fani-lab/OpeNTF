@@ -20,10 +20,10 @@ class Document(Team):
         fields = []
         for field in self.fos:
             if field["w"] != 0.0:
-                fields.append(field["name"])
+                fields.append(field["name"].replace(" ", "_"))
         # Extend the fields with keywords
         if len(self.keywords) != 0:
-            fields.extend(self.keywords)
+            fields.extend(self.keywords.replace(" ", "_"))
         return fields
     
     def get_fields(self):
@@ -46,7 +46,7 @@ class Document(Team):
             while True:
                 # Read line by line to not overload the memory
                 line = jf.readline()
-                if not line or (topn and counter > topn):
+                if not line or (topn and counter >= topn):
                     break
 
                 jsonline = json.loads(line.lower().lstrip(","))
@@ -77,10 +77,10 @@ class Document(Team):
 
                     # Retrieve the desired attributes
                     member_id = auth['id']
-                    member_name = auth['name']
+                    member_name = auth['name'].replace(" ", "_")
 
                     if 'org' in auth.keys():
-                        member_org = auth['org']
+                        member_org = auth['org'].replace(" ", "_")
                     else:
                         member_org = ""
 
@@ -99,10 +99,10 @@ class Document(Team):
                 team = Document(id, members, title, year, type, venue, references, fos, keywords)
                 if team.get_uid() not in teams.keys():
                     teams[team.get_uid()] = team
+                else: teams[team.get_uid()+1] = team
 
-                input_data.append(team.get_skills())
-                output_data.append(team.get_members_names())
-
+                input_data.append(" ".join(team.get_skills()))
+                output_data.append(" ".join(team.get_members_names()))
                 counter += 1
-
+        
         return all_members, teams, input_data, output_data

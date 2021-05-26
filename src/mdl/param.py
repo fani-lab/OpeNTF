@@ -7,8 +7,8 @@ import numpy as np
 np.random.seed(0)
 
 fnn = {
-    'd': 100,#size of hidden space
-    'lr': 0.001,#learning rate
+    'd': 300,#size of hidden space
+    'lr': 0.01,#learning rate
     'b': 100, #batch
-    'e': 5, #epochs
+    'e': 50, #epochs
 }
