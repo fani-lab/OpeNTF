@@ -24,26 +24,24 @@ def weighted_cross_entropy_with_logits(logits, targets, pos_weight = 2.5):
 # Set device cuda for GPU if it's available otherwise run on the CPU
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-num_nodes = mdl.param.fnn['d']
-learning_rate = mdl.param.fnn['lr']
-batch_size = mdl.param.fnn['b']
-num_epochs = mdl.param.fnn['e']
+def learn(index_to_skill, index_to_member, splits, skill_sparse_vecs, member_sparse_vecs, params, output):
 
-def learn(teams, skill_to_index, member_to_index, index_to_skill, index_to_member, splits):
-    input_matrix, output_matrix = Team.build_dataset_fnn(teams, skill_to_index, member_to_index)
-    
+    num_nodes = params['d']
+    learning_rate = params['lr']
+    batch_size = params['b']
+    num_epochs = params['e']
+
+    output = f"{output}/nt{skill_sparse_vecs.shape[0]}_is{len(index_to_skill)}_os{len(index_to_member)}_nn{num_nodes}_lr{learning_rate}_bs{batch_size}_ne{num_epochs}"
+
     # Retrieving some of the required information for the model
-    number_of_teams = len(teams)
     input_size = len(index_to_skill)
     output_size = len(index_to_member)
     
     # Specify a path for the model
-    PATH = f"../output/fnn/nt{number_of_teams}_is{input_size}_os{output_size}_nn{num_nodes}_lr{learning_rate}_bs{batch_size}_ne{num_epochs}"
-    if not os.path.isdir(PATH): os.mkdir(PATH)
+    if not os.path.isdir(output): os.mkdir(output)
     else:
         print("This model already exists")
-        return input_matrix, output_matrix, PATH
-
+        return output
 
     # Prime a dict for train and valid loss
     train_valid_loss = dict()
@@ -53,10 +51,10 @@ def learn(teams, skill_to_index, member_to_index, index_to_skill, index_to_membe
     # Training K-fold
     for foldidx in splits['folds'].keys():
         # Retrieving the folds
-        X_train = input_matrix[splits['folds'][foldidx]['train'], :]
-        y_train = output_matrix[splits['folds'][foldidx]['train']]
-        X_valid = input_matrix[splits['folds'][foldidx]['valid'], :]
-        y_valid = output_matrix[splits['folds'][foldidx]['valid']]
+        X_train = skill_sparse_vecs[splits['folds'][foldidx]['train'], :]
+        y_train = member_sparse_vecs[splits['folds'][foldidx]['train']]
+        X_valid = skill_sparse_vecs[splits['folds'][foldidx]['valid'], :]
+        y_valid = member_sparse_vecs[splits['folds'][foldidx]['valid']]
 
         # Building custom dataset
         training_matrix = TFDataset(X_train, y_train)
@@ -137,19 +135,19 @@ def learn(teams, skill_to_index, member_to_index, index_to_skill, index_to_membe
             scheduler.step(valid_running_loss/X_valid.shape[0])
 
          
-        model_path = f"{PATH}/state_dict_model_{foldidx}.pt"
+        model_path = f"{output}/state_dict_model_{foldidx}.pt"
     
         # Save
         torch.save(model.state_dict(), model_path)
         train_valid_loss[foldidx]['train'] = train_loss_values
         train_valid_loss[foldidx]['valid'] = valid_loss_values
 
-    plot_path = f"{PATH}/train_valid_loss.json"
+    plot_path = f"{output}/train_valid_loss.json"
     
     with open(plot_path, 'w') as outfile:
         json.dump(train_valid_loss, outfile)
 
-    return input_matrix, output_matrix, PATH
+    return output
 
 def plot(plot_path):
     with open(plot_path) as infile:
@@ -161,16 +159,16 @@ def plot(plot_path):
         plt.title(f'Training and Validation Loss for fold #{foldidx}')
         plt.show()  
 
-def eval(PATH, splits, input_matrix, output_matrix, index_to_skill, index_to_member):
-    if not os.path.isdir(PATH):
+def eval(model_path, splits, input_matrix, output_matrix, index_to_skill, index_to_member, batch_size):
+    if not os.path.isdir(model_path):
         print("The model does not exist!")
         return
     input_size = len(index_to_skill)
     output_size = len(index_to_member)    
     
-    auc_path = f"{PATH}/train_valid_auc.json"
+    auc_path = f"{model_path}/train_valid_auc.json"
     if os.path.isfile(auc_path):
-        print(f"Reports can be found in: {PATH}")
+        print(f"Reports can be found in: {model_path}")
         return
 
     # Initialize auc dictionary
@@ -192,9 +190,8 @@ def eval(PATH, splits, input_matrix, output_matrix, index_to_skill, index_to_mem
         training_dataloader = DataLoader(training_matrix, batch_size=batch_size, shuffle=True, num_workers=0)
         validation_dataloader = DataLoader(validation_matrix, batch_size=batch_size, shuffle=True, num_workers=0)
 
-        model_path = f'{PATH}/state_dict_model_{foldidx}.pt'
         model = FNN(input_size=input_size, output_size=output_size, param=mdl.param.fnn).to(device)
-        model.load_state_dict(torch.load(model_path))
+        model.load_state_dict(torch.load(f'{model_path}/state_dict_model_{foldidx}.pt'))
         model.eval()
         
 
@@ -205,7 +202,7 @@ def eval(PATH, splits, input_matrix, output_matrix, index_to_skill, index_to_mem
         auc[foldidx]['valid'] = auc_valid
 
         # Measure Precision, recall, and F1 and save to txt
-        train_rep_path = f'{PATH}/train_rep_{foldidx}.txt'
+        train_rep_path = f'{model_path}/train_rep_{foldidx}.txt'
         if not os.path.isfile(train_rep_path):
             cls = cls_rep(training_dataloader, model, device)
             with open(train_rep_path, 'w') as outfile:
@@ -216,7 +213,7 @@ def eval(PATH, splits, input_matrix, output_matrix, index_to_skill, index_to_mem
         
         print(f"Training report of fold{foldidx}:\n", cls)
 
-        valid_rep_path = f'{PATH}/valid_rep_{foldidx}.txt'
+        valid_rep_path = f'{model_path}/valid_rep_{foldidx}.txt'
         if not os.path.isfile(valid_rep_path):
             cls = cls_rep(validation_dataloader, model, device)
             with open(valid_rep_path, 'w') as outfile:
@@ -230,15 +227,15 @@ def eval(PATH, splits, input_matrix, output_matrix, index_to_skill, index_to_mem
     with open(auc_path, 'w') as outfile:
         json.dump(auc, outfile)
 
-def test(PATH, splits, input_matrix, output_matrix, index_to_skill, index_to_member):
-    if not os.path.isdir(PATH):
+def test(model_path, splits, input_matrix, output_matrix, index_to_skill, index_to_member, batch_size):
+    if not os.path.isdir(model_path):
         print("The model does not exist!")
         return
 
-    auc_path = f"{PATH}/test_auc.json"
+    auc_path = f"{model_path}/test_auc.json"
 
     if os.path.isfile(auc_path):
-        print(f"Reports can be found in: {PATH}")
+        print(f"Reports can be found in: {model_path}")
         return
 
     input_size = len(index_to_skill)
@@ -258,9 +255,8 @@ def test(PATH, splits, input_matrix, output_matrix, index_to_skill, index_to_mem
         auc[foldidx] = ""
     
     for foldidx in splits['folds'].keys():
-        model_path = f'{PATH}/state_dict_model_{foldidx}.pt'
         model = FNN(input_size=input_size, output_size=output_size, param=mdl.param.fnn).to(device)
-        model.load_state_dict(torch.load(model_path))
+        model.load_state_dict(torch.load(f'{model_path}/state_dict_model_{foldidx}.pt'))
         model.eval()
 
         # Measure AUC for each fold and store in dict to later save as json
@@ -268,7 +264,7 @@ def test(PATH, splits, input_matrix, output_matrix, index_to_skill, index_to_mem
         auc[foldidx] = auc_test
 
         # Measure Precision, recall, and F1 and save to txt
-        test_rep_path = f'{PATH}/test_rep_{foldidx}.txt'
+        test_rep_path = f'{model_path}/test_rep_{foldidx}.txt'
         if not os.path.isfile(test_rep_path):
             cls = cls_rep(test_dataloader, model, device)
             with open(test_rep_path, 'w') as outfile:
@@ -282,17 +278,20 @@ def test(PATH, splits, input_matrix, output_matrix, index_to_skill, index_to_mem
     with open(auc_path, 'w') as outfile:
         json.dump(auc, outfile)
 
-def main(splits, teams, skill_to_index, member_to_index, index_to_skill, index_to_member, cmd=['plot', 'eval', 'test']):
-    # if 'train' in cmd or 'eval' in cmd:
-    input_matrix, output_matrix, PATH = learn(teams, skill_to_index, member_to_index, index_to_skill, index_to_member, splits)
-   
+def main(splits, teams, skill_to_index, member_to_index, index_to_skill, index_to_member, cmd=['train', 'test', 'plot', 'eval']):
+    skill_sparse_vecs, member_sparse_vecs = Team.load_sparse_vectors(teams, skill_to_index, member_to_index, f'../data/preprocessed/sparse_vecs_{len(teams)}.npz')
+
+    # if 'train' in cmd:
+    output = learn(index_to_skill, index_to_member, splits, skill_sparse_vecs, member_sparse_vecs, mdl.param.fnn, f'../output/fnn')
+
+    if 'test' in cmd:
+        test(output, splits, skill_sparse_vecs, member_sparse_vecs, index_to_skill, index_to_member, mdl.param.fnn['b'])
+
     if 'plot' in cmd:
-        plot_path = f"{PATH}/train_valid_loss.json"
+        plot_path = f"{output}/train_valid_loss.json"
         plot(plot_path)
 
     if 'eval' in cmd:
-        eval(PATH, splits, input_matrix, output_matrix, index_to_skill, index_to_member)
+        eval(output, splits, skill_sparse_vecs, member_sparse_vecs, index_to_skill, index_to_member, mdl.param.fnn['b'])
         # eval_phase(PATH, splits, phases = ['train'])
 
-    if 'test' in cmd:
-        test(PATH, splits, input_matrix, output_matrix, index_to_skill, index_to_member)
