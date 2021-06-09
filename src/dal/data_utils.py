@@ -7,7 +7,7 @@ import mdl.param
 import numpy as np
 
 def create_evaluation_splits(n_sample, n_folds):
-    train, test = train_test_split(np.arange(n_sample), train_size=0.9, test_size=0.1, random_state=0, shuffle=True)
+    train, test = train_test_split(np.arange(n_sample), train_size=0.85, test_size=0.15, random_state=0, shuffle=True)
     splits = dict()
     splits['test'] = test
     splits['folds'] = dict()

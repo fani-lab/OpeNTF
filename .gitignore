@@ -1,6 +1,13 @@
-dblp.v12.json
 /.ipynb_checkpoints
 /.vscode
 .idea/
+*.json
 *.pyc
+*.npz
+*.pt
+*.txt
+*.csv
+*.yml
+*.src
+*.tgt
 tmp.py

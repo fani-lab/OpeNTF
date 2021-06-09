@@ -10,16 +10,30 @@ import matplotlib.pyplot as plt
 from cmn.team import Team
 import mdl.param
 from dal.data_utils import *
-from mdl.fnn import FNN
+from mdl.skipgram import SGNS
 from mdl.custom_dataset import TFDataset
 from torch.optim.lr_scheduler import StepLR, ReduceLROnPlateau
 import csv
 import ast
+import random
 
 
 def weighted_cross_entropy_with_logits(logits, targets, pos_weight = 2.5):
     return -targets * torch.log(torch.sigmoid(logits)) * pos_weight + (1 - targets) * -torch.log(1 - torch.sigmoid(logits))
 
+def sgns_with_logits(logits, targets, neg_samples = 5):
+    targets = targets.squeeze(1)
+    logits = logits.squeeze(1)
+    random_samples = torch.zeros_like(targets)
+    for b in range(targets.shape[0]):
+        cor_idx = torch.nonzero(targets[b], as_tuple = True)[0]
+        for i in range(neg_samples):
+            idx = random.randint(0, targets.shape[1]- 1)
+
+            if idx not in cor_idx:
+                random_samples[b][idx] = 1
+
+    return -targets * torch.log(torch.sigmoid(logits)) - random_samples * torch.log(torch.sigmoid(-logits))
 
 # Set device cuda for GPU if it's available otherwise run on the CPU
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -30,11 +44,11 @@ def learn(index_to_skill, index_to_member, splits, skill_sparse_vecs, member_spa
     learning_rate = params['lr']
     batch_size = params['b']
     num_epochs = params['e']
-
+    ns = params['ns']
     # Build a folder for this model for the first time
     if not os.path.isdir(output): os.mkdir(output)
     print(skill_sparse_vecs.shape)
-    output = f"{output}/nt{skill_sparse_vecs.shape[0]}_is{len(index_to_skill)}_os{len(index_to_member)}_nn{num_nodes}_lr{learning_rate}_bs{batch_size}_ne{num_epochs}"
+    output = f"{output}/ns{ns}_nt{skill_sparse_vecs.shape[0]}_is{len(index_to_skill)}_os{len(index_to_member)}_nn{num_nodes}_lr{learning_rate}_bs{batch_size}_ne{num_epochs}"
 
     # Retrieving some of the required information for the model
     input_size = len(index_to_skill)
@@ -70,7 +84,7 @@ def learn(index_to_skill, index_to_member, splits, skill_sparse_vecs, member_spa
         data_loaders = {"train": training_dataloader, "val": validation_dataloader}
 
         # Initialize network
-        model = FNN(input_size=input_size, output_size=output_size, param=mdl.param.fnn).to(device)
+        model = SGNS(input_size=input_size, output_size=output_size, param=mdl.param.sgns).to(device)
 
 
         # Loss and optimizer
@@ -112,9 +126,9 @@ def learn(index_to_skill, index_to_member, splits, skill_sparse_vecs, member_spa
                     targets = targets.float().to(device=device)
 
                     # forward
-                    scores = model(data)
+                    logits = model(data)
 
-                    loss = weighted_cross_entropy_with_logits(scores, targets)
+                    loss = sgns_with_logits(logits, targets, ns)
                     print(loss.sum().item())
                     
                     # Summing the loss of mini-batches
@@ -193,7 +207,7 @@ def eval(model_path, splits, input_matrix, output_matrix, index_to_skill, index_
         training_dataloader = DataLoader(training_matrix, batch_size=batch_size, shuffle=True, num_workers=0)
         validation_dataloader = DataLoader(validation_matrix, batch_size=batch_size, shuffle=True, num_workers=0)
 
-        model = FNN(input_size=input_size, output_size=output_size, param=mdl.param.fnn).to(device)
+        model = SGNS(input_size=input_size, output_size=output_size, param=mdl.param.sgns).to(device)
         model.load_state_dict(torch.load(f'{model_path}/state_dict_model_{foldidx}.pt'))
         model.eval()
         
@@ -214,7 +228,7 @@ def eval(model_path, splits, input_matrix, output_matrix, index_to_skill, index_
             with open(train_rep_path, 'r') as infile:
                 cls = infile.read()
         
-        print(f"Training report of fold{foldidx}:\n", cls)
+        # print(f"Training report of fold{foldidx}:\n", cls)
 
         valid_rep_path = f'{model_path}/valid_rep_{foldidx}.txt'
         if not os.path.isfile(valid_rep_path):
@@ -225,7 +239,7 @@ def eval(model_path, splits, input_matrix, output_matrix, index_to_skill, index_
             with open(valid_rep_path, 'r') as infile:
                 cls = infile.read()
 
-        print(f"Validation report of fold{foldidx}:\n", cls)
+        # print(f"Validation report of fold{foldidx}:\n", cls)
 
     with open(auc_path, 'w') as outfile:
         json.dump(auc, outfile)
@@ -238,8 +252,8 @@ def test(model_path, splits, input_matrix, output_matrix, index_to_skill, index_
     auc_path = f"{model_path}/test_auc.json"
 
     # if os.path.isfile(auc_path):
-        # print(f"Reports can be found in: {model_path}")
-        # return
+    #     print(f"Reports can be found in: {model_path}")
+    #     return
 
     input_size = len(index_to_skill)
     output_size = len(index_to_member)  
@@ -258,7 +272,7 @@ def test(model_path, splits, input_matrix, output_matrix, index_to_skill, index_
         auc[foldidx] = ""
     
     for foldidx in splits['folds'].keys():
-        model = FNN(input_size=input_size, output_size=output_size, param=mdl.param.fnn).to(device)
+        model = SGNS(input_size=input_size, output_size=output_size, param=mdl.param.sgns).to(device)
         model.load_state_dict(torch.load(f'{model_path}/state_dict_model_{foldidx}.pt'))
         model.eval()
 
@@ -291,16 +305,16 @@ def main(splits, teams, skill_to_index, member_to_index, index_to_skill, index_t
     skill_sparse_vecs, member_sparse_vecs = Team.load_sparse_vectors(teams, skill_to_index, member_to_index, f'../data/preprocessed/named_toy/sparse_vecs_{len(teams)}.npz')
 
     # if 'train' in cmd:
-    output = learn(index_to_skill, index_to_member, splits, skill_sparse_vecs, member_sparse_vecs, mdl.param.fnn, f'../output/named_toy/fnn')
+    output = learn(index_to_skill, index_to_member, splits, skill_sparse_vecs, member_sparse_vecs, mdl.param.sgns, f'../output/named_toy/sgns')
 
     if 'test' in cmd:
-        test(output, splits, skill_sparse_vecs, member_sparse_vecs, index_to_skill, index_to_member, mdl.param.fnn['b'])
+        test(output, splits, skill_sparse_vecs, member_sparse_vecs, index_to_skill, index_to_member, mdl.param.sgns['b'])
 
     if 'plot' in cmd:
         plot_path = f"{output}/train_valid_loss.json"
         plot(plot_path)
 
     if 'eval' in cmd:
-        eval(output, splits, skill_sparse_vecs, member_sparse_vecs, index_to_skill, index_to_member, mdl.param.fnn['b'])
+        eval(output, splits, skill_sparse_vecs, member_sparse_vecs, index_to_skill, index_to_member, mdl.param.sgns['b'])
         # eval_phase(PATH, splits, phases = ['train'])
 
