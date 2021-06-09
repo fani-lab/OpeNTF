@@ -1,6 +1,6 @@
 import json
 import traceback
-
+import random
 from cmn.member import Member
 from cmn.author import Author
 from cmn.team import Team
@@ -94,7 +94,7 @@ class Document(Team):
                     team = Document(id, members, title, year, type, venue, references, fos, keywords)
                     if team.get_uid() not in teams.keys():
                         teams[team.get_uid()] = team
-                    else: teams[team.get_uid()+1] = team
+                    else: teams[team.get_uid()+random.randint(0,100000)] = team
 
                     input_data.append(" ".join(team.get_skills()))
                     output_data.append(" ".join(team.get_members_names()))
