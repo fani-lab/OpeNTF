@@ -9,7 +9,7 @@ torch.cuda.manual_seed_all(0)
 np.random.seed(0)
 
 fnn = {
-    'd': 25,  # size of hidden space
+    'd': 50,  # size of hidden space
     'lr': 0.1,  # learning rate
     'b': 3,  # batch
     'e': 50000,  # epochs
