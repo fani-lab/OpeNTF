@@ -190,56 +190,62 @@ def eval(model_path, splits, input_matrix, output_matrix, index_to_skill, index_
 
     # Initialize auc dictionary
     auc = dict()
-    for foldidx in splits['folds'].keys():
-        auc[foldidx] = {'train' : "", 'valid' : ""} 
+    with open(f"{model_path}/train_valid_loss.json", 'r') as infile:
+        data = json.load(infile)
+        for foldidx in splits['folds'].keys():
+            if np.any(np.isnan(data[str(foldidx)]["train"])): continue
+            auc[foldidx] = {'train' : "", 'valid' : ""}
 
 
     # Load
-    for foldidx in splits['folds'].keys():
-        X_train = input_matrix[splits['folds'][foldidx]['train'], :]
-        y_train = output_matrix[splits['folds'][foldidx]['train']]
-        X_valid = input_matrix[splits['folds'][foldidx]['valid'], :]
-        y_valid = output_matrix[splits['folds'][foldidx]['valid']]
+    with open(f"{model_path}/train_valid_loss.json", 'r') as infile:
+        data = json.load(infile)
+        for foldidx in splits['folds'].keys():
+            if np.any(np.isnan(data[str(foldidx)]["train"])): continue
+            X_train = input_matrix[splits['folds'][foldidx]['train'], :]
+            y_train = output_matrix[splits['folds'][foldidx]['train']]
+            X_valid = input_matrix[splits['folds'][foldidx]['valid'], :]
+            y_valid = output_matrix[splits['folds'][foldidx]['valid']]
 
-        training_matrix = TFDataset(X_train, y_train)
-        validation_matrix = TFDataset(X_valid, y_valid)
+            training_matrix = TFDataset(X_train, y_train)
+            validation_matrix = TFDataset(X_valid, y_valid)
 
-        training_dataloader = DataLoader(training_matrix, batch_size=batch_size, shuffle=True, num_workers=0)
-        validation_dataloader = DataLoader(validation_matrix, batch_size=batch_size, shuffle=True, num_workers=0)
+            training_dataloader = DataLoader(training_matrix, batch_size=batch_size, shuffle=True, num_workers=0)
+            validation_dataloader = DataLoader(validation_matrix, batch_size=batch_size, shuffle=True, num_workers=0)
 
-        model = SGNS(input_size=input_size, output_size=output_size, param=mdl.param.sgns).to(device)
-        model.load_state_dict(torch.load(f'{model_path}/state_dict_model_{foldidx}.pt'))
-        model.eval()
-        
+            model = SGNS(input_size=input_size, output_size=output_size, param=mdl.param.sgns).to(device)
+            model.load_state_dict(torch.load(f'{model_path}/state_dict_model_{foldidx}.pt'))
+            model.eval()
+            
 
-        # Measure AUC for each fold and store in dict to later save as json
-        auc_train = roc_auc(training_dataloader, model, device)
-        auc_valid = roc_auc(validation_dataloader, model, device)
-        auc[foldidx]['train'] = auc_train
-        auc[foldidx]['valid'] = auc_valid
+            # Measure AUC for each fold and store in dict to later save as json
+            auc_train = roc_auc(training_dataloader, model, device)
+            auc_valid = roc_auc(validation_dataloader, model, device)
+            auc[foldidx]['train'] = auc_train
+            auc[foldidx]['valid'] = auc_valid
 
-        # Measure Precision, recall, and F1 and save to txt
-        train_rep_path = f'{model_path}/train_rep_{foldidx}.txt'
-        if not os.path.isfile(train_rep_path):
-            cls = cls_rep(training_dataloader, model, device)
-            with open(train_rep_path, 'w') as outfile:
-                outfile.write(cls)
-        else:
-            with open(train_rep_path, 'r') as infile:
-                cls = infile.read()
-        
-        print(f"Training report of fold{foldidx}:\n", cls)
+            # Measure Precision, recall, and F1 and save to txt
+            train_rep_path = f'{model_path}/train_rep_{foldidx}.txt'
+            if not os.path.isfile(train_rep_path):
+                cls = cls_rep(training_dataloader, model, device)
+                with open(train_rep_path, 'w') as outfile:
+                    outfile.write(cls)
+            else:
+                with open(train_rep_path, 'r') as infile:
+                    cls = infile.read()
+            
+            print(f"Training report of fold{foldidx}:\n", cls)
 
-        valid_rep_path = f'{model_path}/valid_rep_{foldidx}.txt'
-        if not os.path.isfile(valid_rep_path):
-            cls = cls_rep(validation_dataloader, model, device)
-            with open(valid_rep_path, 'w') as outfile:
-                outfile.write(cls)
-        else:
-            with open(valid_rep_path, 'r') as infile:
-                cls = infile.read()
+            valid_rep_path = f'{model_path}/valid_rep_{foldidx}.txt'
+            if not os.path.isfile(valid_rep_path):
+                cls = cls_rep(validation_dataloader, model, device)
+                with open(valid_rep_path, 'w') as outfile:
+                    outfile.write(cls)
+            else:
+                with open(valid_rep_path, 'r') as infile:
+                    cls = infile.read()
 
-        print(f"Validation report of fold{foldidx}:\n", cls)
+            print(f"Validation report of fold{foldidx}:\n", cls)
 
     with open(auc_path, 'w') as outfile:
         json.dump(auc, outfile)
@@ -268,29 +274,36 @@ def test(model_path, splits, input_matrix, output_matrix, index_to_skill, index_
     
     # Initialize auc dictionary
     auc = dict()
-    for foldidx in splits['folds'].keys():
-        auc[foldidx] = ""
     
-    for foldidx in splits['folds'].keys():
-        model = SGNS(input_size=input_size, output_size=output_size, param=mdl.param.sgns).to(device)
-        model.load_state_dict(torch.load(f'{model_path}/state_dict_model_{foldidx}.pt'))
-        model.eval()
+    with open(f"{model_path}/train_valid_loss.json", 'r') as infile:
+        data = json.load(infile)
+        for foldidx in splits['folds'].keys():
+            if np.any(np.isnan(data[str(foldidx)]["train"])): continue
+            auc[foldidx] = ""
 
-        # Measure AUC for each fold and store in dict to later save as json
-        auc_test = roc_auc(test_dataloader, model, device)
-        auc[foldidx] = auc_test
+    with open(f"{model_path}/train_valid_loss.json", 'r') as infile:
+        data = json.load(infile)
+        for foldidx in splits['folds'].keys():
+            if np.any(np.isnan(data[str(foldidx)]["train"])): continue
+            model = SGNS(input_size=input_size, output_size=output_size, param=mdl.param.sgns).to(device)
+            model.load_state_dict(torch.load(f'{model_path}/state_dict_model_{foldidx}.pt'))
+            model.eval()
 
-        # Measure Precision, recall, and F1 and save to txt
-        test_rep_path = f'{model_path}/test_rep_{foldidx}.txt'
-        if not os.path.isfile(test_rep_path):
-            cls = cls_rep(test_dataloader, model, device)
-            with open(test_rep_path, 'w') as outfile:
-                outfile.write(cls)
-        else:
-            with open(test_rep_path, 'r') as infile:
-                cls = infile.read()
-        
-        print(f"Test report of fold{foldidx}:\n", cls)
+            # Measure AUC for each fold and store in dict to later save as json
+            auc_test = roc_auc(test_dataloader, model, device)
+            auc[foldidx] = auc_test
+
+            # Measure Precision, recall, and F1 and save to txt
+            test_rep_path = f'{model_path}/test_rep_{foldidx}.txt'
+            if not os.path.isfile(test_rep_path):
+                cls = cls_rep(test_dataloader, model, device)
+                with open(test_rep_path, 'w') as outfile:
+                    outfile.write(cls)
+            else:
+                with open(test_rep_path, 'r') as infile:
+                    cls = infile.read()
+            
+            print(f"Test report of fold{foldidx}:\n", cls)
 
     auc_values = list(map(float, list(auc.values())))
     auc_mean = np.mean(auc_values)
