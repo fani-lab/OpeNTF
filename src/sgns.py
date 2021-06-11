@@ -47,7 +47,7 @@ def learn(index_to_skill, index_to_member, splits, skill_sparse_vecs, member_spa
     ns = params['ns']
     # Build a folder for this model for the first time
     if not os.path.isdir(output): os.mkdir(output)
-    print(skill_sparse_vecs.shape)
+
     output = f"{output}/ns{ns}_nt{skill_sparse_vecs.shape[0]}_is{len(index_to_skill)}_os{len(index_to_member)}_nn{num_nodes}_lr{learning_rate}_bs{batch_size}_ne{num_epochs}"
 
     # Retrieving some of the required information for the model
@@ -228,7 +228,7 @@ def eval(model_path, splits, input_matrix, output_matrix, index_to_skill, index_
             with open(train_rep_path, 'r') as infile:
                 cls = infile.read()
         
-        # print(f"Training report of fold{foldidx}:\n", cls)
+        print(f"Training report of fold{foldidx}:\n", cls)
 
         valid_rep_path = f'{model_path}/valid_rep_{foldidx}.txt'
         if not os.path.isfile(valid_rep_path):
@@ -239,7 +239,7 @@ def eval(model_path, splits, input_matrix, output_matrix, index_to_skill, index_
             with open(valid_rep_path, 'r') as infile:
                 cls = infile.read()
 
-        # print(f"Validation report of fold{foldidx}:\n", cls)
+        print(f"Validation report of fold{foldidx}:\n", cls)
 
     with open(auc_path, 'w') as outfile:
         json.dump(auc, outfile)
@@ -251,9 +251,9 @@ def test(model_path, splits, input_matrix, output_matrix, index_to_skill, index_
 
     auc_path = f"{model_path}/test_auc.json"
 
-    # if os.path.isfile(auc_path):
-    #     print(f"Reports can be found in: {model_path}")
-    #     return
+    if os.path.isfile(auc_path):
+        print(f"Reports can be found in: {model_path}")
+        return
 
     input_size = len(index_to_skill)
     output_size = len(index_to_member)  
