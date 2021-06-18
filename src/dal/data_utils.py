@@ -1,10 +1,10 @@
 import torch
 import numpy as np
-from datetime import datetime
 from sklearn.metrics import multilabel_confusion_matrix, f1_score, classification_report, roc_auc_score, precision_recall_curve, auc
 from sklearn.model_selection import train_test_split, KFold
 import mdl.param
-import numpy as np
+from sklearn.metrics import roc_curve
+import matplotlib.pyplot as plt
 
 def create_evaluation_splits(n_sample, n_folds):
     train, test = train_test_split(np.arange(n_sample), train_size=0.85, test_size=0.15, random_state=0, shuffle=True)
@@ -18,6 +18,82 @@ def create_evaluation_splits(n_sample, n_folds):
         splits['folds'][k]['valid'] = train[validIdx]
 
     return splits
+
+# def plot_roc(loader, model, device):
+#     C = loader.dataset.output.shape[1]
+#     with torch.no_grad():
+#         y_true = torch.empty(0, C)
+#         y_pred = torch.empty(0, C)
+#
+#         for x, y in loader:
+#             x = x.to(device=device)
+#             y = y.to(device=device)
+#
+#             scores = model(x)
+#             scores = torch.sigmoid(scores)
+#             scores = torch.round(scores)
+#
+#             y = y.squeeze(1).cpu().numpy()
+#             scores = scores.squeeze(1).cpu().numpy()
+#
+#             y_true = np.vstack((y_true, y))
+#             y_pred = np.vstack((y_pred, scores))
+#
+#         fpr, tpr, _ = roc_curve(y_true, y_pred)
+#         plt.plot(fpr, tpr, 'k-')
+#
+#         # plt.xlabel('Number of nodes')
+#         # plt.ylabel('AUC')
+#         # plt.title('lr = 0.01')
+#         # plt.legend()
+#         plt.show()
+
+def roc_auc(loader, model, device):
+    C = loader.dataset.output.shape[1]
+    with torch.no_grad():
+        y_true = torch.empty(0, C)
+        y_pred = torch.empty(0, C)
+
+        for x, y in loader:
+            x = x.to(device=device)
+            y = y.to(device=device)
+
+            scores = model(x)
+            scores = torch.sigmoid(scores)
+            scores = torch.round(scores)
+
+            y = y.squeeze(1).cpu().numpy()
+            scores = scores.squeeze(1).cpu().numpy()
+
+            y_true = np.vstack((y_true, y))
+            y_pred = np.vstack((y_pred, scores))
+
+        auc = roc_auc_score(y_true, y_pred, average='micro', multi_class="ovr")
+        return str(auc)
+
+
+def cls_rep(loader, model, device):
+    C = loader.dataset.output.shape[1]
+    with torch.no_grad():
+        y_true = torch.empty(0, C)
+        y_pred = torch.empty(0, C)
+
+        for x, y in loader:
+            x = x.to(device=device)
+            y = y.to(device=device)
+
+            scores = model(x)
+            scores = torch.sigmoid(scores)
+            scores = torch.round(scores)
+
+            y = y.squeeze(1).cpu().numpy()
+            scores = scores.squeeze(1).cpu().numpy()
+
+            y_true = np.vstack((y_true, y))
+            y_pred = np.vstack((y_pred, scores))
+
+        f1 = classification_report(y_true, y_pred, zero_division=0)
+        return f1
 
 
 def eval_metrics(loader, model, device):
@@ -45,6 +121,7 @@ def eval_metrics(loader, model, device):
         return str(auc), cls_rep
 
 
+
 def prc_auc(loader, model, device):
     C = loader.dataset.output.shape[1]
     with torch.no_grad():
@@ -69,51 +146,6 @@ def prc_auc(loader, model, device):
         auc = auc(precision, recall)
         return auc
 
-def roc_auc(loader, model, device):
-    C = loader.dataset.output.shape[1]
-    with torch.no_grad():
-        y_true = torch.empty(0, C)
-        y_pred = torch.empty(0, C)
-
-        for x, y in loader:
-            x = x.to(device=device)
-            y = y.to(device=device)
-            
-            scores = model(x)
-            scores = torch.sigmoid(scores)
-            scores = torch.round(scores)
-
-            y = y.squeeze(1).cpu().numpy()
-            scores = scores.squeeze(1).cpu().numpy()
-
-            y_true = np.vstack((y_true, y))
-            y_pred = np.vstack((y_pred, scores))
-
-        auc = roc_auc_score(y_true, y_pred, average='micro', multi_class = "ovr")
-        return str(auc)
-
-def cls_rep(loader, model, device):
-    C = loader.dataset.output.shape[1]
-    with torch.no_grad():
-        y_true = torch.empty(0, C)
-        y_pred = torch.empty(0, C)
-
-        for x, y in loader:
-            x = x.to(device=device)
-            y = y.to(device=device)
-            
-            scores = model(x)
-            scores = torch.sigmoid(scores)
-            scores = torch.round(scores)
-
-            y = y.squeeze(1).cpu().numpy()
-            scores = scores.squeeze(1).cpu().numpy()
-
-            y_true = np.vstack((y_true, y))
-            y_pred = np.vstack((y_pred, scores))
-
-        f1 = classification_report(y_true, y_pred, zero_division=0)
-        return f1
 
 def f_score(loader, model, device, average = 'micro'):
     C = loader.dataset.output.shape[1]
@@ -137,6 +169,7 @@ def f_score(loader, model, device, average = 'micro'):
         f1 = f1_score(y_true, y_pred, zero_division=0, average=average)
         return f1
 
+
 def confusion_mat(loader, model, device):
     C = loader.dataset.output.shape[1]
     with torch.no_grad():
@@ -158,6 +191,7 @@ def confusion_mat(loader, model, device):
 
         cm = multilabel_confusion_matrix(y_true, y_pred)
         return cm
+
 
 def micro_f1(loader, model, device):
     true_pos = 0
@@ -288,5 +322,4 @@ def special_f1(loader, model, device):
         # print(average_f1)
         print(ave_pre)
         print(ave_rec)
-        print(ave_f1)        
-            
+        print(ave_f1)
