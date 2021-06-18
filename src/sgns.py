@@ -16,7 +16,9 @@ from torch.optim.lr_scheduler import StepLR, ReduceLROnPlateau
 import csv
 import ast
 import random
+import time
 
+random.seed(0)
 
 def weighted_cross_entropy_with_logits(logits, targets, pos_weight = 2.5):
     return -targets * torch.log(torch.sigmoid(logits)) * pos_weight + (1 - targets) * -torch.log(1 - torch.sigmoid(logits))
@@ -65,6 +67,7 @@ def learn(index_to_skill, index_to_member, splits, skill_sparse_vecs, member_spa
     for i in range(len(splits['folds'].keys())):
         train_valid_loss[i] = {'train' : [], 'valid' : []}
 
+    start_time = time.time()
     # Training K-fold
     for foldidx in splits['folds'].keys():
         # Retrieving the folds
@@ -103,10 +106,13 @@ def learn(index_to_skill, index_to_member, splits, skill_sparse_vecs, member_spa
         train_loss_values = []
         valid_loss_values = []
 
+        print(f"Fold {foldidx}")
+        fold_time = time.time()
         # Train Network
         for epoch in range(num_epochs):
-            print('Epoch {}/{}'.format(epoch+1, num_epochs))
+            print(f'Epoch {epoch+1}/{num_epochs}')
             print('-' * 15)
+            print(f"{time.time() - fold_time} seconds has passed for this fold, and {time.time() - start_time} seconds has passed overall.")
 
             train_running_loss = 0.0    
             valid_running_loss = 0.0
@@ -126,10 +132,10 @@ def learn(index_to_skill, index_to_member, splits, skill_sparse_vecs, member_spa
                     targets = targets.float().to(device=device)
 
                     # forward
-                    logits = model(data)
-
-                    loss = sgns_with_logits(logits, targets, ns)
-                    print(loss.sum().item())
+                    scores = model(data)
+                    print("this is the score:", scores.sum().item())
+                    loss = sgns_with_logits(scores, targets, ns)
+                    print("this is the loss:", loss.sum().item())
                     
                     # Summing the loss of mini-batches
                     if phase == 'train':
@@ -159,6 +165,7 @@ def learn(index_to_skill, index_to_member, splits, skill_sparse_vecs, member_spa
         train_valid_loss[foldidx]['train'] = train_loss_values
         train_valid_loss[foldidx]['valid'] = valid_loss_values
 
+    print(f"It took {time.time() - start_time} to train the model.")
     plot_path = f"{output}/train_valid_loss.json"
     
     with open(plot_path, 'w') as outfile:
@@ -257,9 +264,9 @@ def test(model_path, splits, input_matrix, output_matrix, index_to_skill, index_
 
     auc_path = f"{model_path}/test_auc.json"
 
-    if os.path.isfile(auc_path):
-        print(f"Reports can be found in: {model_path}")
-        return
+    # if os.path.isfile(auc_path):
+    #     print(f"Reports can be found in: {model_path}")
+        # return
 
     input_size = len(index_to_skill)
     output_size = len(index_to_member)  
@@ -314,11 +321,15 @@ def test(model_path, splits, input_matrix, output_matrix, index_to_skill, index_
     with open(auc_path, 'w') as outfile:
         json.dump(auc, outfile)
 
-def main(splits, teams, skill_to_index, member_to_index, index_to_skill, index_to_member, cmd=['train', 'test', 'plot', 'eval']):
-    skill_sparse_vecs, member_sparse_vecs = Team.load_sparse_vectors(teams, skill_to_index, member_to_index, f'../data/preprocessed/named_toy/sparse_vecs_{len(teams)}.npz')
+def main(splits, teams, skill_to_index, member_to_index, index_to_skill, index_to_member, cmd=['test', 'plot', 'eval']):
+    # skill_sparse_vecs, member_sparse_vecs = Team.load_sparse_vectors(teams, skill_to_index, member_to_index, f'../data/preprocessed/sparse_vecs_{len(teams)}.npz')
+    #
+    # output = learn(index_to_skill, index_to_member, splits, skill_sparse_vecs, member_sparse_vecs, mdl.param.sgns, f'../output/sgns')
+    skill_sparse_vecs, member_sparse_vecs = Team.load_sparse_vectors(teams, skill_to_index, member_to_index,
+                                                                     f'../data/preprocessed/named_toy/sparse_vecs_{len(teams)}.npz')
 
-    # if 'train' in cmd:
-    output = learn(index_to_skill, index_to_member, splits, skill_sparse_vecs, member_sparse_vecs, mdl.param.sgns, f'../output/named_toy/sgns')
+    output = learn(index_to_skill, index_to_member, splits, skill_sparse_vecs, member_sparse_vecs, mdl.param.sgns,
+                   f'../output/named_toy/sgns')
 
     if 'test' in cmd:
         test(output, splits, skill_sparse_vecs, member_sparse_vecs, index_to_skill, index_to_member, mdl.param.sgns['b'])
@@ -329,5 +340,3 @@ def main(splits, teams, skill_to_index, member_to_index, index_to_skill, index_t
 
     if 'eval' in cmd:
         eval(output, splits, skill_sparse_vecs, member_sparse_vecs, index_to_skill, index_to_member, mdl.param.sgns['b'])
-        # eval_phase(PATH, splits, phases = ['train'])
-

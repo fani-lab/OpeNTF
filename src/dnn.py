@@ -1,6 +1,6 @@
 import json
 import pickle
-import torch
+from torch.nn.utils import clip_grad_norm_
 from torch import optim 
 from torch.utils.data import DataLoader 
 from tqdm import tqdm  # For nice progress bar!
@@ -15,6 +15,7 @@ from mdl.custom_dataset import TFDataset
 from torch.optim.lr_scheduler import StepLR, ReduceLROnPlateau
 import csv
 import ast
+import time
 
 
 def weighted_cross_entropy_with_logits(logits, targets, pos_weight = 2.5):
@@ -51,6 +52,7 @@ def learn(index_to_skill, index_to_member, splits, skill_sparse_vecs, member_spa
     for i in range(len(splits['folds'].keys())):
         train_valid_loss[i] = {'train' : [], 'valid' : []}
 
+    start_time = time.time()
     # Training K-fold
     for foldidx in splits['folds'].keys():
         # Retrieving the folds
@@ -89,10 +91,13 @@ def learn(index_to_skill, index_to_member, splits, skill_sparse_vecs, member_spa
         train_loss_values = []
         valid_loss_values = []
 
+        print(f"Fold {foldidx}")
+        fold_time = time.time()
         # Train Network
         for epoch in range(num_epochs):
-            print('Epoch {}/{}'.format(epoch+1, num_epochs))
+            print(f'Epoch {epoch + 1}/{num_epochs}')
             print('-' * 15)
+            print(f"{time.time() - fold_time} seconds has passed for this fold, and {time.time() - start_time} seconds has passed overall.")
 
             train_running_loss = 0.0    
             valid_running_loss = 0.0
@@ -112,10 +117,10 @@ def learn(index_to_skill, index_to_member, splits, skill_sparse_vecs, member_spa
                     targets = targets.float().to(device=device)
 
                     # forward
-                    scores = model(data)
-
+                    scores = model(data).double()
+                    print("this is the score:", scores.sum().item())
                     loss = weighted_cross_entropy_with_logits(scores, targets)
-                    print(loss.sum().item())
+                    print("this is the loss:", loss.sum().item())
                     
                     # Summing the loss of mini-batches
                     if phase == 'train':
@@ -127,6 +132,7 @@ def learn(index_to_skill, index_to_member, splits, skill_sparse_vecs, member_spa
                     optimizer.zero_grad()
                     if phase == 'train': 
                         loss.sum().backward()
+                        clip_grad_norm_(model.parameters(), 1)
                         optimizer.step()
 
                 # Appending the loss of each epoch to plot later
@@ -244,9 +250,9 @@ def test(model_path, splits, input_matrix, output_matrix, index_to_skill, index_
 
     auc_path = f"{model_path}/test_auc.json"
 
-    if os.path.isfile(auc_path):
-        print(f"Reports can be found in: {model_path}")
-        return
+    # if os.path.isfile(auc_path):
+    #     print(f"Reports can be found in: {model_path}")
+    #     return
 
     input_size = len(index_to_skill)
     output_size = len(index_to_member)  
@@ -290,6 +296,7 @@ def test(model_path, splits, input_matrix, output_matrix, index_to_skill, index_
                     cls = infile.read()
             
             print(f"Test report of fold{foldidx}:\n", cls)
+            # plot_roc(test_dataloader, model, device)
 
     auc_values = list(map(float, list(auc.values())))
     auc_mean = np.mean(auc_values)
@@ -301,10 +308,14 @@ def test(model_path, splits, input_matrix, output_matrix, index_to_skill, index_
         json.dump(auc, outfile)
 
 def main(splits, teams, skill_to_index, member_to_index, index_to_skill, index_to_member, cmd=['train', 'test', 'plot', 'eval']):
-    skill_sparse_vecs, member_sparse_vecs = Team.load_sparse_vectors(teams, skill_to_index, member_to_index, f'../data/preprocessed/named_toy/sparse_vecs_{len(teams)}.npz')
+    # skill_sparse_vecs, member_sparse_vecs = Team.load_sparse_vectors(teams, skill_to_index, member_to_index, f'../data/preprocessed/sparse_vecs_{len(teams)}.npz')
 
-    # if 'train' in cmd:
-    output = learn(index_to_skill, index_to_member, splits, skill_sparse_vecs, member_sparse_vecs, mdl.param.fnn, f'../output/named_toy/fnn')
+    # output = learn(index_to_skill, index_to_member, splits, skill_sparse_vecs, member_sparse_vecs, mdl.param.fnn, f'../output/fnn')
+
+    skill_sparse_vecs, member_sparse_vecs = Team.load_sparse_vectors(teams, skill_to_index, member_to_index,
+                                                                     f'../data/preprocessed/named_toy/sparse_vecs_{len(teams)}.npz')
+    output = learn(index_to_skill, index_to_member, splits, skill_sparse_vecs, member_sparse_vecs, mdl.param.fnn,
+                   f'../output/named_toy/fnn')
 
     if 'test' in cmd:
         test(output, splits, skill_sparse_vecs, member_sparse_vecs, index_to_skill, index_to_member, mdl.param.fnn['b'])
@@ -315,5 +326,3 @@ def main(splits, teams, skill_to_index, member_to_index, index_to_skill, index_t
 
     if 'eval' in cmd:
         eval(output, splits, skill_sparse_vecs, member_sparse_vecs, index_to_skill, index_to_member, mdl.param.fnn['b'])
-        # eval_phase(PATH, splits, phases = ['train'])
-

@@ -2,6 +2,7 @@
 /.vscode
 /venv
 .idea/
+/data/raw/splits/
 *.json
 *.pyc
 *.npz
@@ -11,4 +12,5 @@
 *.yml
 *.src
 *.tgt
+*.pickle
 tmp.py
