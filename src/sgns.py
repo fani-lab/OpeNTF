@@ -1,6 +1,6 @@
 import json
 import pickle
-from torch.nn.utils import clip_grad_norm_
+import torch
 from torch import optim 
 from torch.utils.data import DataLoader 
 from tqdm import tqdm  # For nice progress bar!
@@ -10,17 +10,32 @@ import matplotlib.pyplot as plt
 from cmn.team import Team
 import mdl.param
 from dal.data_utils import *
-from mdl.fnn import FNN
+from mdl.skipgram import SGNS
 from mdl.custom_dataset import TFDataset
 from torch.optim.lr_scheduler import StepLR, ReduceLROnPlateau
 import csv
 import ast
+import random
 import time
 
+random.seed(0)
 
 def weighted_cross_entropy_with_logits(logits, targets, pos_weight = 2.5):
     return -targets * torch.log(torch.sigmoid(logits)) * pos_weight + (1 - targets) * -torch.log(1 - torch.sigmoid(logits))
 
+def sgns_with_logits(logits, targets, neg_samples = 5):
+    targets = targets.squeeze(1)
+    logits = logits.squeeze(1)
+    random_samples = torch.zeros_like(targets)
+    for b in range(targets.shape[0]):
+        cor_idx = torch.nonzero(targets[b], as_tuple = True)[0]
+        for i in range(neg_samples):
+            idx = random.randint(0, targets.shape[1]- 1)
+
+            if idx not in cor_idx:
+                random_samples[b][idx] = 1
+
+    return -targets * torch.log(torch.sigmoid(logits)) - random_samples * torch.log(torch.sigmoid(-logits))
 
 # Set device cuda for GPU if it's available otherwise run on the CPU
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -31,11 +46,11 @@ def learn(index_to_skill, index_to_member, splits, skill_sparse_vecs, member_spa
     learning_rate = params['lr']
     batch_size = params['b']
     num_epochs = params['e']
-
+    ns = params['ns']
     # Build a folder for this model for the first time
     if not os.path.isdir(output): os.mkdir(output)
 
-    output = f"{output}/nt{skill_sparse_vecs.shape[0]}_is{len(index_to_skill)}_os{len(index_to_member)}_nn{num_nodes}_lr{learning_rate}_bs{batch_size}_ne{num_epochs}"
+    output = f"{output}/ns{ns}_nt{skill_sparse_vecs.shape[0]}_is{len(index_to_skill)}_os{len(index_to_member)}_nn{num_nodes}_lr{learning_rate}_bs{batch_size}_ne{num_epochs}"
 
     # Retrieving some of the required information for the model
     input_size = len(index_to_skill)
@@ -72,7 +87,7 @@ def learn(index_to_skill, index_to_member, splits, skill_sparse_vecs, member_spa
         data_loaders = {"train": training_dataloader, "val": validation_dataloader}
 
         # Initialize network
-        model = FNN(input_size=input_size, output_size=output_size, param=mdl.param.fnn).to(device)
+        model = SGNS(input_size=input_size, output_size=output_size, param=mdl.param.sgns).to(device)
 
 
         # Loss and optimizer
@@ -95,7 +110,7 @@ def learn(index_to_skill, index_to_member, splits, skill_sparse_vecs, member_spa
         fold_time = time.time()
         # Train Network
         for epoch in range(num_epochs):
-            print(f'Epoch {epoch + 1}/{num_epochs}')
+            print(f'Epoch {epoch+1}/{num_epochs}')
             print('-' * 15)
             print(f"{time.time() - fold_time} seconds has passed for this fold, and {time.time() - start_time} seconds has passed overall.")
 
@@ -117,9 +132,9 @@ def learn(index_to_skill, index_to_member, splits, skill_sparse_vecs, member_spa
                     targets = targets.float().to(device=device)
 
                     # forward
-                    scores = model(data).double()
+                    scores = model(data)
                     print("this is the score:", scores.sum().item())
-                    loss = weighted_cross_entropy_with_logits(scores, targets)
+                    loss = sgns_with_logits(scores, targets, ns)
                     print("this is the loss:", loss.sum().item())
                     
                     # Summing the loss of mini-batches
@@ -132,7 +147,6 @@ def learn(index_to_skill, index_to_member, splits, skill_sparse_vecs, member_spa
                     optimizer.zero_grad()
                     if phase == 'train': 
                         loss.sum().backward()
-                        clip_grad_norm_(model.parameters(), 1)
                         optimizer.step()
 
                 # Appending the loss of each epoch to plot later
@@ -151,6 +165,7 @@ def learn(index_to_skill, index_to_member, splits, skill_sparse_vecs, member_spa
         train_valid_loss[foldidx]['train'] = train_loss_values
         train_valid_loss[foldidx]['valid'] = valid_loss_values
 
+    print(f"It took {time.time() - start_time} to train the model.")
     plot_path = f"{output}/train_valid_loss.json"
     
     with open(plot_path, 'w') as outfile:
@@ -194,7 +209,6 @@ def eval(model_path, splits, input_matrix, output_matrix, index_to_skill, index_
         data = json.load(infile)
         for foldidx in splits['folds'].keys():
             if np.any(np.isnan(data[str(foldidx)]["train"])): continue
-
             X_train = input_matrix[splits['folds'][foldidx]['train'], :]
             y_train = output_matrix[splits['folds'][foldidx]['train']]
             X_valid = input_matrix[splits['folds'][foldidx]['valid'], :]
@@ -206,7 +220,7 @@ def eval(model_path, splits, input_matrix, output_matrix, index_to_skill, index_
             training_dataloader = DataLoader(training_matrix, batch_size=batch_size, shuffle=True, num_workers=0)
             validation_dataloader = DataLoader(validation_matrix, batch_size=batch_size, shuffle=True, num_workers=0)
 
-            model = FNN(input_size=input_size, output_size=output_size, param=mdl.param.fnn).to(device)
+            model = SGNS(input_size=input_size, output_size=output_size, param=mdl.param.sgns).to(device)
             model.load_state_dict(torch.load(f'{model_path}/state_dict_model_{foldidx}.pt'))
             model.eval()
             
@@ -252,7 +266,7 @@ def test(model_path, splits, input_matrix, output_matrix, index_to_skill, index_
 
     # if os.path.isfile(auc_path):
     #     print(f"Reports can be found in: {model_path}")
-    #     return
+        # return
 
     input_size = len(index_to_skill)
     output_size = len(index_to_member)  
@@ -267,6 +281,7 @@ def test(model_path, splits, input_matrix, output_matrix, index_to_skill, index_
     
     # Initialize auc dictionary
     auc = dict()
+    
     with open(f"{model_path}/train_valid_loss.json", 'r') as infile:
         data = json.load(infile)
         for foldidx in splits['folds'].keys():
@@ -277,7 +292,7 @@ def test(model_path, splits, input_matrix, output_matrix, index_to_skill, index_
         data = json.load(infile)
         for foldidx in splits['folds'].keys():
             if np.any(np.isnan(data[str(foldidx)]["train"])): continue
-            model = FNN(input_size=input_size, output_size=output_size, param=mdl.param.fnn).to(device)
+            model = SGNS(input_size=input_size, output_size=output_size, param=mdl.param.sgns).to(device)
             model.load_state_dict(torch.load(f'{model_path}/state_dict_model_{foldidx}.pt'))
             model.eval()
 
@@ -296,7 +311,6 @@ def test(model_path, splits, input_matrix, output_matrix, index_to_skill, index_
                     cls = infile.read()
             
             print(f"Test report of fold{foldidx}:\n", cls)
-            # plot_roc(test_dataloader, model, device)
 
     auc_values = list(map(float, list(auc.values())))
     auc_mean = np.mean(auc_values)
@@ -307,22 +321,22 @@ def test(model_path, splits, input_matrix, output_matrix, index_to_skill, index_
     with open(auc_path, 'w') as outfile:
         json.dump(auc, outfile)
 
-def main(splits, teams, skill_to_index, member_to_index, index_to_skill, index_to_member, cmd=['train', 'test', 'plot', 'eval']):
+def main(splits, teams, skill_to_index, member_to_index, index_to_skill, index_to_member, cmd=['test', 'plot', 'eval']):
     # skill_sparse_vecs, member_sparse_vecs = Team.load_sparse_vectors(teams, skill_to_index, member_to_index, f'../data/preprocessed/sparse_vecs_{len(teams)}.npz')
-
-    # output = learn(index_to_skill, index_to_member, splits, skill_sparse_vecs, member_sparse_vecs, mdl.param.fnn, f'../output/fnn')
-
+    #
+    # output = learn(index_to_skill, index_to_member, splits, skill_sparse_vecs, member_sparse_vecs, mdl.param.sgns, f'../output/sgns')
     skill_sparse_vecs, member_sparse_vecs = Team.load_sparse_vectors(teams, skill_to_index, member_to_index,
                                                                      f'../data/preprocessed/named_toy/sparse_vecs_{len(teams)}.npz')
-    output = learn(index_to_skill, index_to_member, splits, skill_sparse_vecs, member_sparse_vecs, mdl.param.fnn,
-                   f'../output/named_toy/fnn')
+
+    output = learn(index_to_skill, index_to_member, splits, skill_sparse_vecs, member_sparse_vecs, mdl.param.sgns,
+                   f'../output/named_toy/sgns')
 
     if 'test' in cmd:
-        test(output, splits, skill_sparse_vecs, member_sparse_vecs, index_to_skill, index_to_member, mdl.param.fnn['b'])
+        test(output, splits, skill_sparse_vecs, member_sparse_vecs, index_to_skill, index_to_member, mdl.param.sgns['b'])
 
     if 'plot' in cmd:
         plot_path = f"{output}/train_valid_loss.json"
         plot(plot_path)
 
     if 'eval' in cmd:
-        eval(output, splits, skill_sparse_vecs, member_sparse_vecs, index_to_skill, index_to_member, mdl.param.fnn['b'])
+        eval(output, splits, skill_sparse_vecs, member_sparse_vecs, index_to_skill, index_to_member, mdl.param.sgns['b'])

@@ -1,6 +1,16 @@
-dblp.v12.json
 /.ipynb_checkpoints
 /.vscode
+/venv
 .idea/
+/data/raw/splits/
+*.json
 *.pyc
+*.npz
+*.pt
+*.txt
+*.csv
+*.yml
+*.src
+*.tgt
+*.pickle
 tmp.py
