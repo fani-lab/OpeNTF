@@ -1,6 +1,8 @@
 from scipy.sparse import csr_matrix, lil_matrix, save_npz, load_npz
 import numpy as np
 from datetime import datetime
+import time
+
 
 class Team(object):
     count = 0
@@ -43,12 +45,12 @@ class Team(object):
         idx = 0
         member_to_index = {}
         index_to_member = {}
-
+        start_time = time.time()
         for member in all_members.values():
             index_to_member[idx] = member.get_id()
             member_to_index[member.get_id()] = idx
             idx += 1
-
+        print(f"It took {time.time() - start_time} seconds to build i2m and m2i.")
         return index_to_member, member_to_index
 
     @staticmethod
@@ -56,19 +58,19 @@ class Team(object):
         idx = 0
         skill_to_index = {}
         index_to_skill = {}
-
+        start_time = time.time()
         for team in teams.values():
             for skill in team.get_skills():
                 if skill not in skill_to_index.keys():
                     skill_to_index[skill] = idx
                     index_to_skill[idx] = skill
                     idx += 1
-
+        print(f"It took {time.time() - start_time} seconds to build i2s and s2i.")
         return index_to_skill, skill_to_index
 
     @staticmethod
     def read_data(data_path, topn=None):
-        #should be override by the children classes, customize their loading data
+        # should be overridden by the children classes, customize their loading data
         pass
 
     @staticmethod
@@ -77,9 +79,13 @@ class Team(object):
         BUCKET_SIZE = 100
         SKILL_SIZE = len(skill_to_index)
         AUTHOR_SIZE = len(member_to_index)
+        start_time = time.time()
         try:
+            print("Loading the sparse matrices.")
             data = load_npz(output)
+            print(f"It took {time.time() - start_time} seconds to load the sparse matrices.")
         except:
+            print("Generating the sparse matrices.")
             # Sparse Matrix and bucketing
             data = lil_matrix((training_size, SKILL_SIZE + AUTHOR_SIZE))
             data_ = np.zeros((BUCKET_SIZE, SKILL_SIZE + AUTHOR_SIZE))
@@ -121,11 +127,12 @@ class Team(object):
                     data_[j] = X_y
                 if (i % BUCKET_SIZE == 0):
                     print(f'Loading {i}/{len(teams)} instances! {datetime.now()}')
+                    print(f'{time.time() - start_time} seconds has passed until now.')
             if j > -1:
                 data[-j:] = data_[0:j]
 
             save_npz(output, data.tocsr())
-
+            print(f"It took {time.time() - start_time} seconds to generate and store the sparse matrices.")
         skill_sparse_vecs = data[:, :SKILL_SIZE]
         member_sparse_vecs = data[:, - AUTHOR_SIZE:]
         return skill_sparse_vecs, member_sparse_vecs

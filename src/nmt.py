@@ -3,6 +3,14 @@ import subprocess, os
 import shlex
 import numpy as np
 
+def prepare_data(teams):
+    input_data = []
+    output_data = []
+    for team in teams:
+        input_data.append(" ".join(team.get_skills()))
+        output_data.append(" ".join(team.get_members_names()))
+    return input_data, output_data
+
 def build_vocab(input_data, output_data, splits):
     endl = "\n"
     input_data = np.array(["{}{}".format(i,endl) for i in input_data])
@@ -87,6 +95,7 @@ def test(splits, path):
 
 def main(splits, input_data, output_data, cmd=['train', 'eval', 'test']):
     if 'train' in cmd:
+        # input_data, output_data = prepare_data(teams)
         model_path = build_vocab(input_data, output_data, splits)
         learn(splits, model_path)
     if 'test' in cmd :test(splits, model_path)
