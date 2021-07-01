@@ -166,7 +166,7 @@ def plot(plot_path, output):
         plt.plot(train_valid_loss[foldidx]['valid'], label='Validation Loss')
         plt.legend(loc='upper right')
         plt.title(f'Training and Validation Loss for fold #{foldidx}')
-        plt.savefig(f'{output}/fold{foldidx}.png', dpi=300, bbox_inches='tight')
+        plt.savefig(f'{output}/fold{foldidx}.png', dpi=100, bbox_inches='tight')
         plt.show()  
 
 def eval(model_path, splits, input_matrix, output_matrix, index_to_skill, index_to_member, batch_size):
