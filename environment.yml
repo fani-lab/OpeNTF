@@ -1,0 +1,14 @@
+name: ttf
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.8
+  - pytorch==1.6.0
+  - pip:
+    - matplotlib==3.4.2
+    - scipy==1.6.3
+    - numpy==1.20.3
+    - tqdm==4.60.0
+    - PyYAML==5.4
+    - scikit_learn==0.24.2
