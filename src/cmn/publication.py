@@ -10,7 +10,7 @@ import os
 
 random.seed(0)
 
-class Document(Team):
+class Publication(Team):
     def __init__(self, id, authors, title, doc_type, year, venue, references, fos, keywords):
         super().__init__(id, authors)
         self.title = title
@@ -44,18 +44,18 @@ class Document(Team):
         counter = 0
         teams = {}
         all_members = {}
-        input_data = []
-        output_data = []
+        # input_data = []
+        # output_data = []
         output_name = "_".join(data_path.split("/")[-1].split(".")[:-1])
-        output_pickle = f'../data/preprocessed/{output_name}.pickle'
+        output_pickle = f'../data/preprocessed/{output_name}/teams.pickle'
 
         start_time = time.time()
         try:
             with open(output_pickle, 'rb') as infile:
                 print("Loading the pickle.")
-                all_members, teams, input_data, output_data = pickle.load(infile)
+                all_members, teams = pickle.load(infile)
                 print(f"It took {time.time() - start_time} seconds to load from the pickle.")
-                return all_members, teams, input_data, output_data
+                return all_members, teams
         except:
             with open(data_path, "r", encoding='utf-8') as jf:
                 # Skip the first line
@@ -107,13 +107,11 @@ class Document(Team):
                             # if member_id not in members.keys():
                             #     members[member_id] = member
 
-                        team = Document(id, members, title, year, type, venue, references, fos, keywords)
-                        if team.get_uid() not in teams.keys():
-                            teams[team.get_uid()] = team
-                        else: teams[team.get_uid()+random.randint(0, 100000)] = team
+                        team = Publication(id, members, title, year, type, venue, references, fos, keywords)
+                        teams[team.id] = team
 
-                        input_data.append(" ".join(team.get_skills()))
-                        output_data.append(" ".join(team.get_members_names()))
+                        # input_data.append(" ".join(team.get_skills()))
+                        # output_data.append(" ".join(team.get_members_names()))
 
                         counter += 1
                         if counter % 10000 == 0:
@@ -126,7 +124,7 @@ class Document(Team):
             print(f"It took {time.time() - start_time} seconds to load the data.")
             write_time = time.time()
             with open(output_pickle, "wb") as outfile:
-                pickle.dump((all_members, teams, input_data, output_data), outfile)
+                pickle.dump((all_members, teams), outfile)
             print(f"It took {time.time() - write_time} seconds to pickle the data")
             print(f"It took {time.time() - start_time} seconds to load the data and pickle it.")
-        return all_members, teams, input_data, output_data
+        return all_members, teams
