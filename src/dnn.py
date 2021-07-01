@@ -158,7 +158,7 @@ def learn(index_to_skill, index_to_member, splits, skill_sparse_vecs, member_spa
 
     return output
 
-def plot(plot_path):
+def plot(plot_path, output):
     with open(plot_path) as infile:
         train_valid_loss = json.load(infile)
     for foldidx in train_valid_loss.keys():
@@ -166,6 +166,7 @@ def plot(plot_path):
         plt.plot(train_valid_loss[foldidx]['valid'], label='Validation Loss')
         plt.legend(loc='upper right')
         plt.title(f'Training and Validation Loss for fold #{foldidx}')
+        plt.savefig(f'{output}/fold{foldidx}.png', dpi=100, bbox_inches='tight')
         plt.show()  
 
 def eval(model_path, splits, input_matrix, output_matrix, index_to_skill, index_to_member, batch_size):
@@ -307,22 +308,20 @@ def test(model_path, splits, input_matrix, output_matrix, index_to_skill, index_
     with open(auc_path, 'w') as outfile:
         json.dump(auc, outfile)
 
-def main(splits, teams, skill_to_index, member_to_index, index_to_skill, index_to_member, cmd=['train', 'test', 'plot', 'eval']):
+def main(splits, teams, skill_to_index, member_to_index, index_to_skill, index_to_member, output, cmd=['train', 'test', 'plot', 'eval']):
     # skill_sparse_vecs, member_sparse_vecs = Team.load_sparse_vectors(teams, skill_to_index, member_to_index, f'../data/preprocessed/sparse_vecs_{len(teams)}.npz')
 
     # output = learn(index_to_skill, index_to_member, splits, skill_sparse_vecs, member_sparse_vecs, mdl.param.fnn, f'../output/fnn')
 
-    skill_sparse_vecs, member_sparse_vecs = Team.load_sparse_vectors(teams, skill_to_index, member_to_index,
-                                                                     f'../data/preprocessed/named_toy/sparse_vecs_{len(teams)}.npz')
-    output = learn(index_to_skill, index_to_member, splits, skill_sparse_vecs, member_sparse_vecs, mdl.param.fnn,
-                   f'../output/named_toy/fnn')
+    skill_sparse_vecs, member_sparse_vecs = Team.load_sparse_vectors(teams, skill_to_index, member_to_index, f'../data/preprocessed/{output}/sparse_vecs_{len(teams)}.npz')
+    output = learn(index_to_skill, index_to_member, splits, skill_sparse_vecs, member_sparse_vecs, mdl.param.fnn, f'../output/fnn/{output}')
 
     if 'test' in cmd:
         test(output, splits, skill_sparse_vecs, member_sparse_vecs, index_to_skill, index_to_member, mdl.param.fnn['b'])
 
     if 'plot' in cmd:
         plot_path = f"{output}/train_valid_loss.json"
-        plot(plot_path)
+        plot(plot_path, output)
 
     if 'eval' in cmd:
         eval(output, splits, skill_sparse_vecs, member_sparse_vecs, index_to_skill, index_to_member, mdl.param.fnn['b'])
