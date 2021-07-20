@@ -321,15 +321,11 @@ def test(model_path, splits, input_matrix, output_matrix, index_to_skill, index_
     with open(auc_path, 'w') as outfile:
         json.dump(auc, outfile)
 
-def main(splits, teams, skill_to_index, member_to_index, index_to_skill, index_to_member, cmd=['test', 'plot', 'eval']):
-    # skill_sparse_vecs, member_sparse_vecs = Team.load_sparse_vectors(teams, skill_to_index, member_to_index, f'../data/preprocessed/sparse_vecs_{len(teams)}.npz')
-    #
-    # output = learn(index_to_skill, index_to_member, splits, skill_sparse_vecs, member_sparse_vecs, mdl.param.sgns, f'../output/sgns')
-    skill_sparse_vecs, member_sparse_vecs = Team.load_sparse_vectors(teams, skill_to_index, member_to_index,
-                                                                     f'../data/preprocessed/named_toy/sparse_vecs_{len(teams)}.npz')
-
+def main(splits, teams, skill_to_index, member_to_index, index_to_skill, index_to_member, output, cmd=['test', 'plot', 'eval']):
+    skill_sparse_vecs, member_sparse_vecs = Team.load_sparse_vectors\
+        (teams, skill_to_index, member_to_index, f'../data/preprocessed/{output}/sparse_vecs_{len(teams)}.npz')
     output = learn(index_to_skill, index_to_member, splits, skill_sparse_vecs, member_sparse_vecs, mdl.param.sgns,
-                   f'../output/named_toy/sgns')
+                   f'../output/{output}/sgns/')
 
     if 'test' in cmd:
         test(output, splits, skill_sparse_vecs, member_sparse_vecs, index_to_skill, index_to_member, mdl.param.sgns['b'])

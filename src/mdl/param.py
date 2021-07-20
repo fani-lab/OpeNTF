@@ -11,14 +11,14 @@ np.random.seed(0)
 fnn = {
     'd': 100,  # size of hidden space
     'lr': 0.01,  # learning rate
-    'b': 100,  # batch
+    'b': 64,  # batch
     'e': 10,  # epochs
 }
 
 sgns = {
     'd': 100,  # size of hidden space
     'lr': 0.01,  # learning rate
-    'b': 100,  # batch
+    'b': 64,  # batch
     'e': 10,  # epochs
     'ns': 5,  # negative samples
 }
