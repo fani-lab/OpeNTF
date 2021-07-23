@@ -325,7 +325,7 @@ def main(splits, teams, skill_to_index, member_to_index, index_to_skill, index_t
     skill_sparse_vecs, member_sparse_vecs = Team.load_sparse_vectors\
         (teams, skill_to_index, member_to_index, f'../data/preprocessed/{output}/sparse_vecs_{len(teams)}.npz')
     output = learn(index_to_skill, index_to_member, splits, skill_sparse_vecs, member_sparse_vecs, mdl.param.sgns,
-                   f'../output/{output}/sgns/')
+                   f'../output/{output}/sgns')
 
     if 'test' in cmd:
         test(output, splits, skill_sparse_vecs, member_sparse_vecs, index_to_skill, index_to_member, mdl.param.sgns['b'])
