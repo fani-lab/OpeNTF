@@ -19,34 +19,29 @@ def create_evaluation_splits(n_sample, n_folds):
 
     return splits
 
-# def plot_roc(loader, model, device):
-#     C = loader.dataset.output.shape[1]
-#     with torch.no_grad():
-#         y_true = torch.empty(0, C)
-#         y_pred = torch.empty(0, C)
-#
-#         for x, y in loader:
-#             x = x.to(device=device)
-#             y = y.to(device=device)
-#
-#             scores = model(x)
-#             scores = torch.sigmoid(scores)
-#             scores = torch.round(scores)
-#
-#             y = y.squeeze(1).cpu().numpy()
-#             scores = scores.squeeze(1).cpu().numpy()
-#
-#             y_true = np.vstack((y_true, y))
-#             y_pred = np.vstack((y_pred, scores))
-#
-#         fpr, tpr, _ = roc_curve(y_true, y_pred)
-#         plt.plot(fpr, tpr, 'k-')
-#
-#         # plt.xlabel('Number of nodes')
-#         # plt.ylabel('AUC')
-#         # plt.title('lr = 0.01')
-#         # plt.legend()
-#         plt.show()
+def plot_roc(loader, model, device):
+    C = loader.dataset.output.shape[1]
+    with torch.no_grad():
+        y_true = torch.empty(0, C)
+        y_pred = torch.empty(0, C)
+
+        for x, y in loader:
+            x = x.to(device=device)
+            y = y.to(device=device)
+
+            scores = model(x)
+            scores = torch.sigmoid(scores)
+            # scores = torch.round(scores)
+
+            y = y.squeeze(1).cpu().numpy()
+            scores = scores.squeeze(1).cpu().numpy()
+
+            y_true = np.vstack((y_true, y))
+            y_pred = np.vstack((y_pred, scores))
+
+
+        fpr, tpr, _ = roc_curve(y_true.ravel(), y_pred.ravel())
+        return fpr, tpr
 
 def roc_auc(loader, model, device):
     C = loader.dataset.output.shape[1]
@@ -60,7 +55,7 @@ def roc_auc(loader, model, device):
 
             scores = model(x)
             scores = torch.sigmoid(scores)
-            scores = torch.round(scores)
+            # scores = torch.round(scores)
 
             y = y.squeeze(1).cpu().numpy()
             scores = scores.squeeze(1).cpu().numpy()

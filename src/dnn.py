@@ -179,15 +179,20 @@ def eval(model_path, splits, input_matrix, output_matrix, index_to_skill, index_
     auc_path = f"{model_path}/train_valid_auc.json"
     if os.path.isfile(auc_path):
         print(f"Reports can be found in: {model_path}")
-        return
+        # return
 
-    # Initialize auc dictionary
+    # Initialize auc dictionary for training and validation
+    # Initialize roc dictionary for training and validation
     auc = dict()
+    roc_train = dict()
+    roc_valid = dict()
     with open(f"{model_path}/train_valid_loss.json", 'r') as infile:
         data = json.load(infile)
         for foldidx in splits['folds'].keys():
             if np.any(np.isnan(data[str(foldidx)]["train"])): continue
-            auc[foldidx] = {'train' : "", 'valid' : ""}
+            auc[foldidx] = {'train': "", 'valid': ""}
+            roc_train[foldidx] = {'fpr': [], 'tpr': []}
+            roc_valid[foldidx] = {'fpr': [], 'tpr': []}
 
 
     # Load
@@ -218,6 +223,9 @@ def eval(model_path, splits, input_matrix, output_matrix, index_to_skill, index_
             auc[foldidx]['train'] = auc_train
             auc[foldidx]['valid'] = auc_valid
 
+            roc_train[foldidx]['fpr'], roc_train[foldidx]['tpr'] = plot_roc(training_dataloader, model, device)
+            roc_valid[foldidx]['fpr'], roc_valid[foldidx]['fpr'] = plot_roc(validation_dataloader, model, device)
+
             # Measure Precision, recall, and F1 and save to txt
             train_rep_path = f'{model_path}/train_rep_{foldidx}.txt'
             if not os.path.isfile(train_rep_path):
@@ -241,6 +249,37 @@ def eval(model_path, splits, input_matrix, output_matrix, index_to_skill, index_
 
             print(f"Validation report of fold{foldidx}:\n", cls)
 
+    colors = ['deeppink', 'royalblue', 'darkviolet', 'aqua', 'darkorange', 'maroon', 'chocolate']
+
+    # Plot the roc curves for training set
+    plt.figure()
+    for foldidx in splits['folds'].keys():
+
+        plt.plot(roc_train[foldidx]['fpr'], roc_train[foldidx]['tpr'],
+                 label='micro-average ROC curve #{:.0f} of training set(auc = {:.2f})'.format(foldidx, float(auc[foldidx]["train"])),
+                 color=colors[foldidx], linestyle=':', linewidth=4)
+
+    plt.xlabel('False positive rate')
+    plt.ylabel('True positive rate')
+    plt.title('ROC curves for testing set')
+    plt.legend()
+    plt.show()
+
+    # Plot the roc curves for validation set
+    plt.figure()
+    for foldidx in splits['folds'].keys():
+        print(roc_valid[foldidx]['fpr'].shape)
+        print(roc_valid[foldidx]['tpr'].shape)
+        plt.plot(roc_valid[foldidx]['fpr'], roc_valid[foldidx]['tpr'],
+                 label='micro-average ROC curve #{:.0f} of validation set (auc = {:.2f})'.format(foldidx, float(auc[foldidx]["valid"])),
+                 color=colors[foldidx], linestyle=':', linewidth=4)
+
+    plt.xlabel('False positive rate')
+    plt.ylabel('True positive rate')
+    plt.title('ROC curves for validation set')
+    plt.legend()
+    plt.show()
+
     with open(auc_path, 'w') as outfile:
         json.dump(auc, outfile)
 
@@ -251,9 +290,9 @@ def test(model_path, splits, input_matrix, output_matrix, index_to_skill, index_
 
     auc_path = f"{model_path}/test_auc.json"
 
-    # if os.path.isfile(auc_path):
-    #     print(f"Reports can be found in: {model_path}")
-    #     return
+    if os.path.isfile(auc_path):
+        print(f"Reports can be found in: {model_path}")
+        # return
 
     input_size = len(index_to_skill)
     output_size = len(index_to_member)  
@@ -268,11 +307,15 @@ def test(model_path, splits, input_matrix, output_matrix, index_to_skill, index_
     
     # Initialize auc dictionary
     auc = dict()
+    fpr = dict()
+    tpr = dict()
     with open(f"{model_path}/train_valid_loss.json", 'r') as infile:
         data = json.load(infile)
         for foldidx in splits['folds'].keys():
             if np.any(np.isnan(data[str(foldidx)]["train"])): continue
             auc[foldidx] = ""
+            fpr[foldidx] = []
+            tpr[foldidx] = []
 
     with open(f"{model_path}/train_valid_loss.json", 'r') as infile:
         data = json.load(infile)
@@ -285,7 +328,7 @@ def test(model_path, splits, input_matrix, output_matrix, index_to_skill, index_
             # Measure AUC for each fold and store in dict to later save as json
             auc_test = roc_auc(test_dataloader, model, device)
             auc[foldidx] = auc_test
-
+            fpr[foldidx], tpr[foldidx] = plot_roc(test_dataloader, model, device)
             # Measure Precision, recall, and F1 and save to txt
             test_rep_path = f'{model_path}/test_rep_{foldidx}.txt'
             if not os.path.isfile(test_rep_path):
@@ -308,12 +351,26 @@ def test(model_path, splits, input_matrix, output_matrix, index_to_skill, index_
     with open(auc_path, 'w') as outfile:
         json.dump(auc, outfile)
 
+    colors = ['deeppink', 'royalblue', 'darkviolet', 'aqua', 'darkorange', 'maroon', 'chocolate']
+    plt.figure()
+    for foldidx in splits['folds'].keys():
+        plt.plot(fpr[foldidx], tpr[foldidx],
+                 label='micro-average ROC curve #{:.0f} of test set (auc = {:.2f})'.format(foldidx, float(
+                     auc[foldidx])),
+                 color=colors[foldidx], linestyle=':', linewidth=4)
+
+    plt.xlabel('False positive rate')
+    plt.ylabel('True positive rate')
+    plt.title('ROC curves for test set')
+    plt.legend()
+    plt.show()
+
 def main(splits, teams, skill_to_index, member_to_index, index_to_skill, index_to_member, output, cmd=['test', 'plot', 'eval']):
 
     skill_sparse_vecs, member_sparse_vecs = Team.load_sparse_vectors\
         (teams, skill_to_index, member_to_index, f'../data/preprocessed/{output}/sparse_vecs_{len(teams)}.npz')
     output = learn(index_to_skill, index_to_member, splits, skill_sparse_vecs, member_sparse_vecs, mdl.param.fnn,
-                   f'../output/{output}/fnn/')
+                   f'../output/{output}/fnn')
 
     if 'test' in cmd:
         test(output, splits, skill_sparse_vecs, member_sparse_vecs, index_to_skill, index_to_member, mdl.param.fnn['b'])

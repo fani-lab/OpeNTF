@@ -52,6 +52,8 @@ class Publication(Team):
         if not os.path.isdir(f'../data/preprocessed/{output_name}/'): os.mkdir(f'../data/preprocessed/{output_name}/')
         output_pickle = f'../data/preprocessed/{output_name}/teams.pickle'
 
+        bypassed = {}
+
         start_time = time.time()
         try:
             with open(output_pickle, 'rb') as infile:
@@ -85,8 +87,11 @@ class Publication(Team):
                         if 'fos' in jsonline.keys():
                             fos = jsonline['fos']
                         else:
+                            bypassed[id] = "No FOS!"
                             continue  # fos -> skills
-                        if 'authors' not in jsonline.keys(): continue
+                        if 'authors' not in jsonline.keys():
+                            bypassed[id] = "No Author!"
+                            continue
 
                         members = []
                         for auth in jsonline['authors']:
@@ -127,6 +132,10 @@ class Publication(Team):
                         print(f'ERROR: There has been error in loading json line `{line}`!\n{traceback.format_exc()}')
                         continue
                         # raise
+            bypassed_path = f'../data/preprocessed/{output_name}/bypassed.json'
+            if not os.path.isfile(bypassed_path):
+                with open(bypassed_path, 'w') as outfile:
+                    json.dump(bypassed, outfile)
             print(f"It took {time.time() - start_time} seconds to load the data.")
             write_time = time.time()
             with open(output_pickle, "wb") as outfile:
