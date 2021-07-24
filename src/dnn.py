@@ -268,8 +268,6 @@ def eval(model_path, splits, input_matrix, output_matrix, index_to_skill, index_
     # Plot the roc curves for validation set
     plt.figure()
     for foldidx in splits['folds'].keys():
-        print(roc_valid[foldidx]['fpr'].shape)
-        print(roc_valid[foldidx]['tpr'].shape)
         plt.plot(roc_valid[foldidx]['fpr'], roc_valid[foldidx]['tpr'],
                  label='micro-average ROC curve #{:.0f} of validation set (auc = {:.2f})'.format(foldidx, float(auc[foldidx]["valid"])),
                  color=colors[foldidx], linestyle=':', linewidth=4)
@@ -329,6 +327,7 @@ def test(model_path, splits, input_matrix, output_matrix, index_to_skill, index_
             auc_test = roc_auc(test_dataloader, model, device)
             auc[foldidx] = auc_test
             fpr[foldidx], tpr[foldidx] = plot_roc(test_dataloader, model, device)
+
             # Measure Precision, recall, and F1 and save to txt
             test_rep_path = f'{model_path}/test_rep_{foldidx}.txt'
             if not os.path.isfile(test_rep_path):
@@ -340,7 +339,6 @@ def test(model_path, splits, input_matrix, output_matrix, index_to_skill, index_
                     cls = infile.read()
             
             print(f"Test report of fold{foldidx}:\n", cls)
-            # plot_roc(test_dataloader, model, device)
 
     auc_values = list(map(float, list(auc.values())))
     auc_mean = np.mean(auc_values)
