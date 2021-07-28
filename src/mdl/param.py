@@ -9,16 +9,16 @@ torch.cuda.manual_seed_all(0)
 np.random.seed(0)
 
 fnn = {
-    'd': 100,  # size of hidden space
-    'lr': 0.01,  # learning rate
-    'b': 100,  # batch
-    'e': 10,  # epochs
+    'd': 10,  # size of hidden space
+    'lr': 0.001,  # learning rate
+    'b': 3,  # batch
+    'e': 1000,  # epochs
 }
 
 sgns = {
     'd': 100,  # size of hidden space
     'lr': 0.01,  # learning rate
-    'b': 100,  # batch
+    'b': 32,  # batch
     'e': 10,  # epochs
     'ns': 5,  # negative samples
 }
