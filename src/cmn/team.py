@@ -28,6 +28,9 @@ class Team(object):
     def get_skills(self):
         pass
 
+    def get_id(self):
+        return self.id
+
     @staticmethod
     def build_index_members(all_members):
         idx = 0
