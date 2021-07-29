@@ -8,7 +8,7 @@ def prepare_data(teams):
     output_data = []
     for team in teams:
         input_data.append(" ".join(team.get_skills()))
-        output_data.append(" ".join(team.get_members_names()))
+        output_data.append(" ".join([m.get_name() for m in team.members]))
     return input_data, output_data
 
 def build_vocab(input_data, output_data, splits):
