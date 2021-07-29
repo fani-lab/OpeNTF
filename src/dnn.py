@@ -7,16 +7,16 @@ from tqdm import tqdm  # For nice progress bar!
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-from cmn.team import Team
-import mdl.param
-from dal.data_utils import *
-from mdl.fnn import FNN
-from mdl.custom_dataset import TFDataset
 from torch.optim.lr_scheduler import StepLR, ReduceLROnPlateau
 import csv
 import ast
 import time
 
+from cmn.team import Team
+import mdl.param
+from mdl.fnn import FNN
+from mdl.custom_dataset import TFDataset
+from dal.data_utils import *
 
 def weighted_cross_entropy_with_logits(logits, targets, pos_weight = 2.5):
     return -targets * torch.log(torch.sigmoid(logits)) * pos_weight + (1 - targets) * -torch.log(1 - torch.sigmoid(logits))
@@ -25,27 +25,22 @@ def weighted_cross_entropy_with_logits(logits, targets, pos_weight = 2.5):
 # Set device cuda for GPU if it's available otherwise run on the CPU
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-def learn(index_to_skill, index_to_member, splits, skill_sparse_vecs, member_sparse_vecs, params, output):
+def learn(splits, i2s, i2m, skill_vecs, member_vecs, params, output):
 
     num_nodes = params['d']
     learning_rate = params['lr']
     batch_size = params['b']
     num_epochs = params['e']
 
-    # Build a folder for this model for the first time
-    if not os.path.isdir(output): os.mkdir(output)
-
-    output = f"{output}/nt{skill_sparse_vecs.shape[0]}_is{len(index_to_skill)}_os{len(index_to_member)}_nn{num_nodes}_lr{learning_rate}_bs{batch_size}_ne{num_epochs}"
-
     # Retrieving some of the required information for the model
-    input_size = len(index_to_skill)
-    output_size = len(index_to_member)
+    input_size = len(i2s)
+    output_size = len(i2m)
     
     # Specify a path for the model
     if not os.path.isdir(output): os.mkdir(output)
     else:
         print("This model already exists")
-        return output
+        return
 
     # Prime a dict for train and valid loss
     train_valid_loss = dict()
@@ -56,10 +51,10 @@ def learn(index_to_skill, index_to_member, splits, skill_sparse_vecs, member_spa
     # Training K-fold
     for foldidx in splits['folds'].keys():
         # Retrieving the folds
-        X_train = skill_sparse_vecs[splits['folds'][foldidx]['train'], :]
-        y_train = member_sparse_vecs[splits['folds'][foldidx]['train']]
-        X_valid = skill_sparse_vecs[splits['folds'][foldidx]['valid'], :]
-        y_valid = member_sparse_vecs[splits['folds'][foldidx]['valid']]
+        X_train = skill_vecs[splits['folds'][foldidx]['train'], :]
+        y_train = member_vecs[splits['folds'][foldidx]['train']]
+        X_valid = skill_vecs[splits['folds'][foldidx]['valid'], :]
+        y_valid = member_vecs[splits['folds'][foldidx]['valid']]
 
         # Building custom dataset
         training_matrix = TFDataset(X_train, y_train)
@@ -156,8 +151,6 @@ def learn(index_to_skill, index_to_member, splits, skill_sparse_vecs, member_spa
     with open(plot_path, 'w') as outfile:
         json.dump(train_valid_loss, outfile)
 
-    return output
-
 def plot(plot_path, output):
     with open(plot_path) as infile:
         train_valid_loss = json.load(infile)
@@ -169,12 +162,12 @@ def plot(plot_path, output):
         plt.savefig(f'{output}/fold{foldidx}.png', dpi=100, bbox_inches='tight')
         plt.show()  
 
-def eval(model_path, splits, input_matrix, output_matrix, index_to_skill, index_to_member, batch_size):
+def eval(model_path, splits, i2s, i2m, skill_vecs, member_vecs, batch_size):
     if not os.path.isdir(model_path):
         print("The model does not exist!")
         return
-    input_size = len(index_to_skill)
-    output_size = len(index_to_member)    
+    input_size = len(i2s)
+    output_size = len(i2m)    
     
     auc_path = f"{model_path}/train_valid_auc.json"
     if os.path.isfile(auc_path):
@@ -201,10 +194,10 @@ def eval(model_path, splits, input_matrix, output_matrix, index_to_skill, index_
         for foldidx in splits['folds'].keys():
             if np.any(np.isnan(data[str(foldidx)]["train"])): continue
 
-            X_train = input_matrix[splits['folds'][foldidx]['train'], :]
-            y_train = output_matrix[splits['folds'][foldidx]['train']]
-            X_valid = input_matrix[splits['folds'][foldidx]['valid'], :]
-            y_valid = output_matrix[splits['folds'][foldidx]['valid']]
+            X_train = skill_vecs[splits['folds'][foldidx]['train'], :]
+            y_train = member_vecs[splits['folds'][foldidx]['train']]
+            X_valid = skill_vecs[splits['folds'][foldidx]['valid'], :]
+            y_valid = member_vecs[splits['folds'][foldidx]['valid']]
 
             training_matrix = TFDataset(X_train, y_train)
             validation_matrix = TFDataset(X_valid, y_valid)
@@ -281,7 +274,7 @@ def eval(model_path, splits, input_matrix, output_matrix, index_to_skill, index_
     with open(auc_path, 'w') as outfile:
         json.dump(auc, outfile)
 
-def test(model_path, splits, input_matrix, output_matrix, index_to_skill, index_to_member, batch_size):
+def test(model_path, splits, i2s, i2m, skill_vecs, member_vecs, batch_size):
     if not os.path.isdir(model_path):
         print("The model does not exist!")
         return
@@ -292,12 +285,12 @@ def test(model_path, splits, input_matrix, output_matrix, index_to_skill, index_
         print(f"Reports can be found in: {model_path}")
         # return
 
-    input_size = len(index_to_skill)
-    output_size = len(index_to_member)  
+    input_size = len(i2s)
+    output_size = len(i2m)  
 
     # Load
-    X_test = input_matrix[splits['test'], :]
-    y_test = output_matrix[splits['test']]
+    X_test = skill_vecs[splits['test'], :]
+    y_test = member_vecs[splits['test']]
 
     test_matrix = TFDataset(X_test, y_test)
 
@@ -307,38 +300,32 @@ def test(model_path, splits, input_matrix, output_matrix, index_to_skill, index_
     auc = dict()
     fpr = dict()
     tpr = dict()
-    with open(f"{model_path}/train_valid_loss.json", 'r') as infile:
-        data = json.load(infile)
-        for foldidx in splits['folds'].keys():
-            if np.any(np.isnan(data[str(foldidx)]["train"])): continue
-            auc[foldidx] = ""
-            fpr[foldidx] = []
-            tpr[foldidx] = []
+    for foldidx in splits['folds'].keys():
+        auc[foldidx] = ""
+        fpr[foldidx] = []
+        tpr[foldidx] = []
 
-    with open(f"{model_path}/train_valid_loss.json", 'r') as infile:
-        data = json.load(infile)
-        for foldidx in splits['folds'].keys():
-            if np.any(np.isnan(data[str(foldidx)]["train"])): continue
-            model = FNN(input_size=input_size, output_size=output_size, param=mdl.param.fnn).to(device)
-            model.load_state_dict(torch.load(f'{model_path}/state_dict_model_{foldidx}.pt'))
-            model.eval()
+    for foldidx in splits['folds'].keys():
+        model = FNN(input_size=input_size, output_size=output_size, param=mdl.param.fnn).to(device)
+        model.load_state_dict(torch.load(f'{model_path}/state_dict_model_{foldidx}.pt'))
+        model.eval()
 
-            # Measure AUC for each fold and store in dict to later save as json
-            auc_test = roc_auc(test_dataloader, model, device)
-            auc[foldidx] = auc_test
-            fpr[foldidx], tpr[foldidx] = plot_roc(test_dataloader, model, device)
+        # Measure AUC for each fold and store in dict to later save as json
+        auc_test = roc_auc(test_dataloader, model, device)
+        auc[foldidx] = auc_test
+        fpr[foldidx], tpr[foldidx] = plot_roc(test_dataloader, model, device)
 
-            # Measure Precision, recall, and F1 and save to txt
-            test_rep_path = f'{model_path}/test_rep_{foldidx}.txt'
-            if not os.path.isfile(test_rep_path):
-                cls = cls_rep(test_dataloader, model, device)
-                with open(test_rep_path, 'w') as outfile:
-                    outfile.write(cls)
-            else:
-                with open(test_rep_path, 'r') as infile:
-                    cls = infile.read()
-            
-            print(f"Test report of fold{foldidx}:\n", cls)
+        # Measure Precision, recall, and F1 and save to txt
+        test_rep_path = f'{model_path}/test_rep_{foldidx}.txt'
+        if not os.path.isfile(test_rep_path):
+            cls = cls_rep(test_dataloader, model, device)
+            with open(test_rep_path, 'w') as outfile:
+                outfile.write(cls)
+        else:
+            with open(test_rep_path, 'r') as infile:
+                cls = infile.read()
+
+        print(f"Test report of fold{foldidx}:\n", cls)
 
     auc_values = list(map(float, list(auc.values())))
     auc_mean = np.mean(auc_values)
@@ -363,19 +350,19 @@ def test(model_path, splits, input_matrix, output_matrix, index_to_skill, index_
     plt.legend()
     plt.show()
 
-def main(splits, teams, skill_to_index, member_to_index, index_to_skill, index_to_member, output, cmd=['test', 'plot', 'eval']):
+def main(splits, skill_vecs, member_vecs, i2m, m2i, i2s, s2i, output, cmd=['train', 'test', 'eval']):
 
-    skill_sparse_vecs, member_sparse_vecs = Team.load_sparse_vectors\
-        (teams, skill_to_index, member_to_index, f'../data/preprocessed/{output}/sparse_vecs_{len(teams)}.npz')
-    output = learn(index_to_skill, index_to_member, splits, skill_sparse_vecs, member_sparse_vecs, mdl.param.fnn,
-                   f'../output/{output}/fnn')
+    # Build a folder for this model for the first time
+    if not os.path.isdir(output): os.mkdir(output)
+    output = f"{output}/nt{skill_vecs.shape[0]}_is{len(i2s)}_os{len(i2m)}_nn{mdl.param.fnn['d']}_lr{mdl.param.fnn['lr']}_bs{mdl.param.fnn['b']}_ne{mdl.param.fnn['e']}"
 
-    if 'test' in cmd:
-        test(output, splits, skill_sparse_vecs, member_sparse_vecs, index_to_skill, index_to_member, mdl.param.fnn['b'])
-
-    if 'plot' in cmd:
+    if 'train' in cmd:
+        learn(splits, i2s, i2m, skill_vecs, member_vecs, mdl.param.fnn, output)
         plot_path = f"{output}/train_valid_loss.json"
         plot(plot_path, output)
 
+    if 'test' in cmd:
+        test(output, splits, i2s, i2m, skill_vecs, member_vecs, mdl.param.fnn['b'])
+
     if 'eval' in cmd:
-        eval(output, splits, skill_sparse_vecs, member_sparse_vecs, index_to_skill, index_to_member, mdl.param.fnn['b'])
+        eval(output, splits, i2s, i2m, skill_vecs, member_vecs, mdl.param.fnn['b'])
