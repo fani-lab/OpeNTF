@@ -378,8 +378,6 @@ def test(model_path, splits, input_matrix, output_matrix, index_to_skill, index_
     plt.show()
 
 def main(splits, teams, skill_to_index, member_to_index, index_to_skill, index_to_member, output, cmd=['test', 'plot', 'eval']):
-    skill_sparse_vecs, member_sparse_vecs = Team.load_sparse_vectors\
-        (teams, skill_to_index, member_to_index, f'../data/preprocessed/{output}/sparse_vecs_{len(teams)}.npz')
     output = learn(index_to_skill, index_to_member, splits, skill_sparse_vecs, member_sparse_vecs, mdl.param.sgns,
                    f'../output/{output}/sgns')
 
