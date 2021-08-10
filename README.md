@@ -41,5 +41,5 @@ Team Formation in Social Network refers to forming a team of individuals, based 
             > Run main.py : cd src> Python main.py
 
 ## Acknowledgement
-    * Dr. Hossein Fani
-    * Arman Vageh Dashti
+   * Dr. Hossein Fani
+   * Arman Vageh Dashti
