@@ -30,11 +30,17 @@ Team Formation in Social Network refers to forming a team of individuals, based 
         1. Open Anconda Prompt (anaconda3) from your local machine
         2. Go the project directory of Team Formation
         3. Create conda environment using following command:
-            > conda create --name (name: any name for environment)
+          ```
+          conda create --name (name: any name for environment)
+          ```
         4. Activate your newly created environment using:
-            > conda activate name (replace name with environment name)
+          ```
+            conda activate name (replace name with environment name)
+          ```
         5. Install pytorch version 1.6:
-            > pip install torch == 1.6.0 torchvision==0.7.0
+          ```
+            pip install torch == 1.6.0 torchvision==0.7.0
+          ```
     3. *Installing requirements*
         1. After succesfully creating environment run:
             > pip install -r requirements.txt
