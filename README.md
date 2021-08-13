@@ -39,7 +39,7 @@ Team Formation in Social Network refers to forming a team of individuals, based 
           ```
         5. Install pytorch version 1.6:
           ```
-            pip install torch == 1.6.0 torchvision==0.7.0
+            pip install torch == 1.6.0
           ```
     3. *Installing requirements*
         1. After succesfully creating environment run:
