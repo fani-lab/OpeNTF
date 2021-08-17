@@ -25,30 +25,30 @@ class Team(object):
     @staticmethod
     def build_index_members(all_members):
         idx = 0
-        member_to_index = {}
-        index_to_member = {}
+        m2i = {}
+        i2m = {}
         start_time = time.time()
         for member in all_members.values():
-            index_to_member[idx] = f'{member.get_id()}_{member.get_name()}'
-            member_to_index[f'{member.get_id()}_{member.get_name()}'] = idx
+            i2m[idx] = f'{member.get_id()}_{member.get_name()}'
+            m2i[f'{member.get_id()}_{member.get_name()}'] = idx
             idx += 1
         print(f"It took {time.time() - start_time} seconds to build i2m and m2i.")
-        return index_to_member, member_to_index
+        return i2m, m2i
 
     @staticmethod
     def build_index_skills(teams):
         idx = 0
-        skill_to_index = {}
-        index_to_skill = {}
+        s2i = {}
+        i2s = {}
         start_time = time.time()
         for team in teams.values():
             for skill in team.get_skills():
-                if skill not in skill_to_index.keys():
-                    skill_to_index[skill] = idx
-                    index_to_skill[idx] = skill
+                if skill not in s2i.keys():
+                    s2i[skill] = idx
+                    i2s[idx] = skill
                     idx += 1
         print(f"It took {time.time() - start_time} seconds to build i2s and s2i.")
-        return index_to_skill, skill_to_index
+        return i2s, s2i
 
     @staticmethod
     def read_data(data_path, output, topn=None):
@@ -73,17 +73,17 @@ class Team(object):
         except:
             print("File not found! Generating the sparse matrices...")
             start_time = time.time()
-            training_size = len(teams)
+            len_teams = len(teams)
             BUCKET_SIZE = 100
             SKILL_SIZE = len(s2i)
             AUTHOR_SIZE = len(m2i)
 
             # Sparse Matrix and bucketing
-            data = lil_matrix((training_size, SKILL_SIZE + AUTHOR_SIZE))
+            data = lil_matrix((len_teams, SKILL_SIZE + AUTHOR_SIZE))
             data_ = np.zeros((BUCKET_SIZE, SKILL_SIZE + AUTHOR_SIZE))
             j = -1
             for i, team in enumerate(teams.values()):
-                if i >= training_size: break
+                if i >= len_teams: break
 
                 # Generating one hot encoded vector for input
                 X = np.zeros((1, SKILL_SIZE))
@@ -94,7 +94,7 @@ class Team(object):
                 # This does not work since the number of authors are different for each sample, therefore we need to build the output as a one hot encoding
                 # y_index = []
                 # for id in output_ids:
-                #     y_index.append(member_to_index[id])
+                #     y_index.append(m2i[id])
                 # y_index.append(len(output_ids))
                 # y = np.asarray([y_index])
 
@@ -128,7 +128,7 @@ class Team(object):
 
             skill_vecs = data[:, :SKILL_SIZE]
             member_vecs = data[:, - AUTHOR_SIZE:]
-            return skill_vecs, member_vecs, i2m, m2i, i2s, s2i, teams
+            return skill_vecs, member_vecs, i2m, m2i, i2s, s2i, len_teams
 
     @classmethod
     def get_stats(cls, teams, output):

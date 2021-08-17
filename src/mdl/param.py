@@ -16,9 +16,9 @@ fnn = {
 }
 
 sgns = {
-    'd': 100,  # size of hidden space
+    'd': 10,  # size of hidden space
     'lr': 0.01,  # learning rate
-    'b': 32,  # batch
+    'b': 2,  # batch
     'e': 10,  # epochs
-    'ns': 5,  # negative samples
+    'ns': 3,  # negative samples
 }

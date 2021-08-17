@@ -350,7 +350,7 @@ def test(model_path, splits, i2s, i2m, skill_vecs, member_vecs, batch_size):
     plt.legend()
     plt.show()
 
-def main(splits, skill_vecs, member_vecs, i2m, m2i, i2s, s2i, output, cmd=['train', 'test', 'eval']):
+def main(splits, skill_vecs, member_vecs, i2m, m2i, i2s, s2i, output, cmd=['train', 'plot', 'test', 'eval']):
 
     # Build a folder for this model for the first time
     if not os.path.isdir(output): os.mkdir(output)
@@ -358,6 +358,8 @@ def main(splits, skill_vecs, member_vecs, i2m, m2i, i2s, s2i, output, cmd=['trai
 
     if 'train' in cmd:
         learn(splits, i2s, i2m, skill_vecs, member_vecs, mdl.param.fnn, output)
+
+    if 'plot' in cmd:
         plot_path = f"{output}/train_valid_loss.json"
         plot(plot_path, output)
 
