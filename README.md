@@ -29,17 +29,21 @@ Team Formation in Social Network refers to forming a team of individuals, based 
     2. *Creating Environment*
         1. Open Anconda Prompt (anaconda3) from your local machine
         2. Go the project directory of Team Formation
-        3. Create conda environment using following command:
+        3. Create conda environment using following comman
           ```
-          conda create --name (name: any name for environment)
+          conda create --TeamFormation (name of environment)
           ```
         4. Activate your newly created environment using:
           ```
-            conda activate name (replace name with environment name)
+            conda activate TeamFormation
           ```
         5. Install pytorch version 1.6:
           ```
             pip install torch == 1.6.0
+          ```
+        6. Install openNMT-py:
+          ```
+            pip install openNMT-py
           ```
     3. *Installing requirements*
         1. After succesfully creating environment run:
