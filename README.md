@@ -18,7 +18,9 @@ Team Formation in Social Network refers to forming a team of individuals, based 
 
 1. **Source Code**
   * Download the .zip file for TeamFormation project from :
-    > [TeamFormation](https://github.com/VaghehDashti/TeamFormation)>Code>DownloadZip
+    ```
+      [TeamFormation](https://github.com/VaghehDashti/TeamFormation)>Code>DownloadZip
+    ```
   * Or Clone the git repository from https://github.com/VaghehDashti/TeamFormation
 
 2. **Create an Environment**
@@ -47,8 +49,12 @@ Team Formation in Social Network refers to forming a team of individuals, based 
           ```
     3. *Installing requirements*
         1. After succesfully creating environment run:
-            > pip install -r requirements.txt
-            > Run main.py : cd src> Python main.py
+         ```
+            pip install -r requirements.txt
+         ```
+         ```
+            Run main.py : cd src> Python main.py
+         ```
 
 ## Acknowledgement
    * Dr. Hossein Fani
