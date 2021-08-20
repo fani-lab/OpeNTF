@@ -18,9 +18,7 @@ Team Formation in Social Network refers to forming a team of individuals, based 
 
 1. **Source Code**
   * Download the .zip file for TeamFormation project from :
-    ```
-      [TeamFormation](https://github.com/VaghehDashti/TeamFormation)>Code>DownloadZip
-    ```
+      > [TeamFormation](https://github.com/VaghehDashti/TeamFormation)>Code>DownloadZip
   * Or Clone the git repository from https://github.com/VaghehDashti/TeamFormation
 
 2. **Create an Environment**
@@ -54,6 +52,11 @@ Team Formation in Social Network refers to forming a team of individuals, based 
          ```
          ```
             Run main.py : cd src> Python main.py
+         ```
+         2. Or update requirements using environment.yml file:
+         * Go the directory where environment.yml is located and run :
+         ```
+            conda env update -f environment.yml
          ```
 
 ## Acknowledgement
