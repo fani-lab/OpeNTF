@@ -39,7 +39,12 @@ Team Formation in Social Network refers to forming a team of individuals, based 
           ```
         5. Install pytorch version 1.6:
           ```
-            pip install torch == 1.6.0
+            # CUDA 10.2
+            pip install torch == 1.6.0 
+          ```
+          ```
+            OR # CUDA 10.1
+            pip install torch==1.6.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html
           ```
         6. Install openNMT-py:
           ```
