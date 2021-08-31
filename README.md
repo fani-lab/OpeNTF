@@ -13,7 +13,7 @@ git clone https://github.com/VaghehDashti/TeamFormation.git
 cd TeamFormation
 pip install -r requirements.txt
 ```
-But a better way would be to create a new [``conda``](https://www.anaconda.com/products/individual) environment (by default ``TeamFormation``) and install the required packages by:
+But a better way would be to create a new [``conda``](https://www.anaconda.com/products/individual) environment, by default ``ttf`` (temporal team formation) and install the required packages by:
 ```sh
 git clone https://github.com/VaghehDashti/TeamFormation.git
 cd TeamFormation
