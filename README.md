@@ -2,68 +2,34 @@
 Team Formation in Social Network refers to forming a team of individuals, based on their skills or expertise to accomplish the specified task.
 
 # Table of Content
-* Setup
-* Features
-* Quickstart
-* Acknowledgement
+1. [Setup](#1-setup)
+2. [Quickstart](#2-quickstart)
+3. [Features](#3-features)
+4. [Acknowledgement](#4-acknowledgement)
 
-## Setup
+## 1. Setup
+We require ``Python >=3.7`` and packages listed in [``requirements.txt``](requirements.txt). We need to clone the codebase and install the required packages by:
+```sh
+git clone https://github.com/VaghehDashti/TeamFormation.git
+cd TeamFormation
+pip install -r requirements.txt
+```
+But a better way would be to create a new [``conda``](https://www.anaconda.com/products/individual) environment (by default ``TeamFormation``) and install the required packages by:
+```sh
+git clone https://github.com/VaghehDashti/TeamFormation.git
+cd TeamFormation
+conda env create -f environment.yml
+```
 
-### Requirements:
-1. Python >=3.7 
-    * [Python](https://www.python.org/downloads/)
-2. Pytorch == 1.6
-    
-## QuickStart
+For installation of specific version of a python package due to, e.g., ``CUDA`` versions compatibility, one can edit [``environment.yml``](environment.yml) or [``requirements.txt``](requirements.txt) like as follows:
 
-1. **Source Code**
-  * Download the .zip file for TeamFormation project from :
-      > [TeamFormation](https://github.com/VaghehDashti/TeamFormation)>Code>DownloadZip
-  * Or Clone the git repository from https://github.com/VaghehDashti/TeamFormation
+```
+# CUDA 10.1
+torch==1.6.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html
+```
+## 2. Quickstart:
 
-2. **Create an Environment**
-    1. *Installation*
-        * Install Anaconda from https://www.anaconda.com/products/individual
-        * Steps to Install Anaconda :  https://docs.anaconda.com/anaconda/install/windows/
+## 3. Features:
 
-    2. *Creating Environment*
-        1. Open Anconda Prompt (anaconda3) from your local machine
-        2. Go the project directory of Team Formation
-        3. Create conda environment using following comman
-          ```
-          conda create --TeamFormation (name of environment)
-          ```
-        4. Activate your newly created environment using:
-          ```
-            conda activate TeamFormation
-          ```
-        5. Install pytorch version 1.6:
-          ```
-            # CUDA 10.2
-            pip install torch == 1.6.0 
-          ```
-          ```
-            OR # CUDA 10.1
-            pip install torch==1.6.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html
-          ```
-        6. Install openNMT-py:
-          ```
-            pip install openNMT-py
-          ```
-    3. *Installing requirements*
-        1. After succesfully creating environment run:
-         ```
-            pip install -r requirements.txt
-         ```
-         ```
-            Run main.py : cd src> Python main.py
-         ```
-         2. Or update requirements using environment.yml file:
-         * Go the directory where environment.yml is located and run :
-         ```
-            conda env update -f environment.yml
-         ```
+## 4. Acknowledgement:
 
-## Acknowledgement
-   * Dr. Hossein Fani
-   * Arman Vageh Dashti
