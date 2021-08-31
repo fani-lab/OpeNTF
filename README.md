@@ -1,7 +1,6 @@
 # Team Formation 
 Team Formation in Social Network refers to forming a team of individuals, based on their skills or expertise to accomplish the specified task.
 
-# Table of Content
 1. [Setup](#1-setup)
 2. [Quickstart](#2-quickstart)
 3. [Features](#3-features)
