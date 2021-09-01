@@ -121,7 +121,7 @@ def learn(splits, i2s, i2m, skill_vecs, member_vecs, params, output, unigram):
         model = SGNS(input_size=input_size, output_size=output_size, param=mdl.param.sgns).to(device)
 
         optimizer = optim.Adam(model.parameters(), lr=learning_rate)
-        scheduler = ReduceLROnPlateau(optimizer, factor = 0.5, patience = 3, verbose = True)
+        scheduler = ReduceLROnPlateau(optimizer, factor=0.5, patience=3, verbose=True)
         # scheduler = StepLR(optimizer, step_size=3, gamma=0.9)
 
         train_loss_values = []
@@ -197,7 +197,7 @@ def learn(splits, i2s, i2m, skill_vecs, member_vecs, params, output, unigram):
 
     return output
 
-def plot(plot_path):
+def plot(plot_path, output):
     with open(plot_path) as infile:
         train_valid_loss = json.load(infile)
     for foldidx in train_valid_loss.keys():
@@ -205,6 +205,7 @@ def plot(plot_path):
         plt.plot(train_valid_loss[foldidx]['valid'], label='Validation Loss')
         plt.legend(loc='upper right')
         plt.title(f'Training and Validation Loss for fold #{foldidx}')
+        plt.savefig(f'{output}/fold{foldidx}.png', dpi=100, bbox_inches='tight')
         plt.show()  
 
 def eval(model_path, splits, i2s, i2m, skill_vecs, member_vecs, batch_size):
@@ -217,7 +218,7 @@ def eval(model_path, splits, i2s, i2m, skill_vecs, member_vecs, batch_size):
     auc_path = f"{model_path}/train_valid_auc.json"
     if os.path.isfile(auc_path):
         print(f"Reports can be found in: {model_path}")
-        return
+
 
     # Initialize auc dictionary for training and validation
     # Initialize roc dictionary for training and validation
@@ -261,7 +262,7 @@ def eval(model_path, splits, i2s, i2m, skill_vecs, member_vecs, batch_size):
             auc[foldidx]['valid'] = auc_valid
 
             roc_train[foldidx]['fpr'], roc_train[foldidx]['tpr'] = plot_roc(training_dataloader, model, device)
-            roc_valid[foldidx]['fpr'], roc_valid[foldidx]['fpr'] = plot_roc(validation_dataloader, model, device)
+            roc_valid[foldidx]['fpr'], roc_valid[foldidx]['tpr'] = plot_roc(validation_dataloader, model, device)
 
             # Measure Precision, recall, and F1 and save to txt
             train_rep_path = f'{model_path}/train_rep_{foldidx}.txt'
@@ -298,7 +299,7 @@ def eval(model_path, splits, i2s, i2m, skill_vecs, member_vecs, batch_size):
 
     plt.xlabel('False positive rate')
     plt.ylabel('True positive rate')
-    plt.title('ROC curves for testing set')
+    plt.title('ROC curves for training set')
     plt.legend()
     plt.show()
 
@@ -352,30 +353,27 @@ def test(model_path, splits, i2s, i2m, skill_vecs, member_vecs, batch_size):
             fpr[foldidx] = []
             tpr[foldidx] = []
 
-    with open(f"{model_path}/train_valid_loss.json", 'r') as infile:
-        data = json.load(infile)
-        for foldidx in splits['folds'].keys():
-            if np.any(np.isnan(data[str(foldidx)]["train"])): continue
-            model = SGNS(input_size=input_size, output_size=output_size, param=mdl.param.sgns).to(device)
-            model.load_state_dict(torch.load(f'{model_path}/state_dict_model_{foldidx}.pt'))
-            model.eval()
+    for foldidx in auc.keys():
+        model = SGNS(input_size=input_size, output_size=output_size, param=mdl.param.sgns).to(device)
+        model.load_state_dict(torch.load(f'{model_path}/state_dict_model_{foldidx}.pt'))
+        model.eval()
 
-            # Measure AUC for each fold and store in dict to later save as json
-            auc_test = roc_auc(test_dataloader, model, device)
-            auc[foldidx] = auc_test
-            fpr[foldidx], tpr[foldidx] = plot_roc(test_dataloader, model, device)
+        # Measure AUC for each fold and store in dict to later save as json
+        auc_test = roc_auc(test_dataloader, model, device)
+        auc[foldidx] = auc_test
+        fpr[foldidx], tpr[foldidx] = plot_roc(test_dataloader, model, device)
 
-            # Measure Precision, recall, and F1 and save to txt
-            test_rep_path = f'{model_path}/test_rep_{foldidx}.txt'
-            if not os.path.isfile(test_rep_path):
-                cls = cls_rep(test_dataloader, model, device)
-                with open(test_rep_path, 'w') as outfile:
-                    outfile.write(cls)
-            else:
-                with open(test_rep_path, 'r') as infile:
-                    cls = infile.read()
-            
-            print(f"Test report of fold{foldidx}:\n", cls)
+        # Measure Precision, recall, and F1 and save to txt
+        test_rep_path = f'{model_path}/test_rep_{foldidx}.txt'
+        if not os.path.isfile(test_rep_path):
+            cls = cls_rep(test_dataloader, model, device)
+            with open(test_rep_path, 'w') as outfile:
+                outfile.write(cls)
+        else:
+            with open(test_rep_path, 'r') as infile:
+                cls = infile.read()
+
+        print(f"Test report of fold{foldidx}:\n", cls)
 
     auc_values = list(map(float, list(auc.values())))
     auc_mean = np.mean(auc_values)
@@ -389,7 +387,7 @@ def test(model_path, splits, i2s, i2m, skill_vecs, member_vecs, batch_size):
 
     colors = ['deeppink', 'royalblue', 'darkviolet', 'aqua', 'darkorange', 'maroon', 'chocolate']
     plt.figure()
-    for foldidx in splits['folds'].keys():
+    for foldidx in fpr.keys():
         plt.plot(fpr[foldidx], tpr[foldidx],
                  label='micro-average ROC curve #{:.0f} of test set (auc = {:.2f})'.format(foldidx, float(
                      auc[foldidx])),
@@ -414,8 +412,8 @@ def main(splits, skill_vecs, member_vecs, i2m, m2i, i2s, s2i, output, cmd=['trai
         plot_path = f"{output}/train_valid_loss.json"
         plot(plot_path, output)
 
-    if 'test' in cmd:
-        test(output, splits, i2s, i2m, skill_vecs, member_vecs, mdl.param.sgns['b'])
-
     if 'eval' in cmd:
         eval(output, splits, i2s, i2m, skill_vecs, member_vecs, mdl.param.sgns['b'])
+
+    if 'test' in cmd:
+        test(output, splits, i2s, i2m, skill_vecs, member_vecs, mdl.param.sgns['b'])
