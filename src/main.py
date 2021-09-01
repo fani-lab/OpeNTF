@@ -12,15 +12,13 @@ import sgns
 
 sys.path.extend(['../cmn'])
 
-# output = 'dblp.v12'
-output = 'toy'
+output = 'dblp.v12'
+# output = 'toy'
 
 skill_vecs, member_vecs, i2m, m2i, i2s, s2i, len_teams = Publication.generate_sparse_vectors(raw_data_path=f'../data/raw/{output}.json', output=f'../data/preprocessed/{output}', topn=None)
 
-# Arman => the model train-test does not need teams now.
-# But just because of n_teams we have to load them all. Try to find a workaround please.
 splits = create_evaluation_splits(len_teams, 2)
-# dnn.main(splits, skill_vecs, member_vecs, i2m, m2i, i2s, s2i, output=f'../output/{output}/fnn/', cmd=['test'])  # ['train', 'test', 'eval']
+dnn.main(splits, skill_vecs, member_vecs, i2m, m2i, i2s, s2i, output=f'../output/{output}/fnn', cmd=['train', 'eval', 'test'])  # ['train', 'test', 'eval']
 
 # nmt.main(splits, input_data, output_data, cmd=['train', 'test', 'eval'])
 

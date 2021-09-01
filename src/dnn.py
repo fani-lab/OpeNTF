@@ -45,7 +45,7 @@ def learn(splits, i2s, i2m, skill_vecs, member_vecs, params, output):
     # Prime a dict for train and valid loss
     train_valid_loss = dict()
     for i in range(len(splits['folds'].keys())):
-        train_valid_loss[i] = {'train' : [], 'valid' : []}
+        train_valid_loss[i] = {'train': [], 'valid': []}
 
     start_time = time.time()
     # Training K-fold
@@ -172,7 +172,6 @@ def eval(model_path, splits, i2s, i2m, skill_vecs, member_vecs, batch_size):
     auc_path = f"{model_path}/train_valid_auc.json"
     if os.path.isfile(auc_path):
         print(f"Reports can be found in: {model_path}")
-        # return
 
     # Initialize auc dictionary for training and validation
     # Initialize roc dictionary for training and validation
@@ -217,7 +216,7 @@ def eval(model_path, splits, i2s, i2m, skill_vecs, member_vecs, batch_size):
             auc[foldidx]['valid'] = auc_valid
 
             roc_train[foldidx]['fpr'], roc_train[foldidx]['tpr'] = plot_roc(training_dataloader, model, device)
-            roc_valid[foldidx]['fpr'], roc_valid[foldidx]['fpr'] = plot_roc(validation_dataloader, model, device)
+            roc_valid[foldidx]['fpr'], roc_valid[foldidx]['tpr'] = plot_roc(validation_dataloader, model, device)
 
             # Measure Precision, recall, and F1 and save to txt
             train_rep_path = f'{model_path}/train_rep_{foldidx}.txt'
@@ -254,7 +253,7 @@ def eval(model_path, splits, i2s, i2m, skill_vecs, member_vecs, batch_size):
 
     plt.xlabel('False positive rate')
     plt.ylabel('True positive rate')
-    plt.title('ROC curves for testing set')
+    plt.title('ROC curves for training set')
     plt.legend()
     plt.show()
 
@@ -300,12 +299,15 @@ def test(model_path, splits, i2s, i2m, skill_vecs, member_vecs, batch_size):
     auc = dict()
     fpr = dict()
     tpr = dict()
-    for foldidx in splits['folds'].keys():
-        auc[foldidx] = ""
-        fpr[foldidx] = []
-        tpr[foldidx] = []
+    with open(f"{model_path}/train_valid_loss.json", 'r') as infile:
+        data = json.load(infile)
+        for foldidx in splits['folds'].keys():
+            if np.any(np.isnan(data[str(foldidx)]["train"])): continue
+            auc[foldidx] = ""
+            fpr[foldidx] = []
+            tpr[foldidx] = []
 
-    for foldidx in splits['folds'].keys():
+    for foldidx in auc.keys():
         model = FNN(input_size=input_size, output_size=output_size, param=mdl.param.fnn).to(device)
         model.load_state_dict(torch.load(f'{model_path}/state_dict_model_{foldidx}.pt'))
         model.eval()
@@ -338,7 +340,7 @@ def test(model_path, splits, i2s, i2m, skill_vecs, member_vecs, batch_size):
 
     colors = ['deeppink', 'royalblue', 'darkviolet', 'aqua', 'darkorange', 'maroon', 'chocolate']
     plt.figure()
-    for foldidx in splits['folds'].keys():
+    for foldidx in fpr.keys():
         plt.plot(fpr[foldidx], tpr[foldidx],
                  label='micro-average ROC curve #{:.0f} of test set (auc = {:.2f})'.format(foldidx, float(
                      auc[foldidx])),
@@ -363,8 +365,8 @@ def main(splits, skill_vecs, member_vecs, i2m, m2i, i2s, s2i, output, cmd=['trai
         plot_path = f"{output}/train_valid_loss.json"
         plot(plot_path, output)
 
-    if 'test' in cmd:
-        test(output, splits, i2s, i2m, skill_vecs, member_vecs, mdl.param.fnn['b'])
-
     if 'eval' in cmd:
         eval(output, splits, i2s, i2m, skill_vecs, member_vecs, mdl.param.fnn['b'])
+
+    if 'test' in cmd:
+        test(output, splits, i2s, i2m, skill_vecs, member_vecs, mdl.param.fnn['b'])
