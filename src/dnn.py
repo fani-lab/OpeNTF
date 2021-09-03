@@ -1,6 +1,6 @@
 import json
 import pickle
-from torch.nn.utils import clip_grad_norm_
+from torch.nn.utils import clip_grad_norm_, clip_grad_value_
 from torch import optim 
 from torch.utils.data import DataLoader 
 from tqdm import tqdm  # For nice progress bar!
@@ -11,6 +11,8 @@ from torch.optim.lr_scheduler import StepLR, ReduceLROnPlateau
 import csv
 import ast
 import time
+import torch
+torch.cuda.empty_cache()
 
 from cmn.team import Team
 import mdl.param
@@ -79,7 +81,7 @@ def learn(splits, i2s, i2m, skill_vecs, member_vecs, params, output):
         # criterion = nn.MultiLabelSoftMarginLoss()
 
         optimizer = optim.Adam(model.parameters(), lr=learning_rate)
-        scheduler = ReduceLROnPlateau(optimizer, factor = 0.5, patience = 3, verbose = True)
+        scheduler = ReduceLROnPlateau(optimizer, factor=0.5, patience=3, verbose=True)
         # scheduler = StepLR(optimizer, step_size=3, gamma=0.9)
 
 
@@ -112,7 +114,7 @@ def learn(splits, i2s, i2m, skill_vecs, member_vecs, params, output):
                     targets = targets.float().to(device=device)
 
                     # forward
-                    scores = model(data).double()
+                    scores = model(data)
                     print("this is the score:", scores.sum().item())
                     loss = weighted_cross_entropy_with_logits(scores, targets)
                     print("this is the loss:", loss.sum().item())
@@ -127,7 +129,7 @@ def learn(splits, i2s, i2m, skill_vecs, member_vecs, params, output):
                     optimizer.zero_grad()
                     if phase == 'train': 
                         loss.sum().backward()
-                        clip_grad_norm_(model.parameters(), 1)
+                        clip_grad_value_(model.parameters(), 1)
                         optimizer.step()
 
                 # Appending the loss of each epoch to plot later
@@ -136,7 +138,7 @@ def learn(splits, i2s, i2m, skill_vecs, member_vecs, params, output):
                 else:
                     valid_loss_values.append((valid_running_loss/X_valid.shape[0]))
 
-            scheduler.step(valid_running_loss/X_valid.shape[0])
+                scheduler.step(valid_running_loss/X_valid.shape[0])
 
          
         model_path = f"{output}/state_dict_model_{foldidx}.pt"

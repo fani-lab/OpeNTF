@@ -1,6 +1,8 @@
 import json
 import pickle
 import torch
+torch.cuda.empty_cache()
+from torch.nn.utils import clip_grad_norm_, clip_grad_value_
 from torch import optim 
 from torch.utils.data import DataLoader 
 from tqdm import tqdm  # For nice progress bar!
@@ -171,6 +173,7 @@ def learn(splits, i2s, i2m, skill_vecs, member_vecs, params, output, unigram):
                     optimizer.zero_grad()
                     if phase == 'train': 
                         loss.sum().backward()
+                        clip_grad_value_(model.parameters(), 1)
                         optimizer.step()
 
                 # Appending the loss of each epoch to plot later
@@ -179,7 +182,7 @@ def learn(splits, i2s, i2m, skill_vecs, member_vecs, params, output, unigram):
                 else:
                     valid_loss_values.append((valid_running_loss/X_valid.shape[0]))
 
-            scheduler.step(valid_running_loss/X_valid.shape[0])
+                scheduler.step(valid_running_loss/X_valid.shape[0])
 
          
         model_path = f"{output}/state_dict_model_{foldidx}.pt"
@@ -195,7 +198,6 @@ def learn(splits, i2s, i2m, skill_vecs, member_vecs, params, output, unigram):
     with open(plot_path, 'w') as outfile:
         json.dump(train_valid_loss, outfile)
 
-    return output
 
 def plot(plot_path, output):
     with open(plot_path) as infile:
@@ -239,6 +241,7 @@ def eval(model_path, splits, i2s, i2m, skill_vecs, member_vecs, batch_size):
         data = json.load(infile)
         for foldidx in splits['folds'].keys():
             if np.any(np.isnan(data[str(foldidx)]["train"])): continue
+
             X_train = skill_vecs[splits['folds'][foldidx]['train'], :]
             y_train = member_vecs[splits['folds'][foldidx]['train']]
             X_valid = skill_vecs[splits['folds'][foldidx]['valid'], :]

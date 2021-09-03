@@ -1,5 +1,5 @@
 import torch
-from torch.nn.functional import relu, sigmoid
+from torch.nn.functional import leaky_relu, sigmoid
 from torch import nn  
 
 
@@ -13,7 +13,7 @@ class FNN(nn.Module):
         self.initialize_weights()
 
     def forward(self, x):
-        x = self.dp(relu(self.fc1(x)))
+        x = self.dp(leaky_relu(self.fc1(x)))
         x = self.fc2(x)
         return x
 
