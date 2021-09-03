@@ -13,4 +13,6 @@
 *.src
 *.tgt
 *.pickle
+*.png
+*.pkl
 tmp.py
