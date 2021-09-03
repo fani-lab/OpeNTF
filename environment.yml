@@ -4,6 +4,7 @@ channels:
   - conda-forge
 dependencies:
   - python=3.8
+  - pip=21.1.2
   - pytorch==1.6.0
   - pip:
     - matplotlib==3.4.2
@@ -12,3 +13,4 @@ dependencies:
     - tqdm==4.60.0
     - PyYAML==5.4
     - scikit_learn==0.24.2
+    - opennmt-py==2.1.2
