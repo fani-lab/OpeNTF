@@ -29,18 +29,36 @@ For installation of specific version of a python package due to, e.g., ``CUDA`` 
 # CUDA 10.1
 torch==1.6.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html
 ```
-## 2. Quickstart:
-After installing the required packages, you can easily test neural models both with and without negative sampling with the default hyperparameters by running the ``main.py`` inside the ``src`` folder
+## 2. Quickstart
+**Data Preprocessing**
+Raw dataset, e.g., scholarly papers from [``dblp``]() or movies from [``imdb``], were assumed to be populated in [``data/raw``](data/raw). For the sake of integration test, a tiny-size toy example dataset [``toy.json``](data/raw/toy.json) from [``dblp``]() has been already available.
+
+Raw data will be preprocessed into two main sparse matrices each row of which represents: 
+i) ``member_vecs``: occurrence (boolean) vector representation for members of a team, e.g., authors of a paper or crew members of a movie, 
+ii) ``skill_vecs``: occurrence (boolean) vector representation for required skills for a team, e.g., keywords of a paper or genre of a movie.
+
+Also, indexes will be created to map the vector's indexes to members' names and skills' name, i.e., ``i2m``, ``m2i``, ``i2s``, ``s2i``.
+
+The sparse matrixes and the indexes will be persisted in [``data/preprocessed/{name of dataset}``](data/preprocessed/) as pickles ``teams.pkl`` and ``indexes.pkl``. For example, the preprocessed data for our toy example are [``teams.pkl``](data/preprocessed/toy/teams.pkl) and [``indexes.pkl``](data/preprocessed/toy/indexes.pkl).
+
+Please note that the preprocessing step will be executed once. Subsequent runs loads the persisted pickle files. In order to regenerate them, one should simply delete them. 
+
+**Data Train-Test Split**
+Likewise, please explain beriefly what happens in this step.
+
+**Model Train-Eval-Test**
+Likewise, please explain beriefly what happens in this step.
+
+For each model, different phases of machine learning pipeline has been implemented in ** and will be triggered by cmd arguement inside the [``src/main.py``](src/main.py). For example, for our feedforward baseline, the pipeline has been implemented in [``src/dnn.py``](src/dnn.py). Models' hyperparameters such as learning rate (``lr``) or number of epochs (``e``) can be set in [``src/mdl/param.py``](src/mdl/param.py).
+
+**Run**
+The pipeline runner has been implemented in [``src/main.py``](src/main.py) and can be started by:
+
 ```sh
+cd src
 python main.py
 ```
-If you want to change the hyperparameters you can open ``src/mdl/param.py`` and change the values to whatever you want.
-The default hyperparameters, which we used in our paper, are:
-- d: 100 (size of the hidden layer)
-- lr: 0.01 (learning rate)
-- b: 5 (mini-batch size)
-- e: 2 (number of epochs)
-- ns: 5 (number of negative samples)
+**Results**
 
 ## 3. Features:
 
