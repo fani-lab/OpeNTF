@@ -10,7 +10,7 @@ np.random.seed(0)
 
 fnn = {
     'd': 10,  # size of hidden space
-    'lr': 0.001,  # learning rate
+    'lr': 0.1,  # learning rate
     'b': 4,  # batch
     'e': 2,  # epochs
 }
