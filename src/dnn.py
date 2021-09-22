@@ -115,9 +115,9 @@ def learn(splits, i2s, i2m, skill_vecs, member_vecs, params, output):
 
                     # forward
                     scores = model(data)
-                    print("this is the score:", scores.sum().item())
+                    print(f"this is the {phase} score:", scores.sum().item())
                     loss = weighted_cross_entropy_with_logits(scores, targets)
-                    print("this is the loss:", loss.sum().item())
+                    print(f"this is the {phase} loss:", loss.sum().item())
                     
                     # Summing the loss of mini-batches
                     if phase == 'train':
@@ -131,6 +131,10 @@ def learn(splits, i2s, i2m, skill_vecs, member_vecs, params, output):
                         loss.sum().backward()
                         clip_grad_value_(model.parameters(), 1)
                         optimizer.step()
+
+                    if batch_idx % 10000 == 0:
+                        model_path = f"{output}/state_dict_model_{foldidx}_{batch_idx}.pt"
+                        torch.save(model.state_dict(), model_path)
 
                 # Appending the loss of each epoch to plot later
                 if phase == 'train':

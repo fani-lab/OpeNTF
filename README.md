@@ -56,11 +56,11 @@ Please note that the preprocessing step will be executed once. Subsequent runs l
 
 **Data Train-Test Split**
 
-Likewise, please explain beriefly what happens in this step.
+We randomly take 15% of the dataset for the test set, i.e., the model never sees these instances during training. You can change this parameter [sth](https://github.com/VaghehDashti/TeamFormation/blob/c73378c1e20a62957bdb0dfe4f54b882130c6d2e/src/dal/data_utils.py#L10)
 
 **Model Train-Eval-Test**
 
-Likewise, please explain beriefly what happens in this step.
+We use 5-fold validation and train a model on each fold and utilize the validation set of each fold to adjust the learning rate during training.
 
 For each model, different phases of machine learning pipeline has been implemented in ** and will be triggered by cmd arguement inside the [``src/main.py``](src/main.py). For example, for our feedforward baseline, the pipeline has been implemented in [``src/dnn.py``](src/dnn.py). Models' hyperparameters such as learning rate (``lr``) or number of epochs (``e``) can be set in [``src/mdl/param.py``](src/mdl/param.py).
 
