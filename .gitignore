@@ -15,4 +15,4 @@
 *.pickle
 *.png
 *.pkl
-tmp.py
+src/tmp.py
