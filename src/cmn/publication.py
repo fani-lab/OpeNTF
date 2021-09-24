@@ -1,7 +1,7 @@
 import json
 import traceback
 import pickle
-import time
+from time import time
 import os
 import matplotlib.pyplot as plt
 from collections import Counter
@@ -12,7 +12,7 @@ from cmn.team import Team
 
 class Publication(Team):
     def __init__(self, id, authors, title, year, doc_type, venue, references, fos, keywords):
-        super().__init__(id, authors)
+        super().__init__(id, authors, None)
         self.title = title
         self.year = year
         self.doc_type = doc_type
@@ -22,15 +22,19 @@ class Publication(Team):
         self.keywords = keywords
         self.skills = self.set_skills()
 
+        for author in self.members:
+            author.teams.add(self.id)
+            author.skills.union(set(self.skills))
+
     # Fill the fields attribute with non-zero weight from FOS
     def set_skills(self):
-        skills = []
+        skills = set()
         for skill in self.fos:
             if skill["w"] != 0.0:
-                skills.append(skill["name"].replace(" ", "_"))
+                skills.add(skill["name"].replace(" ", "_"))
         # Extend the fields with keywords
-        if len(self.keywords) != 0:
-            skills.extend(self.keywords.replace(" ", "_"))
+        if len(self.keywords):
+            skills.union(set([keyword.replace(" ", "_") for keyword in self.keywords]))
         return skills
 
     def get_skills(self):
@@ -40,35 +44,36 @@ class Publication(Team):
         return self.year
 
     @staticmethod
-    def read_data(data_path, output, topn=None):
-        counter = 0
-        teams = {}
-        all_members = {}
-        bypassed = {}
+    def read_data(datapath, output, index=True, topn=None):
         try:
-            start_time = time.time()
-            with open(f'{output}/teams.pkl', 'rb') as infile:
+            st = time()
+            print("Loading indexes pickle...")
+            with open(f'{output}/indexes.pkl', 'rb') as infile: i2c, c2i, i2s, s2i, i2t, t2i = pickle.load(infile)
+            print(f"It took {time() - st} seconds to load from the pickles.")
+            teams = None
+            if not index:
+                st = time()
                 print("Loading teams pickle...")
-                teams = pickle.load(infile)
-            with open(f'{output}/indexes.pkl', 'rb') as infile:
-                print("Loading indexes pickle...")
-                i2m, m2i, i2s, s2i, i2t, t2i = pickle.load(infile)
-            print(f"It took {time.time() - start_time} seconds to load from the pickles.")
-            return i2m, m2i, i2s, s2i, i2t, t2i, teams
-        except:
+                with open(f'{output}/teams.pkl', 'rb') as tfile: teams = pickle.load(tfile)
+                print(f"It took {time() - st} seconds to load from the pickles.")
+
+            return i2c, c2i, i2s, s2i, i2t, t2i, teams
+        except (FileNotFoundError, EOFError) as e:
             print("Pickles not found! Reading raw data ...")
-            with open(data_path, "r", encoding='utf-8') as jf:
+            teams = {}; candidates = {}
+            n_row = 0
+            with open(datapath, "r", encoding='utf-8') as jf:
                 # Skip the first line
                 jf.readline()
                 while True:
                     try:
                         # Read line by line to not overload the memory
                         line = jf.readline()
-                        if not line or (topn and counter >= topn):
+                        n_row += 1
+                        if not line or (topn and n_row >= topn):
                             break
 
                         jsonline = json.loads(line.lower().lstrip(","))
-
                         # Retrieve the desired attributes
                         id = jsonline['id']
                         title = jsonline['title']
@@ -79,68 +84,46 @@ class Publication(Team):
                         keywords = jsonline['keywords'] if 'keywords' in jsonline.keys() else []
 
                         # a team must have skills and members
-                        if 'fos' in jsonline.keys():
-                            fos = jsonline['fos']
-                        else:
-                            bypassed[id] = "No FOS!"
-                            continue  # fos -> skills
-                        if 'authors' not in jsonline.keys():
-                            bypassed[id] = "No Author!"
-                            continue
+                        try: fos = jsonline['fos']
+                        except: print(f'Warning! No fos for team id={id}. Bypassed!'); continue  #publication must have fos (skills)
+                        try: authors = jsonline['authors']
+                        except: print(f'Warning! No author for team id={id}. Bypassed!'); continue #publication must have authors (members)
+
                         members = []
-                        for auth in jsonline['authors']:
-
-                            # Retrieve the desired attributes
-                            member_id = auth['id']
-                            member_name = auth['name'].replace(" ", "_")
-
-                            if 'org' in auth.keys():
-                                member_org = auth['org'].replace(" ", "_")
-                            else:
-                                member_org = ""
-
-                            if member_id not in all_members.keys():
-                                member = Author(member_id, member_name, member_org)
-                                all_members[member_id] = member
-                            else:
-                                member = all_members[member_id]
-                                member.increase_n()
-                            members.append(member)
+                        for author in authors:
+                            member_id = author['id']
+                            member_name = author['name'].replace(" ", "_")
+                            member_org = author['org'].replace(" ", "_") if 'org' in author else ""
+                            if (idname := f'{member_id}_{member_name}') not in candidates:
+                                candidates[idname] = Author(member_id, member_name, member_org)
+                            members.append(candidates[idname])
 
                         team = Publication(id, members, title, year, type, venue, references, fos, keywords)
                         teams[team.id] = team
+                        if n_row % 10000 == 0: print(f"{n_row} instances have been loaded, and {time() - st} seconds has passed.")
 
-                        # input_data.append(" ".join(team.get_skills()))
-                        # output_data.append(" ".join([m.get_name() for m in team.members]))
-
-                        counter += 1
-                        if counter % 10000 == 0:
-                            print(
-                                f"{counter} instances have been loaded, and {time.time() - start_time} seconds has passed.")
-
-                    except:  # ideally should happen only for the last line ']'
-                        print(f'ERROR: There has been error in loading json line `{line}`!\n{traceback.format_exc()}')
+                    except json.JSONDecodeError as e:  # ideally should happen only for the last line ']'
+                        print(f'JSONDecodeError: There has been error in loading json line `{line}`!\n{e}')
                         continue
-                        # raise
-            if len(bypassed) > 0:
-                with open(f'{output}/bypassed.json', 'w') as outfile:
-                    json.dump(bypassed, outfile)
-            print(f"It took {time.time() - start_time} seconds to load the data.")
+                    except Exception as e:
+                        raise e
 
-            i2m, m2i = Team.build_index_members(all_members)
-            i2s, s2i = Team.build_index_skills(teams)
-            i2t, t2i = Team.build_index_teams(teams)
-            write_time = time.time()
-            with open(f'{output}/teams.pkl', "wb") as outfile:
-                pickle.dump(teams, outfile)
-            with open(f'{output}/indexes.pkl', "wb") as outfile:
-                pickle.dump((i2m, m2i, i2s, s2i, i2t, t2i), outfile)
-            with open(f'{output}/members.pkl', "wb") as outfile:
-                pickle.dump(all_members, outfile)
-            print(f"It took {time.time() - write_time} seconds to pickle the data")
+            print(f"It took {time() - st} seconds to load the data. #teams: {len(teams)} out of #lines: {n_row}.")
 
+            i2c, c2i = Team.build_index_candidates(teams.values())
+            i2s, s2i = Team.build_index_skills(teams.values())
+            i2t, t2i = Team.build_index_teams(teams.values())
+            st = time()
+            try: os.makedirs(output)
+            except FileExistsError as ex: pass
+            with open(f'{output}/teams.pkl', "wb") as outfile: pickle.dump(teams, outfile)
+            with open(f'{output}/indexes.pkl', "wb") as outfile: pickle.dump((i2c, c2i, i2s, s2i, i2t, t2i), outfile)
+            with open(f'{output}/candidates.pkl', "wb") as outfile: pickle.dump(candidates, outfile)
+            print(f"It took {time() - st} seconds to pickle the data")
 
-            return i2m, m2i, i2s, s2i, i2t, t2i, teams
+            return i2c, c2i, i2s, s2i, i2t, t2i, teams
+        except Exception as e:
+            raise e
 
     @staticmethod
     def remove_outliers(output, n):
@@ -169,8 +152,6 @@ class Publication(Team):
             pickle.dump(all_members, outfile)
         print(f"It took {time.time() - write_time} seconds to pickle the data")
         return i2m, m2i, i2s, s2i, i2t, t2i, teams
-
-
 
     @classmethod
     def get_stats(cls, teams, output):

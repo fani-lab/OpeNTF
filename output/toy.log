@@ -1,0 +1,21 @@
+Loading the sparse matrices...
+File not found! Generating the sparse matrices...
+Loading indexes pickle...
+Pickles not found! Reading raw data ...
+JSONDecodeError: There has been error in loading json line `]`!
+Expecting value: line 1 column 1 (char 0)
+It took 0.000997304916381836 seconds to load the data. #teams: 30 out of #lines: 32.
+It took 0.001995086669921875 seconds to pickle the data
+Loading 0/3 instances! 0.0
+Loading 0/3 instances! 0.0
+Loading 0/3 instances! 0.0
+Loading 0/3 instances! 0.0
+Loading 0/3 instances! 0.0
+Loading 0/3 instances! 0.0
+Loading 0/2 instances! 0.0
+Loading 0/2 instances! 0.0
+Loading 0/2 instances! 0.0
+Loading 0/2 instances! 0.0
+Loading 0/2 instances! 0.0
+Loading 0/2 instances! 0.0
+It took 2.821469306945801 seconds to generate and store the sparse matrices of size (30, 24)

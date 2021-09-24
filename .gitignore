@@ -3,7 +3,6 @@
 /venv
 /.idea/
 /data/raw/dblp.v12.json
-*.json
 *.pyc
 *.npz
 *.pt
