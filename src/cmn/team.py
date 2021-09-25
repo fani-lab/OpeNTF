@@ -1,4 +1,6 @@
 import os
+import matplotlib.pyplot as plt
+from collections import Counter
 from scipy.sparse import lil_matrix
 import scipy.sparse
 import numpy as np
@@ -8,8 +10,9 @@ import multiprocessing
 from functools import partial
 
 class Team(object):
-    def __init__(self, id, members, skills):
+    def __init__(self, id, members, skills, datetime):
         self.id = id
+        self.datetime = datetime
         self.members = members
         self.skills = skills
 
@@ -92,9 +95,9 @@ class Team(object):
             except Exception as ex:
                 raise ex
 
-            if (i % bucket_size == 0): print(f'Loading {i}/{len(teams)} instances! {time() - st}')
+            if (i % bucket_size == 0): print(f'Loading {i}/{len(teams)} instances by {multiprocessing.current_process()}! {time() - st}')
 
-        if j > -1: data[-j:] = data_[0:j]
+        if j > -1: data[-(j+1):] = data_[0:j+1]
         return data
 
     @classmethod
@@ -110,13 +113,15 @@ class Team(object):
             print("File not found! Generating the sparse matrices...")
             i2c, c2i, i2s, s2i, i2t, t2i, teams = cls.read_data(datapath, output, False, topn)
             st = time()
+            # parallel
             with multiprocessing.Pool() as p:
                 n_core = multiprocessing.cpu_count() if ncores < 0 else ncores
                 subteams = np.array_split(list(teams.values()), n_core)
-                func = partial(Team.bucketing, 1000, s2i, c2i)
+                func = partial(Team.bucketing, 10, s2i, c2i)
                 data = p.map(func, subteams)
+            # serial
             # data = Team.bucketing(1000, s2i, c2i, teams.values())
-            data = scipy.sparse.vstack(data, 'csr')
+            data = scipy.sparse.vstack(data, 'lil')#{'bsr', 'coo', 'csc', 'csr', 'dia', 'dok', 'lil'}, By default an appropriate sparse matrix format is returned!!
             teamids = data[:, 0]
             skill_vecs = data[:, 1:len(s2i)]
             member_vecs = data[:, - len(c2i):]
@@ -128,6 +133,38 @@ class Team(object):
             raise e
 
     @classmethod
-    def get_stats(cls, teams, output):
-        pass
+    def get_stats(cls, teamsvecs, output, plot=False):
+        try:
+            with open(f'{output}/stats.pkl', 'rb') as infile:
+                print("Loading the stats pickle ...")
+                stats = pickle.load(infile)
+                if plot: Team.plot_stats(stats, output)
+                return stats
 
+        except FileNotFoundError:
+            print("File not found! Generating stats ...")
+            stats = {}
+            teamids, skillvecs, membervecs = teamsvecs
+            nteams_nskills = Counter(skillvecs.sum(axis=1).A1.astype(int))
+            stats['nteams_nskills'] = {k: v for k, v in sorted(nteams_nskills.items(), key=lambda item: item[1], reverse=True)}
+            stats['nteams_skill-idx'] = {k: v for k, v in enumerate(sorted(skillvecs.sum(axis=0).A1.astype(int), reverse=True))}
+
+            nteams_nmembers = Counter(membervecs.sum(axis=1).A1.astype(int))
+            stats['nteams_nmembers'] = {k: v for k, v in sorted(nteams_nmembers.items(), key=lambda item: item[1], reverse=True)}
+            stats['nteams_candidate-idx'] = {k: v for k, v in enumerate(sorted(membervecs.sum(axis=0).A1.astype(int), reverse=True))}
+
+            #TODO: temporal stats!
+            with open(f'{output}/stats.pkl', 'wb') as outfile: pickle.dump(stats, outfile)
+            if plot: Team.plot_stats(stats, output)
+        return stats
+
+    @staticmethod
+    def plot_stats(stats, output):
+        for k, v in stats.items():
+            fig = plt.figure()
+            ax = fig.add_subplot(1, 1, 1)
+            ax.bar(*zip(*stats[k].items()))
+            ax.set_xlabel(k.split('_')[1].replace('n', '#'))
+            ax.set_ylabel(k.split('_')[0].replace('n', '#'))
+            fig.savefig(f'{output}/{k}.png', dpi=100, bbox_inches='tight')
+            plt.show()
