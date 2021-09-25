@@ -154,6 +154,8 @@ class Team(object):
             stats['nteams_candidate-idx'] = {k: v for k, v in enumerate(sorted(membervecs.sum(axis=0).A1.astype(int), reverse=True))}
 
             #TODO: temporal stats!
+            #TODO: skills_years (2-D image)
+            #TODO: candidate_years (2-D image)
             with open(f'{output}/stats.pkl', 'wb') as outfile: pickle.dump(stats, outfile)
             if plot: Team.plot_stats(stats, output)
         return stats
@@ -168,23 +170,3 @@ class Team(object):
             ax.set_ylabel(k.split('_')[0].replace('n', '#'))
             fig.savefig(f'{output}/{k}.png', dpi=100, bbox_inches='tight')
             plt.show()
-
-    @staticmethod
-    def get_unigram(output, m2i):
-        try:
-            with open(f'{output}/stats.pkl', 'rb') as infile:
-                print("Loading the stat pickle...")
-                stats = pickle.load(infile)
-
-            n_papers = sum(list(stats['n_publications_per_year'].values()))
-            n_authors = len(list(stats['n_publications_per_author'].values()))
-
-            unigram = np.zeros(n_authors)
-            for k, v in stats['n_publications_per_author'].items():
-                unigram[m2i[k]] = v / n_papers
-
-            return unigram
-
-
-        except FileNotFoundError:
-            print("File not found!")
