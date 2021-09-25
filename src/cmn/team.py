@@ -168,3 +168,23 @@ class Team(object):
             ax.set_ylabel(k.split('_')[0].replace('n', '#'))
             fig.savefig(f'{output}/{k}.png', dpi=100, bbox_inches='tight')
             plt.show()
+
+    @staticmethod
+    def get_unigram(output, m2i):
+        try:
+            with open(f'{output}/stats.pkl', 'rb') as infile:
+                print("Loading the stat pickle...")
+                stats = pickle.load(infile)
+
+            n_papers = sum(list(stats['n_publications_per_year'].values()))
+            n_authors = len(list(stats['n_publications_per_author'].values()))
+
+            unigram = np.zeros(n_authors)
+            for k, v in stats['n_publications_per_author'].items():
+                unigram[m2i[k]] = v / n_papers
+
+            return unigram
+
+
+        except FileNotFoundError:
+            print("File not found!")
