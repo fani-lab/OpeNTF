@@ -1,3 +1,9 @@
+- choose how to form skills for teams
+    based on title
+    based on abstract
+    based on keywords
+    based on fos/genre/...
+
 - stats on sparse matrix
     temporal stats at team.py
 

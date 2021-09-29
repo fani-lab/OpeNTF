@@ -18,14 +18,14 @@ scikit_learn==0.24.2
 ```
 To clone the codebase and install the required packages by ``pip``:
 ```sh
-git clone https://github.com/VaghehDashti/TeamFormation.git
+git clone https://github.com/Fani-Lab/neural_team_formation
 cd TeamFormation
 pip install -r requirements.txt
 ```
 or by [``conda``](https://www.anaconda.com/products/individual):
 
 ```sh
-git clone https://github.com/VaghehDashti/TeamFormation.git
+git clone https://github.com/Fani-Lab/neural_team_formation
 cd TeamFormation
 conda env create -f environment.yml
 ```
@@ -64,7 +64,7 @@ Please note that the preprocessing step will be executed once. Subsequent runs l
 
 **Data Train-Test Split**
 
-We randomly take 15% of the dataset for the test set, i.e., the model never sees these instances during training. You can change this parameter [sth](https://github.com/VaghehDashti/TeamFormation/blob/c73378c1e20a62957bdb0dfe4f54b882130c6d2e/src/dal/data_utils.py#L10)
+We randomly take 15% of the dataset for the test set, i.e., the model never sees these instances during training. You can change this parameter [sth](./src/dal/data_utils.py)
 
 **Model Train-Eval-Test**
 
