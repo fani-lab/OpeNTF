@@ -1,0 +1,5 @@
+- stats on sparse matrix
+    temporal stats at team.py
+
+- remove outliers
+    based on sparse matrix or teams.pkl at team.py
