@@ -1,4 +1,4 @@
-name: TeamFormation
+name: ntf
 channels:
   - defaults
   - conda-forge
