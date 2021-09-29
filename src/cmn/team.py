@@ -123,7 +123,7 @@ class Team(object):
             # data = Team.bucketing(1000, s2i, c2i, teams.values())
             data = scipy.sparse.vstack(data, 'lil')#{'bsr', 'coo', 'csc', 'csr', 'dia', 'dok', 'lil'}, By default an appropriate sparse matrix format is returned!!
             teamids = data[:, 0]
-            skill_vecs = data[:, 1:len(s2i)]
+            skill_vecs = data[:, 1:len(s2i) + 1]
             member_vecs = data[:, - len(c2i):]
             with open(f'{output}/teamsvecs.pkl', 'wb') as outfile: pickle.dump((teamids, skill_vecs, member_vecs), outfile)
             print(f"It took {time() - st} seconds to generate and store the sparse matrices of size {data.shape}")
