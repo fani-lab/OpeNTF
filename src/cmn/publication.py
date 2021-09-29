@@ -126,31 +126,3 @@ class Publication(Team):
     # @classmethod
     # def get_stats(cls, teamsvecs, output, plot=False):
         # return super(Publication, cls).get_stats(teamsvecs, output, plot=False)
-
-    @staticmethod
-    def remove_outliers(output, n):
-        with open(f'{output}/members.pkl', 'rb') as infile:
-            all_members = dict(pickle.load(infile))
-            for id in [member.get_id() for member in all_members.values() if member.get_n_papers() <= n]: del all_members[id]
-            # for member in all_members.values():
-            #     if member.get_n_papers() <= n:
-            #         del all_members[member.get_id()]
-        with open(f'{output}/teams.pkl', 'rb') as infile:
-            teams = dict(pickle.load(infile))
-            for team in teams.values():
-                new_team_members = [member for member in team.members if member.get_id() in all_members.keys()]
-                team.set_members(new_team_members)
-
-        i2m, m2i = Team.build_index_members(all_members)
-        i2s, s2i = Team.build_index_skills(teams)
-        i2t, t2i = Team.build_index_teams(teams)
-
-        write_time = time.time()
-        with open(f'{output}/teams_v2.pkl', "wb") as outfile:
-            pickle.dump(teams, outfile)
-        with open(f'{output}/indexes_v2.pkl', "wb") as outfile:
-            pickle.dump((i2m, m2i, i2s, s2i, i2t, t2i), outfile)
-        with open(f'{output}/members_v2.pkl', "wb") as outfile:
-            pickle.dump(all_members, outfile)
-        print(f"It took {time.time() - write_time} seconds to pickle the data")
-        return i2m, m2i, i2s, s2i, i2t, t2i, teams
