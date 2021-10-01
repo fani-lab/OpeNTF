@@ -28,7 +28,7 @@ def run(datapath, domain, filter, topn, min_team_size, min_team, model, ncores, 
 
 def addargs(parser):
     dataset = parser.add_argument_group('dataset')
-    dataset.add_argument('-data', type=str, required=True, help='The dataset path; required; (example: ./../data/raw/toy.json.json)')
+    dataset.add_argument('-data', type=str, required=True, help='The dataset path; required; (example: ./../data/raw/toy.json)')
     dataset.add_argument('-domain', type=str, required=True, choices=['dblp', 'imdb', 'patent'], help='The dataset path; required; (example: dblp)')
     dataset.add_argument('-filter', type=int, required=True, default=1, choices=[1, 0], help='Remove outliers? (1=True, 0=False)')
     dataset.add_argument('-topn', type=int, default=None, help='The topn instances; (default: all)')
@@ -43,8 +43,8 @@ def addargs(parser):
     output.add_argument('-output', type=str, default='./../output/', help='The output path (default: ./../output/)')
 
 
-# python -u main.py -data=./../data/raw/toy.json.json -domain=dblp -topn=10000 -model=dnn -ncores=4 2>&1 | tee ./../output/toy.json.log &
-# python -u main.py -data=./../data/raw/dblp.v12.json.json.json -domain=dblp -topn=10000 -model=dnn -ncores=4 2>&1 | tee ./../output/dblp.log &
+# python -u main.py -data=./../data/raw/toy.json -domain=dblp -topn=10000 -model=dnn -ncores=4 2>&1 | tee ./../output/toy.log &
+# python -u main.py -data=./../data/raw/dblp.v12.json -domain=dblp -topn=10000 -model=dnn -ncores=4 2>&1 | tee ./../output/dblp.log &
 global ncores
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Team Formation')
