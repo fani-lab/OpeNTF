@@ -101,31 +101,47 @@ class Team(object):
         return data
 
     @classmethod
-    def generate_sparse_vectors(cls, datapath, output, topn=None, ncores=-1):
+    def generate_sparse_vectors(cls, datapath, filter, preprocessed_path, filtered_path, min_team_size, min_team,
+                                topn=None, ncores=-1):
         try:
             st = time()
             print("Loading the sparse matrices...")
-            with open(f'{output}/teamsvecs.pkl', 'rb') as infile: teamids, skill_vecs, member_vecs = pickle.load(infile)
+            if filter == 0:
+                with open(f'{preprocessed_path}/teamsvecs.pkl', 'rb') as infile:
+                    teamids, skill_vecs, member_vecs = pickle.load(infile)
+                i2c, c2i, i2s, s2i, i2t, t2i, _ = cls.read_data(datapath, preprocessed_path, index=True, topn=topn)
+            else:
+                with open(f'{filtered_path}/teamsvecs.pkl', 'rb') as infile:
+                    teamids, skill_vecs, member_vecs = pickle.load(infile)
+                i2c, c2i, i2s, s2i, i2t, t2i, _ = cls.remove_outliers(datapath, preprocessed_path, filtered_path,
+                                                                      min_team_size, min_team, index=True, topn=topn)
             print(f"It took {time() - st} seconds to load the sparse matrices.")
-            i2c, c2i, i2s, s2i, i2t, t2i, _ = cls.read_data(datapath, output, True, topn)
             return teamids, skill_vecs, member_vecs, i2c, c2i, i2s, s2i, i2t, t2i
         except FileNotFoundError as e:
             print("File not found! Generating the sparse matrices...")
-            i2c, c2i, i2s, s2i, i2t, t2i, teams = cls.read_data(datapath, output, False, topn)
+            if filter == 0:
+                i2c, c2i, i2s, s2i, i2t, t2i, teams = cls.read_data(datapath, preprocessed_path, index=False, topn=topn)
+            else:
+                i2c, c2i, i2s, s2i, i2t, t2i, teams = cls.remove_outliers(datapath, preprocessed_path, filtered_path,
+                                                                          min_team_size, min_team, index=False,
+                                                                          topn=topn)
             st = time()
-            # parallel
             with multiprocessing.Pool() as p:
                 n_core = multiprocessing.cpu_count() if ncores < 0 else ncores
                 subteams = np.array_split(list(teams.values()), n_core)
-                func = partial(Team.bucketing, 10, s2i, c2i)
+                func = partial(Team.bucketing, 5, s2i, c2i)
                 data = p.map(func, subteams)
-            # serial
             # data = Team.bucketing(1000, s2i, c2i, teams.values())
-            data = scipy.sparse.vstack(data, 'lil')#{'bsr', 'coo', 'csc', 'csr', 'dia', 'dok', 'lil'}, By default an appropriate sparse matrix format is returned!!
+            data = scipy.sparse.vstack(data, 'csr')
             teamids = data[:, 0]
             skill_vecs = data[:, 1:len(s2i) + 1]
             member_vecs = data[:, - len(c2i):]
-            with open(f'{output}/teamsvecs.pkl', 'wb') as outfile: pickle.dump((teamids, skill_vecs, member_vecs), outfile)
+            if filter == 0:
+                with open(f'{preprocessed_path}/teamsvecs.pkl', 'wb') as outfile:
+                    pickle.dump((teamids, skill_vecs, member_vecs), outfile)
+            else:
+                with open(f'{filtered_path}/teamsvecs.pkl', 'wb') as outfile:
+                    pickle.dump((teamids, skill_vecs, member_vecs), outfile)
             print(f"It took {time() - st} seconds to generate and store the sparse matrices of size {data.shape}")
             return teamids, skill_vecs, member_vecs, i2c, c2i, i2s, s2i, i2t, t2i
 
