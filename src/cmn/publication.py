@@ -59,8 +59,7 @@ class Publication(Team):
             return i2c, c2i, i2s, s2i, i2t, t2i, teams
         except (FileNotFoundError, EOFError) as e:
             print("Pickles not found! Reading raw data ...")
-            teams = {};
-            candidates = {}
+            teams = {}; candidates = {}
             n_row = 0
             with open(datapath, "r", encoding='utf-8') as jf:
                 # Skip the first line
@@ -84,16 +83,11 @@ class Publication(Team):
                         keywords = jsonline['keywords'] if 'keywords' in jsonline.keys() else []
 
                         # a team must have skills and members
-                        try:
-                            fos = jsonline['fos']
-                        except:
-                            print(
-                                f'Warning! No fos for team id={id}. Bypassed!'); continue  # publication must have fos (skills)
-                        try:
-                            authors = jsonline['authors']
-                        except:
-                            print(
-                                f'Warning! No author for team id={id}. Bypassed!'); continue  # publication must have authors (members)
+                        try: fos = jsonline['fos']
+                        except: print(f'Warning! No fos for team id={id}. Bypassed!'); continue  #publication must have fos (skills)
+                        try: authors = jsonline['authors']
+                        except: print(f'Warning! No author for team id={id}. Bypassed!'); continue #publication must have authors (members)
+
                         members = []
                         for author in authors:
                             member_id = author['id']
@@ -104,8 +98,7 @@ class Publication(Team):
                             members.append(candidates[idname])
                         team = Publication(id, members, title, year, type, venue, references, fos, keywords)
                         teams[team.id] = team
-                        if n_row % 10000 == 0: print(
-                            f"{n_row} instances have been loaded, and {time() - st} seconds has passed.")
+                        if n_row % 10000 == 0: print(f"{n_row} instances have been loaded, and {time() - st} seconds has passed.")
 
                     except json.JSONDecodeError as e:  # ideally should happen only for the last line ']'
                         print(f'JSONDecodeError: There has been error in loading json line `{line}`!\n{e}')
@@ -119,16 +112,11 @@ class Publication(Team):
             i2s, s2i = Team.build_index_skills(teams.values())
             i2t, t2i = Team.build_index_teams(teams.values())
             st = time()
-            try:
-                os.makedirs(preprocessed_path)
-            except FileExistsError as ex:
-                pass
-            with open(f'{preprocessed_path}/teams.pkl', "wb") as outfile:
-                pickle.dump(teams, outfile)
-            with open(f'{preprocessed_path}/indexes.pkl', "wb") as outfile:
-                pickle.dump((i2c, c2i, i2s, s2i, i2t, t2i), outfile)
-            with open(f'{preprocessed_path}/candidates.pkl', "wb") as outfile:
-                pickle.dump(candidates, outfile)
+            try: os.makedirs(preprocessed_path)
+            except FileExistsError as ex: pass
+            with open(f'{preprocessed_path}/teams.pkl', "wb") as outfile: pickle.dump(teams, outfile)
+            with open(f'{preprocessed_path}/indexes.pkl', "wb") as outfile: pickle.dump((i2c, c2i, i2s, s2i, i2t, t2i), outfile)
+            with open(f'{preprocessed_path}/candidates.pkl', "wb") as outfile: pickle.dump(candidates, outfile)
             print(f"It took {time() - st} seconds to pickle the data")
 
             return i2c, c2i, i2s, s2i, i2t, t2i, teams
@@ -163,9 +151,6 @@ class Publication(Team):
                 candidates = dict(pickle.load(infile))
                 for id in [f'{member.id}_{member.name}' for member in candidates.values() if
                            len(member.teams) < min_team]: del candidates[id]
-                # for member in all_members.values():
-                #     if member.get_n_papers() <= n:
-                #         del all_members[member.get_id()]
 
             # remove the outlier members from teams
             for team in teams.values():

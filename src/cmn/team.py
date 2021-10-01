@@ -101,8 +101,7 @@ class Team(object):
         return data
 
     @classmethod
-    def generate_sparse_vectors(cls, datapath, filter, preprocessed_path, filtered_path, min_team_size, min_team,
-                                topn=None, ncores=-1):
+    def generate_sparse_vectors(cls, datapath, filter, preprocessed_path, filtered_path, min_team_size, min_team, topn=None, ncores=-1):
         try:
             st = time()
             print("Loading the sparse matrices...")
@@ -126,13 +125,15 @@ class Team(object):
                                                                           min_team_size, min_team, index=False,
                                                                           topn=topn)
             st = time()
+            # parallel
             with multiprocessing.Pool() as p:
                 n_core = multiprocessing.cpu_count() if ncores < 0 else ncores
                 subteams = np.array_split(list(teams.values()), n_core)
-                func = partial(Team.bucketing, 5, s2i, c2i)
+                func = partial(Team.bucketing, 10, s2i, c2i)
                 data = p.map(func, subteams)
+            # serial
             # data = Team.bucketing(1000, s2i, c2i, teams.values())
-            data = scipy.sparse.vstack(data, 'csr')
+            data = scipy.sparse.vstack(data, 'lil')#{'bsr', 'coo', 'csc', 'csr', 'dia', 'dok', 'lil'}, By default an appropriate sparse matrix format is returned!!
             teamids = data[:, 0]
             skill_vecs = data[:, 1:len(s2i) + 1]
             member_vecs = data[:, - len(c2i):]
