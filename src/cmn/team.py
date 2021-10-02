@@ -143,11 +143,11 @@ class Team(object):
     @staticmethod
     def remove_outliers(teams, settings):
         # remove teams with size less than min_team_size
-        for id in [team.id for team in teams.values() if len(team.members) < settings['min_team_size']]: del teams[id]
+        for id in [team.id for team in teams.values() if len(team.members) < settings['filter']['min_team_size']]: del teams[id]
 
         # remove members with less than min_team number of teams from teams
         for team in teams.values():
-            team.members = [member for member in team.members if len(member.teams) > settings['min_nteam']]
+            team.members = [member for member in team.members if len(member.teams) > settings['filter']['min_nteam']]
 
         return teams
 
