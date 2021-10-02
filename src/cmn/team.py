@@ -75,6 +75,7 @@ class Team(object):
         indexes['i2s'], indexes['s2i'] = Team.build_index_skills(teams.values())
         indexes['i2t'], indexes['t2i'] = Team.build_index_teams(teams.values())
         st = time()
+
         try: os.makedirs(output)
         except FileExistsError as ex: pass
 
@@ -111,7 +112,8 @@ class Team(object):
 
     @classmethod
     def generate_sparse_vectors(cls, datapath, output, filter, settings):
-        pkl = f'{output}/teamsvecs_filtered.pkl' if filter else f'{output}/teamsvecs.pkl'
+        output += ".filtered" if filter else ""
+        pkl = f'{output}/teamsvecs.pkl'
         try:
             st = time()
             with open(pkl, 'rb') as infile: vecs = pickle.load(infile)
@@ -143,11 +145,11 @@ class Team(object):
     @staticmethod
     def remove_outliers(teams, settings):
         # remove teams with size less than min_team_size
-        for id in [team.id for team in teams.values() if len(team.members) < settings['min_team_size']]: del teams[id]
+        for id in [team.id for team in teams.values() if len(team.members) < settings['filter']['min_team_size']]: del teams[id]
 
         # remove members with less than min_team number of teams from teams
         for team in teams.values():
-            team.members = [member for member in team.members if len(member.teams) > settings['min_nteam']]
+            team.members = [member for member in team.members if len(member.teams) > settings['filter']['min_nteam']]
 
         return teams
 
