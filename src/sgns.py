@@ -10,7 +10,7 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 from cmn.team import Team
-import mdl.param
+import param
 from dal.data_utils import *
 from mdl.skipgram import SGNS
 from mdl.custom_dataset import TFDataset

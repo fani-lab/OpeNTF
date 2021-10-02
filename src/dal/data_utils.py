@@ -2,7 +2,6 @@ import torch
 import numpy as np
 from sklearn.metrics import multilabel_confusion_matrix, f1_score, classification_report, roc_auc_score, precision_recall_curve, auc
 from sklearn.model_selection import train_test_split, KFold
-import mdl.param
 from sklearn.metrics import roc_curve
 import matplotlib.pyplot as plt
 

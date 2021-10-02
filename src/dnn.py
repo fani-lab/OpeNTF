@@ -12,10 +12,10 @@ import csv
 import ast
 import time
 import torch
+
 torch.cuda.empty_cache()
 
-from cmn.team import Team
-import mdl.param
+import param
 from mdl.fnn import FNN
 from mdl.custom_dataset import TFDataset
 from dal.data_utils import *
@@ -27,7 +27,7 @@ def weighted_cross_entropy_with_logits(logits, targets, pos_weight = 2.5):
 # Set device cuda for GPU if it's available otherwise run on the CPU
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-def learn(splits, i2s, i2m, skill_vecs, member_vecs, params, output):
+def learn(splits, indexes, vecs, params, output):
 
     num_nodes = params['d']
     learning_rate = params['lr']
@@ -35,12 +35,12 @@ def learn(splits, i2s, i2m, skill_vecs, member_vecs, params, output):
     num_epochs = params['e']
 
     # Retrieving some of the required information for the model
-    input_size = len(i2s)
-    output_size = len(i2m)
+    input_size = len(indexes['i2s'])
+    output_size = len(indexes['i2c'])
     
     # Specify a path for the model
-    if not os.path.isdir(output): os.mkdir(output)
-    else:
+    try: os.makedirs(output)
+    except FileExistsError as ex:
         print("This model already exists")
         return
 
@@ -53,10 +53,10 @@ def learn(splits, i2s, i2m, skill_vecs, member_vecs, params, output):
     # Training K-fold
     for foldidx in splits['folds'].keys():
         # Retrieving the folds
-        X_train = skill_vecs[splits['folds'][foldidx]['train'], :]
-        y_train = member_vecs[splits['folds'][foldidx]['train']]
-        X_valid = skill_vecs[splits['folds'][foldidx]['valid'], :]
-        y_valid = member_vecs[splits['folds'][foldidx]['valid']]
+        X_train = vecs['skill'][splits['folds'][foldidx]['train'], :]
+        y_train = vecs['member'][splits['folds'][foldidx]['train']]
+        X_valid = vecs['skill'][splits['folds'][foldidx]['valid'], :]
+        y_valid = vecs['member'][splits['folds'][foldidx]['valid']]
 
         # Building custom dataset
         training_matrix = TFDataset(X_train, y_train)
@@ -69,7 +69,7 @@ def learn(splits, i2s, i2m, skill_vecs, member_vecs, params, output):
         data_loaders = {"train": training_dataloader, "val": validation_dataloader}
 
         # Initialize network
-        model = FNN(input_size=input_size, output_size=output_size, param=mdl.param.fnn).to(device)
+        model = FNN(input_size=input_size, output_size=output_size, param=params).to(device)
 
 
         # Loss and optimizer
@@ -168,12 +168,12 @@ def plot(plot_path, output):
         plt.savefig(f'{output}/fold{foldidx}.png', dpi=100, bbox_inches='tight')
         plt.show()  
 
-def eval(model_path, splits, i2s, i2m, skill_vecs, member_vecs, batch_size):
+def eval(model_path, splits, indexes, vecs, params):
     if not os.path.isdir(model_path):
         print("The model does not exist!")
         return
-    input_size = len(i2s)
-    output_size = len(i2m)    
+    input_size = len(indexes['i2s'])
+    output_size = len(indexes['i2c'])
     
     auc_path = f"{model_path}/train_valid_auc.json"
     if os.path.isfile(auc_path):
@@ -199,18 +199,18 @@ def eval(model_path, splits, i2s, i2m, skill_vecs, member_vecs, batch_size):
         for foldidx in splits['folds'].keys():
             if np.any(np.isnan(data[str(foldidx)]["train"])): continue
 
-            X_train = skill_vecs[splits['folds'][foldidx]['train'], :]
-            y_train = member_vecs[splits['folds'][foldidx]['train']]
-            X_valid = skill_vecs[splits['folds'][foldidx]['valid'], :]
-            y_valid = member_vecs[splits['folds'][foldidx]['valid']]
+            X_train = vecs['skill'][splits['folds'][foldidx]['train'], :]
+            y_train = vecs['member'][splits['folds'][foldidx]['train']]
+            X_valid = vecs['skill'][splits['folds'][foldidx]['valid'], :]
+            y_valid = vecs['member'][splits['folds'][foldidx]['valid']]
 
             training_matrix = TFDataset(X_train, y_train)
             validation_matrix = TFDataset(X_valid, y_valid)
 
-            training_dataloader = DataLoader(training_matrix, batch_size=batch_size, shuffle=True, num_workers=0)
-            validation_dataloader = DataLoader(validation_matrix, batch_size=batch_size, shuffle=True, num_workers=0)
+            training_dataloader = DataLoader(training_matrix, batch_size=params['b'], shuffle=True, num_workers=0)
+            validation_dataloader = DataLoader(validation_matrix, batch_size=params['b'], shuffle=True, num_workers=0)
 
-            model = FNN(input_size=input_size, output_size=output_size, param=mdl.param.fnn).to(device)
+            model = FNN(input_size=input_size, output_size=output_size, param=params).to(device)
             model.load_state_dict(torch.load(f'{model_path}/state_dict_model_{foldidx}.pt'))
             model.eval()
             
@@ -279,7 +279,7 @@ def eval(model_path, splits, i2s, i2m, skill_vecs, member_vecs, batch_size):
     with open(auc_path, 'w') as outfile:
         json.dump(auc, outfile)
 
-def test(model_path, splits, i2s, i2m, skill_vecs, member_vecs, batch_size):
+def test(model_path, splits, indexes, vecs, params):
     if not os.path.isdir(model_path):
         print("The model does not exist!")
         return
@@ -290,16 +290,16 @@ def test(model_path, splits, i2s, i2m, skill_vecs, member_vecs, batch_size):
         print(f"Reports can be found in: {model_path}")
         # return
 
-    input_size = len(i2s)
-    output_size = len(i2m)  
+    input_size = len(indexes['i2s'])
+    output_size = len(indexes['i2c'])
 
     # Load
-    X_test = skill_vecs[splits['test'], :]
-    y_test = member_vecs[splits['test']]
+    X_test = vecs['skill'][splits['test'], :]
+    y_test = vecs['member'][splits['test']]
 
     test_matrix = TFDataset(X_test, y_test)
 
-    test_dataloader = DataLoader(test_matrix, batch_size=batch_size, shuffle=True, num_workers=0)
+    test_dataloader = DataLoader(test_matrix, batch_size=params['b'], shuffle=True, num_workers=0)
     
     # Initialize auc dictionary
     auc = dict()
@@ -314,7 +314,7 @@ def test(model_path, splits, i2s, i2m, skill_vecs, member_vecs, batch_size):
             tpr[foldidx] = []
 
     for foldidx in auc.keys():
-        model = FNN(input_size=input_size, output_size=output_size, param=mdl.param.fnn).to(device)
+        model = FNN(input_size=input_size, output_size=output_size, param=params).to(device)
         model.load_state_dict(torch.load(f'{model_path}/state_dict_model_{foldidx}.pt'))
         model.eval()
 
@@ -358,21 +358,20 @@ def test(model_path, splits, i2s, i2m, skill_vecs, member_vecs, batch_size):
     plt.legend()
     plt.show()
 
-def main(splits, skill_vecs, member_vecs, i2m, m2i, i2s, s2i, output, cmd=['train', 'plot', 'test', 'eval']):
-
+def main(splits, vecs, indexes, output, settings, cmd):
     # Build a folder for this model for the first time
-    if not os.path.isdir(output): os.mkdir(output)
-    output = f"{output}/nt{skill_vecs.shape[0]}_is{len(i2s)}_os{len(i2m)}_nn{mdl.param.fnn['d']}_lr{mdl.param.fnn['lr']}_bs{mdl.param.fnn['b']}_ne{mdl.param.fnn['e']}"
+    output = f"{output}/" \
+             f"t{vecs['skill'].shape[0]}." \
+             f"s{vecs['skill'].shape[1]}." \
+             f"c{vecs['member'].shape[1]}." \
+             f"{'.'.join([k + str(v) for k,v in settings.items()])}"
 
-    if 'train' in cmd:
-        learn(splits, i2s, i2m, skill_vecs, member_vecs, mdl.param.fnn, output)
+    if 'train' in cmd: learn(splits, indexes, vecs, settings, output)
 
     if 'plot' in cmd:
         plot_path = f"{output}/train_valid_loss.json"
         plot(plot_path, output)
 
-    if 'eval' in cmd:
-        eval(output, splits, i2s, i2m, skill_vecs, member_vecs, mdl.param.fnn['b'])
+    if 'eval' in cmd: eval(output, splits, indexes, vecs, settings)
 
-    if 'test' in cmd:
-        test(output, splits, i2s, i2m, skill_vecs, member_vecs, mdl.param.fnn['b'])
+    if 'test' in cmd: test(output, splits, indexes, vecs, settings)

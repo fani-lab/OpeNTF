@@ -64,15 +64,24 @@ class Team(object):
         return i2t, t2i
 
     @staticmethod
-    def read_data(data_path, output, topn=None):
+    def read_data(teams, output, filter, settings):
         # should be overridden by the children classes, customize their loading data
         # read data from file
+        # apply filtering
+        if filter: teams = Team.remove_outliers(teams, settings)
         # build indexes
-        # i2c, c2i = Team.build_index_candidates(candidates)
-        # i2s, s2i = Team.build_index_skills(teams)
-        # persist them as pickles
-        # return i2c, c2i, i2s, s2i, teams
-        pass
+        indexes = {}
+        indexes['i2c'], indexes['c2i'] = Team.build_index_candidates(teams.values())
+        indexes['i2s'], indexes['s2i'] = Team.build_index_skills(teams.values())
+        indexes['i2t'], indexes['t2i'] = Team.build_index_teams(teams.values())
+        st = time()
+        try: os.makedirs(output)
+        except FileExistsError as ex: pass
+
+        with open(f'{output}/teams.pkl', "wb") as outfile: pickle.dump(teams, outfile)
+        with open(f'{output}/indexes.pkl', "wb") as outfile: pickle.dump(indexes, outfile)
+        print(f"It took {time() - st} seconds to pickle the data")
+        return  indexes, teams
 
     @staticmethod
     def bucketing(bucket_size, s2i, c2i, teams):
@@ -101,53 +110,46 @@ class Team(object):
         return data
 
     @classmethod
-    def generate_sparse_vectors(cls, datapath, filter, preprocessed_path, filtered_path, min_team_size, min_team, topn=None, ncores=-1):
+    def generate_sparse_vectors(cls, datapath, output, filter, settings):
+        pkl = f'{output}/teamsvecs_filtered.pkl' if filter else f'{output}/teamsvecs.pkl'
         try:
             st = time()
-            print("Loading the sparse matrices...")
-            if filter == 0:
-                with open(f'{preprocessed_path}/teamsvecs.pkl', 'rb') as infile:
-                    teamids, skill_vecs, member_vecs = pickle.load(infile)
-                i2c, c2i, i2s, s2i, i2t, t2i, _ = cls.read_data(datapath, preprocessed_path, index=True, topn=topn)
-            else:
-                with open(f'{filtered_path}/teamsvecs.pkl', 'rb') as infile:
-                    teamids, skill_vecs, member_vecs = pickle.load(infile)
-                i2c, c2i, i2s, s2i, i2t, t2i, _ = cls.remove_outliers(datapath, preprocessed_path, filtered_path,
-                                                                      min_team_size, min_team, index=True, topn=topn)
+            with open(pkl, 'rb') as infile: vecs = pickle.load(infile)
+            indexes, _ = cls.read_data(datapath, output, index=True, filter=filter, settings=settings)
             print(f"It took {time() - st} seconds to load the sparse matrices.")
-            return teamids, skill_vecs, member_vecs, i2c, c2i, i2s, s2i, i2t, t2i
+            return vecs, indexes
         except FileNotFoundError as e:
             print("File not found! Generating the sparse matrices...")
-            if filter == 0:
-                i2c, c2i, i2s, s2i, i2t, t2i, teams = cls.read_data(datapath, preprocessed_path, index=False, topn=topn)
-            else:
-                i2c, c2i, i2s, s2i, i2t, t2i, teams = cls.remove_outliers(datapath, preprocessed_path, filtered_path,
-                                                                          min_team_size, min_team, index=False,
-                                                                          topn=topn)
+            indexes, teams = cls.read_data(datapath, output, index=False, filter=filter, settings=settings)
             st = time()
             # parallel
             with multiprocessing.Pool() as p:
-                n_core = multiprocessing.cpu_count() if ncores < 0 else ncores
+                n_core = multiprocessing.cpu_count() if settings['ncore'] < 0 else settings['ncore']
                 subteams = np.array_split(list(teams.values()), n_core)
-                func = partial(Team.bucketing, 10, s2i, c2i)
+                func = partial(Team.bucketing, settings['bucket_size'], indexes['s2i'], indexes['c2i'])
                 data = p.map(func, subteams)
             # serial
             # data = Team.bucketing(1000, s2i, c2i, teams.values())
             data = scipy.sparse.vstack(data, 'lil')#{'bsr', 'coo', 'csc', 'csr', 'dia', 'dok', 'lil'}, By default an appropriate sparse matrix format is returned!!
-            teamids = data[:, 0]
-            skill_vecs = data[:, 1:len(s2i) + 1]
-            member_vecs = data[:, - len(c2i):]
-            if filter == 0:
-                with open(f'{preprocessed_path}/teamsvecs.pkl', 'wb') as outfile:
-                    pickle.dump((teamids, skill_vecs, member_vecs), outfile)
-            else:
-                with open(f'{filtered_path}/teamsvecs.pkl', 'wb') as outfile:
-                    pickle.dump((teamids, skill_vecs, member_vecs), outfile)
+            vecs = {'id': data[:, 0], 'skill': data[:, 1:len(indexes['s2i']) + 1], 'member':data[:, - len(indexes['c2i']):]}
+
+            with open(pkl, 'wb') as outfile: pickle.dump(vecs, outfile)
             print(f"It took {time() - st} seconds to generate and store the sparse matrices of size {data.shape}")
-            return teamids, skill_vecs, member_vecs, i2c, c2i, i2s, s2i, i2t, t2i
+            return vecs, indexes
 
         except Exception as e:
             raise e
+
+    @staticmethod
+    def remove_outliers(teams, settings):
+        # remove teams with size less than min_team_size
+        for id in [team.id for team in teams.values() if len(team.members) < settings['min_team_size']]: del teams[id]
+
+        # remove members with less than min_team number of teams from teams
+        for team in teams.values():
+            team.members = [member for member in team.members if len(member.teams) > settings['min_nteam']]
+
+        return teams
 
     @classmethod
     def get_stats(cls, teamsvecs, output, plot=False):
@@ -161,7 +163,7 @@ class Team(object):
         except FileNotFoundError:
             print("File not found! Generating stats ...")
             stats = {}
-            teamids, skillvecs, membervecs = teamsvecs
+            teamids, skillvecs, membervecs = teamsvecs['id'], teamsvecs['skill'], teamsvecs['member']
             nteams_nskills = Counter(skillvecs.sum(axis=1).A1.astype(int))
             stats['nteams_nskills'] = {k: v for k, v in sorted(nteams_nskills.items(), key=lambda item: item[1], reverse=True)}
             stats['nteams_skill-idx'] = {k: v for k, v in enumerate(sorted(skillvecs.sum(axis=0).A1.astype(int), reverse=True))}
