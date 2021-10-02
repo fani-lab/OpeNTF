@@ -42,21 +42,20 @@ class Publication(Team):
         return self.year
 
     @staticmethod
-    def read_data(datapath, preprocessed_path, index=True, topn=None):
+    def read_data(datapath, output, index, filter, settings):
         try:
             st = time()
-            with open(f'{preprocessed_path}/indexes.pkl', 'rb') as infile:
-                print("Loading indexes pickle...")
-                i2c, c2i, i2s, s2i, i2t, t2i = pickle.load(infile)
+            print("Loading indexes pickle...")
+            with open(f'{output}/indexes.pkl', 'rb') as infile: indexes = pickle.load(infile)
             print(f"It took {time() - st} seconds to load from the pickles.")
             teams = None
             if not index:
                 st = time()
                 print("Loading teams pickle...")
-                with open(f'{preprocessed_path}/teams.pkl', 'rb') as tfile: teams = pickle.load(tfile)
+                with open(f'{output}/teams.pkl', 'rb') as tfile: teams = pickle.load(tfile)
                 print(f"It took {time() - st} seconds to load from the pickles.")
 
-            return i2c, c2i, i2s, s2i, i2t, t2i, teams
+            return indexes, teams
         except (FileNotFoundError, EOFError) as e:
             print("Pickles not found! Reading raw data ...")
             teams = {}; candidates = {}
@@ -68,9 +67,9 @@ class Publication(Team):
                     try:
                         # Read line by line to not overload the memory
                         line = jf.readline()
+                        if not line: break
                         n_row += 1
-                        if not line or (topn and n_row >= topn):
-                            break
+
 
                         jsonline = json.loads(line.lower().lstrip(","))
                         # Retrieve the desired attributes
@@ -107,74 +106,10 @@ class Publication(Team):
                         raise e
 
             print(f"It took {time() - st} seconds to load the data. #teams: {len(teams)} out of #lines: {n_row}.")
+            return super(Publication, Publication).read_data(teams, output, filter, settings)
 
-            i2c, c2i = Team.build_index_candidates(teams.values())
-            i2s, s2i = Team.build_index_skills(teams.values())
-            i2t, t2i = Team.build_index_teams(teams.values())
-            st = time()
-            try: os.makedirs(preprocessed_path)
-            except FileExistsError as ex: pass
-            with open(f'{preprocessed_path}/teams.pkl', "wb") as outfile: pickle.dump(teams, outfile)
-            with open(f'{preprocessed_path}/indexes.pkl', "wb") as outfile: pickle.dump((i2c, c2i, i2s, s2i, i2t, t2i), outfile)
-            with open(f'{preprocessed_path}/candidates.pkl', "wb") as outfile: pickle.dump(candidates, outfile)
-            print(f"It took {time() - st} seconds to pickle the data")
-
-            return i2c, c2i, i2s, s2i, i2t, t2i, teams
         except Exception as e:
             raise e
-
-    @staticmethod
-    def remove_outliers(datapath, preprocessed_path, filtered_path, min_team_size, min_team, index=True, topn=None):
-        try:
-            st = time()
-            with open(f'{filtered_path}/indexes.pkl', 'rb') as infile:
-                print("Loading indexes pickle...")
-                i2c, c2i, i2s, s2i, i2t, t2i = pickle.load(infile)
-            print(f"It took {time() - st} seconds to load from the pickles.")
-            teams = None
-            if not index:
-                st = time()
-                print("Loading teams pickle...")
-                with open(f'{filtered_path}/teams.pkl', 'rb') as tfile: teams = pickle.load(tfile)
-                print(f"It took {time() - st} seconds to load from the pickles.")
-
-            return i2c, c2i, i2s, s2i, i2t, t2i, teams
-        except (FileNotFoundError, EOFError) as e:
-            i2c, c2i, i2s, s2i, i2t, t2i, teams = Publication.read_data(datapath, preprocessed_path, index=False,
-                                                                        topn=topn)
-
-            # remove teams with size less than min_team_size
-            for id in [team.id for team in teams.values() if len(team.members) < min_team_size]: del teams[id]
-
-            # remove candidates with number of teams less than min_team
-            with open(f'{preprocessed_path}/candidates.pkl', 'rb') as infile:
-                candidates = dict(pickle.load(infile))
-                for id in [f'{member.id}_{member.name}' for member in candidates.values() if
-                           len(member.teams) < min_team]: del candidates[id]
-
-            # remove the outlier members from teams
-            for team in teams.values():
-                new_team_members = [member for member in team.members if
-                                    f'{member.id}_{member.name}' in candidates.keys()]
-                team.members = new_team_members
-                print(team.members)
-
-            i2c, c2i = Team.build_index_candidates(teams.values())
-            i2s, s2i = Team.build_index_skills(teams.values())
-            i2t, t2i = Team.build_index_teams(teams.values())
-
-            wt = time()
-            with open(f'{filtered_path}/teams.pkl', "wb") as outfile:
-                pickle.dump(teams, outfile)
-            with open(f'{filtered_path}/indexes.pkl', "wb") as outfile:
-                pickle.dump((i2c, c2i, i2s, s2i, i2t, t2i), outfile)
-            with open(f'{filtered_path}/candidates.pkl', "wb") as outfile:
-                pickle.dump(candidates, outfile)
-            print(f"It took {time() - wt} seconds to pickle the data")
-            if not index:
-                return i2c, c2i, i2s, s2i, i2t, t2i, teams
-            else:
-                return i2c, c2i, i2s, s2i, i2t, t2i, None
 
     @staticmethod
     def get_unigram(output, m2i):
