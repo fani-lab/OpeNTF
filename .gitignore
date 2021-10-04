@@ -7,12 +7,12 @@
 *.npz
 *.pt
 *.txt
-*.csv
 *.yml
 *.src
 *.tgt
 *.pickle
 *.png
 *.pkl
+*.csv
 *.tsv
 src/tmp.py
