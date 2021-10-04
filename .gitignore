@@ -14,4 +14,5 @@
 *.pickle
 *.png
 *.pkl
+*.tsv
 src/tmp.py
