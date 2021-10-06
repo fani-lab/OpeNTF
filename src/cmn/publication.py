@@ -43,19 +43,9 @@ class Publication(Team):
 
     @staticmethod
     def read_data(datapath, output, index, filter, settings):
+        st = time()
         try:
-            st = time()
-            print("Loading indexes pickle...")
-            with open(f'{output}/indexes.pkl', 'rb') as infile: indexes = pickle.load(infile)
-            print(f"It took {time() - st} seconds to load from the pickles.")
-            teams = None
-            if not index:
-                st = time()
-                print("Loading teams pickle...")
-                with open(f'{output}/teams.pkl', 'rb') as tfile: teams = pickle.load(tfile)
-                print(f"It took {time() - st} seconds to load from the pickles.")
-
-            return indexes, teams
+            return super(Publication, Publication).load_data(output, index)
         except (FileNotFoundError, EOFError) as e:
             print("Pickles not found! Reading raw data ...")
             teams = {}; candidates = {}
