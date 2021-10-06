@@ -85,6 +85,21 @@ class Team(object):
         return  indexes, teams
 
     @staticmethod
+    def load_data(output, index):
+        st = time()
+        print("Loading indexes pickle...")
+        with open(f'{output}/indexes.pkl', 'rb') as infile: indexes = pickle.load(infile)
+        print(f"It took {time() - st} seconds to load from the pickles.")
+        teams = None
+        if not index:
+            st = time()
+            print("Loading teams pickle...")
+            with open(f'{output}/teams.pkl', 'rb') as tfile: teams = pickle.load(tfile)
+            print(f"It took {time() - st} seconds to load from the pickles.")
+
+        return indexes, teams
+
+    @staticmethod
     def bucketing(bucket_size, s2i, c2i, teams):
         skill_vec_dim = len(s2i)
         candidate_vec_dim = len(c2i)

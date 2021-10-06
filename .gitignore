@@ -6,13 +6,9 @@
 *.pyc
 *.npz
 *.pt
-*.txt
-*.yml
 *.src
 *.tgt
 *.pickle
 *.png
-*.pkl
-*.csv
 *.tsv
 src/tmp.py

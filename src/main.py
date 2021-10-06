@@ -13,10 +13,10 @@ sys.path.extend(['../cmn'])
 
 def run(datapath, domain, filter, model, output, settings):
     if domain == 'dblp':
-        vecs, indexes = Publication.generate_sparse_vectors(datapath, f'./../data/preprocessed/{os.path.split(datapath)[-1]}', filter, settings['data'])
+        vecs, indexes = Publication.generate_sparse_vectors(datapath, f'./../data/preprocessed/dblp/{os.path.split(datapath)[-1]}', filter, settings['data'])
 
     if domain == 'imdb':
-        vecs, indexes = Movie.generate_sparse_vectors(datapath, f'./../data/preprocessed/{os.path.split(datapath)[-1]}', filter, settings['data'])
+        vecs, indexes = Movie.generate_sparse_vectors(datapath, f'./../data/preprocessed/imdb/{os.path.split(datapath)[-1]}', filter, settings['data'])
 
     splits = create_evaluation_splits(len(indexes['t2i']), settings['model']['splits'])
 
@@ -43,7 +43,8 @@ def addargs(parser):
 
 # python -u main.py -data=./../data/raw/toy.json -domain=dblp -model=dnn  2>&1 | tee ./../output/toy.log &
 # python -u main.py -data=./../data/raw/dblp.v12.json -domain=dblp -model=dnn 2>&1 | tee ./../output/dblp.log &
-# python -u main.py -data=./../data/raw/title_basic.csv -domain=imdb -model=dnn -filter=0
+# python -u main.py -data=./../data/raw/toy.title.basics.tsv -domain=imdb -model=dnn -filter=0
+# python -u main.py -data=./../data/raw/title.basics.tsv -domain=imdb -model=dnn -filter=0
 
 global ncores
 if __name__ == '__main__':
