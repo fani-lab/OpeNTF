@@ -1,0 +1,21 @@
+nconst	primaryName	birthYear	deathYear	primaryProfession	knownForTitles
+nm0913300	David Wasco	\N	\N	production_designer,art_department,actor	tt0265666,tt0266697,tt0361748,tt3783958
+nm0000237	John Travolta	1954	\N	actor,soundtrack,producer	tt0113161,tt0076666,tt0077631,tt0110912
+nm0000235	Uma Thurman	1970	\N	actress,soundtrack,producer	tt0118688,tt0110912,tt0266697,tt0378194
+nm0000168	Samuel L. Jackson	1948	\N	actor,producer,soundtrack	tt4154664,tt0110912,tt3460252,tt0417148
+nm0000246	Bruce Willis	1955	\N	actor,soundtrack,producer	tt0167404,tt0095016,tt0110912,tt0088571
+nm0000233	Quentin Tarantino	1963	\N	writer,actor,producer	tt0110912,tt0105236,tt0116367,tt3460252
+nm0000812	Roger Avary	1965	\N	writer,producer,director	tt7248248,tt0292644,tt0110265,tt0110912
+nm0004744	Lawrence Bender	1957	\N	producer,camera_department,actor	tt0266697,tt0361748,tt0105236,tt0110912
+nm0782900	Andrzej Sekula	1954	\N	cinematographer,director,camera_department	tt0285492,tt0110912,tt0144084,tt0105236
+nm0579673	Sally Menke	1953	2010	editor,producer,sound_department	tt0110912,tt0361748,tt0378194,tt0266697
+nm0821205	Zach Staenberg	1954	\N	editor,producer,editorial_department	tt0133093,tt0234215,tt1731141,tt1637688
+nm0000206	Keanu Reeves	1964	\N	actor,producer,soundtrack	tt0133093,tt0234215,tt0111257,tt0102685
+nm0000401	Laurence Fishburne	1961	\N	actor,producer,writer	tt0234215,tt0327056,tt0133093,tt0242653
+nm0005251	Carrie-Anne Moss	1967	\N	actress,producer	tt0242653,tt0209144,tt0457572,tt0133093
+nm0915989	Hugo Weaving	1960	\N	actor,soundtrack,producer	tt0133093,tt0120737,tt0167261,tt0167260
+nm0905154	Lana Wachowski	1965	\N	writer,producer,director	tt0115736,tt0234215,tt1371111,tt0133093
+nm0905152	Lilly Wachowski	1967	\N	writer,producer,director	tt1371111,tt0115736,tt0133093,tt0234215
+nm0005428	Joel Silver	1952	\N	producer,actor,miscellaneous	tt5444294,tt3799694,tt0095016,tt0133093
+nm0204485	Don Davis	1957	\N	composer,music_department,soundtrack	tt0163025,tt0133093,tt0242653,tt0234215
+nm0691084	Bill Pope	1952	\N	cinematographer,director,camera_department	tt3040964,tt3890160,tt0133093,tt0316654
