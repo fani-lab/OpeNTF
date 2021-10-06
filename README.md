@@ -48,7 +48,7 @@ The above run, load and preprocessed a tiny-size toy example dataset [``toy.json
 ## 3. Features:
 **Data Preprocessing**
 
-Raw dataset, e.g., scholarly papers from [AMiner](https://www.aminer.org/) 's citation network dataset of [``dblp``](https://originalstatic.aminer.cn/misc/dblp.v12.7z) or movies from [``imdb``], were assumed to be populated in [``data/raw``](data/raw). For the sake of integration test, a tiny-size toy example dataset [``toy.json``](data/raw/toy.json) from [``dblp``](https://originalstatic.aminer.cn/misc/dblp.v12.7z) has been already available.
+Raw dataset, e.g., scholarly papers from [AMiner](https://www.aminer.org/) 's citation network dataset of [``dblp``](https://originalstatic.aminer.cn/misc/dblp.v12.7z) or movies from [``imdb``](https://datasets.imdbws.com/), were assumed to be populated in [``data/raw``](data/raw). For the sake of integration test, a tiny-size toy example dataset [``toy.json``](data/raw/toy.json) from [``dblp``](https://originalstatic.aminer.cn/misc/dblp.v12.7z) and [[``toy.title.basics.tsv``](data/raw/toy.title.basics.tsv), [``toy.title.principals.tsv``](data/raw/toy.title.principals.tsv), [``toy.name.basics.tsv``](data/raw/toy.name.basics.tsv)] from [``imdb``](https://datasets.imdbws.com/) have been already provided.
 
 Raw data will be preprocessed into two main sparse matrices each row of which represents: 
 
