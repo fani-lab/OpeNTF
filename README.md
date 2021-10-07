@@ -1,5 +1,8 @@
 # Neural Team Formation 
-Team Formation refers to forming a team of individuals, based on their skills or expertise to accomplish the specified task.
+Teams are the primary vehicle for coordinating experts with diverse skills needed for a particular collaborative project, and Team Formation (TF) has firsthand effects on creating organizational performance. Social network analysis has been employed for TF by incorporating social ties and interpersonal collaboration features using measures such as degree and closeness centrality. Socially driven methods, however, face two significant challenges, esp., when currency (timeliness) is of the prime concern: ``i) temporality``: the expert's skills and her social attributes constantly changes over time. A successful collaboration of experts in a team years ago does not tailor a successful team now, ``ii) Complexity``: optimum teams are found by computationally expensive search over all the subgraphs of a large-scale collaboration graph (search-based.) 
+
+## Objectives
+We propose ``learning-based`` approaches. We will train neural models that would learn relationships among experts and their social attributes in vector space. Wherein, we consider all past (un)successful team compositions as training samples to predict future teams and the team's level of success. Therefore, we bring efficiency while enhancing efficacy due to the inherently iterative and online learning procedure in neural architectures. More importantly, we will address temporality by incorporating sequences on the neural architecture via recurrence, which yields a richer representation and more accurate team composition within time. We are the first who consider temporal graph neural networks for team formation and will provide major advances via ``1) time-sensitive`` and ``2) scalable`` incorporation of experts' attributes and skills. 
 
 1. [Setup](#1-setup)
 2. [Quickstart](#2-quickstart)
@@ -15,6 +18,7 @@ scipy==1.6.3
 numpy==1.20.3
 tqdm==4.60.0
 scikit_learn==0.24.2
+pandas==1.3.3
 ```
 To clone the codebase and install the required packages by ``pip``:
 ```sh
