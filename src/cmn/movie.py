@@ -42,9 +42,10 @@ class Movie(Team):
             print("Pickles not found! Reading raw data ...")
             #in imdb, titles represent movies and name represent crew members
 
-            title_basics = pd.read_csv(datapath, sep='\t', header=0, na_values='\\N').sort_values(by=['tconst'])#title.basics.tsv
+            title_basics = pd.read_csv(datapath, sep='\t', header=0, na_values='\\N', dtype={"startYear": "Int64", "endYear": "Int64"}).sort_values(by=['tconst'])#title.basics.tsv
+
             title_basics = title_basics[title_basics['titleType'].isin(['movie', ''])]
-            title_principals = pd.read_csv(datapath.replace('title.basics', 'title.principals'), sep='\t', header=0, na_values='\\N')#movie-crew association for top-10 cast
+            title_principals = pd.read_csv(datapath.replace('title.basics', 'title.principals'), sep='\t', header=0, na_values='\\N', dtype={"birthYear": "Int64", "deathYear": "Int64"})#movie-crew association for top-10 cast
             name_basics = pd.read_csv(datapath.replace('title.basics', 'name.basics'), sep='\t', header=0, na_values='\\N')#name.basics.tsv
 
             movies_crewids = pd.merge(title_basics, title_principals, on='tconst', how='inner', copy=False)
@@ -66,8 +67,8 @@ class Movie(Team):
                                      [],
                                      movie_crew['primaryTitle'],
                                      movie_crew['originalTitle'],
-                                     int(movie_crew['startYear']) if not pd.isnull(movie_crew['startYear']) else None,
-                                     int(movie_crew['endYear']) if not pd.isnull(movie_crew['endYear']) else None,
+                                     movie_crew['startYear'],
+                                     movie_crew['endYear'],
                                      movie_crew['runtimeMinutes'],
                                      movie_crew['genres'],
                                      [])
@@ -79,8 +80,8 @@ class Movie(Team):
                     if (idname := f'{member_id}_{member_name}') not in candidates:
                         candidates[idname] = CastnCrew(movie_crew['nconst'].replace('nm', ''),
                                                        movie_crew['primaryName'].replace(' ', '_'),
-                                                       int(movie_crew['birthYear']) if not pd.isnull(movie_crew['birthYear']) else None,
-                                                       int(movie_crew['deathYear']) if not pd.isnull(movie_crew['deathYear']) else None,
+                                                       movie_crew['birthYear'],
+                                                       movie_crew['deathYear'],
                                                        movie_crew['primaryProfession'],
                                                        movie_crew['knownForTitles'],
                                                        None)
