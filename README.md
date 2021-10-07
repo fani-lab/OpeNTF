@@ -15,6 +15,7 @@ scipy==1.6.3
 numpy==1.20.3
 tqdm==4.60.0
 scikit_learn==0.24.2
+pandas==1.3.3
 ```
 To clone the codebase and install the required packages by ``pip``:
 ```sh
