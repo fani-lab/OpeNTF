@@ -1,22 +1,34 @@
-import sys
+import pandas as pd
 import pickle
 
-from cmn.publication import Publication
 
-# output = '../data/preprocessed/dblp/dblp.v12.json'
-# output = '../data/preprocessed/dblp/toy.json'
-# with open(f'{output}.filtered/teamsvecs.pkl', 'rb') as infile:
-#     stats = Publication.get_stats(pickle.load(infile), f'../data/preprocessed/{output}', plot=True)
-#
-# with open(f'../data/preprocessed/dblp/{output}/teamsvecs.pkl', 'rb') as infile:
-#     stats = Publication.get_stats(pickle.load(infile), f'../data/preprocessed/{output}', plot=True)
+class Stats:
+    def __init__(self, inventors):
+        self.save_path = '../data/processed/indexes_inventor.pkl'
+        self.all_inventors = inventors
 
-from cmn.movie import Movie
+    def get_stats(self):
+        with open(f'{self.save_path}', "rb") as infile:
+            print('Loading Pickle File.......')
+            stats = pickle.load(infile)
+            for item in stats:
+                print(item[3])
+                break
+                for val in item.values():
+                    print(val)
+                break
 
-output = '../data/preprocessed/imdb/toy.title.basics.tsv'
-# with open(f'{output}.filtered/teamsvecs.pkl', 'rb') as infile:
-#     stats = Movie.get_stats(pickle.load(infile), f'{output}', plot=True)
+            #
+            # bucket_size = 100
+            # skill_size = len(s2i)
+            # author_size = len(m2i)
+            # # Sparse Matrix and bucketing
+            # data = lil_matrix((len_teams, SKILL_SIZE + AUTHOR_SIZE))
+            # data_ = np.zeros((BUCKET_SIZE, SKILL_SIZE + AUTHOR_SIZE))
+            # data = lil_matrix((len_teams, skill_size + author_size))
+            # data_ = np.zeros((bucket_size, skill_size + author_size))
 
-with open(f'{output}/teamsvecs.pkl', 'rb') as infile:
-    stats = Movie.get_stats(pickle.load(infile), f'{output}', plot=True)
+
+
+
 
