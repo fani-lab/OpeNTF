@@ -1,8 +1,10 @@
-class Member(object):
-    count = 0
-    def __init__(self, id, name):
-        Member.count += 1
+class member(object):
+    def __init__(self, id, member):
         self.id = id
-        self.name = name
-        self.teams = set()
-        self.skills = set()
+        self.members = member
+
+    def get_id(self):
+        return self.id
+
+    def get_inventor_id(self):
+        return self.members
