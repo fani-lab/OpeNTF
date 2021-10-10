@@ -166,6 +166,10 @@ class Team(object):
         for team in teams.values():
             team.members = [member for member in team.members if len(member.teams) > settings['filter']['min_nteam']]
 
+        # after removing members with less than "min_nteam" teams, we may have teams with only 1 or even 0 members
+        # remove teams with size less than 2 members (because 1 member is not a team byitself)
+        for id in [team.id for team in teams.values() if len(team.members) < 2]: del teams[id]
+
         return teams
 
     @classmethod
@@ -203,6 +207,6 @@ class Team(object):
             ax = fig.add_subplot(1, 1, 1)
             ax.bar(*zip(*stats[k].items()))
             ax.set_xlabel(k.split('_')[1].replace('n', '#'))
-            ax.set_ylabel(k.split('_')[0].replace('n', '#'))
+            ax.set_ylabel(k.split('_')[0].replace('n', '#'), 0)
             fig.savefig(f'{output}/{k}.png', dpi=100, bbox_inches='tight')
             plt.show()
