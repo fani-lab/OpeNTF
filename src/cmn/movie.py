@@ -27,9 +27,9 @@ class Movie(Team):
         self.skills = self.set_skills()
 
         for i, member in enumerate(self.members):
-            member.teams.add(self.id)
-            member.skills.union(set(self.skills))
-            member.role.add(self.members_details[i])
+            member.teams.append(self.id)
+            member.skills.update(set(self.skills))
+            member.role.append(self.members_details[i])
 
     def set_skills(self):
         return set(self.genres.split(','))
@@ -43,17 +43,22 @@ class Movie(Team):
             print("Pickles not found! Reading raw data ...")
             # in imdb, title.* represent movies and name.* represent crew members
 
-            title_basics = pd.read_csv(datapath, sep='\t', header=0, na_values='\\N',dtype={"startYear": "Int64", "endYear": "Int64"}, low_memory=False).sort_values(by=['tconst'])  # title.basics.tsv
+            print("Reading movie data ...")
+            title_basics = pd.read_csv(datapath, sep='\t', header=0, na_values='\\N',dtype={"startYear": "Int64", "endYear": "Int64"}, low_memory=False)  # title.basics.tsv
             title_basics = title_basics[title_basics['titleType'].isin(['movie', ''])]
+            print("Reading cast'ncrew data ...")
             title_principals = pd.read_csv(datapath.replace('title.basics', 'title.principals'), sep='\t', header=0,na_values='\\N',dtype={"birthYear": "Int64", "deathYear": "Int64"},low_memory=False)  # movie-crew association for top-10 cast
             name_basics = pd.read_csv(datapath.replace('title.basics', 'name.basics'), sep='\t', header=0,na_values='\\N',low_memory=False)  # name.basics.tsv
 
+            print("Joining movie-crew data ...")
             movies_crewids = pd.merge(title_basics, title_principals, on='tconst', how='inner', copy=False)
             movies_crewids_crew = pd.merge(movies_crewids, name_basics, on='nconst', how='inner', copy=False)
 
             movies_crewids_crew.dropna(subset=['genres'], inplace=True)
+            movies_crewids_crew.sort_values(by=['tconst'], inplace=True)
             movies_crewids_crew = movies_crewids_crew.append(pd.Series(), ignore_index=True)
 
+            print("Reading data to objects ...")
             teams = {}; candidates = {}; n_row = 0
             current = None
             #for index, movie_crew in tqdm(movies_crewids_crew.iterrows(), total=movies_crewids_crew.shape[0]):#54%|█████▍    | 2036802/3776643 [04:20<03:37, 7989.97it/s]
@@ -83,10 +88,14 @@ class Movie(Team):
                                                        movie_crew.birthYear,
                                                        movie_crew.deathYear,
                                                        movie_crew.primaryProfession,
-                                                       movie_crew.knownForTitles,
-                                                       None)
+                                                       movie_crew.knownForTitles)
                     team.members.append(candidates[idname])
                     team.members_details.append((movie_crew.category, movie_crew.job, movie_crew.characters))
+
+                    candidates[idname].skills.update(set(team.skills))
+                    candidates[idname].teams.append(team.id)
+                    candidates[idname].roles.append(team.members_details[-1])
+
                 except Exception as e:
                     raise e
             return super(Movie, Movie).read_data(teams, output, filter, settings)
