@@ -82,7 +82,7 @@ class Team(object):
         with open(f'{output}/teams.pkl', "wb") as outfile: pickle.dump(teams, outfile)
         with open(f'{output}/indexes.pkl', "wb") as outfile: pickle.dump(indexes, outfile)
         print(f"It took {time() - st} seconds to pickle the data")
-        return  indexes, teams
+        return indexes, teams
 
     @staticmethod
     def load_data(output, index):
@@ -127,10 +127,11 @@ class Team(object):
 
     @classmethod
     def generate_sparse_vectors(cls, datapath, output, filter, settings):
-        output += ".filtered" if filter else ""
+        output += f'.filtered.mt{settings["filter"]["min_nteam"]}.ts{settings["filter"]["min_team_size"]}' if filter else ""
         pkl = f'{output}/teamsvecs.pkl'
         try:
             st = time()
+            print("Loading sparse matrices...")
             with open(pkl, 'rb') as infile: vecs = pickle.load(infile)
             indexes, _ = cls.read_data(datapath, output, index=True, filter=filter, settings=settings)
             print(f"It took {time() - st} seconds to load the sparse matrices.")
@@ -159,6 +160,7 @@ class Team(object):
 
     @staticmethod
     def remove_outliers(teams, settings):
+        print(f'Removing outliers {settings["filter"]} ...')
         for id in list(teams.keys()):
             teams[id].members = [member for member in teams[id].members if len(member.teams) > settings['filter']['min_nteam']]
             if len(teams[id].members) < settings['filter']['min_team_size']: del teams[id]
