@@ -56,9 +56,8 @@ class Movie(Team):
 
             teams = {}; candidates = {}; n_row = 0
             current = None
-            st = time()
             #for index, movie_crew in tqdm(movies_crewids_crew.iterrows(), total=movies_crewids_crew.shape[0]):#54%|█████▍    | 2036802/3776643 [04:20<03:37, 7989.97it/s]
-            # for index in tqdm(range(0, movies_crewids_crew.shape[0], 1)):#
+            # for index in tqdm(range(0, movies_crewids_crew.shape[0], 1)):#50%|█████     | 1888948/3776643 [06:06<06:12, 5074.40it/s]
             #     movie_crew = movies_crewids_crew.loc[index]
             for movie_crew in tqdm(movies_crewids_crew.itertuples(), total=movies_crewids_crew.shape[0]):#100%|███████████|3776642it [01:05, 57568.62it/s]
                 try:
@@ -90,6 +89,4 @@ class Movie(Team):
                     team.members_details.append((movie_crew.category, movie_crew.job, movie_crew.characters))
                 except Exception as e:
                     raise e
-            print(time() - st)
-
             return super(Movie, Movie).read_data(teams, output, filter, settings)
