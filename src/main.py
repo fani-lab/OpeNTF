@@ -28,7 +28,6 @@ def run(datapath, domain, filter, model, output, settings):
     if model == 'sgns':
         sgns.main(splits, vecs['skill'], vecs['member'], indexes, f'../output/{output}/sgns', settings['model'])
 
-
 def addargs(parser):
     dataset = parser.add_argument_group('dataset')
     dataset.add_argument('-data', type=str, required=True, help='The dataset path; required; (example: ./../data/raw/toy.json)')
