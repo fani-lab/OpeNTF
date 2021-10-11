@@ -1,4 +1,5 @@
 import json
+from tqdm import  tqdm
 import traceback
 import pickle
 from time import time
@@ -22,7 +23,7 @@ class Publication(Team):
 
         for author in self.members:
             author.teams.add(self.id)
-            author.skills.union(set(self.skills))
+            author.skills.update(set(self.skills))
 
     # Fill the fields attribute with non-zero weight from FOS
     def set_skills(self):
@@ -47,22 +48,15 @@ class Publication(Team):
         try:
             return super(Publication, Publication).load_data(output, index)
         except (FileNotFoundError, EOFError) as e:
-            print("Pickles not found! Reading raw data ...")
+            print("Pickles not found! Reading raw data (progress in bytes) ...")
             teams = {}; candidates = {}
-            n_row = 0
-            with open(datapath, "r", encoding='utf-8') as jf:
-                # Skip the first line
-                jf.readline()
-                while True:
+
+            with tqdm(total=os.path.getsize(datapath)) as pbar, open(datapath, "r", encoding='utf-8') as jf:
+                for line in jf:
                     try:
-                        # Read line by line to not overload the memory
-                        line = jf.readline()
                         if not line: break
-                        n_row += 1
-
-
+                        pbar.update(len(line))
                         jsonline = json.loads(line.lower().lstrip(","))
-                        # Retrieve the desired attributes
                         id = jsonline['id']
                         title = jsonline['title']
                         year = jsonline['year']
@@ -73,9 +67,9 @@ class Publication(Team):
 
                         # a team must have skills and members
                         try: fos = jsonline['fos']
-                        except: print(f'Warning! No fos for team id={id}. Bypassed!'); continue  #publication must have fos (skills)
+                        except: continue  #publication must have fos (skills)
                         try: authors = jsonline['authors']
-                        except: print(f'Warning! No author for team id={id}. Bypassed!'); continue #publication must have authors (members)
+                        except: continue #publication must have authors (members)
 
                         members = []
                         for author in authors:
@@ -87,17 +81,12 @@ class Publication(Team):
                             members.append(candidates[idname])
                         team = Publication(id, members, title, year, type, venue, references, fos, keywords)
                         teams[team.id] = team
-                        if n_row % 10000 == 0: print(f"{n_row} instances have been loaded, and {time() - st} seconds has passed.")
-
                     except json.JSONDecodeError as e:  # ideally should happen only for the last line ']'
                         print(f'JSONDecodeError: There has been error in loading json line `{line}`!\n{e}')
                         continue
                     except Exception as e:
                         raise e
-
-            print(f"It took {time() - st} seconds to load the data. #teams: {len(teams)} out of #lines: {n_row}.")
             return super(Publication, Publication).read_data(teams, output, filter, settings)
-
         except Exception as e:
             raise e
 
