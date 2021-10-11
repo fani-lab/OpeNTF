@@ -1,4 +1,5 @@
 import pandas as pd
+from tqdm import tqdm
 import traceback
 import pickle
 from time import time
@@ -40,13 +41,12 @@ class Movie(Team):
             return super(Movie, Movie).load_data(output, index)
         except (FileNotFoundError, EOFError) as e:
             print("Pickles not found! Reading raw data ...")
-            # in imdb, titles represent movies and name represent crew members
+            # in imdb, title.* represent movies and name.* represent crew members
 
             title_basics = pd.read_csv(datapath, sep='\t', header=0, na_values='\\N',dtype={"startYear": "Int64", "endYear": "Int64"}, low_memory=False).sort_values(by=['tconst'])  # title.basics.tsv
             title_basics = title_basics[title_basics['titleType'].isin(['movie', ''])]
             title_principals = pd.read_csv(datapath.replace('title.basics', 'title.principals'), sep='\t', header=0,na_values='\\N',dtype={"birthYear": "Int64", "deathYear": "Int64"},low_memory=False)  # movie-crew association for top-10 cast
-            name_basics = pd.read_csv(datapath.replace('title.basics', 'name.basics'), sep='\t', header=0,na_values='\\N',low_memory=False
-                                      )  # name.basics.tsv
+            name_basics = pd.read_csv(datapath.replace('title.basics', 'name.basics'), sep='\t', header=0,na_values='\\N',low_memory=False)  # name.basics.tsv
 
             movies_crewids = pd.merge(title_basics, title_principals, on='tconst', how='inner', copy=False)
             movies_crewids_crew = pd.merge(movies_crewids, name_basics, on='nconst', how='inner', copy=False)
@@ -54,54 +54,42 @@ class Movie(Team):
             movies_crewids_crew.dropna(subset=['genres'], inplace=True)
             movies_crewids_crew = movies_crewids_crew.append(pd.Series(), ignore_index=True)
 
-            teams = {}
-            candidates = {}
-            n_row = 0
+            teams = {}; candidates = {}; n_row = 0
             current = None
-            members = []
-            members_details = []
-            # for index, movie_crew in movies_crewids_crew.iterrows():
-            for index in range(0, movies_crewids_crew.shape[0], 1):
+            st = time()
+            #for index, movie_crew in tqdm(movies_crewids_crew.iterrows(), total=movies_crewids_crew.shape[0]):#54%|█████▍    | 2036802/3776643 [04:20<03:37, 7989.97it/s]
+            # for index in tqdm(range(0, movies_crewids_crew.shape[0], 1)):#
+            #     movie_crew = movies_crewids_crew.loc[index]
+            for movie_crew in tqdm(movies_crewids_crew.itertuples(), total=movies_crewids_crew.shape[0]):#100%|███████████|3776642it [01:05, 57568.62it/s]
                 try:
-                    if pd.isnull(new := movies_crewids_crew['tconst'].iloc[index]): break
+                    if pd.isnull(new := movie_crew.tconst): break
                     if current != new:
-                        team = Movie(movies_crewids_crew['tconst'].iloc[index].replace('tt', ''),
+                        team = Movie(movie_crew.tconst.replace('tt', ''),
                                      [],
-                                     movies_crewids_crew['primaryTitle'].iloc[index],
-                                     movies_crewids_crew['originalTitle'].iloc[index],
-                                     int(movies_crewids_crew['startYear'].iloc[index]) if not pd.isnull(
-                                         movies_crewids_crew['startYear'].iloc[index]) else None,
-                                     int(movies_crewids_crew['endYear'].iloc[index]) if not pd.isnull(
-                                         movies_crewids_crew['endYear'].iloc[index]) else None,
-                                     movies_crewids_crew['runtimeMinutes'].iloc[index],
-                                     movies_crewids_crew['genres'].iloc[index],
+                                     movie_crew.primaryTitle,
+                                     movie_crew.originalTitle,
+                                     movie_crew.startYear,
+                                     movie_crew.endYear,
+                                     movie_crew.runtimeMinutes,
+                                     movie_crew.genres,
                                      [])
                         current = new
                         teams[team.id] = team
 
-                    member_id = movies_crewids_crew['nconst'].iloc[index].replace('nm', '')
-                    member_name = movies_crewids_crew['primaryName'].iloc[index].replace(" ", "_")
+                    member_id = movie_crew.nconst.replace('nm', '')
+                    member_name = movie_crew.primaryName.replace(" ", "_")
                     if (idname := f'{member_id}_{member_name}') not in candidates:
-                        candidates[idname] = CastnCrew(movies_crewids_crew['nconst'].iloc[index].replace('nm', ''),
-                                                       movies_crewids_crew['primaryName'].iloc[index].replace(' ', '_'),
-                                                       int(movies_crewids_crew['birthYear'].iloc[
-                                                               index]) if not pd.isnull(
-                                                           movies_crewids_crew['birthYear'].iloc[index]) else None,
-                                                       int(movies_crewids_crew['deathYear'].iloc[
-                                                               index]) if not pd.isnull(
-                                                           movies_crewids_crew['deathYear'].iloc[index]) else None,
-                                                       movies_crewids_crew['primaryProfession'].iloc[index],
-                                                       movies_crewids_crew['knownForTitles'].iloc[index],
+                        candidates[idname] = CastnCrew(movie_crew.nconst.replace('nm', ''),
+                                                       movie_crew.primaryName.replace(' ', '_'),
+                                                       movie_crew.birthYear,
+                                                       movie_crew.deathYear,
+                                                       movie_crew.primaryProfession,
+                                                       movie_crew.knownForTitles,
                                                        None)
                     team.members.append(candidates[idname])
-                    team.members_details.append((movies_crewids_crew['category'].iloc[index],
-                                                 movies_crewids_crew['job'].iloc[index],
-                                                 movies_crewids_crew['characters'].iloc[index]))
-
-                    if (n_row := n_row + 1) % 10000 == 0: print(
-                        f"{n_row} instances have been loaded, and {time() - st} seconds has passed.")
-
+                    team.members_details.append((movie_crew.category, movie_crew.job, movie_crew.characters))
                 except Exception as e:
                     raise e
+            print(time() - st)
 
             return super(Movie, Movie).read_data(teams, output, filter, settings)
