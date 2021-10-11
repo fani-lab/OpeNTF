@@ -159,12 +159,9 @@ class Team(object):
 
     @staticmethod
     def remove_outliers(teams, settings):
-        # remove teams with size less than min_team_size
-        for id in [team.id for team in teams.values() if len(team.members) < settings['filter']['min_team_size']]: del teams[id]
-
-        # remove members with less than min_team number of teams from teams
-        for team in teams.values():
-            team.members = [member for member in team.members if len(member.teams) > settings['filter']['min_nteam']]
+        for id in list(teams.keys()):
+            teams[id].members = [member for member in teams[id].members if len(member.teams) > settings['filter']['min_nteam']]
+            if len(teams[id].members) < settings['filter']['min_team_size']: del teams[id]
 
         return teams
 
@@ -202,7 +199,7 @@ class Team(object):
             fig = plt.figure()
             ax = fig.add_subplot(1, 1, 1)
             ax.bar(*zip(*stats[k].items()))
-            ax.set_xlabel(k.split('_')[1].replace('n', '#'))
-            ax.set_ylabel(k.split('_')[0].replace('n', '#'))
+            ax.set_xlabel(k.split('_')[1].replace('n', '#', 0))
+            ax.set_ylabel(k.split('_')[0].replace('n', '#', 0))
             fig.savefig(f'{output}/{k}.png', dpi=100, bbox_inches='tight')
             plt.show()
