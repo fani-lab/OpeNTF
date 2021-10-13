@@ -15,6 +15,7 @@ class FNN(nn.Module):
     def forward(self, x):
         x = self.dp(leaky_relu(self.fc1(x)))
         x = self.fc2(x)
+        x = torch.clamp(torch.sigmoid(x), min=1.e-6, max=1. - 1.e-6)
         return x
 
     def initialize_weights(self):
