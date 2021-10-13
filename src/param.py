@@ -15,7 +15,7 @@ settings = {
                 'd': 100,    # size of hidden space
                 'lr': 0.1,  # learning rate
                 'b': 1000,     # batch_size
-                'e': 2,     # epochs
+                'e': 200,     # epochs
             },
             'sgns':{
                 'd': 100,
@@ -35,8 +35,8 @@ settings = {
             'imdb':{},
         },
         'filter': {
-            'min_nteam': 2,
-            'min_team_size': 2,
+            'min_nteam': 10,
+            'min_team_size': 3,
         },
         'ncore': 4,
         'bucket_size': 1000
