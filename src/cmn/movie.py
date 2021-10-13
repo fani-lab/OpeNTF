@@ -42,16 +42,15 @@ class Movie(Team):
         except (FileNotFoundError, EOFError) as e:
             print(f"Pickles not found! Reading raw data from {datapath} ...")
             # in imdb, title.* represent movies and name.* represent crew members
-            movie_id = lambda x : (x.replace('tt',''))
-            member_id = lambda x: (x.replace('nm',''))
-            crew_name = lambda x : (x.replace(' ','_'))
+            strid2int = lambda x : int(x[2:])
+            crew_name = lambda x : x.replace(' ','_')
 
             print("Reading movie data ...")
-            title_basics = pd.read_csv(datapath, sep='\t', header=0, na_values='\\N',converters={'tconst': movie_id},dtype={"startYear": "Int64", "endYear": "Int64"}, low_memory=False)  # title.basics.tsv
+            title_basics = pd.read_csv(datapath, sep='\t', header=0, na_values='\\N', converters={'tconst': strid2int}, dtype={"startYear": "Int64", "endYear": "Int64"}, low_memory=False)  # title.basics.tsv
             title_basics = title_basics[title_basics['titleType'].isin(['movie', ''])]
             print("Reading cast'ncrew data ...")
-            title_principals = pd.read_csv(datapath.replace('title.basics', 'title.principals'), sep='\t', header=0,na_values='\\N',converters={'tconst': movie_id, 'nconst':member_id},dtype={"birthYear": "Int64", "deathYear": "Int64"},low_memory=False)  # movie-crew association for top-10 cast
-            name_basics = pd.read_csv(datapath.replace('title.basics', 'name.basics'), sep='\t', header=0,na_values='\\N',converters={'nconst':member_id,'primaryName':crew_name},low_memory=False)  # name.basics.tsv
+            title_principals = pd.read_csv(datapath.replace('title.basics', 'title.principals'), sep='\t', header=0,na_values='\\N', converters={'tconst': strid2int, 'nconst': strid2int}, dtype={"birthYear": "Int64", "deathYear": "Int64"},low_memory=False)  # movie-crew association for top-10 cast
+            name_basics = pd.read_csv(datapath.replace('title.basics', 'name.basics'), sep='\t', header=0,na_values='\\N', converters={'nconst': strid2int,'primaryName': crew_name},low_memory=False)  # name.basics.tsv
 
             print("Joining movie-crew data ...")
             movies_crewids = pd.merge(title_basics, title_principals, on='tconst', how='inner', copy=False)
