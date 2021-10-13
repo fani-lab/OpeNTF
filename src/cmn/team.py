@@ -81,19 +81,19 @@ class Team(object):
 
         with open(f'{output}/teams.pkl', "wb") as outfile: pickle.dump(teams, outfile)
         with open(f'{output}/indexes.pkl', "wb") as outfile: pickle.dump(indexes, outfile)
-        print(f"It took {time() - st} seconds to pickle the data")
+        print(f"It took {time() - st} seconds to pickle the data into {output}")
         return indexes, teams
 
     @staticmethod
     def load_data(output, index):
         st = time()
-        print("Loading indexes pickle...")
+        print(f"Loading indexes pickle from {output}/indexes.pkl ...")
         with open(f'{output}/indexes.pkl', 'rb') as infile: indexes = pickle.load(infile)
         print(f"It took {time() - st} seconds to load from the pickles.")
         teams = None
         if not index:
             st = time()
-            print("Loading teams pickle...")
+            print(f"Loading teams pickle from {output}/teams.pkl ...")
             with open(f'{output}/teams.pkl', 'rb') as tfile: teams = pickle.load(tfile)
             print(f"It took {time() - st} seconds to load from the pickles.")
 
@@ -131,13 +131,13 @@ class Team(object):
         pkl = f'{output}/teamsvecs.pkl'
         try:
             st = time()
-            print("Loading sparse matrices...")
+            print(f"Loading sparse matrices from {pkl} ...")
             with open(pkl, 'rb') as infile: vecs = pickle.load(infile)
             indexes, _ = cls.read_data(datapath, output, index=True, filter=filter, settings=settings)
             print(f"It took {time() - st} seconds to load the sparse matrices.")
             return vecs, indexes
         except FileNotFoundError as e:
-            print("File not found! Generating the sparse matrices...")
+            print("File not found! Generating the sparse matrices ...")
             indexes, teams = cls.read_data(datapath, output, index=False, filter=filter, settings=settings)
             st = time()
             # parallel
@@ -152,7 +152,7 @@ class Team(object):
             vecs = {'id': data[:, 0], 'skill': data[:, 1:len(indexes['s2i']) + 1], 'member':data[:, - len(indexes['c2i']):]}
 
             with open(pkl, 'wb') as outfile: pickle.dump(vecs, outfile)
-            print(f"It took {time() - st} seconds to generate and store the sparse matrices of size {data.shape}")
+            print(f"It took {time() - st} seconds to generate and store the sparse matrices of size {data.shape} at {pkl}")
             return vecs, indexes
 
         except Exception as e:
