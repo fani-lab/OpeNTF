@@ -8,7 +8,7 @@
 *.pt
 *.src
 *.tgt
-*.pickle
+*.pkl
 *.png
 *.tsv
 src/tmp.py

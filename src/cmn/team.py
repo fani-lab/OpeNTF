@@ -205,3 +205,7 @@ class Team(object):
             ax.set_ylabel(k.split('_')[0].replace('n', '#', 0))
             fig.savefig(f'{output}/{k}.png', dpi=100, bbox_inches='tight')
             plt.show()
+
+    @staticmethod
+    def get_unigram(membervecs):
+        return membervecs.sum(axis=0)/membervecs.shape[0]

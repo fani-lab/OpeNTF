@@ -26,7 +26,7 @@ def run(datapath, domain, filter, model, output, settings):
     # nmt.main(splits, input_data, output_data, cmd=['train', 'test', 'eval'])
 
     if model == 'sgns':
-        sgns.main(splits, vecs['skill'], vecs['member'], indexes, f'../output/{output}/sgns', settings['model'])
+        sgns.main(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}/sgns', settings['model']['baseline']['sgns'], settings['model']['cmd'])
 
 def addargs(parser):
     dataset = parser.add_argument_group('dataset')
