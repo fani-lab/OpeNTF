@@ -20,12 +20,10 @@ from mdl.custom_dataset import TFDataset
 from dal.data_utils import *
 
 def weighted_cross_entropy_with_logits(logits, targets, pos_weight = 2.5):
-    logits = torch.sigmoid(logits)
-    logits = torch.clamp(logits, min= 1.e-6, max=1. - 1.e-6)
-    loss = -targets * torch.log(logits) * pos_weight + (1 - targets) * - torch.log(1 - logits)
-    if loss.isnan().any():
-        raise Exception("nan in loss!")
-    return loss.sum()
+    return (-targets * torch.log(logits) * pos_weight + (1 - targets) * - torch.log(1 - logits)).sum()
+    # if loss.isnan().any():
+    #     raise Exception("nan in loss!")
+    # return loss.sum()
 
 def learn(splits, indexes, vecs, params, output):
 
@@ -96,10 +94,10 @@ def learn(splits, indexes, vecs, params, output):
                         y_ = model(X)
                         loss = weighted_cross_entropy_with_logits(y_, y)
                         valid_running_loss += loss.item()
-                    # print(f'Fold {foldidx}/{len(splits["folds"]) - 1}, Epoch {epoch}/{num_epochs - 1}, Minibatch {batch_idx}/{int(X_train.shape[0] / batch_size)}, Phase {phase}'
-                    #       f', Running Loss {phase} {loss.item()}'
-                    #       # f", Time {time.time() - fold_time}, Overal {time.time() - start_time} "
-                    #       )
+                    print(f'Fold {foldidx}/{len(splits["folds"]) - 1}, Epoch {epoch}/{num_epochs - 1}, Minibatch {batch_idx}/{int(X_train.shape[0] / batch_size)}, Phase {phase}'
+                          f', Running Loss {phase} {loss.item()}'
+                          # f", Time {time.time() - fold_time}, Overal {time.time() - start_time} "
+                          )
                 # Appending the loss of each epoch to plot later
                 if phase == 'train': train_loss_values.append(train_running_loss/X_train.shape[0])
                 else: valid_loss_values.append(valid_running_loss/X_valid.shape[0])
