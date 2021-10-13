@@ -42,13 +42,16 @@ class Movie(Team):
         except (FileNotFoundError, EOFError) as e:
             print("Pickles not found! Reading raw data ...")
             # in imdb, title.* represent movies and name.* represent crew members
+            movie_id = lambda x : (x.replace('tt',''))
+            member_id = lambda x: (x.replace('nm',''))
+            crew_name = lambda x : (x.replace(' ','_'))
 
             print("Reading movie data ...")
-            title_basics = pd.read_csv(datapath, sep='\t', header=0, na_values='\\N',dtype={"startYear": "Int64", "endYear": "Int64"}, low_memory=False)  # title.basics.tsv
+            title_basics = pd.read_csv(datapath, sep='\t', header=0, na_values='\\N',converters={'tconst': movie_id},dtype={"startYear": "Int64", "endYear": "Int64"}, low_memory=False)  # title.basics.tsv
             title_basics = title_basics[title_basics['titleType'].isin(['movie', ''])]
             print("Reading cast'ncrew data ...")
-            title_principals = pd.read_csv(datapath.replace('title.basics', 'title.principals'), sep='\t', header=0,na_values='\\N',dtype={"birthYear": "Int64", "deathYear": "Int64"},low_memory=False)  # movie-crew association for top-10 cast
-            name_basics = pd.read_csv(datapath.replace('title.basics', 'name.basics'), sep='\t', header=0,na_values='\\N',low_memory=False)  # name.basics.tsv
+            title_principals = pd.read_csv(datapath.replace('title.basics', 'title.principals'), sep='\t', header=0,na_values='\\N',converters={'tconst': movie_id, 'nconst':member_id},dtype={"birthYear": "Int64", "deathYear": "Int64"},low_memory=False)  # movie-crew association for top-10 cast
+            name_basics = pd.read_csv(datapath.replace('title.basics', 'name.basics'), sep='\t', header=0,na_values='\\N',converters={'nconst':member_id,'primaryName':crew_name},low_memory=False)  # name.basics.tsv
 
             print("Joining movie-crew data ...")
             movies_crewids = pd.merge(title_basics, title_principals, on='tconst', how='inner', copy=False)
@@ -68,7 +71,7 @@ class Movie(Team):
                 try:
                     if pd.isnull(new := movie_crew.tconst): break
                     if current != new:
-                        team = Movie(movie_crew.tconst.replace('tt', ''),
+                        team = Movie(movie_crew.tconst,
                                      [],
                                      movie_crew.primaryTitle,
                                      movie_crew.originalTitle,
@@ -80,11 +83,11 @@ class Movie(Team):
                         current = new
                         teams[team.id] = team
 
-                    member_id = movie_crew.nconst.replace('nm', '')
-                    member_name = movie_crew.primaryName.replace(" ", "_")
+                    member_id = movie_crew.nconst
+                    member_name = movie_crew.primaryName
                     if (idname := f'{member_id}_{member_name}') not in candidates:
-                        candidates[idname] = CastnCrew(movie_crew.nconst.replace('nm', ''),
-                                                       movie_crew.primaryName.replace(' ', '_'),
+                        candidates[idname] = CastnCrew(movie_crew.nconst,
+                                                       movie_crew.primaryName,
                                                        movie_crew.birthYear,
                                                        movie_crew.deathYear,
                                                        movie_crew.primaryProfession,
