@@ -40,7 +40,7 @@ class Movie(Team):
         try:
             return super(Movie, Movie).load_data(output, index)
         except (FileNotFoundError, EOFError) as e:
-            print("Pickles not found! Reading raw data ...")
+            print(f"Pickles not found! Reading raw data from {datapath} ...")
             # in imdb, title.* represent movies and name.* represent crew members
 
             print("Reading movie data ...")
