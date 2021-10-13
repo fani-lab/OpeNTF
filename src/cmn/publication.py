@@ -48,7 +48,7 @@ class Publication(Team):
         try:
             return super(Publication, Publication).load_data(output, index)
         except (FileNotFoundError, EOFError) as e:
-            print("Pickles not found! Reading raw data (progress in bytes) ...")
+            print(f"Pickles not found! Reading raw data from {datapath} (progress in bytes) ...")
             teams = {}; candidates = {}
 
             with tqdm(total=os.path.getsize(datapath)) as pbar, open(datapath, "r", encoding='utf-8') as jf:
