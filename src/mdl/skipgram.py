@@ -1,5 +1,7 @@
-from torch import nn  
-from torch.nn.functional import relu, leaky_relu
+import torch
+from torch import nn
+from torch.nn.functional import leaky_relu, sigmoid
+
 
 class SGNS(nn.Module):
     def __init__(self, input_size, output_size, param):
@@ -13,6 +15,7 @@ class SGNS(nn.Module):
     def forward(self, x):
         x = self.dp(leaky_relu(self.fc1(x)))
         x = self.fc2(x)
+        x = torch.clamp(sigmoid(x), min=1.e-6, max=1. - 1.e-6)
         return x
 
     def initialize_weights(self):

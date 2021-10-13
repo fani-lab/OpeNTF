@@ -12,17 +12,18 @@ settings = {
     'model':{
         'baseline': {
             'dnn': {
-                'd': 100,    # size of hidden space
+                'd': 10,    # size of hidden space
                 'lr': 0.1,  # learning rate
-                'b': 1000,     # batch_size
+                'b': 3,     # batch_size
                 'e': 200,     # epochs
             },
             'sgns':{
-                'd': 100,
-                'lr': 0.01,
+                'd': 10,
+                'lr': 0.1,
                 'b': 3,
                 'e': 10,
                 'ns': 3,
+                's': 'uniform'  # 'uniform', 'unigram', 'unigram_b'
             },
         },
         'cmd': ['train', 'plot', 'test', 'eval'],
