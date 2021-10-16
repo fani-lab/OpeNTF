@@ -1,19 +1,18 @@
 import json
 import pickle
-from torch.nn.utils import clip_grad_norm_, clip_grad_value_
-from torch import optim 
-from torch.utils.data import DataLoader 
 from tqdm import tqdm  # For nice progress bar!
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-from torch.optim.lr_scheduler import StepLR, ReduceLROnPlateau
-import csv
-import ast
 import time
-import torch
 
-torch.cuda.empty_cache()
+import torch
+from torch.optim.lr_scheduler import StepLR, ReduceLROnPlateau
+from torch.nn.utils import clip_grad_norm_, clip_grad_value_
+from torch import optim
+from torch.utils.data import DataLoader
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+torch.autograd.set_detect_anomaly(True)
 
 import param
 from mdl.fnn import FNN
@@ -21,30 +20,23 @@ from mdl.custom_dataset import TFDataset
 from dal.data_utils import *
 
 def weighted_cross_entropy_with_logits(logits, targets, pos_weight = 2.5):
-    return -targets * torch.log(torch.sigmoid(logits)) * pos_weight + (1 - targets) * -torch.log(1 - torch.sigmoid(logits))
-
-
-# Set device cuda for GPU if it's available otherwise run on the CPU
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    return (-targets * torch.log(logits) * pos_weight + (1 - targets) * - torch.log(1 - logits)).sum()
+    # if loss.isnan().any():
+    #     raise Exception("nan in loss!")
+    # return loss.sum()
 
 def learn(splits, indexes, vecs, params, output):
 
-    num_nodes = params['d']
-    learning_rate = params['lr']
-    batch_size = params['b']
-    num_epochs = params['e']
+    num_nodes = params['d']; learning_rate = params['lr']; batch_size = params['b']; num_epochs = params['e']
 
-    # Retrieving some of the required information for the model
     input_size = len(indexes['i2s'])
     output_size = len(indexes['i2c'])
-    
-    # Specify a path for the model
+
     try: os.makedirs(output)
     except FileExistsError as ex:
         print("This model already exists")
         return
 
-    # Prime a dict for train and valid loss
     train_valid_loss = dict()
     for i in range(len(splits['folds'].keys())):
         train_valid_loss[i] = {'train': [], 'valid': []}
@@ -53,27 +45,19 @@ def learn(splits, indexes, vecs, params, output):
     # Training K-fold
     for foldidx in splits['folds'].keys():
         # Retrieving the folds
-        X_train = vecs['skill'][splits['folds'][foldidx]['train'], :]
-        y_train = vecs['member'][splits['folds'][foldidx]['train']]
-        X_valid = vecs['skill'][splits['folds'][foldidx]['valid'], :]
-        y_valid = vecs['member'][splits['folds'][foldidx]['valid']]
+        X_train = vecs['skill'][splits['folds'][foldidx]['train'], :]; y_train = vecs['member'][splits['folds'][foldidx]['train']]
+        X_valid = vecs['skill'][splits['folds'][foldidx]['valid'], :]; y_valid = vecs['member'][splits['folds'][foldidx]['valid']]
 
-        # Building custom dataset
         training_matrix = TFDataset(X_train, y_train)
         validation_matrix = TFDataset(X_valid, y_valid)
 
-        # Generating dataloaders
         training_dataloader = DataLoader(training_matrix, batch_size=batch_size, shuffle=True, num_workers=0)
         validation_dataloader = DataLoader(validation_matrix, batch_size=batch_size, shuffle=True, num_workers=0)
+        data_loaders = {"train": training_dataloader, "valid": validation_dataloader}
 
-        data_loaders = {"train": training_dataloader, "val": validation_dataloader}
-
-        # Initialize network
         model = FNN(input_size=input_size, output_size=output_size, param=params).to(device)
 
-
         # Loss and optimizer
-
         # criterion = nn.MSELoss()
         # criterion = nn.MultiLabelMarginLoss()
         # criterion = nn.BCELoss()
@@ -84,70 +68,47 @@ def learn(splits, indexes, vecs, params, output):
         scheduler = ReduceLROnPlateau(optimizer, factor=0.5, patience=3, verbose=True)
         # scheduler = StepLR(optimizer, step_size=3, gamma=0.9)
 
-
-        train_loss_values = []
-        valid_loss_values = []
-
-        print(f"Fold {foldidx}")
+        train_loss_values = []; valid_loss_values = []
         fold_time = time.time()
-        # Train Network
         for epoch in range(num_epochs):
-            print(f'Epoch {epoch + 1}/{num_epochs}')
-            print('-' * 15)
-            print(f"{time.time() - fold_time} seconds has passed for this fold, and {time.time() - start_time} seconds has passed overall.")
-
-            train_running_loss = 0.0    
-            valid_running_loss = 0.0
-
+            train_running_loss = valid_running_loss = 0.0
             # Each epoch has a training and validation phase
-            for phase in ['train', 'val']:
-                if phase == 'train':
-                    model.train(True)  # Set model to training mode
-                    # scheduler.step()
-                else:
-                    model.train(False)  # Set model to evaluate mode
-
-                # Iterating through mini-batches    
-                for batch_idx, (data, targets) in tqdm(enumerate(data_loaders[phase])):
-                    # Get data to cuda if possible
-                    data = data.float().to(device=device)
-                    targets = targets.float().to(device=device)
-
-                    # forward
-                    scores = model(data)
-                    print(f"this is the {phase} score:", scores.sum().item())
-                    loss = weighted_cross_entropy_with_logits(scores, targets)
-                    print(f"this is the {phase} loss:", loss.sum().item())
-                    
-                    # Summing the loss of mini-batches
+            for phase in ['train', 'valid']:
+                for batch_idx, (X, y) in enumerate(data_loaders[phase]):
+                    torch.cuda.empty_cache()
+                    X = X.float().to(device=device)# Get data to cuda if possible
+                    y = y.float().to(device=device)
                     if phase == 'train':
-                        train_running_loss += loss.sum().item()
-                    else:
-                        valid_running_loss += loss.sum().item()
-                        
-                    # backward
-                    optimizer.zero_grad()
-                    if phase == 'train': 
-                        loss.sum().backward()
-                        clip_grad_value_(model.parameters(), 1)
+                        model.train(True)  # scheduler.step()
+                        # forward
+                        optimizer.zero_grad()
+                        y_ = model(X)
+                        loss = weighted_cross_entropy_with_logits(y_, y)
+                        # backward
+                        loss.backward()
+                        # clip_grad_value_(model.parameters(), 1)
                         optimizer.step()
-
-                    if batch_idx % 10000 == 0:
-                        model_path = f"{output}/state_dict_model_{foldidx}_{batch_idx}.pt"
-                        torch.save(model.state_dict(), model_path)
-
+                        train_running_loss += loss.item()
+                    else:#valid
+                        model.train(False)  # Set model to valid mode
+                        y_ = model(X)
+                        loss = weighted_cross_entropy_with_logits(y_, y)
+                        valid_running_loss += loss.item()
+                    print(f'Fold {foldidx}/{len(splits["folds"]) - 1}, Epoch {epoch}/{num_epochs - 1}, Minibatch {batch_idx}/{int(X_train.shape[0] / batch_size)}, Phase {phase}'
+                          f', Running Loss {phase} {loss.item()}'
+                          # f", Time {time.time() - fold_time}, Overal {time.time() - start_time} "
+                          )
                 # Appending the loss of each epoch to plot later
-                if phase == 'train':
-                    train_loss_values.append((train_running_loss/X_train.shape[0]))
-                else:
-                    valid_loss_values.append((valid_running_loss/X_valid.shape[0]))
+                if phase == 'train': train_loss_values.append(train_running_loss/X_train.shape[0])
+                else: valid_loss_values.append(valid_running_loss/X_valid.shape[0])
+                print(f'Fold {foldidx}/{len(splits["folds"]) - 1}, Epoch {epoch}/{num_epochs - 1}'
+                      f', Running Loss {phase} {train_loss_values[-1] if phase == "train" else valid_loss_values[-1]}'
+                      # f", Time {time.time() - fold_time}, Overal {time.time() - start_time} "
+                      )
+            torch.save(model.state_dict(), f"{output}/state_dict_model.f{foldidx}.e{epoch}.pt")
+            scheduler.step(valid_running_loss/X_valid.shape[0])
 
-                scheduler.step(valid_running_loss/X_valid.shape[0])
-
-         
         model_path = f"{output}/state_dict_model_{foldidx}.pt"
-    
-        # Save
         torch.save(model.state_dict(), model_path)
         train_valid_loss[foldidx]['train'] = train_loss_values
         train_valid_loss[foldidx]['valid'] = valid_loss_values
@@ -363,7 +324,7 @@ def main(splits, vecs, indexes, output, settings, cmd):
     output = f"{output}/" \
              f"t{vecs['skill'].shape[0]}." \
              f"s{vecs['skill'].shape[1]}." \
-             f"c{vecs['member'].shape[1]}." \
+             f"e{vecs['member'].shape[1]}." \
              f"{'.'.join([k + str(v) for k,v in settings.items()])}"
 
     if 'train' in cmd: learn(splits, indexes, vecs, settings, output)
