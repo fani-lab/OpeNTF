@@ -81,19 +81,19 @@ class Team(object):
 
         with open(f'{output}/teams.pkl', "wb") as outfile: pickle.dump(teams, outfile)
         with open(f'{output}/indexes.pkl', "wb") as outfile: pickle.dump(indexes, outfile)
-        print(f"It took {time() - st} seconds to pickle the data")
-        return  indexes, teams
+        print(f"It took {time() - st} seconds to pickle the data into {output}")
+        return indexes, teams
 
     @staticmethod
     def load_data(output, index):
         st = time()
-        print("Loading indexes pickle...")
+        print(f"Loading indexes pickle from {output}/indexes.pkl ...")
         with open(f'{output}/indexes.pkl', 'rb') as infile: indexes = pickle.load(infile)
         print(f"It took {time() - st} seconds to load from the pickles.")
         teams = None
         if not index:
             st = time()
-            print("Loading teams pickle...")
+            print(f"Loading teams pickle from {output}/teams.pkl ...")
             with open(f'{output}/teams.pkl', 'rb') as tfile: teams = pickle.load(tfile)
             print(f"It took {time() - st} seconds to load from the pickles.")
 
@@ -127,16 +127,17 @@ class Team(object):
 
     @classmethod
     def generate_sparse_vectors(cls, datapath, output, filter, settings):
-        output += ".filtered" if filter else ""
+        output += f'.filtered.mt{settings["filter"]["min_nteam"]}.ts{settings["filter"]["min_team_size"]}' if filter else ""
         pkl = f'{output}/teamsvecs.pkl'
         try:
             st = time()
+            print(f"Loading sparse matrices from {pkl} ...")
             with open(pkl, 'rb') as infile: vecs = pickle.load(infile)
             indexes, _ = cls.read_data(datapath, output, index=True, filter=filter, settings=settings)
             print(f"It took {time() - st} seconds to load the sparse matrices.")
             return vecs, indexes
         except FileNotFoundError as e:
-            print("File not found! Generating the sparse matrices...")
+            print("File not found! Generating the sparse matrices ...")
             indexes, teams = cls.read_data(datapath, output, index=False, filter=filter, settings=settings)
             st = time()
             # parallel
@@ -151,7 +152,7 @@ class Team(object):
             vecs = {'id': data[:, 0], 'skill': data[:, 1:len(indexes['s2i']) + 1], 'member':data[:, - len(indexes['c2i']):]}
 
             with open(pkl, 'wb') as outfile: pickle.dump(vecs, outfile)
-            print(f"It took {time() - st} seconds to generate and store the sparse matrices of size {data.shape}")
+            print(f"It took {time() - st} seconds to generate and store the sparse matrices of size {data.shape} at {pkl}")
             return vecs, indexes
 
         except Exception as e:
@@ -159,12 +160,10 @@ class Team(object):
 
     @staticmethod
     def remove_outliers(teams, settings):
-        # remove teams with size less than min_team_size
-        for id in [team.id for team in teams.values() if len(team.members) < settings['filter']['min_team_size']]: del teams[id]
-
-        # remove members with less than min_team number of teams from teams
-        for team in teams.values():
-            team.members = [member for member in team.members if len(member.teams) > settings['filter']['min_nteam']]
+        print(f'Removing outliers {settings["filter"]} ...')
+        for id in list(teams.keys()):
+            teams[id].members = [member for member in teams[id].members if len(member.teams) > settings['filter']['min_nteam']]
+            if len(teams[id].members) < settings['filter']['min_team_size']: del teams[id]
 
         return teams
 
@@ -202,7 +201,7 @@ class Team(object):
             fig = plt.figure()
             ax = fig.add_subplot(1, 1, 1)
             ax.bar(*zip(*stats[k].items()))
-            ax.set_xlabel(k.split('_')[1].replace('n', '#'))
-            ax.set_ylabel(k.split('_')[0].replace('n', '#'))
+            ax.set_xlabel(k.split('_')[1].replace('n', '#', 0))
+            ax.set_ylabel(k.split('_')[0].replace('n', '#', 0))
             fig.savefig(f'{output}/{k}.png', dpi=100, bbox_inches='tight')
             plt.show()
