@@ -14,16 +14,12 @@ from cmn.team import Team
 import os.path
 
 
-class Assignee:
+class Patent:
     def __init__(self, assignee_path, inventor_path, location_path, save_path, patent_path):
-        self.assignee_path = assignee_path
         self.inventor_path = inventor_path
         self.location_path = location_path
         self.save_path = save_path
-        self.assignee_save_location = ""
         self.inventor_save_location = ""
-        # self.patent_save_location = ""
-        self.assignee_location = pd.DataFrame()
         self.inventor_location = pd.DataFrame()
         self.patent_location = pd.DataFrame()
         self.patent_path = patent_path
@@ -61,17 +57,13 @@ class Assignee:
         subset_df = self.subset_patents()
         to_obj = pd.DataFrame()
         final_save = '../data/processed/patent_processed.csv'
-        toy_save = '../data/raw/toy.patent/toy.patent.csv'
+        toy_save = '../data/raw/toy.patent'
         chunk_list_patent = []
 
         if os.path.isfile(final_save):
             if toy:
-                toy_df = pd.DataFrame()
                 patent_df = pd.read_csv(final_save)
-                toy_df = patent_df[patent_df['country'].isin(['US'])][:4]
-                toy_df = pd.concat([toy_df, patent_df[patent_df['country'].isin(['GB'])][:3]])
-                toy_df = pd.concat([toy_df, patent_df[patent_df['country'].isin(['IN'])][:3]])
-                toy_df.to_csv(toy_save, index=False)
+                Patent.toy(patent_df, toy_save)
             patent_df = pd.read_csv(final_save)
             return final_save
         else:
@@ -102,7 +94,7 @@ class Assignee:
             inventor_final_loc = pd.merge(inventor_final, location, left_on='location_id', right_on='id',
                                           how='inner')
 
-            inventor_final_loc.drop(['id'], inplace=True, axis=1)
+            inventor_final_loc.drop(columns=['id'], inplace=True, axis=1)
 
             patent_df = pd.read_csv(self.patent_path, sep='\t', chunksize=100000,
                                     usecols=['id', 'date', 'title'])
@@ -113,15 +105,26 @@ class Assignee:
                     [self.patent_location, chunk_list_patent[chunk]]).drop_duplicates()
             patent_final = pd.merge(inventor_final_loc, self.patent_location, left_on='patent_id',
                                     right_on='id', how='inner')
-            patent_final.drop(['id'], inplace=True, axis=1)
+            patent_final.drop(columns=['id'], inplace=True)
             if toy:
-                toy_df = pd.DataFrame()
-                toy_df = patent_final[patent_final['country'].isin(['US'])][:4]
-                toy_df = pd.concat([toy_df, patent_final[patent_final['country'].isin(['GB'])][:3]])
-                toy_df = pd.concat([toy_df, patent_final[patent_final['country'].isin(['IN'])][:3]])
-                toy_df.to_csv(toy_save, index=False)
+                Patent.toy(patent_final, toy_save)
             patent_final.to_csv(final_save, index=False)
 
             print(f'Time taken to process inventor details {(time.time() - start_time) / 60} minutes')
 
         return final_save
+
+    @staticmethod
+    def toy(patent_df, toy_save):
+        toy_df = pd.DataFrame()
+        toy_df = patent_df[patent_df['country'].isin(['US'])][:4]
+        toy_df = pd.concat([toy_df, patent_df[patent_df['country'].isin(['GB'])][:3]])
+        toy_df = pd.concat([toy_df, patent_df[patent_df['country'].isin(['IN'])][:3]])
+        toy_inventor = toy_df[['patent_id', 'inventor_id', 'full_name', 'male_flag']]
+        toy_patent_inventor = toy_df[['patent_id', 'inventor_id', 'skills', 'date', 'title']]
+        toy_location = toy_df[['patent_id', 'location_id', 'city', 'state', 'country']]
+        toy_df.to_csv(f'{toy_save}/toy.patent.csv', index=False)
+        toy_inventor.to_csv(f'{toy_save}/toy.inventor.csv', index=False)
+        toy_patent_inventor.to_csv(f'{toy_save}/toy.patent_inventor.csv', index=False)
+        toy_location.to_csv(f'{toy_save}/toy.location.csv', index=False)
+
