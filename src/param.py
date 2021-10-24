@@ -12,18 +12,18 @@ settings = {
     'model':{
         'baseline': {
             'dnn': {
-                'd': 10,    # size of hidden space
+                'd': 100,    # size of hidden space
                 'lr': 0.1,  # learning rate
-                'b': 3,     # batch_size
-                'e': 200,     # epochs
+                'b': 4096,     # batch_size
+                'e': 2,     # epochs
             },
             'sgns':{
-                'd': 10,
+                'd': 100,
                 'lr': 0.1,
-                'b': 3,
-                'e': 10,
-                'ns': 3,
-                's': 'uniform'  # 'uniform', 'unigram', 'unigram_b'
+                'b': 4096,
+                'e': 2,
+                'ns': 5,
+                's': 'unigram'  # 'uniform', 'unigram', 'unigram_b'
             },
         },
         'cmd': ['train', 'plot', 'test', 'eval'],
@@ -36,10 +36,10 @@ settings = {
             'imdb':{},
         },
         'filter': {
-            'min_nteam': 10,
+            'min_nteam': 30,
             'min_team_size': 3,
         },
-        'ncore': 4,
-        'bucket_size': 1000
+        'ncore': 5,
+        'bucket_size': 500
     },
 }
