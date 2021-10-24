@@ -5,7 +5,7 @@ import param
 from cmn.publication import Publication
 from cmn.movie import Movie 
 from dal.data_utils import *
-import dnn
+import pipeline
 import nmt
 import sgns
 
@@ -20,8 +20,8 @@ def run(datapath, domain, filter, model, output, settings):
 
     splits = create_evaluation_splits(len(indexes['t2i']), settings['model']['splits'])
 
-    if model == 'dnn':
-        dnn.main(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}/dnn', settings['model']['baseline']['dnn'], settings['model']['cmd'])
+    if model == 'fnn':
+        pipeline.main(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}/nn', settings['model']['baseline']['nn'], settings['model']['cmd'])
 
     # nmt.main(splits, input_data, output_data, cmd=['train', 'test', 'eval'])
 
@@ -35,7 +35,7 @@ def addargs(parser):
     dataset.add_argument('-filter', type=int, default=1, choices=[1, 0], help='Remove outliers? (1=True (default), 0=False)')
 
     baseline = parser.add_argument_group('baseline')
-    baseline.add_argument('-model', type=str, required=True, choices=['dnn', 'sgns', 'nmt'], help='The model name (example: dnn)')
+    baseline.add_argument('-model', type=str, required=True, choices=['fnn', 'nmt'], help='The model name (example: fnn)')
 
     output = parser.add_argument_group('output')
     output.add_argument('-output', type=str, default='./../output/', help='The output path (default: ./../output/)')

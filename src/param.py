@@ -11,19 +11,14 @@ np.random.seed(0)
 settings = {
     'model':{
         'baseline': {
-            'dnn': {
-                'd': 100,    # size of hidden space
+            'nn':{
+                'd': 100,  # number of nodes for each layer
+                'l': 1,  # number of layers
                 'lr': 0.1,  # learning rate
-                'b': 4096,     # batch_size
-                'e': 2,     # epochs
-            },
-            'sgns':{
-                'd': 100,
-                'lr': 0.1,
-                'b': 4096,
-                'e': 2,
-                'ns': 5,
-                's': 'unigram'  # 'uniform', 'unigram', 'unigram_b'
+                'b': 4096,  # batch size
+                'e': 2,  # epoch
+                'ns': 5,  # number of negative samples
+                's': 'none', # 'none', 'uniform', 'unigram', 'unigram_b'
             },
         },
         'cmd': ['train', 'plot', 'test', 'eval'],
