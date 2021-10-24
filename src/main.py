@@ -1,14 +1,10 @@
 import sys,os
 import argparse
-
 import param
 from cmn.publication import Publication
 from cmn.movie import Movie 
 from dal.data_utils import *
 import pipeline
-import nmt
-import sgns
-
 sys.path.extend(['../cmn'])
 
 def run(datapath, domain, filter, model, output, settings):
@@ -23,10 +19,8 @@ def run(datapath, domain, filter, model, output, settings):
     if model == 'fnn':
         pipeline.main(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}/nn', settings['model']['baseline']['nn'], settings['model']['cmd'])
 
-    # nmt.main(splits, input_data, output_data, cmd=['train', 'test', 'eval'])
-
-    if model == 'sgns':
-        sgns.main(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}/sgns', settings['model']['baseline']['sgns'], settings['model']['cmd'])
+    # if model == 'nmt'""
+    #     nmt.main(splits, input_data, output_data, cmd=['train', 'test', 'eval'])
 
 def addargs(parser):
     dataset = parser.add_argument_group('dataset')
