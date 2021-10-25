@@ -14,3 +14,5 @@
 src/tmp.py
 /output/
 *.log
+/baseline/Team_Formation_Library/teamFormationLibrary/dataset
+/baseline/Team_Formation_Library/teamFormationLibrary/output/Models
