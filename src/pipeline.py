@@ -71,7 +71,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 def learn(splits, indexes, vecs, params, output, unigram):
 
-    num_nodes = params['d']; num_layers = params['l']; learning_rate = params['lr']; batch_size = params['b']; num_epochs = params['e'];ns = params['ns']; s = params['s']
+    layers = params['l']; learning_rate = params['lr']; batch_size = params['b']; num_epochs = params['e'];ns = params['ns']; s = params['s']
 
     # Retrieving some of the required information for the model
     input_size = len(indexes['i2s'])
@@ -82,7 +82,7 @@ def learn(splits, indexes, vecs, params, output, unigram):
         os.makedirs(output)
     except FileExistsError as ex:
         print("This model already exists")
-        return
+        # return
 
     # Prime a dict for train and valid loss
     train_valid_loss = dict()
@@ -106,10 +106,7 @@ def learn(splits, indexes, vecs, params, output, unigram):
         data_loaders = {"train": training_dataloader, "valid": validation_dataloader}
 
         # Initialize network
-        if num_layers > 1:
-            model = DNN(input_size=input_size, output_size=output_size, param=params).to(device)
-        else:
-            model = SNN(input_size=input_size, output_size=output_size, param=params).to(device)
+        model = DNN(input_size=input_size, output_size=output_size, param=params).to(device)
             
         optimizer = optim.Adam(model.parameters(), lr=learning_rate)
         scheduler = ReduceLROnPlateau(optimizer, factor=0.5, patience=10, verbose=True)
@@ -212,14 +209,13 @@ def eval(model_path, splits, indexes, vecs, params):
         print(f"Reports can be found in: {model_path}")
 
     # Initialize roc dictionary for training and validation
-    auc = dict()
+    auc = {'train': {'vals': [], 'mean': '', 'var': ''}, 'valid': {'vals': [], 'mean': '', 'var': ''}}
     roc_train = dict()
     roc_valid = dict()
     with open(f"{model_path}/train_valid_loss.json", 'r') as infile:
         data = json.load(infile)
         for foldidx in splits['folds'].keys():
             if np.any(np.isnan(data[str(foldidx)]["train"])): continue
-            auc[foldidx] = {'train': "", 'valid': ""}
             roc_train[foldidx] = {'fpr': [], 'tpr': []}
             roc_valid[foldidx] = {'fpr': [], 'tpr': []}
 
@@ -242,141 +238,111 @@ def eval(model_path, splits, indexes, vecs, params):
             validation_dataloader = DataLoader(validation_matrix, batch_size=params['b'], shuffle=True, num_workers=0)
 
             # Initialize network
-            if params['l'] > 1:
-                model = DNN(input_size=input_size, output_size=output_size, param=params).to(device)
-            else:
-                model = SNN(input_size=input_size, output_size=output_size, param=params).to(device)
+            model = DNN(input_size=input_size, output_size=output_size, param=params).to(device)
+
             model.load_state_dict(torch.load(f'{model_path}/state_dict_model_{foldidx}.pt'))
             model.eval()
 
-            mean_p_at_k, p_keys, p_values = precision_at_k(training_dataloader, model, device)
-            mean_r_at_k, r_keys, r_values = recall_at_k(training_dataloader, model, device)
-            mean_ndcg_at_k, n_keys, n_values = ndcg_at_k(training_dataloader, model, device)
-            mean_map_at_k, m_keys, m_values = map_at_k(training_dataloader, model, device)
-
-            with open(f'{model_path}/p_at_k_training_{foldidx}.json', 'w') as outfile:
-                json.dump(mean_p_at_k, outfile)
-            with open(f'{model_path}/r_at_k_training_{foldidx}.json', 'w') as outfile:
-                json.dump(mean_r_at_k, outfile)
-            with open(f'{model_path}/ndcg_at_k_training_{foldidx}.json', 'w') as outfile:
-                json.dump(mean_ndcg_at_k, outfile)
-            with open(f'{model_path}/map_at_k_training_{foldidx}.json', 'w') as outfile:
-                json.dump(mean_map_at_k, outfile)
-
-            fig, axs = plt.subplots(2, 2, sharex='all')
-            fig.text(0.5, 0.04, 'k', ha='center')
-            axs[0, 0].plot(p_keys, p_values)
-            axs[0, 0].set(ylabel='Precision score')
-            axs[0, 0].set_title(f'Precision at K for training set and fold {foldidx}')
-            axs[0, 1].plot(r_keys, r_values)
-            axs[0, 1].set(ylabel='Recall score')
-            axs[0, 1].set_title(f'Recall at K for training set and fold {foldidx}')
-            axs[1, 0].plot(n_keys, n_values)
-            axs[1, 0].set(ylabel='NDCG score')
-            axs[1, 0].set_title(f'NDCG at K for training set and fold {foldidx}')
-            axs[1, 1].plot(m_keys, m_values)
-            axs[1, 1].set(ylabel='map score')
-            axs[1, 1].set_title(f'map at K for training set and fold {foldidx}')
-
-            fig.savefig(f"{model_path}/at_k_training_{foldidx}.png", dpi=100, bbox_inches='tight')
-            fig.show()
-
-            mean_p_at_k, p_keys, p_values = precision_at_k(validation_dataloader, model, device)
-            mean_r_at_k, r_keys, r_values = recall_at_k(validation_dataloader, model, device)
-            mean_ndcg_at_k, n_keys, n_values = ndcg_at_k(validation_dataloader, model, device)
-            mean_map_at_k, m_keys, m_values = map_at_k(validation_dataloader, model, device)
-
-            with open(f'{model_path}/p_at_k_validation_{foldidx}.json', 'w') as outfile:
-                json.dump(mean_p_at_k, outfile)
-            with open(f'{model_path}/r_at_k_validation_{foldidx}.json', 'w') as outfile:
-                json.dump(mean_r_at_k, outfile)
-            with open(f'{model_path}/ndcg_at_k_validation_{foldidx}.json', 'w') as outfile:
-                json.dump(mean_ndcg_at_k, outfile)
-            with open(f'{model_path}/map_at_k_validation_{foldidx}.json', 'w') as outfile:
-                json.dump(mean_map_at_k, outfile)
+            train_met = evaluation_metrics(training_dataloader, model, device)
+            with open(f'{model_path}/p_at_k_test_{foldidx}.json', 'w') as outfile:
+                json.dump(train_met['p'][0], outfile)
+            print("precision at k is dumped.")
+            with open(f'{model_path}/r_at_k_test_{foldidx}.json', 'w') as outfile:
+                json.dump(train_met['r'][0], outfile)
+            print("recall at k is dumped.")
+            with open(f'{model_path}/ndcg_at_k_test_{foldidx}.json', 'w') as outfile:
+                json.dump(train_met['ndcg'][0], outfile)
+            print("ndcg at k is dumped.")
+            with open(f'{model_path}/map_at_k_test_{foldidx}.json', 'w') as outfile:
+                json.dump(train_met['map'][0], outfile)
+            print("map at k is dumped.")
 
             fig, axs = plt.subplots(2, 2, sharex='all')
             fig.text(0.5, 0.04, 'k', ha='center')
-            axs[0, 0].plot(p_keys, p_values)
+            axs[0, 0].plot(train_met['p'][1], train_met['p'][2])
             axs[0, 0].set(ylabel='Precision score')
-            axs[0, 0].set_title(f'Precision at K for validation set and fold {foldidx}')
-            axs[0, 1].plot(r_keys, r_values)
+            axs[0, 0].set_title(f'Precision at K for test set and fold {foldidx}')
+            axs[0, 1].plot(train_met['r'][1], train_met['r'][2])
             axs[0, 1].set(ylabel='Recall score')
-            axs[0, 1].set_title(f'Recall at K for validation set and fold {foldidx}')
-            axs[1, 0].plot(n_keys, n_values)
+            axs[0, 1].set_title(f'Recall at K for test set and fold {foldidx}')
+            axs[1, 0].plot(train_met['ndcg'][1], train_met['ndcg'][2])
             axs[1, 0].set(ylabel='NDCG score')
-            axs[1, 0].set_title(f'NDCG at K for validation set and fold {foldidx}')
-            axs[1, 1].plot(m_keys, m_values)
+            axs[1, 0].set_title(f'NDCG at K for test set and fold {foldidx}')
+            axs[1, 1].plot(train_met['map'][1], train_met['map'][2])
             axs[1, 1].set(ylabel='map score')
-            axs[1, 1].set_title(f'map at K for validation set and fold {foldidx}')
-
-            fig.savefig(f"{model_path}/at_k_validation_{foldidx}.png", dpi=100, bbox_inches='tight')
+            axs[1, 1].set_title(f'map at K for test set and fold {foldidx}')
+            fig.savefig(f"{model_path}/at_k_test_{foldidx}.png", dpi=100, bbox_inches='tight')
             fig.show()
-
-            p_at_k_training = plot_precision_at_k(training_dataloader, model, device)
-            r_at_k_training = plot_recall_at_k(training_dataloader, model, device)
-            ndcg_at_k_training = plot_ndcg_at_k(training_dataloader, model, device)
-            p_at_k_validation = plot_precision_at_k(validation_dataloader, model, device)
-            r_at_k_validation = plot_recall_at_k(validation_dataloader, model, device)
-            ndcg_at_k_validation = plot_ndcg_at_k(validation_dataloader, model, device)
-
-            fig, axs = plt.subplots(3)
-            axs[0].plot(list(range(10, 60, 10)), p_at_k_training)
-            axs[0].set(xlabel='k', ylabel='Precision score')
-            axs[0].set_title(f'Precision at K for training set and fold {foldidx}')
-            axs[1].plot(list(range(10, 60, 10)), r_at_k_training)
-            axs[1].set(xlabel='k', ylabel='Recall score')
-            axs[1].set_title(f'Recall at K for training set and fold {foldidx}')
-            axs[2].plot(list(range(10, 60, 10)), ndcg_at_k_training)
-            axs[2].set(xlabel='k', ylabel='NDCG score')
-            axs[2].set_title(f'NDCG at K for training set and fold {foldidx}')
-            fig.savefig(f"{model_path}/at_k_training_{foldidx}.png", dpi=100, bbox_inches='tight')
-            fig.show()
-
-            fig2, axs2 = plt.subplots(3)
-            axs2[0].plot(list(range(10, 60, 10)), p_at_k_validation)
-            axs2[0].set(xlabel='k', ylabel='Precision score')
-            axs2[0].set_title(f'Precision at K for validation set and fold {foldidx}')
-            axs2[1].plot(list(range(10, 60, 10)), r_at_k_validation)
-            axs2[1].set(xlabel='k', ylabel='Recall score')
-            axs2[1].set_title(f'Recall at K for validation set and fold {foldidx}')
-            axs2[2].plot(list(range(10, 60, 10)), ndcg_at_k_validation)
-            axs2[2].set(xlabel='k', ylabel='NDCG score')
-            axs2[2].set_title(f'NDCG at K for validation set and fold {foldidx}')
-            fig2.savefig(f"{model_path}/at_k_validation_{foldidx}.png", dpi=100, bbox_inches='tight')
-            fig2.show()
 
             # Measure AUC for each fold and store in dict to later save as json
-            auc_train = roc_auc(training_dataloader, model, device)
-            auc_valid = roc_auc(validation_dataloader, model, device)
-            auc[foldidx]['train'] = auc_train
-            auc[foldidx]['valid'] = auc_valid
+            auc['train']['vals'].append(float(train_met['auc']))
+            roc_train[foldidx]['fpr'], roc_train[foldidx]['tpr'] = train_met['roc'][0], train_met['roc'][1]
 
-            roc_train[foldidx]['fpr'], roc_train[foldidx]['tpr'] = plot_roc(training_dataloader, model, device)
-            roc_valid[foldidx]['fpr'], roc_valid[foldidx]['tpr'] = plot_roc(validation_dataloader, model, device)
+            valid_met = evaluation_metrics(validation_dataloader, model, device)
+            with open(f'{model_path}/p_at_k_test_{foldidx}.json', 'w') as outfile:
+                json.dump(valid_met['p'][0], outfile)
+            print("precision at k is dumped.")
+            with open(f'{model_path}/r_at_k_test_{foldidx}.json', 'w') as outfile:
+                json.dump(valid_met['r'][0], outfile)
+            print("recall at k is dumped.")
+            with open(f'{model_path}/ndcg_at_k_test_{foldidx}.json', 'w') as outfile:
+                json.dump(valid_met['ndcg'][0], outfile)
+            print("ndcg at k is dumped.")
+            with open(f'{model_path}/map_at_k_test_{foldidx}.json', 'w') as outfile:
+                json.dump(valid_met['map'][0], outfile)
+            print("map at k is dumped.")
+
+            fig, axs = plt.subplots(2, 2, sharex='all')
+            fig.text(0.5, 0.04, 'k', ha='center')
+            axs[0, 0].plot(valid_met['p'][1], valid_met['p'][2])
+            axs[0, 0].set(ylabel='Precision score')
+            axs[0, 0].set_title(f'Precision at K for test set and fold {foldidx}')
+            axs[0, 1].plot(valid_met['r'][1], valid_met['r'][2])
+            axs[0, 1].set(ylabel='Recall score')
+            axs[0, 1].set_title(f'Recall at K for test set and fold {foldidx}')
+            axs[1, 0].plot(valid_met['ndcg'][1], valid_met['ndcg'][2])
+            axs[1, 0].set(ylabel='NDCG score')
+            axs[1, 0].set_title(f'NDCG at K for test set and fold {foldidx}')
+            axs[1, 1].plot(valid_met['map'][1], valid_met['map'][2])
+            axs[1, 1].set(ylabel='map score')
+            axs[1, 1].set_title(f'map at K for test set and fold {foldidx}')
+            fig.savefig(f"{model_path}/at_k_test_{foldidx}.png", dpi=100, bbox_inches='tight')
+            fig.show()
+
+            # Measure AUC for each fold and store in dict to later save as json
+            auc['valid']['vals'].append(float(valid_met['auc']))
+            roc_valid[foldidx]['fpr'], roc_valid[foldidx]['tpr'] = valid_met['roc'][0], valid_met['roc'][1]
 
             # Measure Precision, recall, and F1 and save to txt
-            train_rep_path = f'{model_path}/train_rep_{foldidx}.txt'
-            if not os.path.isfile(train_rep_path):
-                cls = cls_rep(training_dataloader, model, device)
-                with open(train_rep_path, 'w') as outfile:
-                    outfile.write(cls)
-            else:
-                with open(train_rep_path, 'r') as infile:
-                    cls = infile.read()
-            
-            print(f"Training report of fold{foldidx}:\n", cls)
+            # train_rep_path = f'{model_path}/train_rep_{foldidx}.txt'
+            # if not os.path.isfile(train_rep_path):
+            #     cls = cls_rep(training_dataloader, model, device)
+            #     with open(train_rep_path, 'w') as outfile:
+            #         outfile.write(cls)
+            # else:
+            #     with open(train_rep_path, 'r') as infile:
+            #         cls = infile.read()
+            #
+            # print(f"Training report of fold{foldidx}:\n", cls)
+            #
+            # valid_rep_path = f'{model_path}/valid_rep_{foldidx}.txt'
+            # if not os.path.isfile(valid_rep_path):
+            #     cls = cls_rep(validation_dataloader, model, device)
+            #     with open(valid_rep_path, 'w') as outfile:
+            #         outfile.write(cls)
+            # else:
+            #     with open(valid_rep_path, 'r') as infile:
+            #         cls = infile.read()
+            #
+            # print(f"Validation report of fold{foldidx}:\n", cls)
 
-            valid_rep_path = f'{model_path}/valid_rep_{foldidx}.txt'
-            if not os.path.isfile(valid_rep_path):
-                cls = cls_rep(validation_dataloader, model, device)
-                with open(valid_rep_path, 'w') as outfile:
-                    outfile.write(cls)
-            else:
-                with open(valid_rep_path, 'r') as infile:
-                    cls = infile.read()
+    auc['train']['mean'] = np.mean(auc['train']['vals'])
+    auc['train']['var'] = np.var(auc['train']['vals'])
+    auc['valid']['mean'] = np.mean(auc['valid']['vals'])
+    auc['valid']['var'] = np.var(auc['valid']['vals'])
 
-            print(f"Validation report of fold{foldidx}:\n", cls)
+    with open(auc_path, 'w') as outfile:
+        json.dump(auc, outfile)
 
     colors = ['deeppink', 'royalblue', 'darkviolet', 'aqua', 'darkorange', 'maroon', 'chocolate']
 
@@ -385,9 +351,8 @@ def eval(model_path, splits, indexes, vecs, params):
     for foldidx in splits['folds'].keys():
         plt.plot(roc_train[foldidx]['fpr'], roc_train[foldidx]['tpr'],
                  label='micro-average ROC curve #{:.0f} of training set(auc = {:.2f})'.format(foldidx, float(
-                     auc[foldidx]["train"])),
+                     auc['train']['vals'][int(foldidx)])),
                  color=colors[foldidx], linestyle=':', linewidth=4)
-
     plt.xlabel('False positive rate')
     plt.ylabel('True positive rate')
     plt.title('ROC curves for training set')
@@ -400,7 +365,7 @@ def eval(model_path, splits, indexes, vecs, params):
     for foldidx in splits['folds'].keys():
         plt.plot(roc_valid[foldidx]['fpr'], roc_valid[foldidx]['tpr'],
                  label='micro-average ROC curve #{:.0f} of validation set (auc = {:.2f})'.format(foldidx, float(
-                     auc[foldidx]["valid"])),
+                     auc['valid']['vals'][int(foldidx)])),
                  color=colors[foldidx], linestyle=':', linewidth=4)
 
     plt.xlabel('False positive rate')
@@ -409,8 +374,6 @@ def eval(model_path, splits, indexes, vecs, params):
     plt.legend()
     plt.savefig(f'{model_path}/roc_validation.png', dpi=100, bbox_inches='tight')
     plt.show()
-    with open(auc_path, 'w') as outfile:
-        json.dump(auc, outfile)
 
 def test(model_path, splits, indexes, vecs, params):
     if not os.path.isdir(model_path):
@@ -447,12 +410,10 @@ def test(model_path, splits, indexes, vecs, params):
             tpr[foldidx] = []
 
     for foldidx in auc.keys():
-        if params['l'] > 1:
-            model = DNN(input_size=input_size, output_size=output_size, param=params).to(device)
-        else:
-            model = SNN(input_size=input_size, output_size=output_size, param=params).to(device)
+        model = DNN(input_size=input_size, output_size=output_size, param=params).to(device)
         model.load_state_dict(torch.load(f'{model_path}/state_dict_model_{foldidx}.pt'))
         model.eval()
+
         met = evaluation_metrics(test_dataloader, model, device)
         with open(f'{model_path}/p_at_k_test_{foldidx}.json', 'w') as outfile:
             json.dump(met['p'][0], outfile)
@@ -494,7 +455,6 @@ def test(model_path, splits, indexes, vecs, params):
     auc_var = np.var(auc_values)
     auc["mean"] = auc_mean
     auc["var"] = auc_var
-
 
     with open(auc_path, 'w') as outfile:
         json.dump(auc, outfile)

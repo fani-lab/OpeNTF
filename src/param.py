@@ -12,16 +12,15 @@ settings = {
     'model':{
         'baseline': {
             'nn':{
-                'd': 100,  # number of nodes for each layer
-                'l': 1,  # number of layers
+                'l': [100],  # list of number of nodes in each layer
                 'lr': 0.1,  # learning rate
                 'b': 4096,  # batch size
                 'e': 2,  # epoch
                 'ns': 5,  # number of negative samples
-                's': 'none', # 'none', 'uniform', 'unigram', 'unigram_b'
+                's': 'none',  # 'none', 'uniform', 'unigram', 'unigram_b'
             },
         },
-        'cmd': ['train', 'plot', 'test', 'eval'],
+        'cmd': ['train', 'plot', 'eval', 'test'],  # 'train', 'plot', 'eval', 'test'
         'splits': 5
     },
     'data':{
