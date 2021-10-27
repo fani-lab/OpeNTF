@@ -69,13 +69,23 @@ Please note that the preprocessing step will be executed once. Subsequent runs l
 
 **Data Train-Test Split**
 
-We randomly take 15% of the dataset for the test set, i.e., the model never sees these instances during training. You can change this parameter [sth](./src/dal/data_utils.py)
+We randomly take 15% of the dataset for the test set, i.e., the model never sees these instances during training. You can change this parameter [here](https://github.com/fani-lab/neural_team_formation/blob/82c057ccd83e88381c1375fd0c3ff1fd719e9595/src/dal/data_utils.py#L11).
 
 **Model Train-Eval-Test**
 
 We use 5-fold validation and train a model on each fold and utilize the validation set of each fold to adjust the learning rate during training.
 
 For each model, different phases of machine learning pipeline has been implemented in ** and will be triggered by cmd arguement inside the [``src/main.py``](src/main.py). For example, for our feedforward baseline, the pipeline has been implemented in [``src/dnn.py``](src/dnn.py). Models' hyperparameters such as learning rate (``lr``) or number of epochs (``e``) can be set in [``src/mdl/param.py``](src/mdl/param.py).
+
+**Negative Sampling Strategies**
+
+We study the effect of three different negative sampling distributions: two static negative sampling distributions , and a novel adaptive noise distribution:
+
+(1) uniform distribution, where each subset of experts e’ is chosen with the same probability from the uniform distribution over all subsets of experts P(E) , i.e. P(e')=1/|P(E)|.
+
+(2) unigram distribution, where each subset of experts e’ is chosen regarding their frequency in all previous successful collaborative teams, i.e. P(e')=|t<sub>s',e'</sub>|/|T| and t<sub>s',e'</sub> is the successful teams with skill subset s’ != s. Intuitively, teams of experts that have been more successful but for other skill subsets (s’ != s) will be given a higher probability and chosen more frequently as a negative sample to dampen the effect of popularity bias. We can further relax the s’ s condition in practice and consider popular successful teams of experts even for the current input skill subset s.
+
+(3) smoothed unigram distribution in each training minibatch, where we employed the add-1 or Laplace smoothing when computing the unigram distribution of the experts but in each training minibatch, i.e. P(e')=(1+|t<sub>s',e'</sub>|)/(|B|+|E|), where B is a minibatch subset of T, and t<sub>s',e'</sub> is the successful teams including expert e' in each training minibatch B. Minibatch stochastic gradient descent is the de facto method for neural models where the data is splitted into batches of data, each of which sent to the model for partial calculation to speed up training while maintaining high accuracy. Since only a few teams of experts exist in each minibatch, we employ the Laplace smoothing so that no expert has 0 probability. Same as the unigram distribution, experts that were part of more successful teams in each minibatch will be picked more often to dampen the popularity effect.
 
 **Run**
 
