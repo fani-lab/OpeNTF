@@ -198,11 +198,19 @@ class Team(object):
     @staticmethod
     def plot_stats(stats, output):
         for k, v in stats.items():
-            fig = plt.figure()
+            fig = plt.figure(figsize=(3, 3))
             ax = fig.add_subplot(1, 1, 1)
-            ax.bar(*zip(*stats[k].items()))
+            ax.loglog(*zip(*stats[k].items()), marker='x', linestyle='None')
             ax.set_xlabel(k.split('_')[1].replace('n', '#', 0))
             ax.set_ylabel(k.split('_')[0].replace('n', '#', 0))
+            ax.grid(True, color="#93a1a1", alpha=0.3)
+            ax.spines['right'].set_color((.8, .8, .8))
+            ax.spines['top'].set_color((.8, .8, .8))
+            ax.minorticks_off()
+            ax.xaxis.set_tick_params(size=1)
+            ax.yaxis.set_tick_params(size=1)
+            ax.xaxis.get_label().set_size(12)
+            ax.yaxis.get_label().set_size(12)
             fig.savefig(f'{output}/{k}.png', dpi=100, bbox_inches='tight')
             plt.show()
 
