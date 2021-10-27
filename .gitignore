@@ -10,5 +10,4 @@
 *.tgt
 *.pickle
 *.png
-*.tsv
 src/tmp.py

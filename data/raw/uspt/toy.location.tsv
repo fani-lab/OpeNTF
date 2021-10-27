@@ -1,0 +1,24 @@
+id	city	state	country	latitude	longitude	county	state_fips	county_fips
+3c713b0a-cb8e-11eb-9615-121df0c29c1e	Austin	TX	US	30.3076	-97.7126	Travis	48.0	48453.0
+3c71ed1a-cb8e-11eb-9615-121df0c29c1e	San Jose	CA	US	37.2969	-121.831	Santa Clara	6.0	6085.0
+3c71eff4-cb8e-11eb-9615-121df0c29c1e	Sunnyvale	CA	US	37.3688	-122.036	Santa Clara	6.0	6085.0
+3c7210b6-cb8e-11eb-9615-121df0c29c1e	Waltham	MA	US	42.3756	-71.2358	Middlesex	25.0	25017.0
+3c7375a9-cb8e-11eb-9615-121df0c29c1e	Saratoga	CA	US	37.2664	-122.026	Santa Clara	6.0	6085.0
+3c7567b2-cb8e-11eb-9615-121df0c29c1e	Monte Sereno	CA	US	37.2363	-121.992	Santa Clara	6.0	6085.0
+3c757777-cb8e-11eb-9615-121df0c29c1e	Kensington	MD	US	39.0832	-76.58	Montgomery	24.0	24031.0
+3c7ab6ad-cb8e-11eb-9615-121df0c29c1e	Irving	TX	US	32.8629	-96.9792	Dallas	48.0	48113.0
+3c7be227-cb8e-11eb-9615-121df0c29c1e	Newton	MA	US	42.3253	-71.2074	Middlesex	25.0	25017.0
+3c7ddd67-cb8e-11eb-9615-121df0c29c1e	Campbell	CA	US	37.2808	-121.95	Santa Clara	6.0	6085.0
+3c85ab70-cb8e-11eb-9615-121df0c29c1e	Ellicott City	MD	US	39.2673	-76.7983	Howard	24.0	24027.0
+3c86c0fd-cb8e-11eb-9615-121df0c29c1e	Portola Valley	CA	US	37.3703	-122.226	San Mateo	6.0	6081.0
+3c9ce3e7-cb8e-11eb-9615-121df0c29c1e	Upland	CA	US	34.0975	-117.648	San Bernardino	6.0	6071.0
+3cb2c475-cb8e-11eb-9615-121df0c29c1e	Lino Lakes	MN	US	45.1674	-93.1037	Anoka	27.0	27003.0
+3cd56b4f-cb8e-11eb-9615-121df0c29c1e	Hood River	OR	US	45.4922	-121.672	Hood River	41.0	41027.0
+4169e4e9-cb8e-11eb-9615-121df0c29c1e	Sequim	WA	US	48.0849	-123.11	Clallam	53.0	53009.0
+48cd0342-cb8e-11eb-9615-121df0c29c1e	Quogue	NY	US	40.8219	-72.5958	Suffolk	36.0	36103.0
+a579b327-cb8e-11eb-9615-121df0c29c1e	Arvada	CO	US	39.849	-105.145	Jefferson	8.0	8059.0
+b5571389-cb8f-11eb-9615-121df0c29c1e	Oakland`	CA	US	37.7587	-122.173		6.0	
+ccebc936-cb8e-11eb-9615-121df0c29c1e	Coimbastore		IN					
+ee4e6706-cb8f-11eb-9615-121df0c29c1e	PT Eindhoven		NL	51.4486	5.45012			
+fbba9d95-cb8f-11eb-9615-121df0c29c1e	San Jose Almadeu	CA	US	37.2969	-121.831		6.0	
+fe490ec8-cb90-11eb-9615-121df0c29c1e	County of Chesterfield	MO	US	38.6512	-90.5861		29.0	
