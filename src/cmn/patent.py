@@ -62,6 +62,7 @@ class Patent(Team):
             teams = {}; candidates = {}; n_row = 0
             current = None
 
+            # 100 % |██████████████████████████████████████████████████████████████████████▉ | 210808 / 210809[00:02 < 00:00,75194.06 it / s]
             for patent_team in tqdm(patents_cpc_inventors_location.itertuples(), total=patents_cpc_inventors_location.shape[0]):
                 try:
                     if pd.isnull(new := patent_team.patent_id): break
