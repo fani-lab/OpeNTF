@@ -29,13 +29,13 @@ class Patent(Team):
 
             #data dictionary can be find at: https://patentsview.org/download/data-download-dictionary
             print("Reading patents ...")
-            patents = pd.read_csv(datapath, sep='\t', header=0, usecols=['id', 'type', 'country', 'date', 'title', 'withdrawn'], low_memory=False)#withdrawn may imply success or failure
+            patents = pd.read_csv(datapath, sep='\t', header=0, dtype={'id':'object'}, usecols=['id', 'type', 'country', 'date', 'title', 'withdrawn'], low_memory=False)#withdrawn may imply success or failure
             patents.rename(columns={'id': 'patent_id', 'country':'patent_country'}, inplace=True)
             patents = patents[patents['type'].isin(['utility', ''])]
 
             print("Reading patents' subgroups ...")
-            patents_cpc = pd.read_csv(datapath.replace('patent', 'cpc_current'), sep='\t', usecols=['patent_id', 'subgroup_id', 'sequence'])
-            patents_cpc.sort_values(by=['patent_id', 'sequence'], inplace=True)
+            patents_cpc = pd.read_csv(datapath.replace('patent', 'cpc_current'), sep='\t', dtype={'patent_id':'object'}, usecols=['patent_id', 'subgroup_id', 'sequence'])
+            patents_cpc.sort_values(by=['patent_id', 'sequence'], inplace=True)#to keep the order of subgroups
             patents_cpc.reset_index(drop=True, inplace=True)
             patents_cpc = patents_cpc.groupby(['patent_id'])['subgroup_id'].apply(','.join).reset_index()
             patents_cpc = pd.merge(patents, patents_cpc, on='patent_id', how='inner', copy=False)
