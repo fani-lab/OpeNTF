@@ -10,7 +10,6 @@
 *.tgt
 *.pkl
 *.png
-*.tsv
 src/tmp.py
 /output/
 *.log
