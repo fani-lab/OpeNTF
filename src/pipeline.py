@@ -6,11 +6,12 @@ from torch.nn.utils import clip_grad_norm_, clip_grad_value_
 from torch import optim 
 from torch.utils.data import DataLoader
 import os
+import param
 import numpy as np
 import matplotlib.pyplot as plt
 from cmn.team import Team
 from dal.data_utils import *
-from mdl.nn import SNN, DNN
+from mdl.nn import DNN
 from mdl.custom_dataset import TFDataset
 from torch.optim.lr_scheduler import StepLR, ReduceLROnPlateau
 import random
