@@ -16,7 +16,7 @@ from cmn.castncrew import CastnCrew
 class Movie(Team):
 
     def __init__(self, id, members, p_title, o_title, release, end, runtime, genres, members_details):
-        super().__init__(id, members, None, release)
+        super().__init__(id, members, set(genres.split(',')), release)
         self.p_title = p_title
         self.o_title = o_title
         self.release = release
@@ -24,15 +24,11 @@ class Movie(Team):
         self.runtime = runtime
         self.genres = genres
         self.members_details = members_details
-        self.skills = self.set_skills()
 
         for i, member in enumerate(self.members):
             member.teams.append(self.id)
             member.skills.update(set(self.skills))
             member.role.append(self.members_details[i])
-
-    def set_skills(self):
-        return set(self.genres.split(','))
 
     @staticmethod
     def read_data(datapath, output, index, filter, settings):
