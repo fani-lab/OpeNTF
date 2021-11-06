@@ -1,4 +1,3 @@
-# Output folder
 This folder consists of the results of our models on each dataset. Specifically, it contains:
 
 ``` 
