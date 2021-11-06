@@ -52,7 +52,7 @@ python main.py -data=data/raw/dblp/toy.dblp.v12.json -domain=dblp -model=fnn
 The above run, loads and preprocesses a tiny-size toy example dataset [``toy.dblp.v12.json``](data/raw/dblp/toy.dblp.v12.json) from [``dblp``](https://originalstatic.aminer.cn/misc/dblp.v12.7z) followed by 5-fold train-evaluation on a training split and final test on test set for a simple feedforward neural model using default hyperparameters from [``./src/param.py``](./src/param.py).
 
 ## 3. Features:
-**Data Preprocessing**
+**Data Loading and Parallel Preprocessing**
 
 Raw dataset, e.g., scholarly papers from [AMiner](https://www.aminer.org/) 's citation network dataset of [``dblp``](https://originalstatic.aminer.cn/misc/dblp.v12.7z) or movies from [``imdb``](https://datasets.imdbws.com/), were assumed to be populated in [``data/raw``](data/raw). For the sake of integration test, a tiny-size toy example dataset [``toy.dblp.v12.json``](data/raw/dblp/toy.dblp.v12.json) from [``dblp``](https://originalstatic.aminer.cn/misc/dblp.v12.7z) and [[``toy.title.basics.tsv``](data/raw/imdb/toy.title.basics.tsv), [``toy.title.principals.tsv``](data/raw/imdb/toy.title.principals.tsv), [``toy.name.basics.tsv``](data/raw/imdb/toy.name.basics.tsv)] from [``imdb``](https://datasets.imdbws.com/) have been already provided.
 
@@ -65,6 +65,9 @@ Raw data will be preprocessed into two main ``sparse`` matrices each row of whic
 Also, indexes will be created to map the vector's indexes to members' names and skills' name, i.e., ``i2c``, ``c2i``, ``i2s``, ``s2i``.
 
 The sparse matrices and the indices will be persisted in [``data/preprocessed/{dblp, imdb}/{name of dataset}``](data/preprocessed/) as pickles ``teamsvecs.pkl`` and ``indexes.pkl``. For example, the preprocessed data for our dblp toy example are [``data/preprocessed/dblp/toy.dblp.v12.json/teams.pkl``](data/preprocessed/dblp/toy.dblp.v12.json/teams.pkl) and [``data/preprocessed/dblp/toy.dblp.v12.json/indexes.pkl``](data/preprocessed/dblp/toy.dblp.v12.json/indexes.pkl).
+
+_Our pipeline benefits from parallel generation of sparse matrices for teams that significantly reduces the preprocessing time.
+For instance, it reduced 11 days to ** hours for the dblp.v12 dataset of ** papers._  
 
 Please note that the preprocessing step will be executed once. Subsequent runs loads the persisted pickle files. In order to regenerate them, one should simply delete them. 
 
