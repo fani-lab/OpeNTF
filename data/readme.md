@@ -1,4 +1,12 @@
 # Data Folder
-You can find raw datasets in [raw](/data/raw) and the preprocessed data including teams pickles and the sparse matrices in [preprocessed](/data/preprocessed).
-In [preprocessed/{name_of_dataset}/{title_of_dataset}](/data/preprocessed), you can find ```teams.pkl```, ```indexes.pkl```, and ```teamsvecs.pkl```, which are the teams, indices, and sparse matrix pickles respectively.
-If you have used filter=1 when running the main file, the folder name would have ```.filtered.mt{min_nteam}.ts{min_team_size}``` at the end of its name.
+You can find raw datasets in [raw](./raw) and the preprocessed data including teams pickles and the sparse matrices in [preprocessed](./preprocessed).
+In [preprocessed/{domain}/{dataset name}](./preprocessed), you can find:
+1) ```teams.pkl```
+2) ```indexes.pkl```
+3) ```teamsvecs.pkl```
+
+which are the teams, indices, and sparse matrix pickles respectively.
+
+If you have used ``filter=1`` when running the main file, the folder name would have ```.filtered.mt{min_nteam}.ts{min_team_size}``` at the end of its name. 
+This means that we filter out those members that have participated in less than ``min_nteam`` as well as those teams that have less than ``min_team_size`` members. 
+The filtering settings can be set by the ``filter`` parameter at [``./../src/param.py``](./../src/param.py)

@@ -11,17 +11,18 @@ np.random.seed(0)
 settings = {
     'model':{
         'baseline': {
-            'nn':{
+            'fnn':{
                 'l': [100],  # list of number of nodes in each layer
                 'lr': 0.1,  # learning rate
                 'b': 4096,  # batch size
                 'e': 2,  # epoch
-                'ns': 5,  # number of negative samples
-                's': 'none',  # 'none', 'uniform', 'unigram', 'unigram_b'
+                'nns': None,  # number of negative samples
+                'ns': None,  # 'uniform', 'unigram', 'unigram_b'
             },
         },
-        'cmd': ['train', 'plot', 'eval', 'test'],  # 'train', 'plot', 'eval', 'test'
-        'splits': 5
+        'cmd': ['eval'],  # 'train', 'test', 'eval'
+        'nfolds': 5,
+        'train_test_split': 0.85
     },
     'data':{
         'domain': {
