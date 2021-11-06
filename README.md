@@ -83,6 +83,7 @@ For example, for our feedforward baseline [``fnn``](./src/mdl/fnn.py), the pipel
 Model's hyperparameters such as learning rate (``lr``) or number of epochs (``e``) can be set in [``./src/param.py``](src/param.py).
 
 **Negative Sampling Strategies**
+
 As known, employing unsuccessful teams convey complementary negative signals to the model to alleviate the long-tail problem. 
 Most real-world training datasets in the team formation domain, however, do not have explicit unsuccessful teams (e.g., collections of rejected papers.) 
 In the absence of unsuccessful training instances, we proposed negative sampling strategies based on the closed-world assumption where no currently known successful group of experts for the required skills is assumed to be unsuccessful. 
@@ -108,6 +109,7 @@ The pipeline accept three required input values:
 3) ``-model``: the baseline model, e.g., ``-model=fnn`` 
 
 **Results**
+
 We used [``pytrec_eval``](https://github.com/cvangysel/pytrec_eval) to evaluate the performance of models on test set as well as on their own train sets (should overfit) and validation sets.
 We report the predictions, evaluation metrics on each test instance, and average on all test instances in ``./output/{dataset name}/{model name}/{model's running setting}/``. 
 For example:
