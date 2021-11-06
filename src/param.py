@@ -11,22 +11,18 @@ np.random.seed(0)
 settings = {
     'model':{
         'baseline': {
-            'dnn': {
-                'd': 100,    # size of hidden space
+            'fnn':{
+                'l': [100],  # list of number of nodes in each layer
                 'lr': 0.1,  # learning rate
-                'b': 1000,     # batch_size
-                'e': 200,     # epochs
-            },
-            'sgns':{
-                'd': 100,
-                'lr': 0.01,
-                'b': 3,
-                'e': 10,
-                'ns': 3,
+                'b': 4096,  # batch size
+                'e': 2,  # epoch
+                'nns': None,  # number of negative samples
+                'ns': None,  # 'uniform', 'unigram', 'unigram_b'
             },
         },
-        'cmd': ['train', 'plot', 'test', 'eval'],
-        'splits': 5
+        'cmd': ['eval'],  # 'train', 'test', 'eval'
+        'nfolds': 5,
+        'train_test_split': 0.85
     },
     'data':{
         'domain': {
@@ -35,10 +31,10 @@ settings = {
             'imdb':{},
         },
         'filter': {
-            'min_nteam': 10,
+            'min_nteam': 30,
             'min_team_size': 3,
         },
-        'ncore': 4,
-        'bucket_size': 1000
+        'ncore': 5,
+        'bucket_size': 500
     },
 }
