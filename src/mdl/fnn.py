@@ -3,9 +3,9 @@ from torch import nn
 from torch.nn.functional import leaky_relu
 
 
-class DNN(nn.Module):
+class FNN(nn.Module):
     def __init__(self, input_size, output_size, param):
-        super(DNN, self).__init__()
+        super(FNN, self).__init__()
         self.fc1 = nn.Linear(input_size, param['l'][0])
         hl = []
         for i in range(1, len(param['l'])):

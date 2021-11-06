@@ -24,15 +24,16 @@ pytre_eval==0.5
 To clone the codebase and install the required packages by ``pip``:
 ```sh
 git clone https://github.com/Fani-Lab/neural_team_formation
-cd TeamFormation
+cd neural_team_formation
 pip install -r requirements.txt
 ```
 or by [``conda``](https://www.anaconda.com/products/individual):
 
 ```sh
 git clone https://github.com/Fani-Lab/neural_team_formation
-cd TeamFormation
+cd neural_team_formation
 conda env create -f environment.yml
+conda activate ntf
 ```
 
 For installation of specific version of a python package due to, e.g., ``CUDA`` versions compatibility, one can edit [``requirements.txt``](requirements.txt) or [``environment.yml``](environment.yml) like as follows:
@@ -45,17 +46,17 @@ torch==1.6.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html
 
 ```sh
 cd src
-python main.py -data=data/raw/toy.json -domain=dblp -model=nn -filter=0
+python main.py -data=data/raw/dblp/toy.dblp.v12.json -domain=dblp -model=fnn
 ```
 
-The above run, loads and preprocesses a tiny-size toy example dataset [``toy.json``](data/raw/toy.json) from [``dblp``](https://originalstatic.aminer.cn/misc/dblp.v12.7z) followed by 5-fold train-evaluation on a training split and final test on test set for a simple feedforward neural model using default hyperparameters.
+The above run, loads and preprocesses a tiny-size toy example dataset [``toy.dblp.v12.json``](data/raw/dblp/toy.dblp.v12.json) from [``dblp``](https://originalstatic.aminer.cn/misc/dblp.v12.7z) followed by 5-fold train-evaluation on a training split and final test on test set for a simple feedforward neural model using default hyperparameters from [``./src/param.py``](./src/param.py).
 
 ## 3. Features:
 **Data Preprocessing**
 
-Raw dataset, e.g., scholarly papers from [AMiner](https://www.aminer.org/) 's citation network dataset of [``dblp``](https://originalstatic.aminer.cn/misc/dblp.v12.7z) or movies from [``imdb``](https://datasets.imdbws.com/), were assumed to be populated in [``data/raw``](data/raw). For the sake of integration test, a tiny-size toy example dataset [``toy.json``](data/raw/toy.json) from [``dblp``](https://originalstatic.aminer.cn/misc/dblp.v12.7z) and [[``toy.title.basics.tsv``](data/raw/toy.title.basics.tsv), [``toy.title.principals.tsv``](data/raw/toy.title.principals.tsv), [``toy.name.basics.tsv``](data/raw/toy.name.basics.tsv)] from [``imdb``](https://datasets.imdbws.com/) have been already provided.
+Raw dataset, e.g., scholarly papers from [AMiner](https://www.aminer.org/) 's citation network dataset of [``dblp``](https://originalstatic.aminer.cn/misc/dblp.v12.7z) or movies from [``imdb``](https://datasets.imdbws.com/), were assumed to be populated in [``data/raw``](data/raw). For the sake of integration test, a tiny-size toy example dataset [``toy.dblp.v12.json``](data/raw/dblp/toy.dblp.v12.json) from [``dblp``](https://originalstatic.aminer.cn/misc/dblp.v12.7z) and [[``toy.title.basics.tsv``](data/raw/imdb/toy.title.basics.tsv), [``toy.title.principals.tsv``](data/raw/imdb/toy.title.principals.tsv), [``toy.name.basics.tsv``](data/raw/imdb/toy.name.basics.tsv)] from [``imdb``](https://datasets.imdbws.com/) have been already provided.
 
-Raw data will be preprocessed into two main sparse matrices each row of which represents: 
+Raw data will be preprocessed into two main ``sparse`` matrices each row of which represents: 
 
 >i) ``member_vecs``: occurrence (boolean) vector representation for members of a team, e.g., authors of a paper or crew members of a movie,
 > 
@@ -63,60 +64,59 @@ Raw data will be preprocessed into two main sparse matrices each row of which re
 
 Also, indexes will be created to map the vector's indexes to members' names and skills' name, i.e., ``i2c``, ``c2i``, ``i2s``, ``s2i``.
 
-The sparse matrices and the indices will be persisted in [``data/preprocessed/{name of dataset}``](data/preprocessed/) as pickles ``teams.pkl`` and ``indexes.pkl``. For example, the preprocessed data for our toy example are [``data/preprocessed/toy.json/teams.pkl``](data/preprocessed/toy.json/teams.pkl) and [``data/preprocessed/toy.json/indexes.pkl``](data/preprocessed/toy.json/indexes.pkl).
+The sparse matrices and the indices will be persisted in [``data/preprocessed/{dblp, imdb}/{name of dataset}``](data/preprocessed/) as pickles ``teamsvecs.pkl`` and ``indexes.pkl``. For example, the preprocessed data for our dblp toy example are [``data/preprocessed/dblp/toy.dblp.v12.json/teams.pkl``](data/preprocessed/dblp/toy.dblp.v12.json/teams.pkl) and [``data/preprocessed/dblp/toy.dblp.v12.json/indexes.pkl``](data/preprocessed/dblp/toy.dblp.v12.json/indexes.pkl).
 
 Please note that the preprocessing step will be executed once. Subsequent runs loads the persisted pickle files. In order to regenerate them, one should simply delete them. 
 
 **Data Train-Test Split**
 
-We randomly take 15% of the dataset for the test set, i.e., the model never sees these instances during training. You can change this parameter [here](https://github.com/fani-lab/neural_team_formation/blob/82c057ccd83e88381c1375fd0c3ff1fd719e9595/src/dal/data_utils.py#L11).
+We randomly take 15% of the dataset for the test set, i.e., the model never sees these instances during training. You can change ``train_test_split`` parameter in [``./src/param.py``](./src/param.py).
 
-**Model Train-Eval-Test**
+**Model Train-Validation Split**
 
-We use 5-fold validation and train a model on each fold and utilize the validation set of each fold to adjust the learning rate during training.
+We use n-fold cross-validation, that is, we train a model n times on (n-1) folds and utilize the ramaining fold as the validation set to adjust the learning rate during training. The number of folds is set by ``nfolds`` in [``./src/param.py``](./src/param.py).
 
-For each model, different phases of machine learning pipeline has been implemented in ** and will be triggered by cmd arguement inside the [``src/main.py``](src/main.py). For example, for our feedforward baseline, the pipeline has been implemented in [``src/dnn.py``](src/dnn.py). Models' hyperparameters such as learning rate (``lr``) or number of epochs (``e``) can be set in [``src/mdl/param.py``](src/mdl/param.py).
+**Model Architecture**
+
+Each model has been defined in [``./src/mdl/``](./src/mdl/) and realized in a submain pipeline that can be executed for ``train``, ``test``, and ``eval`` steps. 
+For example, for our feedforward baseline [``fnn``](./src/mdl/fnn.py), the pipeline has been implemented in [``./src/mdl/fnn.py``](src/mdl/fnn.py) which is realized in [``./src/fnn_main.py``](src/fnn_main.py).
+Model's hyperparameters such as learning rate (``lr``) or number of epochs (``e``) can be set in [``./src/param.py``](src/param.py).
 
 **Negative Sampling Strategies**
+As known, employing unsuccessful teams convey complementary negative signals to the model to alleviate the long-tail problem. 
+Most real-world training datasets in the team formation domain, however, do not have explicit unsuccessful teams (e.g., collections of rejected papers.) 
+In the absence of unsuccessful training instances, we proposed negative sampling strategies based on the closed-world assumption where no currently known successful group of experts for the required skills is assumed to be unsuccessful. 
+We study the effect of three different negative sampling distributions: two static negative sampling distributions , and an adaptive noise distribution:
 
-We study the effect of three different negative sampling distributions: two static negative sampling distributions , and a novel adaptive noise distribution:
+1) Uniform distribution (``uniform``), where subsets of experts is randomly chosen with the same probability as unsuccessful teams from the uniform distribution over all subsets of experts.
 
-(1) uniform distribution, where each subset of experts e’ is chosen with the same probability from the uniform distribution over all subsets of experts P(E) , i.e. P(e')=1/|P(E)|.
+2) Unigram distribution (``unigram``), where subsets of experts is chosen regarding their frequency in all previous successful teams. 
+   Intuitively, teams of experts that have been more successful but for other skill subsets will be given a higher probability and chosen more frequently as a negative sample to dampen the effect of popularity bias.
 
-(2) unigram distribution, where each subset of experts e’ is chosen regarding their frequency in all previous successful collaborative teams, i.e. P(e')=|t<sub>s',e'</sub>|/|T| and t<sub>s',e'</sub> is the successful teams with skill subset s’ != s. Intuitively, teams of experts that have been more successful but for other skill subsets (s’ != s) will be given a higher probability and chosen more frequently as a negative sample to dampen the effect of popularity bias. We can further relax the s’ s condition in practice and consider popular successful teams of experts even for the current input skill subset s.
+3) Smoothed unigram distribution in each training minibatch (``unigram_b``), where we employed the add-1 or Laplace smoothing when computing the unigram distribution of the experts but in each training minibatch. 
+   Minibatch stochastic gradient descent is the _de facto_ method for neural models where the data is splitted into batches of data, each of which sent to the model for partial calculation to speed up training while maintaining high accuracy. 
 
-(3) smoothed unigram distribution in each training minibatch, where we employed the add-1 or Laplace smoothing when computing the unigram distribution of the experts but in each training minibatch, i.e. P(e')=(1+|t<sub>s',e'</sub>|)/(|B|+|E|), where B is a minibatch subset of T, and t<sub>s',e'</sub> is the successful teams including expert e' in each training minibatch B. Minibatch stochastic gradient descent is the de facto method for neural models where the data is splitted into batches of data, each of which sent to the model for partial calculation to speed up training while maintaining high accuracy. Since only a few teams of experts exist in each minibatch, we employ the Laplace smoothing so that no expert has 0 probability. Same as the unigram distribution, experts that were part of more successful teams in each minibatch will be picked more often to dampen the popularity effect.
+To include a negative sampling strategy, there are two paramters for a model to set in [``./src/param.py``](src/param.py):
+- ``ns``: the negative sampling stratey which can be ``uniform``, ``unigram``, ``unigram_b`` or ``None``(no negative stampling).
+- ``nns``: number of negative samples
 
 **Run**
 
-You can change various settings in [``param.py``](/src/param.py) to customize the settings and hyperparameters for generating the sparse matrix and training the model:
-> l : a list consisting the number of node for each hidden layer
-> 
-> lr: the learning rate for the model
->
-> b: the mini-batch size
-> 
-> e: number of epochs
-> 
-> s: the optimization function used for the model: ```none``` for no negative sampling, ```uniform``` for generating negative samples from the uniform distribution of experts, ```unigram``` for generating negative samples from the unigram distribution of experts, and ```unigram_b``` for generatin negative samples from the add-1 smoothed unigram distribution of experts in each training mini-batch
-> 
-> ns: number of negative samples
-> 
-> cmd: parts of the pipeline that needs to be executed: ```train```, ```plot```, ```eval```, ```test```
->
-> splits: number of splits for k-fold
-> 
-> min_nteam: to discard experts with less than ```min_nteam``` collaborations
-> min_team_size: to discard teams with size less than ```min_team_size```
-> 
-> ncores: number of cores utilized for parallel generation of the sparse matrix
-> 
-> bucket_size: bucket size for each process
-
+The pipeline accept three required input values:
+1) ``-data``: the path to the raw datafile, e.g., ``-data=./../data/raw/dblp/dblp.v12.json``, or the main file of a dataset, e.g., ``-data=./../data/raw/imdb/title.basics.tsv``
+2) ``-domain``: the domain of the raw datafile that could be ``dblp`` or ``imdb``, e.g., ``-domain=dblp``.
+3) ``-model``: the baseline model, e.g., ``-model=fnn`` 
 
 **Results**
+We used [``pytrec_eval``](https://github.com/cvangysel/pytrec_eval) to evaluate the performance of models on test set as well as on their own train sets (should overfit) and validation sets.
+We report the predictions, evaluation metrics on each test instance, and average on all test instances in [``./output/{dataset name}/{model name}/{model's running setting}/``]. 
+For example:
+1) [``f0.test.pred``](./output/toy.dblp.v12.json/fnn/t30.s11.e12.l[100].lr0.1.b4096.e2/f0.test.pred) is the predictions of the trained model on [1,2,3,4] folds on each instance of the test set
+2) [``f0.test.pred.eval.csv``](./output/toy.dblp.v12.json/fnn/t30.s11.e12.l[100].lr0.1.b4096.e2/f0.test.pred.eval.csv) is the evaluation metrics of the trained model on [1,2,3,4] folds on each instance of the test set
+3) [``f0.test.pred.eval.mean.csv``](./output/toy.dblp.v12.json/fnn/t30.s11.e12.l[100].lr0.1.b4096.e2/f0.test.pred.eval.mean.csv) is the average of evaluation metrics of the trained model on [1,2,3,4] folds on all instance of the test set
 
-Explain what the result mean and how to interpret. Also, put some figures
+
+TODO: Put result figures and explain them.
 
 ## 4. Acknowledgement:
 
