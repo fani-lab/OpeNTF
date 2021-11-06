@@ -109,7 +109,7 @@ The pipeline accept three required input values:
 
 **Results**
 We used [``pytrec_eval``](https://github.com/cvangysel/pytrec_eval) to evaluate the performance of models on test set as well as on their own train sets (should overfit) and validation sets.
-We report the predictions, evaluation metrics on each test instance, and average on all test instances in [``./output/{dataset name}/{model name}/{model's running setting}/``]. 
+We report the predictions, evaluation metrics on each test instance, and average on all test instances in ``./output/{dataset name}/{model name}/{model's running setting}/``. 
 For example:
 1) [``f0.test.pred``](./output/toy.dblp.v12.json/fnn/t30.s11.e12.l[100].lr0.1.b4096.e2/f0.test.pred) is the predictions of the trained model on [1,2,3,4] folds on each instance of the test set
 2) [``f0.test.pred.eval.csv``](./output/toy.dblp.v12.json/fnn/t30.s11.e12.l[100].lr0.1.b4096.e2/f0.test.pred.eval.csv) is the evaluation metrics of the trained model on [1,2,3,4] folds on each instance of the test set
