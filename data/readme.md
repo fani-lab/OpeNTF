@@ -1,4 +1,3 @@
-# Data Folder
 You can find raw datasets in [raw](./raw) and the preprocessed data including teams pickles and the sparse matrices in [preprocessed](./preprocessed).
 In [preprocessed/{domain}/{dataset name}](./preprocessed), you can find:
 1) ```teams.pkl```
