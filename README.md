@@ -10,15 +10,9 @@ We propose ``neural machine learning`` approaches to Team Formation. We will tra
 4. [Acknowledgement](#4-acknowledgement)
 
 ## 1. Setup
-You need to have ``Python >= 3.8`` and the following packages, listed in [``requirements.txt``](requirements.txt), installed:
+You need to have ``Python >= 3.8`` and install the following main packages, among others listed in [``requirements.txt``](requirements.txt):
 ```
 torch==1.6.0
-matplotlib==3.4.2
-scipy==1.6.3
-numpy==1.20.3
-tqdm==4.60.0
-scikit_learn==0.24.2
-pandas==1.3.3
 pytre_eval==0.5
 ```
 To clone the codebase and install the required packages by ``pip``:
