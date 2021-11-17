@@ -178,15 +178,43 @@ class Team(object):
 
         except FileNotFoundError:
             print("File not found! Generating stats ...")
-            stats = {}
-            teamids, skillvecs, membervecs = teamsvecs['id'], teamsvecs['skill'], teamsvecs['member']
-            nteams_nskills = Counter(skillvecs.sum(axis=1).A1.astype(int))
-            stats['nteams_nskills'] = {k: v for k, v in sorted(nteams_nskills.items(), key=lambda item: item[1], reverse=True)}
-            stats['nteams_skill-idx'] = {k: v for k, v in enumerate(sorted(skillvecs.sum(axis=0).A1.astype(int), reverse=True))}
+            stats = {}; city = {}; state = {}; country = {}
+            geo_loc = [city, state, country]
+            loc_pat = {}
+            with open(teamsvecs, 'rb') as infile:
+                pat_details = pickle.load(infile)
 
-            nteams_nmembers = Counter(membervecs.sum(axis=1).A1.astype(int))
-            stats['nteams_nmembers'] = {k: v for k, v in sorted(nteams_nmembers.items(), key=lambda item: item[1], reverse=True)}
-            stats['nteams_candidate-idx'] = {k: v for k, v in enumerate(sorted(membervecs.sum(axis=0).A1.astype(int), reverse=True))}
+                teamids, skillvecs, membervecs = pat_details['id'], pat_details['skill'], pat_details['member']
+
+                nteams_nskills = Counter(skillvecs.sum(axis=1).A1.astype(int))
+
+                stats['nteams_nskills'] = {k: v for k, v in sorted(nteams_nskills.items(), key=lambda item: item[1], reverse=True)}
+                stats['nteams_skill-idx'] = {k: v for k, v in enumerate(sorted(skillvecs.sum(axis=0).A1.astype(int), reverse=True))}
+                #
+                nteams_nmembers = Counter(membervecs.sum(axis=1).A1.astype(int))
+
+                stats['nteams_nmembers'] = {k: v for k, v in sorted(nteams_nmembers.items(), key=lambda item: item[1], reverse=True)}
+                stats['nteams_candidate-idx'] = {k: v for k, v in enumerate(sorted(membervecs.sum(axis=0).A1.astype(int), reverse=True))}
+
+            with open(teamsvecs.replace('teamsvecs', 'teams'), 'rb') as infile:
+                pat_details_all = pickle.load(infile)
+                for key in pat_details_all.keys():
+                    loc = pat_details_all[key].members_details[0:]
+                    for item in loc:
+                        city[key], state[key], country[key] = item
+                for loc_dict in geo_loc:
+                    new_dict = {}
+                    for k, v in loc_dict.items():
+                        if v in new_dict.keys():
+                            new_dict[v].append(k)
+                        else:
+                            new_dict[v] = [k]
+                    loc_pat.update(new_dict)
+                for k, v in loc_pat.items():
+                    loc_pat[k] = len(v)
+            stats['patents_over_location'] = loc_pat
+            pats_per_loc = {}
+
 
             #TODO: temporal stats!
             #TODO: skills_years (2-D image)
