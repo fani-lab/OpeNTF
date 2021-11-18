@@ -181,6 +181,7 @@ class Team(object):
             stats = {}; city = {}; state = {}; country = {}
             geo_loc = [city, state, country]
             loc_pat = {}
+            city_mem = {}; state_mem = {}; country_mem = {}
             with open(teamsvecs, 'rb') as infile:
                 pat_details = pickle.load(infile)
 
@@ -195,6 +196,8 @@ class Team(object):
 
                 stats['nteams_nmembers'] = {k: v for k, v in sorted(nteams_nmembers.items(), key=lambda item: item[1], reverse=True)}
                 stats['nteams_candidate-idx'] = {k: v for k, v in enumerate(sorted(membervecs.sum(axis=0).A1.astype(int), reverse=True))}
+
+                max_records = pat_details['id'].shape[0]
 
             with open(teamsvecs.replace('teamsvecs', 'teams'), 'rb') as infile:
                 pat_details_all = pickle.load(infile)
@@ -213,8 +216,29 @@ class Team(object):
                 for k, v in loc_pat.items():
                     loc_pat[k] = len(v)
             stats['patents_over_location'] = loc_pat
-            pats_per_loc = {}
 
+            for i in range(0, max_records):
+                id = pat_details['id'][i].astype(int).toarray()[0][0].tolist()
+                loc = pat_details_all[f'{id}'].members_details[0:]
+                for loc_i in loc:
+                    city_name, state_name, country_name = loc_i
+
+                    if city_name in city_mem.keys():
+                        city_mem[city_name] = city_mem[city_name] + 1
+                    else:
+                        city_mem[city_name] = 1
+                    if state_name in state_mem.keys():
+                        state_mem[state_name] = state_mem[state_name] + 1
+                    else:
+                        state_mem[state_name] = 1
+                    if country_name in country_mem.keys():
+                        country_mem[country_name] = country_mem[country_name] + 1
+                    else:
+                        country_mem[country_name] = 1
+
+            stats['number_of_inventors_per_city'] = city_mem
+            stats['number_of_inventors_per_state'] = state_mem
+            stats['number_of_inventors_per_country'] = country_mem
 
             #TODO: temporal stats!
             #TODO: skills_years (2-D image)
