@@ -9,13 +9,14 @@ from torch import optim
 from torch.utils.data import DataLoader
 from torch.optim.lr_scheduler import StepLR, ReduceLROnPlateau
 
-import param #do not remove this
+import param  # do not remove this
 from cmn.team import Team
 from mdl.fnn import FNN
-from mdl.custom_dataset import TFDataset
+from mdl.custom_dataset_emb import TFDataset
 from eval.metric import calculate_metrics
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 
 def cross_entropy(y_, y, ns, nns, unigram):
     if ns == "uniform": return ns_uniform(y_, y, nns)
@@ -23,20 +24,23 @@ def cross_entropy(y_, y, ns, nns, unigram):
     if ns == "unigram_b": return ns_unigram_mini_batch(y_, y, nns)
     return weighted(y_, y)
 
+
 def weighted(logits, targets, pos_weight=2.5):
     return (-targets * torch.log(logits) * pos_weight + (1 - targets) * - torch.log(1 - logits)).sum()
+
 
 def ns_uniform(logits, targets, neg_samples=5):
     targets = targets.squeeze(1)
     logits = logits.squeeze(1)
     random_samples = torch.zeros_like(targets)
     for b in range(targets.shape[0]):
-        k_neg_idx = torch.randint(0, targets.shape[1], (neg_samples, ))
+        k_neg_idx = torch.randint(0, targets.shape[1], (neg_samples,))
         cor_idx = torch.nonzero(targets[b].cpu(), as_tuple=True)[0]
         for idx in k_neg_idx:
             if idx not in cor_idx:
                 random_samples[b][idx] = 1
     return (-targets * torch.log(logits) - random_samples * torch.log(1 - logits)).sum()
+
 
 def ns_unigram(logits, targets, unigram, neg_samples=5):
     targets = targets.squeeze(1)
@@ -51,7 +55,8 @@ def ns_unigram(logits, targets, unigram, neg_samples=5):
         for idx in k_neg_idx:
             if idx not in cor_idx:
                 random_samples[b][idx] = 1
-    return (-targets * torch.log(logits) - random_samples * torch.log(1 -logits)).sum()
+    return (-targets * torch.log(logits) - random_samples * torch.log(1 - logits)).sum()
+
 
 def ns_unigram_mini_batch(logits, targets, neg_samples=5):
     targets = targets.squeeze(1)
@@ -71,10 +76,15 @@ def ns_unigram_mini_batch(logits, targets, neg_samples=5):
                 random_samples[b][idx] = 1
     return (-targets * torch.log(logits) - random_samples * torch.log(1 - logits)).sum()
 
-def learn(splits, indexes, vecs, params, output):
 
-    layers = params['l']; learning_rate = params['lr']; batch_size = params['b']; num_epochs = params['e']; nns = params['nns']; ns = params['ns']
-    input_size = len(indexes['i2s'])
+def learn(splits, indexes, vecs, params, output):
+    layers = params['l']
+    learning_rate = params['lr']
+    batch_size = params['b']
+    num_epochs = params['e']
+    nns = params['nns']
+    ns = params['ns']
+    input_size = vecs['skill'][splits['folds'][0]['train']].shape[1]
     output_size = len(indexes['i2c'])
 
     unigram = Team.get_unigram(vecs['member'])
@@ -88,8 +98,10 @@ def learn(splits, indexes, vecs, params, output):
     # Training K-fold
     for foldidx in splits['folds'].keys():
         # Retrieving the folds
-        X_train = vecs['skill'][splits['folds'][foldidx]['train'], :]; y_train = vecs['member'][splits['folds'][foldidx]['train']]
-        X_valid = vecs['skill'][splits['folds'][foldidx]['valid'], :]; y_valid = vecs['member'][splits['folds'][foldidx]['valid']]
+        X_train = vecs['skill'][splits['folds'][foldidx]['train']]
+        y_train = vecs['member'][splits['folds'][foldidx]['train']]
+        X_valid = vecs['skill'][splits['folds'][foldidx]['valid']]
+        y_valid = vecs['member'][splits['folds'][foldidx]['valid']]
 
         # Building custom dataset
         training_matrix = TFDataset(X_train, y_train)
@@ -102,7 +114,7 @@ def learn(splits, indexes, vecs, params, output):
 
         # Initialize network
         model = FNN(input_size=input_size, output_size=output_size, param=params).to(device)
-            
+
         optimizer = optim.Adam(model.parameters(), lr=learning_rate)
         scheduler = ReduceLROnPlateau(optimizer, factor=0.5, patience=10, verbose=True)
         # scheduler = StepLR(optimizer, step_size=3, gamma=0.9)
@@ -139,7 +151,7 @@ def learn(splits, indexes, vecs, params, output):
                         f'Fold {foldidx}/{len(splits["folds"]) - 1}, Epoch {epoch}/{num_epochs - 1}, Minibatch {batch_idx}/{int(X_train.shape[0] / batch_size)}, Phase {phase}'
                         f', Running Loss {phase} {loss.item()}'
                         f", Time {time.time() - fold_time}, Overall {time.time() - start_time} "
-                        )
+                    )
                 # Appending the loss of each epoch to plot later
                 if phase == 'train':
                     train_loss_values.append(train_running_loss / X_train.shape[0])
@@ -153,7 +165,7 @@ def learn(splits, indexes, vecs, params, output):
             scheduler.step(valid_running_loss / X_valid.shape[0])
 
         model_path = f"{output}/state_dict_model_f{foldidx}.pt"
-    
+
         # Save
         torch.save(model.state_dict(), model_path, pickle_protocol=4)
         train_valid_loss[foldidx]['train'] = train_loss_values
@@ -170,12 +182,13 @@ def learn(splits, indexes, vecs, params, output):
             plt.savefig(f'{output}/fold{foldidx}.png', dpi=100, bbox_inches='tight')
             plt.show()
 
+
 def test(model_path, splits, indexes, vecs, params, on_train_valid_set=False):
     if not os.path.isdir(model_path): raise Exception("The model does not exist!")
-    input_size = len(indexes['i2s'])
+    input_size = vecs['skill'][splits['folds'][0]['train']].shape[1]
     output_size = len(indexes['i2c'])
 
-    X_test = vecs['skill'][splits['test'], :]
+    X_test = vecs['skill'][splits['test']]
     y_test = vecs['member'][splits['test']]
     test_matrix = TFDataset(X_test, y_test)
     test_dl = DataLoader(test_matrix, batch_size=params['b'], shuffle=True, num_workers=0)
@@ -187,12 +200,15 @@ def test(model_path, splits, indexes, vecs, params, on_train_valid_set=False):
 
         for pred_set in (['test', 'train', 'valid'] if on_train_valid_set else ['test']):
             if pred_set != 'test':
-                X = vecs['skill'][splits['folds'][foldidx][pred_set], :]
+                X = vecs['skill'][splits['folds'][foldidx][pred_set]]
                 y = vecs['member'][splits['folds'][foldidx][pred_set]]
                 matrix = TFDataset(X, y)
                 dl = DataLoader(matrix, batch_size=params['b'], shuffle=True, num_workers=0)
             else:
-                X = X_test; y = y_test; matrix = test_matrix; dl = test_dl
+                X = X_test
+                y = y_test
+                matrix = test_matrix
+                dl = test_dl
 
             torch.cuda.empty_cache()
             with torch.no_grad():
@@ -205,6 +221,7 @@ def test(model_path, splits, indexes, vecs, params, on_train_valid_set=False):
 
             torch.save(y_pred, f'{model_path}/f{foldidx}.{pred_set}.pred', pickle_protocol=4)
 
+
 def eval(model_path, splits, vecs, on_train_valid_set=False):
     if not os.path.isdir(model_path): raise Exception("The predictions do not exist!")
     y_test = vecs['member'][splits['test']]
@@ -212,7 +229,8 @@ def eval(model_path, splits, vecs, on_train_valid_set=False):
         for pred_set in (['test', 'train', 'valid'] if on_train_valid_set else ['test']):
             if pred_set != 'test':
                 Y = vecs['member'][splits['folds'][foldidx][pred_set]]
-            else: Y = y_test
+            else:
+                Y = y_test
             Y_ = torch.load(f'{model_path}/f{foldidx}.{pred_set}.pred')
             df, df_mean = calculate_metrics(Y, Y_)
             df.to_csv(f'{model_path}/f{foldidx}.{pred_set}.pred.eval.csv', float_format='%.15f')
@@ -220,7 +238,7 @@ def eval(model_path, splits, vecs, on_train_valid_set=False):
 
 
 def main(splits, vecs, indexes, output, settings, cmd):
-    output = f"{output}/t{vecs['skill'].shape[0]}.s{vecs['skill'].shape[1]}.e{vecs['member'].shape[1]}.{'.'.join([k + str(v).replace(' ', '')for k, v in settings.items() if v])}"
+    output = f"{output}/t{vecs['member'].shape[0]}.s{vecs['skill'][0].shape[0]}.e{vecs['member'].shape[1]}.{'.'.join([k + str(v).replace(' ', '') for k, v in settings.items() if v])}"
     if not os.path.isdir(output): os.makedirs(output)
 
     if 'train' in cmd: learn(splits, indexes, vecs, settings, output)
