@@ -54,6 +54,3 @@ with open(f'{output}/teamsvecs.pkl', 'rb') as infile:
             axs[i].spy(skill_member[:, (j - 1) * 1000000 : j * 1000000], precision=2**i, markersize=1)
         pyplot.show()
 
-
-
-
