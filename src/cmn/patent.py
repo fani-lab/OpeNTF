@@ -29,13 +29,13 @@ class Patent(Team):
 
             #data dictionary can be find at: https://patentsview.org/download/data-download-dictionary
             print("Reading patents ...")
-            patents = pd.read_csv(datapath, sep='\t', header=0, usecols=['id', 'type', 'country', 'date', 'title', 'withdrawn'], low_memory=False)#withdrawn may imply success or failure
+            patents = pd.read_csv(datapath, sep='\t', header=0, dtype={'id':'object'}, usecols=['id', 'type', 'country', 'date', 'title', 'withdrawn'], low_memory=False)#withdrawn may imply success or failure
             patents.rename(columns={'id': 'patent_id', 'country':'patent_country'}, inplace=True)
             patents = patents[patents['type'].isin(['utility', ''])]
 
             print("Reading patents' subgroups ...")
-            patents_cpc = pd.read_csv(datapath.replace('patent', 'cpc_current'), sep='\t', usecols=['patent_id', 'subgroup_id', 'sequence'])
-            patents_cpc.sort_values(by=['patent_id', 'sequence'], inplace=True)
+            patents_cpc = pd.read_csv(datapath.replace('patent', 'cpc_current'), sep='\t', dtype={'patent_id':'object'}, usecols=['patent_id', 'subgroup_id', 'sequence'])
+            patents_cpc.sort_values(by=['patent_id', 'sequence'], inplace=True)#to keep the order of subgroups
             patents_cpc.reset_index(drop=True, inplace=True)
             patents_cpc = patents_cpc.groupby(['patent_id'])['subgroup_id'].apply(','.join).reset_index()
             patents_cpc = pd.merge(patents, patents_cpc, on='patent_id', how='inner', copy=False)
@@ -43,7 +43,7 @@ class Patent(Team):
             #TODO: filter the patent based on subgroup e.g., cpc_subgroup: "Y10S706/XX"	"Data processing: artificial intelligence"
 
             print("Reading patents' inventors ...")
-            patents_inventors = pd.read_csv(datapath.replace('patent', 'patent_inventor'), sep='\t', header=0)
+            patents_inventors = pd.read_csv(datapath.replace('patent', 'patent_inventor'), sep='\t', header=0, dtype={'patent_id':'object'})
             patents_cpc_inventors = pd.merge(patents_cpc, patents_inventors, on='patent_id', how='inner', copy=False)
 
             print("Reading inventors ...")
@@ -62,6 +62,7 @@ class Patent(Team):
             teams = {}; candidates = {}; n_row = 0
             current = None
 
+            # 100 % |██████████████████████████████████████████████████████████████████████▉ | 210808 / 210809[00:02 < 00:00,75194.06 it / s]
             for patent_team in tqdm(patents_cpc_inventors_location.itertuples(), total=patents_cpc_inventors_location.shape[0]):
                 try:
                     if pd.isnull(new := patent_team.patent_id): break
@@ -93,3 +94,56 @@ class Patent(Team):
                     raise e
             return super(Patent, Patent).read_data(teams, output, filter, settings)
 
+    @classmethod
+    def get_stats(cls, teams, output, plot=False):
+        # super().get_stats()
+        # stats = {}
+        # city = {};
+        # state = {};
+        # country = {}
+        # geo_loc = [city, state, country]
+        # loc_pat = {}
+        # city_mem = {};
+        # state_mem = {};
+        # country_mem = {}
+        # with open(teams, 'rb') as infile:
+        #     pat_details_all = pickle.load(infile)
+        #     for key in pat_details_all.keys():
+        #         loc = pat_details_all[key].members_details[0:]
+        #         for item in loc:
+        #             city[key], state[key], country[key] = item
+        #     for loc_dict in geo_loc:
+        #         new_dict = {}
+        #         for k, v in loc_dict.items():
+        #             if v in new_dict.keys():
+        #                 new_dict[v].append(k)
+        #             else:
+        #                 new_dict[v] = [k]
+        #         loc_pat.update(new_dict)
+        #     for k, v in loc_pat.items():
+        #         loc_pat[k] = len(v)
+        # stats['patents_over_location'] = loc_pat
+        # max_records = pat_details['id'].shape[0]
+        # for i in range(0, max_records):
+        #     id = pat_details['id'][i].astype(int).toarray()[0][0].tolist()
+        #     loc = pat_details_all[f'{id}'].members_details[0:]
+        #     for loc_i in loc:
+        #         city_name, state_name, country_name = loc_i
+        #
+        #         if city_name in city_mem.keys():
+        #             city_mem[city_name] = city_mem[city_name] + 1
+        #         else:
+        #             city_mem[city_name] = 1
+        #         if state_name in state_mem.keys():
+        #             state_mem[state_name] = state_mem[state_name] + 1
+        #         else:
+        #             state_mem[state_name] = 1
+        #         if country_name in country_mem.keys():
+        #             country_mem[country_name] = country_mem[country_name] + 1
+        #         else:
+        #             country_mem[country_name] = 1
+        #
+        # stats['number_of_inventors_per_city'] = city_mem
+        # stats['number_of_inventors_per_state'] = state_mem
+        # stats['number_of_inventors_per_country'] = country_mem
+        pass
