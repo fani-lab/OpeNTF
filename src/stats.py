@@ -2,26 +2,35 @@ import sys
 import pickle
 import matplotlib.pyplot as pyplot
 
-# from cmn.publication import Publication
+from cmn.publication import Publication
 output = '../data/preprocessed/dblp/dblp.v12.json'
 # output = '../data/preprocessed/dblp/toy.dblp.v12.json'
 # with open(f'{output}/teamsvecs.pkl', 'rb') as infile:
 #     stats = Publication.get_stats(pickle.load(infile), output, plot=True)
 
-# from cmn.movie import Movie
+from cmn.movie import Movie
 # output = '../data/preprocessed/imdb/title.basics.tsv'
 # # output = '../data/preprocessed/imdb/toy.title.basics.tsv'
 # with open(f'{output}/teamsvecs.pkl', 'rb') as infile:
 #     stats = Movie.get_stats(pickle.load(infile), output, plot=True)
 
+from cmn.patent import Patent
+output = '../data/preprocessed/uspt/toy.patent.tsv'
+stats = Patent.get_stats(f'{output}/teamsvecs.pkl', output, plot=False)
+
 with open(f'{output}/teamsvecs.pkl', 'rb') as infile:
     teamsvecs = pickle.load(infile)
     teamids, skillvecs, membervecs = teamsvecs['id'], teamsvecs['skill'], teamsvecs['member']
-    skill_member = (skillvecs.transpose() @ membervecs)
+
+    # skill_member = (skillvecs.transpose() @ membervecs)
     # pyplot.figure(figsize=(50, 50), dpi=300)
     # color_map = pyplot.imshow(skill_member[:1000, :2000].astype(int).todense())
     # color_map.set_cmap("Blues_r")
     # pyplot.colorbar()
+    # pyplot.show()
+
+    # pyplot.figure(dpi=300)
+    # pyplot.spy(skillvecs[4000000: 4000100, :100], markersize=1)
     # pyplot.show()
 
     n = 6
