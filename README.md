@@ -10,15 +10,9 @@ We propose ``neural machine learning`` approaches to Team Formation. We will tra
 4. [Acknowledgement](#4-acknowledgement)
 
 ## 1. Setup
-You need to have ``Python >= 3.8`` and the following packages, listed in [``requirements.txt``](requirements.txt), installed:
+You need to have ``Python >= 3.8`` and install the following main packages, among others listed in [``requirements.txt``](requirements.txt):
 ```
 torch==1.6.0
-matplotlib==3.4.2
-scipy==1.6.3
-numpy==1.20.3
-tqdm==4.60.0
-scikit_learn==0.24.2
-pandas==1.3.3
 pytre_eval==0.5
 ```
 To clone the codebase and install the required packages by ``pip``:
@@ -66,11 +60,10 @@ Also, indexes will be created to map the vector's indexes to members' names and 
 
 The sparse matrices and the indices will be persisted in [``data/preprocessed/{dblp,imdb,uspt}/{name of dataset}``](data/preprocessed/) as pickles ``teamsvecs.pkl`` and ``indexes.pkl``. For example, the preprocessed data for our dblp toy example are [``data/preprocessed/dblp/toy.dblp.v12.json/teams.pkl``](data/preprocessed/dblp/toy.dblp.v12.json/teams.pkl) and [``data/preprocessed/dblp/toy.dblp.v12.json/indexes.pkl``](data/preprocessed/dblp/toy.dblp.v12.json/indexes.pkl).
 
-_Our pipeline benefits from parallel generation of sparse matrices for teams that significantly reduces the preprocessing time.
-For instance, 
-1) it reduced 11 days to ** hours for the dblp.v12 dataset of ** papers.
-2) it reduced ** days to ** hours for the imdb dataset of ** moview.
-3) it reduced ** days to ** hours for the uspt dataset of ** patents._
+> Our pipeline benefits from parallel generation of sparse matrices for teams that significantly reduces the preprocessing time. For instance, 
+> 1) it reduced 11 days to ** hours for the dblp.v12 dataset of ** papers.
+> 2) it reduced ** days to ** hours for the imdb dataset of ** moview.
+> 3) it reduced ** days to ** hours for the uspt dataset of ** patents.
 
 Please note that the preprocessing step will be executed once. Subsequent runs loads the persisted pickle files. In order to regenerate them, one should simply delete them. 
 

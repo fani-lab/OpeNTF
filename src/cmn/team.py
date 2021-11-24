@@ -170,8 +170,8 @@ class Team(object):
     @classmethod
     def get_stats(cls, teamsvecs, output, plot=False):
         try:
+            print("Loading the stats pickle ...")
             with open(f'{output}/stats.pkl', 'rb') as infile:
-                print("Loading the stats pickle ...")
                 stats = pickle.load(infile)
                 if plot: Team.plot_stats(stats, output)
                 return stats
@@ -180,13 +180,35 @@ class Team(object):
             print("File not found! Generating stats ...")
             stats = {}
             teamids, skillvecs, membervecs = teamsvecs['id'], teamsvecs['skill'], teamsvecs['member']
-            nteams_nskills = Counter(skillvecs.sum(axis=1).A1.astype(int))
-            stats['nteams_nskills'] = {k: v for k, v in sorted(nteams_nskills.items(), key=lambda item: item[1], reverse=True)}
-            stats['nteams_skill-idx'] = {k: v for k, v in enumerate(sorted(skillvecs.sum(axis=0).A1.astype(int), reverse=True))}
 
-            nteams_nmembers = Counter(membervecs.sum(axis=1).A1.astype(int))
+            stats['*nteams'] = teamids.shape[0]
+            stats['*nmembers'] = membervecs.shape[1] #unique members
+            stats['*nskills'] = skillvecs.shape[1]
+
+            #distributions
+            row_sums = skillvecs.sum(axis=1)
+            col_sums = skillvecs.sum(axis=0)
+            nteams_nskills = Counter(row_sums.A1.astype(int))
+            stats['nteams_nskills'] = {k: v for k, v in sorted(nteams_nskills.items(), key=lambda item: item[1], reverse=True)}
+            stats['nteams_skill-idx'] = {k: v for k, v in enumerate(sorted(col_sums.A1.astype(int), reverse=True))}
+            stats['*avg_nskills_team'] = row_sums.mean()
+            stats['*nteams_single_skill'] = stats['nteams_nskills'][1] if 1 in stats['nteams_nskills'] else 0
+            # how many skills have only 1 team, 2 teams, ...
+            nskills_nteams = Counter(col_sums.A1.astype(int))
+            stats['nskills_nteams'] = {k: v for k, v in sorted(nskills_nteams.items(), key=lambda item: item[1], reverse=True)}
+            stats['*avg_nskills_member'] = ((skillvecs.transpose() @ membervecs) > 0).sum(axis=0).mean()
+
+            row_sums = membervecs.sum(axis=1)
+            col_sums = membervecs.sum(axis=0)
+            nteams_nmembers = Counter(row_sums.A1.astype(int))
             stats['nteams_nmembers'] = {k: v for k, v in sorted(nteams_nmembers.items(), key=lambda item: item[1], reverse=True)}
-            stats['nteams_candidate-idx'] = {k: v for k, v in enumerate(sorted(membervecs.sum(axis=0).A1.astype(int), reverse=True))}
+            stats['nteams_candidate-idx'] = {k: v for k, v in enumerate(sorted(col_sums.A1.astype(int), reverse=True))}
+            stats['*avg_nmembers_team'] = row_sums.mean()
+            stats['*nteams_single_member'] = stats['nteams_nmembers'][1] if 1 in stats['nteams_nmembers'] else 0
+            #how many members have only 1 team, 2 teams, ....
+            nmembers_nteams = Counter(col_sums.A1.astype(int))
+            stats['nmembers_nteams'] = {k: v for k, v in sorted(nmembers_nteams.items(), key=lambda item: item[1], reverse=True)}
+            stats['*avg_nteams_member'] = col_sums.mean()
 
             #TODO: temporal stats!
             #TODO: skills_years (2-D image)
@@ -198,6 +220,9 @@ class Team(object):
     @staticmethod
     def plot_stats(stats, output):
         for k, v in stats.items():
+            if '*' in k:
+                print(f'{k} : {v}')
+                continue
             fig = plt.figure(figsize=(3, 3))
             ax = fig.add_subplot(1, 1, 1)
             ax.loglog(*zip(*stats[k].items()), marker='x', linestyle='None')
