@@ -1,16 +1,27 @@
 import sys,os
 import argparse
+import numpy as np
+from sklearn.model_selection import KFold, train_test_split
 
 import param
 from cmn.publication import Publication
 from cmn.movie import Movie
 from cmn.patent import Patent
-from dal.data_utils import *
-import dnn
-import nmt
-import sgns
-
+import fnn_main
 sys.path.extend(['../cmn'])
+
+def create_evaluation_splits(n_sample, n_folds, train_ratio=0.85):
+    train, test = train_test_split(np.arange(n_sample), train_size=train_ratio, test_size=1-train_ratio, random_state=0, shuffle=True)
+    splits = dict()
+    splits['test'] = test
+    splits['folds'] = dict()
+    skf = KFold(n_splits=n_folds, random_state=0, shuffle=True)
+    for k, (trainIdx, validIdx) in enumerate(skf.split(train)):
+        splits['folds'][k] = dict()
+        splits['folds'][k]['train'] = train[trainIdx]
+        splits['folds'][k]['valid'] = train[validIdx]
+
+    return splits
 
 def run(datapath, domain, filter, model, output, settings):
     if domain == 'dblp':
@@ -23,15 +34,13 @@ def run(datapath, domain, filter, model, output, settings):
         vecs, indexes = Patent.generate_sparse_vectors(datapath, f'./../data/preprocessed/uspt/{os.path.split(datapath)[-1]}', filter, settings['data'])
 
 
-    splits = create_evaluation_splits(len(indexes['t2i']), settings['model']['splits'])
+    splits = create_evaluation_splits(len(indexes['t2i']), settings['model']['nfolds'], settings['model']['train_test_split'])
 
-    if model == 'dnn':
-        dnn.main(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}/dnn', settings['model']['baseline']['dnn'], settings['model']['cmd'])
+    if model == 'fnn':
+        fnn_main.main(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}/fnn', settings['model']['baseline']['fnn'], settings['model']['cmd'])
 
-    # nmt.main(splits, input_data, output_data, cmd=['train', 'test', 'eval'])
-
-    if model == 'sgns':
-        sgns.main(splits, vecs['skill'], vecs['member'], indexes, f'../output/{output}/sgns', settings['model'])
+    # if model == 'nmt'""
+    #     nmt_main.main(splits, input_data, output_data, cmd=['train', 'test', 'eval'])
 
 def addargs(parser):
     dataset = parser.add_argument_group('dataset')
@@ -40,16 +49,16 @@ def addargs(parser):
     dataset.add_argument('-filter', type=int, default=0, choices=[0, 1], help='Remove outliers? (0=False(default), 1=True)')
 
     baseline = parser.add_argument_group('baseline')
-    baseline.add_argument('-model', type=str, required=True, choices=['dnn', 'sgns', 'nmt'], help='The model name (example: dnn)')
+    baseline.add_argument('-model', type=str, required=True, choices=['fnn', 'nmt'], help='The model name (example: fnn)')
 
     output = parser.add_argument_group('output')
     output.add_argument('-output', type=str, default='./../output/', help='The output path (default: ./../output/)')
 
-# python -u main.py -data=./../data/raw/dblp/toy.json -domain=dblp -model=dnn  2>&1 | tee ./../output/toy.log &
-# python -u main.py -data=./../data/raw/dblp/dblp.v12.json -domain=dblp -model=dnn 2>&1 | tee ./../output/dblp.log &
-# python -u main.py -data=./../data/raw/imdb/toy.title.basics.tsv -domain=imdb -model=dnn
-# python -u main.py -data=./../data/raw/imdb/title.basics.tsv -domain=imdb -model=dnn
-# python -u main.py -data=./../data/raw/uspt/toy.patent.tsv -domain=uspt -model=dnn
+# python -u main.py -data=./../data/raw/dblp/toy.dblp.v12.json -domain=dblp -model=fnn  2>&1 | tee ./../output/toy.log &
+# python -u main.py -data=./../data/raw/dblp/dblp.v12.json -domain=dblp -model=fnn 2>&1 | tee ./../output/dblp.log &
+# python -u main.py -data=./../data/raw/imdb/toy.title.basics.tsv -domain=imdb -model=fnn
+# python -u main.py -data=./../data/raw/imdb/title.basics.tsv -domain=imdb -model=fnn
+# python -u main.py -data=./../data/raw/uspt/toy.patent.tsv -domain=uspt -model=fnn
 
 global ncores
 if __name__ == '__main__':
