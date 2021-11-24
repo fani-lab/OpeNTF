@@ -170,75 +170,45 @@ class Team(object):
     @classmethod
     def get_stats(cls, teamsvecs, output, plot=False):
         try:
+            print("Loading the stats pickle ...")
             with open(f'{output}/stats.pkl', 'rb') as infile:
-                print("Loading the stats pickle ...")
                 stats = pickle.load(infile)
                 if plot: Team.plot_stats(stats, output)
                 return stats
 
         except FileNotFoundError:
             print("File not found! Generating stats ...")
-            stats = {}; city = {}; state = {}; country = {}
-            geo_loc = [city, state, country]
-            loc_pat = {}
-            city_mem = {}; state_mem = {}; country_mem = {}
-            with open(teamsvecs, 'rb') as infile:
-                pat_details = pickle.load(infile)
+            stats = {}
+            teamids, skillvecs, membervecs = teamsvecs['id'], teamsvecs['skill'], teamsvecs['member']
 
-                teamids, skillvecs, membervecs = pat_details['id'], pat_details['skill'], pat_details['member']
+            stats['*nteams'] = teamids.shape[0]
+            stats['*nmembers'] = membervecs.shape[1] #unique members
+            stats['*nskills'] = skillvecs.shape[1]
 
-                nteams_nskills = Counter(skillvecs.sum(axis=1).A1.astype(int))
+            #distributions
+            row_sums = skillvecs.sum(axis=1)
+            col_sums = skillvecs.sum(axis=0)
+            nteams_nskills = Counter(row_sums.A1.astype(int))
+            stats['nteams_nskills'] = {k: v for k, v in sorted(nteams_nskills.items(), key=lambda item: item[1], reverse=True)}
+            stats['nteams_skill-idx'] = {k: v for k, v in enumerate(sorted(col_sums.A1.astype(int), reverse=True))}
+            stats['*avg_nskills_team'] = row_sums.mean()
+            stats['*nteams_single_skill'] = stats['nteams_nskills'][1] if 1 in stats['nteams_nskills'] else 0
+            # how many skills have only 1 team, 2 teams, ...
+            nskills_nteams = Counter(col_sums.A1.astype(int))
+            stats['nskills_nteams'] = {k: v for k, v in sorted(nskills_nteams.items(), key=lambda item: item[1], reverse=True)}
+            stats['*avg_nskills_member'] = ((skillvecs.transpose() @ membervecs) > 0).sum(axis=0).mean()
 
-                stats['nteams_nskills'] = {k: v for k, v in sorted(nteams_nskills.items(), key=lambda item: item[1], reverse=True)}
-                stats['nteams_skill-idx'] = {k: v for k, v in enumerate(sorted(skillvecs.sum(axis=0).A1.astype(int), reverse=True))}
-                #
-                nteams_nmembers = Counter(membervecs.sum(axis=1).A1.astype(int))
-
-                stats['nteams_nmembers'] = {k: v for k, v in sorted(nteams_nmembers.items(), key=lambda item: item[1], reverse=True)}
-                stats['nteams_candidate-idx'] = {k: v for k, v in enumerate(sorted(membervecs.sum(axis=0).A1.astype(int), reverse=True))}
-
-                max_records = pat_details['id'].shape[0]
-
-            with open(teamsvecs.replace('teamsvecs', 'teams'), 'rb') as infile:
-                pat_details_all = pickle.load(infile)
-                for key in pat_details_all.keys():
-                    loc = pat_details_all[key].members_details[0:]
-                    for item in loc:
-                        city[key], state[key], country[key] = item
-                for loc_dict in geo_loc:
-                    new_dict = {}
-                    for k, v in loc_dict.items():
-                        if v in new_dict.keys():
-                            new_dict[v].append(k)
-                        else:
-                            new_dict[v] = [k]
-                    loc_pat.update(new_dict)
-                for k, v in loc_pat.items():
-                    loc_pat[k] = len(v)
-            stats['patents_over_location'] = loc_pat
-
-            for i in range(0, max_records):
-                id = pat_details['id'][i].astype(int).toarray()[0][0].tolist()
-                loc = pat_details_all[f'{id}'].members_details[0:]
-                for loc_i in loc:
-                    city_name, state_name, country_name = loc_i
-
-                    if city_name in city_mem.keys():
-                        city_mem[city_name] = city_mem[city_name] + 1
-                    else:
-                        city_mem[city_name] = 1
-                    if state_name in state_mem.keys():
-                        state_mem[state_name] = state_mem[state_name] + 1
-                    else:
-                        state_mem[state_name] = 1
-                    if country_name in country_mem.keys():
-                        country_mem[country_name] = country_mem[country_name] + 1
-                    else:
-                        country_mem[country_name] = 1
-
-            stats['number_of_inventors_per_city'] = city_mem
-            stats['number_of_inventors_per_state'] = state_mem
-            stats['number_of_inventors_per_country'] = country_mem
+            row_sums = membervecs.sum(axis=1)
+            col_sums = membervecs.sum(axis=0)
+            nteams_nmembers = Counter(row_sums.A1.astype(int))
+            stats['nteams_nmembers'] = {k: v for k, v in sorted(nteams_nmembers.items(), key=lambda item: item[1], reverse=True)}
+            stats['nteams_candidate-idx'] = {k: v for k, v in enumerate(sorted(col_sums.A1.astype(int), reverse=True))}
+            stats['*avg_nmembers_team'] = row_sums.mean()
+            stats['*nteams_single_member'] = stats['nteams_nmembers'][1] if 1 in stats['nteams_nmembers'] else 0
+            #how many members have only 1 team, 2 teams, ....
+            nmembers_nteams = Counter(col_sums.A1.astype(int))
+            stats['nmembers_nteams'] = {k: v for k, v in sorted(nmembers_nteams.items(), key=lambda item: item[1], reverse=True)}
+            stats['*avg_nteams_member'] = col_sums.mean()
 
             #TODO: temporal stats!
             #TODO: skills_years (2-D image)
@@ -250,10 +220,25 @@ class Team(object):
     @staticmethod
     def plot_stats(stats, output):
         for k, v in stats.items():
-            fig = plt.figure()
+            if '*' in k:
+                print(f'{k} : {v}')
+                continue
+            fig = plt.figure(figsize=(3, 3))
             ax = fig.add_subplot(1, 1, 1)
-            ax.bar(*zip(*stats[k].items()))
+            ax.loglog(*zip(*stats[k].items()), marker='x', linestyle='None')
             ax.set_xlabel(k.split('_')[1].replace('n', '#', 0))
             ax.set_ylabel(k.split('_')[0].replace('n', '#', 0))
+            ax.grid(True, color="#93a1a1", alpha=0.3)
+            ax.spines['right'].set_color((.8, .8, .8))
+            ax.spines['top'].set_color((.8, .8, .8))
+            ax.minorticks_off()
+            ax.xaxis.set_tick_params(size=1)
+            ax.yaxis.set_tick_params(size=1)
+            ax.xaxis.get_label().set_size(12)
+            ax.yaxis.get_label().set_size(12)
             fig.savefig(f'{output}/{k}.png', dpi=100, bbox_inches='tight')
             plt.show()
+
+    @staticmethod
+    def get_unigram(membervecs):
+        return membervecs.sum(axis=0)/membervecs.shape[0]
