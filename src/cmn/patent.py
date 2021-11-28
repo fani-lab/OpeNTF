@@ -5,6 +5,8 @@ from tqdm import tqdm
 from cmn.team import Team
 from cmn.inventor import Inventor
 
+import pickle
+
 class Patent(Team):
     def __init__(self, id, members, date, title, country, subgroups, withdrawn, members_details):
         super().__init__(id, members, set(subgroups.split(',')), date)
@@ -95,55 +97,71 @@ class Patent(Team):
             return super(Patent, Patent).read_data(teams, output, filter, settings)
 
     @classmethod
-    def get_stats(cls, teams, output, plot=False):
-        # super().get_stats()
-        # stats = {}
-        # city = {};
-        # state = {};
-        # country = {}
-        # geo_loc = [city, state, country]
-        # loc_pat = {}
-        # city_mem = {};
-        # state_mem = {};
-        # country_mem = {}
-        # with open(teams, 'rb') as infile:
-        #     pat_details_all = pickle.load(infile)
-        #     for key in pat_details_all.keys():
-        #         loc = pat_details_all[key].members_details[0:]
-        #         for item in loc:
-        #             city[key], state[key], country[key] = item
-        #     for loc_dict in geo_loc:
-        #         new_dict = {}
-        #         for k, v in loc_dict.items():
-        #             if v in new_dict.keys():
-        #                 new_dict[v].append(k)
-        #             else:
-        #                 new_dict[v] = [k]
-        #         loc_pat.update(new_dict)
-        #     for k, v in loc_pat.items():
-        #         loc_pat[k] = len(v)
-        # stats['patents_over_location'] = loc_pat
-        # max_records = pat_details['id'].shape[0]
-        # for i in range(0, max_records):
-        #     id = pat_details['id'][i].astype(int).toarray()[0][0].tolist()
-        #     loc = pat_details_all[f'{id}'].members_details[0:]
-        #     for loc_i in loc:
-        #         city_name, state_name, country_name = loc_i
-        #
-        #         if city_name in city_mem.keys():
-        #             city_mem[city_name] = city_mem[city_name] + 1
-        #         else:
-        #             city_mem[city_name] = 1
-        #         if state_name in state_mem.keys():
-        #             state_mem[state_name] = state_mem[state_name] + 1
-        #         else:
-        #             state_mem[state_name] = 1
-        #         if country_name in country_mem.keys():
-        #             country_mem[country_name] = country_mem[country_name] + 1
-        #         else:
-        #             country_mem[country_name] = 1
-        #
-        # stats['number_of_inventors_per_city'] = city_mem
-        # stats['number_of_inventors_per_state'] = state_mem
-        # stats['number_of_inventors_per_country'] = country_mem
-        pass
+    def get_stats(cls, teamsvecs, output, plot=False):
+        stats = {}
+        stats_to_append = super().get_stats(teamsvecs, output)
+        stats.update(stats_to_append)
+
+        city = {}; state = {}; country = {}
+        geo_loc = [city, state, country]
+        pat_details = {}
+        loc_pat = {}; city_mem = {}; state_mem = {}; country_mem = {}
+        with open(teamsvecs, 'rb') as infile_0:
+            pat_details = pickle.load(infile_0)
+
+        with open(teamsvecs.replace('teamsvecs', 'teams'), 'rb') as infile_1:
+            pat_details_all = pickle.load(infile_1)
+            for key in pat_details_all.keys():
+                loc = pat_details_all[key].members_details[0:]
+                for item in loc:
+                    city[key], state[key], country[key] = item
+            for loc_dict in geo_loc:
+                new_dict = {}
+                for k, v in loc_dict.items():
+                    if v in new_dict.keys():
+                        new_dict[v].append(k)
+                    else:
+                        new_dict[v] = [k]
+                loc_pat.update(new_dict)
+            for k, v in loc_pat.items():
+                loc_pat[k] = len(v)
+        stats['patents_over_location'] = loc_pat
+        max_records = pat_details['id'].shape[0]
+        for i in range(0, max_records):
+            id = pat_details['id'][i].astype(int).toarray()[0][0].tolist()
+            loc = pat_details_all[f'{id}'].members_details[0:]
+            for loc_i in loc:
+                city_name, state_name, country_name = loc_i
+
+                if city_name in city_mem.keys():
+                    city_mem[city_name] = city_mem[city_name] + 1
+                else:
+                    city_mem[city_name] = 1
+                if state_name in state_mem.keys():
+                    state_mem[state_name] = state_mem[state_name] + 1
+                else:
+                    state_mem[state_name] = 1
+                if country_name in country_mem.keys():
+                    country_mem[country_name] = country_mem[country_name] + 1
+                else:
+                    country_mem[country_name] = 1
+
+        country_skill = {}
+        for idx, id_r in enumerate(list(pat_details_all.keys())):
+            for rec in pat_details_all[id_r].members_details:
+                _, _, country = rec
+                if country in country_skill.keys():
+                    country_skill[country] = country_skill[country] + (pat_details['skill'][idx] != 0).sum(1)[0, 0]
+                else:
+                    country_skill[country] = (pat_details['skill'][idx] != 0).sum(1)[0, 0]
+
+        stats['Number of Skills per country'] = country_skill
+
+        stats['number_of_inventors_per_city'] = city_mem
+        stats['number_of_inventors_per_state'] = state_mem
+        stats['number_of_inventors_per_country'] = country_mem
+
+        with open(f'{output}/stats.pkl', 'wb') as outfile: pickle.dump(stats, outfile)
+        if plot: Team.plot_stats(stats, output)
+
+        return stats
