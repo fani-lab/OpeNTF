@@ -7,12 +7,9 @@ import param
 from cmn.publication import Publication
 from cmn.movie import Movie
 from cmn.patent import Patent
-from misc.pickle_reformation import reformat_pickle
-from dal.embedding import Embedding
 import fnn_main
 import bnn_main
-import fnn_emb_main
-import bnn_emb_main
+from mdl.team2vec import Team2Vec
 
 sys.path.extend(['../cmn'])
 
@@ -39,11 +36,6 @@ def run(datapath, domain, filter, model, output, settings):
     if domain == 'uspt':
         vecs, indexes = Patent.generate_sparse_vectors(datapath, f'./../data/preprocessed/uspt/{os.path.split(datapath)[-1]}', filter, settings['data'])
 
-    dimension = 100
-    epochs = 100
-    window = 2
-    dm = 0
-
     splits = create_evaluation_splits(len(indexes['t2i']), settings['model']['nfolds'], settings['model']['train_test_split'])
 
     if model == 'fnn':
@@ -53,30 +45,18 @@ def run(datapath, domain, filter, model, output, settings):
         bnn_main.main(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}/bnn', settings['model']['baseline']['fnn'], settings['model']['cmd'])
 
     if model == 'fnn_emb':
-        dataset, path = reformat_pickle(vecs, f'./../data/preprocessed/{domain}/{os.path.split(datapath)[-1]}', filter, settings['data'])
-        embedding_model = Embedding(domain, f'{path}/teamsvecs_for_emb.pkl', path)
-        embedding_model.init(dataset, 'skill')
-        try:
-            t2v_model = embedding_model.load_model(f"{path}/model_d100_w2_m0_tSkill")
-            vecs['skill'] = t2v_model.dv
-        except:
-            embedding_model.train(dimension=dimension, window=window, dist_mode=dm, output=path, epochs=epochs)
-            t2v_model = embedding_model.load_model(f"{path}/model_d100_w2_m0_tSkill")
-            vecs['skill'] = t2v_model.dv
-        fnn_emb_main.main(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}/fnn', settings['model']['baseline']['fnn'], settings['model']['cmd'])
+        t2v = Team2Vec(vecs, 'skill', f'./../data/preprocessed/{domain}/{os.path.split(datapath)[-1]}')
+        emb_setting = settings['model']['baseline']['emb']
+        t2v.train(emb_setting['d'], emb_setting['w'], emb_setting['dm'], emb_setting['e'])
+        vecs['skill'] = t2v.dv()
+        fnn_main.main(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}/fnn_emb', settings['model']['baseline']['fnn'], settings['model']['cmd'])
 
     if model == 'bnn_emb':
-        dataset, path = reformat_pickle(vecs, f'./../data/preprocessed/{domain}/{os.path.split(datapath)[-1]}', filter, settings['data'])
-        embedding_model = Embedding(domain, f'{path}/teamsvecs_for_emb.pkl', path)
-        embedding_model.init(dataset, 'skill')
-        try:
-            t2v_model = embedding_model.load_model(f"{path}/model_d100_w2_m0_tSkill")
-            vecs['skill'] = t2v_model.dv
-        except:
-            embedding_model.train(dimension=dimension, window=window, dist_mode=dm, output=path, epochs=epochs)
-            t2v_model = embedding_model.load_model(f"{path}/model_d100_w2_m0_tSkill")
-            vecs['skill'] = t2v_model.dv
-        bnn_emb_main.main(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}/bnn', settings['model']['baseline']['fnn'], settings['model']['cmd'])
+        t2v = Team2Vec(vecs, 'skill', f'./../data/preprocessed/{domain}/{os.path.split(datapath)[-1]}')
+        emb_setting = settings['model']['baseline']['emb']
+        t2v.train(emb_setting['d'], emb_setting['w'], emb_setting['dm'], emb_setting['e'])
+        vecs['skill'] = t2v.dv()
+        bnn_main.main(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}/bnn_emb', settings['model']['baseline']['fnn'], settings['model']['cmd'])
 
     # if model == 'nmt'""
     #     nmt_main.main(splits, input_data, output_data, cmd=['train', 'test', 'eval'])
