@@ -9,6 +9,7 @@ from cmn.movie import Movie
 from cmn.patent import Patent
 import fnn_main
 import bnn_main
+import nmt_main
 from mdl.team2vec import Team2Vec
 
 sys.path.extend(['../cmn'])
@@ -58,8 +59,8 @@ def run(datapath, domain, filter, model, output, settings):
         vecs['skill'] = t2v.dv()
         bnn_main.main(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}/bnn_emb', settings['model']['baseline']['fnn'], settings['model']['cmd'])
 
-    # if model == 'nmt'""
-    #     nmt_main.main(splits, input_data, output_data, cmd=['train', 'test', 'eval'])
+    if model == 'nmt':
+        nmt_main.main(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}/nmt', './nmt_base_config.yaml', cmd=['train', 'test', 'eval'])
 
 def addargs(parser):
     dataset = parser.add_argument_group('dataset')
