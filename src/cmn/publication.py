@@ -29,8 +29,8 @@ class Publication(Team):
     def set_skills(self):
         skills = set()
         for skill in self.fos:
-            if skill["w"] != 0.0:
-                skills.add(skill["name"].replace(" ", "_"))
+            #if skill["w"] != 0.0:
+            skills.add(skill["name"].replace(" ", "_"))
         # Extend the fields with keywords
         # if len(self.keywords):
         #     skills.union(set([keyword.replace(" ", "_") for keyword in self.keywords]))
@@ -66,7 +66,7 @@ class Publication(Team):
                         keywords = jsonline['keywords'] if 'keywords' in jsonline.keys() else []
 
                         # a team must have skills and members
-                        try: fos = jsonline['fos']
+                        try: fos = jsonline['fos']# an array of (name, w), w shows a weight. Not sorted! Can be used later!
                         except: continue  #publication must have fos (skills)
                         try: authors = jsonline['authors']
                         except: continue #publication must have authors (members)
