@@ -1,5 +1,6 @@
 import torch
 from torch.utils.data import Dataset
+import scipy.sparse
 
 class TFDataset(Dataset):
     def __init__(self, input_matrix, output_matrix):
@@ -11,4 +12,7 @@ class TFDataset(Dataset):
         return self.input.shape[0]
 
     def __getitem__(self, index):
-        return torch.as_tensor(self.input[index].toarray()).float(), torch.as_tensor(self.output[index].toarray())
+        if scipy.sparse.issparse(self.input):
+            return torch.as_tensor(self.input[index].toarray()).float(), torch.as_tensor(self.output[index].toarray())
+        else:
+            return torch.as_tensor(self.input[index]).float(), torch.as_tensor(self.output[index].toarray())
