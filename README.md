@@ -15,13 +15,13 @@ You need to have ``Python >= 3.8`` and install the following main packages, amon
 torch==1.6.0
 pytre_eval==0.5
 ```
-To clone the codebase and install the required packages by ``pip``:
+By ``pip``, clone the codebase and install the required packages:
 ```sh
 git clone https://github.com/Fani-Lab/neural_team_formation
 cd neural_team_formation
 pip install -r requirements.txt
 ```
-or by [``conda``](https://www.anaconda.com/products/individual):
+By [``conda``](https://www.anaconda.com/products/individual):
 
 ```sh
 git clone https://github.com/Fani-Lab/neural_team_formation

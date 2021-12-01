@@ -8,6 +8,10 @@ from cmn.publication import Publication
 from cmn.movie import Movie
 from cmn.patent import Patent
 import fnn_main
+import bnn_main
+import nmt_main
+from mdl.team2vec import Team2Vec
+
 sys.path.extend(['../cmn'])
 
 def create_evaluation_splits(n_sample, n_folds, train_ratio=0.85):
@@ -33,14 +37,30 @@ def run(datapath, domain, filter, model, output, settings):
     if domain == 'uspt':
         vecs, indexes = Patent.generate_sparse_vectors(datapath, f'./../data/preprocessed/uspt/{os.path.split(datapath)[-1]}', filter, settings['data'])
 
-
     splits = create_evaluation_splits(len(indexes['t2i']), settings['model']['nfolds'], settings['model']['train_test_split'])
 
     if model == 'fnn':
         fnn_main.main(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}/fnn', settings['model']['baseline']['fnn'], settings['model']['cmd'])
 
-    # if model == 'nmt'""
-    #     nmt_main.main(splits, input_data, output_data, cmd=['train', 'test', 'eval'])
+    if model == 'bnn':
+        bnn_main.main(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}/bnn', settings['model']['baseline']['fnn'], settings['model']['cmd'])
+
+    if model == 'fnn_emb':
+        t2v = Team2Vec(vecs, 'skill', f'./../data/preprocessed/{domain}/{os.path.split(datapath)[-1]}')
+        emb_setting = settings['model']['baseline']['emb']
+        t2v.train(emb_setting['d'], emb_setting['w'], emb_setting['dm'], emb_setting['e'])
+        vecs['skill'] = t2v.dv()
+        fnn_main.main(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}/fnn_emb', settings['model']['baseline']['fnn'], settings['model']['cmd'])
+
+    if model == 'bnn_emb':
+        t2v = Team2Vec(vecs, 'skill', f'./../data/preprocessed/{domain}/{os.path.split(datapath)[-1]}')
+        emb_setting = settings['model']['baseline']['emb']
+        t2v.train(emb_setting['d'], emb_setting['w'], emb_setting['dm'], emb_setting['e'])
+        vecs['skill'] = t2v.dv()
+        bnn_main.main(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}/bnn_emb', settings['model']['baseline']['fnn'], settings['model']['cmd'])
+
+    if model == 'nmt':
+        nmt_main.main(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}/nmt', './nmt_base_config.yaml', cmd=['train', 'test', 'eval'])
 
 def addargs(parser):
     dataset = parser.add_argument_group('dataset')
@@ -49,7 +69,7 @@ def addargs(parser):
     dataset.add_argument('-filter', type=int, default=0, choices=[0, 1], help='Remove outliers? (0=False(default), 1=True)')
 
     baseline = parser.add_argument_group('baseline')
-    baseline.add_argument('-model', type=str, required=True, choices=['fnn', 'nmt'], help='The model name (example: fnn)')
+    baseline.add_argument('-model', type=str, required=True, choices=['fnn', 'bnn', 'fnn_emb', 'bnn_emb', 'nmt'], help='The model name (example: fnn)')
 
     output = parser.add_argument_group('output')
     output.add_argument('-output', type=str, default='./../output/', help='The output path (default: ./../output/)')
