@@ -19,8 +19,14 @@ settings = {
                 'nns': None,  # number of negative samples
                 'ns': None,  # 'uniform', 'unigram', 'unigram_b'
             },
+            'emb':{
+                'd': 100,# embedding dimension
+                'e': 10,# epoch
+                'dm': 1,# training algorithm. 1: distributed memory (PV-DM), 0: distributed bag of words (PV-DBOW)
+                'w': 1 #cooccurrence window
+            }
         },
-        'cmd': ['eval'],  # 'train', 'test', 'eval'
+        'cmd': ['train', 'test', 'eval'],  # 'train', 'test', 'eval'
         'nfolds': 5,
         'train_test_split': 0.85
     },

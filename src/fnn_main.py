@@ -18,7 +18,7 @@ from eval.metric import calculate_metrics
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 def cross_entropy(y_, y, ns, nns, unigram):
-    if ns == "uniform": return ns(y_, y, nns)
+    if ns == "uniform": return ns_uniform(y_, y, nns)
     if ns == "unigram": return ns_unigram(y_, y, unigram, nns)
     if ns == "unigram_b": return ns_unigram_mini_batch(y_, y, nns)
     return weighted(y_, y)
@@ -26,7 +26,7 @@ def cross_entropy(y_, y, ns, nns, unigram):
 def weighted(logits, targets, pos_weight=2.5):
     return (-targets * torch.log(logits) * pos_weight + (1 - targets) * - torch.log(1 - logits)).sum()
 
-def ns(logits, targets, neg_samples=5):
+def ns_uniform(logits, targets, neg_samples=5):
     targets = targets.squeeze(1)
     logits = logits.squeeze(1)
     random_samples = torch.zeros_like(targets)
@@ -51,7 +51,7 @@ def ns_unigram(logits, targets, unigram, neg_samples=5):
         for idx in k_neg_idx:
             if idx not in cor_idx:
                 random_samples[b][idx] = 1
-    return (-targets * torch.log(logits) - random_samples * torch.log(1 -logits)).sum()
+    return (-targets * torch.log(logits) - random_samples * torch.log(1 - logits)).sum()
 
 def ns_unigram_mini_batch(logits, targets, neg_samples=5):
     targets = targets.squeeze(1)
@@ -74,7 +74,8 @@ def ns_unigram_mini_batch(logits, targets, neg_samples=5):
 def learn(splits, indexes, vecs, params, output):
 
     layers = params['l']; learning_rate = params['lr']; batch_size = params['b']; num_epochs = params['e']; nns = params['nns']; ns = params['ns']
-    input_size = len(indexes['i2s'])
+    # input_size = len(indexes['i2s'])
+    input_size = vecs['skill'].shape[1]
     output_size = len(indexes['i2c'])
 
     unigram = Team.get_unigram(vecs['member'])
@@ -149,13 +150,13 @@ def learn(splits, indexes, vecs, params, output):
                       f', Running Loss {phase} {train_loss_values[-1] if phase == "train" else valid_loss_values[-1]}'
                       f", Time {time.time() - fold_time}, Overall {time.time() - start_time} "
                       )
-            torch.save(model.state_dict(), f"{output}/state_dict_model.f{foldidx}.e{epoch}.pt")
+            torch.save(model.state_dict(), f"{output}/state_dict_model.f{foldidx}.e{epoch}.pt", pickle_protocol=4)
             scheduler.step(valid_running_loss / X_valid.shape[0])
 
         model_path = f"{output}/state_dict_model_f{foldidx}.pt"
     
         # Save
-        torch.save(model.state_dict(), model_path)
+        torch.save(model.state_dict(), model_path, pickle_protocol=4)
         train_valid_loss[foldidx]['train'] = train_loss_values
         train_valid_loss[foldidx]['valid'] = valid_loss_values
 
@@ -170,9 +171,10 @@ def learn(splits, indexes, vecs, params, output):
             plt.savefig(f'{output}/fold{foldidx}.png', dpi=100, bbox_inches='tight')
             plt.show()
 
-def test(model_path, splits, indexes, vecs, params, on_train_valid_set=False):
+def test(nn_classname, model_path, splits, indexes, vecs, params, on_train_valid_set=False):
     if not os.path.isdir(model_path): raise Exception("The model does not exist!")
-    input_size = len(indexes['i2s'])
+    # input_size = len(indexes['i2s'])
+    input_size = vecs['skill'].shape[1]
     output_size = len(indexes['i2c'])
 
     X_test = vecs['skill'][splits['test'], :]
@@ -181,7 +183,7 @@ def test(model_path, splits, indexes, vecs, params, on_train_valid_set=False):
     test_dl = DataLoader(test_matrix, batch_size=params['b'], shuffle=True, num_workers=0)
 
     for foldidx in splits['folds'].keys():
-        model = FNN(input_size=input_size, output_size=output_size, param=params).to(device)
+        model = nn_classname(input_size=input_size, output_size=output_size, param=params).to(device)
         model.load_state_dict(torch.load(f'{model_path}/state_dict_model_f{foldidx}.pt'))
         model.eval()
 
@@ -203,27 +205,25 @@ def test(model_path, splits, indexes, vecs, params, on_train_valid_set=False):
                     scores = scores.squeeze(1).cpu().numpy()
                     y_pred = np.vstack((y_pred, scores))
 
-            torch.save(y_pred, f'{model_path}/f{foldidx}.{pred_set}.pred')
+            torch.save(y_pred, f'{model_path}/f{foldidx}.{pred_set}.pred', pickle_protocol=4)
 
 def eval(model_path, splits, vecs, on_train_valid_set=False):
     if not os.path.isdir(model_path): raise Exception("The predictions do not exist!")
     y_test = vecs['member'][splits['test']]
     for foldidx in splits['folds'].keys():
         for pred_set in (['test', 'train', 'valid'] if on_train_valid_set else ['test']):
-            if pred_set != 'test':
-                Y = vecs['member'][splits['folds'][foldidx][pred_set]]
+            if pred_set != 'test': Y = vecs['member'][splits['folds'][foldidx][pred_set]]
             else: Y = y_test
             Y_ = torch.load(f'{model_path}/f{foldidx}.{pred_set}.pred')
             df, df_mean = calculate_metrics(Y, Y_)
-            df.to_csv(f'{model_path}/f{foldidx}.{pred_set}.pred.eval.csv')
+            df.to_csv(f'{model_path}/f{foldidx}.{pred_set}.pred.eval.csv', float_format='%.15f')
             df_mean.to_csv(f'{model_path}/f{foldidx}.{pred_set}.pred.eval.mean.csv')
 
-
 def main(splits, vecs, indexes, output, settings, cmd):
-    output = f"{output}/t{vecs['skill'].shape[0]}.s{vecs['skill'].shape[1]}.e{vecs['member'].shape[1]}.{'.'.join([k + str(v).replace(' ', '')for k, v in settings.items() if v])}"
+    output = f"{output}/t{vecs['skill'].shape[0]}.s{vecs['skill'].shape[1]}.m{vecs['member'].shape[1]}.{'.'.join([k + str(v).replace(' ', '')for k, v in settings.items() if v])}"
     if not os.path.isdir(output): os.makedirs(output)
 
     if 'train' in cmd: learn(splits, indexes, vecs, settings, output)
-    if 'test' in cmd: test(output, splits, indexes, vecs, settings, on_train_valid_set=True)
-    if 'eval' in cmd: eval(output, splits, vecs, on_train_valid_set=True)
+    if 'test' in cmd: test(FNN, output, splits, indexes, vecs, settings, on_train_valid_set=False)
+    if 'eval' in cmd: eval(output, splits, vecs, on_train_valid_set=False)
 

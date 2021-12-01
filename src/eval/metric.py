@@ -6,12 +6,10 @@ import pytrec_eval
 import json
 import pandas as pd
 
-def calculate_metrics(Y, Y_, metrics=['p', 'r', 'ndcg', 'map', 'roc', 'rocauc']):
-    eval_met = dict(zip(metrics, [None]*len(metrics)))
-    auc = roc_auc_score(Y.toarray(), Y_, average='micro', multi_class="ovr")
+def calculate_metrics(Y, Y_, metrics=None):
+    # eval_met = dict(zip(metrics, [None]*len(metrics)))
+    aucroc = roc_auc_score(Y.toarray(), Y_, average='micro', multi_class="ovr")
     fpr, tpr, _ = roc_curve(Y.toarray().ravel(), Y_.ravel())
-    eval_met['rocauc'] = auc
-    eval_met['roc'] = (fpr, tpr)
 
     qrel = dict(); run = dict()
     for i, (y, y_) in enumerate(zip(Y, Y_)):
@@ -21,7 +19,7 @@ def calculate_metrics(Y, Y_, metrics=['p', 'r', 'ndcg', 'map', 'roc', 'rocauc'])
 
     p_evaluator = pytrec_eval.RelevanceEvaluator(qrel, {'P_2,4,6,8,10', 'recall_2,4,6,8,10', 'ndcg_cut_2,4,6,8,10', 'map_cut_2,4,6,8,10'})
     df = pd.DataFrame.from_dict(p_evaluator.evaluate(run))
-    return df, df.mean(axis=1)
+    return df, df.mean(axis=1).append(pd.Series([aucroc, (fpr, tpr)], index=['aucroc', 'roc']))
 
 def plot_ndcg_at_k(loader, model, device):
     C = loader.dataset.output.shape[1]
