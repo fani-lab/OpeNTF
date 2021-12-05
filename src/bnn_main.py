@@ -124,5 +124,5 @@ def main(splits, vecs, indexes, output, settings, cmd):
 
     if 'train' in cmd: learn(splits, indexes, vecs, settings, output)
     if 'test' in cmd: fnn_main.test(BNN, output, splits, indexes, vecs, settings, on_train_valid_set=False)
-    if 'eval' in cmd: fnn_main.eval(output, splits, vecs, on_train_valid_set=False)
-
+    if 'eval' in cmd: fnn_main.evaluate(output, splits, vecs, on_train_valid_set=False, per_instance=False)
+    if 'plot' in cmd: fnn_main.plot_roc(output, splits, on_train_valid_set=False)

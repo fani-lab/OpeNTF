@@ -19,3 +19,97 @@ tt0133093	6	nm0905152	director	\N	\N
 tt0133093	7	nm0005428	producer	producer	\N
 tt0133093	8	nm0204485	composer	\N	\N
 tt0133093	9	nm0691084	cinematographer	director of photography	\N
+tt0042621	10	nm0044109	editor	\N	\N
+tt0042621	1	nm0679959	actor	\N	["Michel Grandier"]
+tt0042621	2	nm0167235	actress	\N	["Juliette"]
+tt0042621	3	nm0146613	actor	\N	["Le châtelain & Monsieur Bellanger"]
+tt0042621	4	nm0350764	actor	\N	["Le père Lajeunesse & le greffier"]
+tt0042621	5	nm0138893	director	\N	\N
+tt0042621	6	nm0627410	writer	play	\N
+tt0042621	7	nm0899254	writer	adaptation	\N
+tt0042621	8	nm0006158	composer	\N	\N
+tt0042621	9	nm0002162	cinematographer	\N	\N
+tt0042622	1	nm0000032	actor	\N	["Antony"]
+tt0042622	2	nm0322603	actor	\N	["Cassius"]
+tt0042622	3	nm0850919	actor	\N	["Julius Caesar"]
+tt0042622	4	nm0103192	actor	\N	["Brutus"]
+tt0042622	5	nm0000636	writer	play	\N
+tt0042622	6	nm0205244	producer	producer	\N
+tt0042622	7	nm0445030	producer	producer	\N
+tt0042622	8	nm6388048	composer	\N	\N
+tt0042622	9	nm0573057	cinematographer	\N	\N
+tt0042625	10	nm0309950	editor	\N	\N
+tt0042625	1	nm0041509	actor	\N	["Serge Cremer"]
+tt0042625	2	nm0051086	actor	\N	["Le président du tribunal"]
+tt0042625	3	nm0124482	actor	\N	["Félix Noblet - le 5ème juré"]
+tt0042625	4	nm0144889	actor	\N	["Gilbert de Montesson - le 1er juré"]
+tt0042625	5	nm0147265	director	\N	\N
+tt0042625	6	nm0816458	writer	dialogue	\N
+tt0042625	7	nm0233587	producer	producer	\N
+tt0042625	8	nm0499472	composer	\N	\N
+tt0042625	9	nm0099961	cinematographer	\N	\N
+tt0042626	10	nm0840582	cinematographer	\N	\N
+tt0042626	1	nm0001536	actor	\N	["Tora"]
+tt0042626	2	nm0038315	actress	\N	\N
+tt0042626	3	nm0652743	actor	\N	\N
+tt0042626	4	nm0853392	actor	\N	\N
+tt0042626	5	nm0408348	director	\N	\N
+tt0042626	6	nm0644823	writer	\N	\N
+tt0042626	7	nm0609404	producer	producer	\N
+tt0042626	8	nm1070384	producer	producer	\N
+tt0042626	9	nm0297914	composer	\N	\N
+tt2352779	1	nm1417818	actor	\N	["Juan Antonio 'Toño' Pérez"]
+tt2352779	2	nm4021116	actress	\N	["Martha Costilla de Pérez"]
+tt2352779	3	nm4940472	actress	\N	["Natalia Pérez Costilla"]
+tt2352779	4	nm4644085	actor	\N	["Alfonso 'Poncho' Pérez Costilla"]
+tt2352779	5	nm1889503	director	\N	\N
+tt2352779	6	nm1962502	director	co-director	\N
+tt2352779	7	nm2684620	writer	creator	\N
+tt2352779	8	nm3872055	writer	\N	\N
+tt5120964	2	nm0333260	actor	\N	["Roman Wild"]
+tt5120964	3	nm0500529	actor	\N	["Richard Steinkamp"]
+tt5120964	4	nm2219491	actor	\N	["Ben Roschinski"]
+tt5120964	5	nm2542265	writer	head writer	\N
+tt5120964	6	nm3796859	actress	\N	["Katja Bergmann"]
+tt5120964	7	nm2687900	actress	\N	["Zoé Laffort"]
+tt4920934	1	nm1101808	self	\N	["Self - Presenter"]
+tt4920934	2	nm7520000	self	\N	["Self - Presenter"]
+tt4920934	3	nm7064895	self	\N	["Self - Presenter"]
+tt4920934	4	nm7519957	self	\N	["Self - Presenter"]
+tt4920934	5	nm3717852	self	\N	["Self - Presenter"]
+tt4920934	6	nm9198684	self	\N	["Self - Presenter"]
+tt4920766	1	nm1254452	self	\N	["Self"]
+tt4920766	2	nm5288382	self	\N	["Self - Odemykající"]
+tt4920766	3	nm0361821	self	\N	["Self"]
+tt4920766	4	nm0873608	self	\N	["Self"]
+tt4920766	5	nm2622637	director	\N	\N
+tt0000005	1	nm0443482	actor	\N	["Blacksmith"]
+tt0000005	2	nm0653042	actor	\N	["Assistant"]
+tt0000005	3	nm0005690	director	\N	\N
+tt0000005	4	nm0249379	producer	producer	\N
+tt0000061	1	nm4007970	actress	\N	\N
+tt0000061	2	nm0010291	director	\N	\N
+tt0000061	3	nm0666972	producer	producer	\N
+tt0000075	1	nm0194945	actress	\N	["Woman"]
+tt0000075	2	nm0617588	actor	\N	["Magician"]
+tt0000065	1	nm0617588	actor	\N	["Lightening Sketch Artist"]
+tt0000417	1	nm0617588	actor	\N	["Prof. Barbenfouillis","The Moon"]
+tt0000417	2	nm0029244	actor	\N	["Astronomer"]
+tt0000417	3	nm0076933	actress	\N	["Lady in the Moon"]
+tt0000417	4	nm1215996	actor	\N	["Astronomer"]
+tt0000417	5	nm0894523	writer	novel "De la Terre à la Lune"	\N
+tt0000417	6	nm0920229	writer	novel "First Men in the Moon"	\N
+tt0000417	7	nm0242155	composer	\N	\N
+tt0000417	8	nm0324073	composer	\N	\N
+tt0000417	9	nm4491570	composer	\N	\N
+tt0496232	1	nm1375877	actor	\N	\N
+tt0496232	2	nm0593917	director	\N	\N
+tt0496232	3	nm0585955	cinematographer	\N	\N
+tt12427530	1	nm11625684	actor	\N	\N
+tt12427530	2	nm11625683	director	\N	\N
+tt12427530	3	nm11625689	producer	producer	\N
+tt12427530	4	nm11625686	producer	producer	\N
+tt1099601	1	nm1122677	self	\N	["Self - Co-Host"]
+tt0000003	1	nm0721526	director	\N	\N
+tt0000003	2	nm1770680	producer	producer	\N
+tt0000003	3	nm1335271	composer	\N	\N
