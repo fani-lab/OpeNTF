@@ -107,7 +107,7 @@ class Patent(Team):
 
         except FileNotFoundError:
             stats = {}
-            stats.update(super().get_stats(teamsvecs, output))
+            stats.update(super().get_stats(teamsvecs, output, plot))
 
             #dic[patent.country] +=1
             #dic[patent.country, skill] +=1
