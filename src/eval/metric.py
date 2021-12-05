@@ -11,12 +11,12 @@ def calculate_metrics(Y, Y_, per_instance=False, metrics={'P_2,5,10', 'recall_2,
     aucroc, fpr, tpr = calculate_auc_roc(Y, Y_)
 
     qrel = dict(); run = dict()
-    print(f'building pytrec_eval input for {Y.shape[0]} instances ...')
+    print(f'Building pytrec_eval input for {Y.shape[0]} instances ...')
     for i, (y, y_) in enumerate(zip(Y, Y_)):
         qrel['q' + str(i)] = {'d' + str(idx): 1 for idx in y.nonzero()[1]}
         run['q' + str(i)] = {'d' + str(j): int(np.round(v * 100)) for j,v in enumerate(y_)}
         # run['q' + str(i)] = {'d' + str(idx): int(np.round(y_[idx] * 10)) for idx in np.where(y_ > 0.5)[0]}
-    print(f'evaluating {metrics} ...')
+    print(f'Evaluating {metrics} ...')
     df = pd.DataFrame.from_dict(pytrec_eval.RelevanceEvaluator(qrel, metrics).evaluate(run))
     print(f'Averaging ...')
     return df if per_instance else None, df.mean(axis=1).append(pd.Series([aucroc, (fpr, tpr)], index=['aucroc', 'roc']))
