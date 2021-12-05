@@ -10,6 +10,7 @@ from torch.utils.data import DataLoader
 from torch.optim.lr_scheduler import StepLR, ReduceLROnPlateau
 import pandas as pd
 import pickle
+
 import param #do not remove this
 from cmn.team import Team
 from mdl.fnn import FNN
@@ -208,59 +209,35 @@ def test(nn_classname, model_path, splits, indexes, vecs, params, on_train_valid
 
             torch.save(y_pred, f'{model_path}/f{foldidx}.{pred_set}.pred', pickle_protocol=4)
 
-def eval(model_path, splits, vecs, on_train_valid_set=False):
+def evaluate(model_path, splits, vecs, on_train_valid_set=False, per_instance=False):
     if not os.path.isdir(model_path): raise Exception("The predictions do not exist!")
     y_test = vecs['member'][splits['test']]
-    metrics = ['P', 'recall', 'ndcg_cut', 'map_cut']
-    dfs = {'P': [], 'recall': [], 'ndcg_cut': [], 'map_cut': []}
-    aucs = {'test': [], 'train': [], 'valid': []} if on_train_valid_set else {'test': []}
-    for foldidx in splits['folds'].keys():
-        for pred_set in (['test', 'train', 'valid'] if on_train_valid_set else ['test']):
+    for pred_set in (['test', 'train', 'valid'] if on_train_valid_set else ['test']):
+        fold_mean = pd.DataFrame()
+        for foldidx in splits['folds'].keys():
             if pred_set != 'test': Y = vecs['member'][splits['folds'][foldidx][pred_set]]
             else: Y = y_test
             Y_ = torch.load(f'{model_path}/f{foldidx}.{pred_set}.pred')
+            df, df_mean = calculate_metrics(Y, Y_, per_instance)
+            if per_instance: df.to_csv(f'{model_path}/f{foldidx}.{pred_set}.pred.eval.csv', float_format='%.15f')
+            df_mean.to_csv(f'{model_path}/f{foldidx}.{pred_set}.pred.eval.mean.csv')
+            fold_mean = pd.concat([fold_mean, df_mean], axis=1)
+        #the last row is a list of roc values
+        fold_mean.iloc[:-1].mean(axis=1).to_csv(f'{model_path}/{pred_set}.pred.eval.mean.csv')
 
-            auc, fpr, tpr = calculate_auc_roc(Y, Y_)
-            aucs[pred_set].append((auc))
-            with open(f"{model_path}/f{foldidx}.{pred_set}.fpr_tpr.pkl", 'wb') as outfile:
-                pickle.dump((fpr, tpr), outfile)
-
-            for metric, df, df_mean in calculate_ranking_metrics(Y, Y_):
-                df.to_csv(f'{model_path}/{metric}.f{foldidx}.{pred_set}.pred.eval.csv', float_format='%.15f')
-                df_mean.to_csv(f'{model_path}/{metric}.f{foldidx}.{pred_set}.pred.eval.mean.csv')
-                dfs[metric].append(df_mean)
-            # for metric in metrics:
-            #     df, df_mean = calculate_ranking_metrics(Y, Y_, metric)
-            #     df.to_csv(f'{model_path}/{metric}.f{foldidx}.{pred_set}.pred.eval.csv', float_format='%.15f')
-            #     df_mean.to_csv(f'{model_path}/{metric}.f{foldidx}.{pred_set}.pred.eval.mean.csv')
-            #     dfs[metric].append(df_mean)
-    for metric in metrics:
-        pd.concat(dfs[metric], axis=1).mean(axis=1).to_csv(f'{model_path}/{metric}.mean.csv')
-    auc_mean = {}
-    for pred_set, aucs_list in aucs.items():
-        mean_met = f'{pred_set}_mean'
-        var_met = f'{pred_set}_var'
-        auc_mean[mean_met] = sum(aucs_list)/len(aucs_list)
-        auc_mean[var_met] = np.var(aucs_list)
-
-    with open(f"{model_path}/aucs.json", 'w') as outfile:
-        json.dump(auc_mean, outfile)
 
 def plot_roc(model_path, splits, on_train_valid_set=False):
-    colors = ['deeppink', 'royalblue', 'darkviolet', 'aqua', 'darkorange', 'maroon', 'chocolate']
     for pred_set in (['test', 'train', 'valid'] if on_train_valid_set else ['test']):
         plt.figure()
         for foldidx in splits['folds'].keys():
-            # Plot the roc curves
-            with open(f"{model_path}/f{foldidx}.{pred_set}.fpr_tpr.pkl", 'rb') as infile:
-                fpr, tpr = pickle.load(infile)
-            plt.plot(fpr, tpr, label='micro-average ROC curve #{:.0f} of {} set'.format(foldidx, pred_set), color=colors[foldidx], linestyle=':', linewidth=4)
+            fpr, tpr = eval(pd.read_csv(f'{model_path}/f{foldidx}.{pred_set}.pred.eval.mean.csv', index_col=0).loc['roc'][0].replace('array', 'np.array'))
+            plt.plot(fpr, tpr, label=f'micro-average fold{foldidx} on {pred_set} set', linestyle=':', linewidth=4)
 
-        plt.xlabel('False positive rate')
-        plt.ylabel('True positive rate')
+        plt.xlabel('false positive rate')
+        plt.ylabel('true positive rate')
         plt.title(f'ROC curves for {pred_set} set')
         plt.legend()
-        plt.savefig(f'{model_path}/{pred_set}.roc_curves.png', dpi=100, bbox_inches='tight')
+        plt.savefig(f'{model_path}/{pred_set}.roc.png', dpi=100, bbox_inches='tight')
         plt.show()
 
 def main(splits, vecs, indexes, output, settings, cmd):
@@ -268,6 +245,6 @@ def main(splits, vecs, indexes, output, settings, cmd):
     if not os.path.isdir(output): os.makedirs(output)
 
     if 'train' in cmd: learn(splits, indexes, vecs, settings, output)
-    if 'test' in cmd: test(FNN, output, splits, indexes, vecs, settings, on_train_valid_set=False)
-    if 'eval' in cmd: eval(output, splits, vecs, on_train_valid_set=False)
-    if 'plot' in cmd: plot_roc(output, splits, on_train_valid_set=False)
+    if 'test' in cmd: test(FNN, output, splits, indexes, vecs, settings, on_train_valid_set=True)
+    if 'eval' in cmd: evaluate(output, splits, vecs, on_train_valid_set=True, per_instance=True)
+    if 'plot' in cmd: plot_roc(output, splits, on_train_valid_set=True)
