@@ -26,7 +26,7 @@ settings = {
                 'w': 1 #cooccurrence window
             }
         },
-        'cmd': ['test', 'eval', 'plot'],  # 'train', 'test', 'eval'
+        'cmd': ['train', 'test', 'eval', 'plot'],  # 'train', 'test', 'eval'
         'nfolds': 5,
         'train_test_split': 0.85
     },

@@ -1,6 +1,7 @@
 import pandas as pd
 from time import time
 from tqdm import tqdm
+import pickle
 
 from cmn.team import Team
 from cmn.inventor import Inventor
@@ -95,55 +96,23 @@ class Patent(Team):
             return super(Patent, Patent).read_data(teams, output, filter, settings)
 
     @classmethod
-    def get_stats(cls, teams, output, plot=False):
-        # super().get_stats()
-        # stats = {}
-        # city = {};
-        # state = {};
-        # country = {}
-        # geo_loc = [city, state, country]
-        # loc_pat = {}
-        # city_mem = {};
-        # state_mem = {};
-        # country_mem = {}
-        # with open(teams, 'rb') as infile:
-        #     pat_details_all = pickle.load(infile)
-        #     for key in pat_details_all.keys():
-        #         loc = pat_details_all[key].members_details[0:]
-        #         for item in loc:
-        #             city[key], state[key], country[key] = item
-        #     for loc_dict in geo_loc:
-        #         new_dict = {}
-        #         for k, v in loc_dict.items():
-        #             if v in new_dict.keys():
-        #                 new_dict[v].append(k)
-        #             else:
-        #                 new_dict[v] = [k]
-        #         loc_pat.update(new_dict)
-        #     for k, v in loc_pat.items():
-        #         loc_pat[k] = len(v)
-        # stats['patents_over_location'] = loc_pat
-        # max_records = pat_details['id'].shape[0]
-        # for i in range(0, max_records):
-        #     id = pat_details['id'][i].astype(int).toarray()[0][0].tolist()
-        #     loc = pat_details_all[f'{id}'].members_details[0:]
-        #     for loc_i in loc:
-        #         city_name, state_name, country_name = loc_i
-        #
-        #         if city_name in city_mem.keys():
-        #             city_mem[city_name] = city_mem[city_name] + 1
-        #         else:
-        #             city_mem[city_name] = 1
-        #         if state_name in state_mem.keys():
-        #             state_mem[state_name] = state_mem[state_name] + 1
-        #         else:
-        #             state_mem[state_name] = 1
-        #         if country_name in country_mem.keys():
-        #             country_mem[country_name] = country_mem[country_name] + 1
-        #         else:
-        #             country_mem[country_name] = 1
-        #
-        # stats['number_of_inventors_per_city'] = city_mem
-        # stats['number_of_inventors_per_state'] = state_mem
-        # stats['number_of_inventors_per_country'] = country_mem
-        pass
+    def get_stats(cls, teams, teamsvecs, output, plot=False):
+        try:
+            print("Loading the stats pickle ...")
+            with open(f'{output}/stats.pkl', 'rb') as infile:
+                stats = pickle.load(infile)
+                if plot: Team.plot_stats(stats, output)
+                return stats
+
+        except FileNotFoundError:
+            stats = {}
+            stats.update(super().get_stats(teamsvecs, output, plot))
+
+            # dic[patent.country] +=1
+            # dic[patent.country, skill] +=1
+
+            # dict[inventor.country] +=1 over inventors' locations
+
+            # inventors' location != patent.location
+
+            return stats
