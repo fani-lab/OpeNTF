@@ -1,0 +1,1255 @@
+Loading sparse matrices from ./../data/preprocessed/dblp/toy.dblp.v12.json/teamsvecs.pkl ...
+Loading indexes pickle from ./../data/preprocessed/dblp/toy.dblp.v12.json/indexes.pkl ...
+It took 0.000997304916381836 seconds to load from the pickles.
+It took 0.000997304916381836 seconds to load the sparse matrices.
+Loading the skill embedding pickle ...
+File not found! Learning skillemb.d100.w1.dm1 embeddings from scratch ...
+Loading the skill documents pickle ...
+  0%|          | 0/100 [00:00<?, ?it/s]  6%|6         | 6/100 [00:00<00:01, 57.84it/s] 12%|#2        | 12/100 [00:00<00:01, 58.51it/s] 19%|#9        | 19/100 [00:00<00:01, 59.23it/s] 25%|##5       | 25/100 [00:00<00:01, 59.14it/s] 31%|###1      | 31/100 [00:00<00:01, 59.29it/s] 37%|###7      | 37/100 [00:00<00:01, 59.18it/s] 43%|####3     | 43/100 [00:00<00:00, 58.93it/s] 49%|####9     | 49/100 [00:00<00:00, 58.95it/s] 55%|#####5    | 55/100 [00:00<00:00, 58.96it/s] 61%|######1   | 61/100 [00:01<00:00, 58.87it/s] 67%|######7   | 67/100 [00:01<00:00, 58.91it/s] 73%|#######3  | 73/100 [00:01<00:00, 59.11it/s] 80%|########  | 80/100 [00:01<00:00, 59.57it/s] 86%|########6 | 86/100 [00:01<00:00, 59.31it/s] 93%|#########3| 93/100 [00:01<00:00, 59.53it/s]100%|##########| 100/100 [00:01<00:00, 59.68it/s]100%|##########| 100/100 [00:01<00:00, 59.22it/s]
+Saving model for skillemb.d100.w1.dm1 under directory ./../data/preprocessed/dblp/toy.dblp.v12.json ...
+Fold 0/2, Epoch 0/99, Minibatch 0/0, Phase train, Running Loss train 2832.861328125, Time 0.004986286163330078, Overall 0.005983591079711914 
+Fold 0/2, Epoch 0/99, Running Loss train 177.0538330078125, Time 0.004986286163330078, Overall 0.005983591079711914 
+Fold 0/2, Epoch 0/99, Minibatch 0/0, Phase valid, Running Loss valid 1883.3868408203125, Time 0.005983829498291016, Overall 0.0069811344146728516 
+Fold 0/2, Epoch 0/99, Running Loss valid 209.26520453559027, Time 0.005983829498291016, Overall 0.0069811344146728516 
+Fold 0/2, Epoch 1/99, Minibatch 0/0, Phase train, Running Loss train 6221.91259765625, Time 0.008976221084594727, Overall 0.010970830917358398 
+Fold 0/2, Epoch 1/99, Running Loss train 388.8695373535156, Time 0.009973526000976562, Overall 0.010970830917358398 
+Fold 0/2, Epoch 1/99, Minibatch 0/0, Phase valid, Running Loss valid 7001.4033203125, Time 0.010970592498779297, Overall 0.011967897415161133 
+Fold 0/2, Epoch 1/99, Running Loss valid 777.9337022569445, Time 0.010970592498779297, Overall 0.011967897415161133 
+Fold 0/2, Epoch 2/99, Minibatch 0/0, Phase train, Running Loss train 20470.3515625, Time 0.013962745666503906, Overall 0.014960050582885742 
+Fold 0/2, Epoch 2/99, Running Loss train 1279.39697265625, Time 0.013962745666503906, Overall 0.014960050582885742 
+Fold 0/2, Epoch 2/99, Minibatch 0/0, Phase valid, Running Loss valid 3294.18017578125, Time 0.01495981216430664, Overall 0.015957117080688477 
+Fold 0/2, Epoch 2/99, Running Loss valid 366.02001953125, Time 0.01495981216430664, Overall 0.015957117080688477 
+Fold 0/2, Epoch 3/99, Minibatch 0/0, Phase train, Running Loss train 9881.7109375, Time 0.01795220375061035, Overall 0.018949508666992188 
+Fold 0/2, Epoch 3/99, Running Loss train 617.60693359375, Time 0.01795220375061035, Overall 0.018949508666992188 
+Fold 0/2, Epoch 3/99, Minibatch 0/0, Phase valid, Running Loss valid 1777.92041015625, Time 0.018949270248413086, Overall 0.019946575164794922 
+Fold 0/2, Epoch 3/99, Running Loss valid 197.54671223958334, Time 0.018949270248413086, Overall 0.019946575164794922 
+Fold 0/2, Epoch 4/99, Minibatch 0/0, Phase train, Running Loss train 5470.2158203125, Time 0.021941423416137695, Overall 0.02293872833251953 
+Fold 0/2, Epoch 4/99, Running Loss train 341.88848876953125, Time 0.021941423416137695, Overall 0.02293872833251953 
+Fold 0/2, Epoch 4/99, Minibatch 0/0, Phase valid, Running Loss valid 1786.701171875, Time 0.022938966751098633, Overall 0.02393627166748047 
+Fold 0/2, Epoch 4/99, Running Loss valid 198.52235243055554, Time 0.022938966751098633, Overall 0.02393627166748047 
+Fold 0/2, Epoch 5/99, Minibatch 0/0, Phase train, Running Loss train 7036.48779296875, Time 0.02593088150024414, Overall 0.026928186416625977 
+Fold 0/2, Epoch 5/99, Running Loss train 439.7804870605469, Time 0.02593088150024414, Overall 0.026928186416625977 
+Fold 0/2, Epoch 5/99, Minibatch 0/0, Phase valid, Running Loss valid 1190.0474853515625, Time 0.026936054229736328, Overall 0.027933359146118164 
+Fold 0/2, Epoch 5/99, Running Loss valid 132.22749837239584, Time 0.026936054229736328, Overall 0.027933359146118164 
+Fold 0/2, Epoch 6/99, Minibatch 0/0, Phase train, Running Loss train 4546.5673828125, Time 0.028930187225341797, Overall 0.029927492141723633 
+Fold 0/2, Epoch 6/99, Running Loss train 284.16046142578125, Time 0.028930187225341797, Overall 0.029927492141723633 
+Fold 0/2, Epoch 6/99, Minibatch 0/0, Phase valid, Running Loss valid 1028.0841064453125, Time 0.030917882919311523, Overall 0.03191518783569336 
+Fold 0/2, Epoch 6/99, Running Loss valid 114.2315673828125, Time 0.030917882919311523, Overall 0.03191518783569336 
+Fold 0/2, Epoch 7/99, Minibatch 0/0, Phase train, Running Loss train 3611.94775390625, Time 0.03390955924987793, Overall 0.034906864166259766 
+Fold 0/2, Epoch 7/99, Running Loss train 225.74673461914062, Time 0.03390955924987793, Overall 0.034906864166259766 
+Fold 0/2, Epoch 7/99, Minibatch 0/0, Phase valid, Running Loss valid 867.9580688476562, Time 0.034906625747680664, Overall 0.0359039306640625 
+Fold 0/2, Epoch 7/99, Running Loss valid 96.43978542751736, Time 0.034906625747680664, Overall 0.0359039306640625 
+Fold 0/2, Epoch 8/99, Minibatch 0/0, Phase train, Running Loss train 3329.658935546875, Time 0.037899017333984375, Overall 0.03889632225036621 
+Fold 0/2, Epoch 8/99, Running Loss train 208.1036834716797, Time 0.037899017333984375, Overall 0.03889632225036621 
+Fold 0/2, Epoch 8/99, Minibatch 0/0, Phase valid, Running Loss valid 788.2017822265625, Time 0.03889584541320801, Overall 0.039893150329589844 
+Fold 0/2, Epoch 8/99, Running Loss valid 87.57797580295139, Time 0.03889584541320801, Overall 0.039893150329589844 
+Fold 0/2, Epoch 9/99, Minibatch 0/0, Phase train, Running Loss train 2764.41552734375, Time 0.04089093208312988, Overall 0.04188823699951172 
+Fold 0/2, Epoch 9/99, Running Loss train 172.77597045898438, Time 0.04188823699951172, Overall 0.042885541915893555 
+Fold 0/2, Epoch 9/99, Minibatch 0/0, Phase valid, Running Loss valid 816.511474609375, Time 0.04288530349731445, Overall 0.04388260841369629 
+Fold 0/2, Epoch 9/99, Running Loss valid 90.72349717881944, Time 0.04288530349731445, Overall 0.04388260841369629 
+Fold 0/2, Epoch 10/99, Minibatch 0/0, Phase train, Running Loss train 2730.77099609375, Time 0.04587745666503906, Overall 0.0468747615814209 
+Fold 0/2, Epoch 10/99, Running Loss train 170.67318725585938, Time 0.04587745666503906, Overall 0.0468747615814209 
+Fold 0/2, Epoch 10/99, Minibatch 0/0, Phase valid, Running Loss valid 854.2125854492188, Time 0.0468745231628418, Overall 0.04787182807922363 
+Fold 0/2, Epoch 10/99, Running Loss valid 94.91250949435764, Time 0.0468745231628418, Overall 0.04787182807922363 
+Fold 0/2, Epoch 11/99, Minibatch 0/0, Phase train, Running Loss train 2768.93701171875, Time 0.04986691474914551, Overall 0.050864219665527344 
+Fold 0/2, Epoch 11/99, Running Loss train 173.05856323242188, Time 0.04986691474914551, Overall 0.050864219665527344 
+Fold 0/2, Epoch 11/99, Minibatch 0/0, Phase valid, Running Loss valid 826.6156616210938, Time 0.050864458084106445, Overall 0.05186176300048828 
+Fold 0/2, Epoch 11/99, Running Loss valid 91.84618462456598, Time 0.050864458084106445, Overall 0.05186176300048828 
+Fold 0/2, Epoch 12/99, Minibatch 0/0, Phase train, Running Loss train 2586.35400390625, Time 0.05385613441467285, Overall 0.05485343933105469 
+Fold 0/2, Epoch 12/99, Running Loss train 161.64712524414062, Time 0.05385613441467285, Overall 0.05485343933105469 
+Fold 0/2, Epoch 12/99, Minibatch 0/0, Phase valid, Running Loss valid 818.8848876953125, Time 0.05485343933105469, Overall 0.05585074424743652 
+Fold 0/2, Epoch 12/99, Running Loss valid 90.98720974392361, Time 0.05485343933105469, Overall 0.05585074424743652 
+Fold 0/2, Epoch 13/99, Minibatch 0/0, Phase train, Running Loss train 2618.999755859375, Time 0.0578455924987793, Overall 0.05884289741516113 
+Fold 0/2, Epoch 13/99, Running Loss train 163.68748474121094, Time 0.0578455924987793, Overall 0.05884289741516113 
+Fold 0/2, Epoch 13/99, Minibatch 0/0, Phase valid, Running Loss valid 794.1404418945312, Time 0.05984020233154297, Overall 0.060837507247924805 
+Fold 0/2, Epoch 13/99, Running Loss valid 88.23782687717014, Time 0.05984020233154297, Overall 0.060837507247924805 
+Fold 0/2, Epoch 14/99, Minibatch 0/0, Phase train, Running Loss train 2575.970947265625, Time 0.06283235549926758, Overall 0.06382966041564941 
+Fold 0/2, Epoch 14/99, Running Loss train 160.99818420410156, Time 0.06283235549926758, Overall 0.06382966041564941 
+Fold 0/2, Epoch 14/99, Minibatch 0/0, Phase valid, Running Loss valid 773.4031372070312, Time 0.06382942199707031, Overall 0.06482672691345215 
+Fold 0/2, Epoch 14/99, Running Loss valid 85.93368191189236, Time 0.06382942199707031, Overall 0.06482672691345215 
+Fold 0/2, Epoch 15/99, Minibatch 0/0, Phase train, Running Loss train 2568.77734375, Time 0.06682157516479492, Overall 0.06781888008117676 
+Fold 0/2, Epoch 15/99, Running Loss train 160.548583984375, Time 0.06682157516479492, Overall 0.06781888008117676 
+Fold 0/2, Epoch 15/99, Minibatch 0/0, Phase valid, Running Loss valid 770.0924682617188, Time 0.06781864166259766, Overall 0.06881594657897949 
+Fold 0/2, Epoch 15/99, Running Loss valid 85.56582980685764, Time 0.06781864166259766, Overall 0.06881594657897949 
+Fold 0/2, Epoch 16/99, Minibatch 0/0, Phase train, Running Loss train 2566.9130859375, Time 0.07081079483032227, Overall 0.0718080997467041 
+Fold 0/2, Epoch 16/99, Running Loss train 160.43206787109375, Time 0.07081079483032227, Overall 0.0718080997467041 
+Fold 0/2, Epoch 16/99, Minibatch 0/0, Phase valid, Running Loss valid 777.60302734375, Time 0.0718088150024414, Overall 0.07280611991882324 
+Fold 0/2, Epoch 16/99, Running Loss valid 86.40033637152777, Time 0.07280564308166504, Overall 0.07380294799804688 
+Fold 0/2, Epoch 17/99, Minibatch 0/0, Phase train, Running Loss train 2560.14501953125, Time 0.07579755783081055, Overall 0.07679486274719238 
+Fold 0/2, Epoch 17/99, Running Loss train 160.00906372070312, Time 0.07579755783081055, Overall 0.07679486274719238 
+Fold 0/2, Epoch 17/99, Minibatch 0/0, Phase valid, Running Loss valid 777.5977783203125, Time 0.07679486274719238, Overall 0.07779216766357422 
+Fold 0/2, Epoch 17/99, Running Loss valid 86.39975314670139, Time 0.07679486274719238, Overall 0.07779216766357422 
+Fold 0/2, Epoch 18/99, Minibatch 0/0, Phase train, Running Loss train 2508.89794921875, Time 0.0797872543334961, Overall 0.08078455924987793 
+Fold 0/2, Epoch 18/99, Running Loss train 156.80612182617188, Time 0.0797872543334961, Overall 0.08078455924987793 
+Fold 0/2, Epoch 18/99, Minibatch 0/0, Phase valid, Running Loss valid 771.327880859375, Time 0.08078432083129883, Overall 0.08178162574768066 
+Fold 0/2, Epoch 18/99, Running Loss valid 85.70309787326389, Time 0.08078432083129883, Overall 0.08178162574768066 
+Fold 0/2, Epoch 19/99, Minibatch 0/0, Phase train, Running Loss train 2563.550048828125, Time 0.08377623558044434, Overall 0.08477354049682617 
+Fold 0/2, Epoch 19/99, Running Loss train 160.2218780517578, Time 0.08377623558044434, Overall 0.08477354049682617 
+Fold 0/2, Epoch 19/99, Minibatch 0/0, Phase valid, Running Loss valid 765.0696411132812, Time 0.08478140830993652, Overall 0.08577871322631836 
+Fold 0/2, Epoch 19/99, Running Loss valid 85.00773790147569, Time 0.08478140830993652, Overall 0.08577871322631836 
+Fold 0/2, Epoch 20/99, Minibatch 0/0, Phase train, Running Loss train 2496.8076171875, Time 0.08776569366455078, Overall 0.08876299858093262 
+Fold 0/2, Epoch 20/99, Running Loss train 156.05047607421875, Time 0.08776569366455078, Overall 0.08876299858093262 
+Fold 0/2, Epoch 20/99, Minibatch 0/0, Phase valid, Running Loss valid 770.4591674804688, Time 0.08876323699951172, Overall 0.08976054191589355 
+Fold 0/2, Epoch 20/99, Running Loss valid 85.60657416449652, Time 0.08876323699951172, Overall 0.08976054191589355 
+Fold 0/2, Epoch 21/99, Minibatch 0/0, Phase train, Running Loss train 2485.865966796875, Time 0.09075784683227539, Overall 0.09175515174865723 
+Fold 0/2, Epoch 21/99, Running Loss train 155.3666229248047, Time 0.09075784683227539, Overall 0.09175515174865723 
+Fold 0/2, Epoch 21/99, Minibatch 0/0, Phase valid, Running Loss valid 775.2869262695312, Time 0.09175515174865723, Overall 0.09275245666503906 
+Fold 0/2, Epoch 21/99, Running Loss valid 86.14299180772569, Time 0.09175515174865723, Overall 0.09275245666503906 
+Fold 0/2, Epoch 22/99, Minibatch 0/0, Phase train, Running Loss train 2498.2216796875, Time 0.09474682807922363, Overall 0.09574413299560547 
+Fold 0/2, Epoch 22/99, Running Loss train 156.13885498046875, Time 0.09474682807922363, Overall 0.09574413299560547 
+Fold 0/2, Epoch 22/99, Minibatch 0/0, Phase valid, Running Loss valid 774.1522216796875, Time 0.09574460983276367, Overall 0.09674191474914551 
+Fold 0/2, Epoch 22/99, Running Loss valid 86.01691351996527, Time 0.09574460983276367, Overall 0.09674191474914551 
+Fold 0/2, Epoch 23/99, Minibatch 0/0, Phase train, Running Loss train 2502.05615234375, Time 0.09773898124694824, Overall 0.09873628616333008 
+Fold 0/2, Epoch 23/99, Running Loss train 156.37850952148438, Time 0.09873628616333008, Overall 0.09973359107971191 
+Fold 0/2, Epoch 23/99, Minibatch 0/0, Phase valid, Running Loss valid 770.4934692382812, Time 0.09873628616333008, Overall 0.09973359107971191 
+Fold 0/2, Epoch 23/99, Running Loss valid 85.61038547092014, Time 0.09873628616333008, Overall 0.09973359107971191 
+Fold 0/2, Epoch 24/99, Minibatch 0/0, Phase train, Running Loss train 2496.18359375, Time 0.10172843933105469, Overall 0.10272574424743652 
+Fold 0/2, Epoch 24/99, Running Loss train 156.011474609375, Time 0.10172843933105469, Overall 0.10272574424743652 
+Fold 0/2, Epoch 24/99, Minibatch 0/0, Phase valid, Running Loss valid 769.5496826171875, Time 0.10272598266601562, Overall 0.10372328758239746 
+Fold 0/2, Epoch 24/99, Running Loss valid 85.50552029079861, Time 0.10272598266601562, Overall 0.10372328758239746 
+Fold 0/2, Epoch 25/99, Minibatch 0/0, Phase train, Running Loss train 2479.639404296875, Time 0.1047205924987793, Overall 0.10571789741516113 
+Fold 0/2, Epoch 25/99, Running Loss train 154.9774627685547, Time 0.10571765899658203, Overall 0.10671496391296387 
+Fold 0/2, Epoch 25/99, Minibatch 0/0, Phase valid, Running Loss valid 770.1118774414062, Time 0.10571765899658203, Overall 0.10671496391296387 
+Fold 0/2, Epoch 25/99, Running Loss valid 85.56798638237848, Time 0.10671544075012207, Overall 0.1077127456665039 
+Fold 0/2, Epoch 26/99, Minibatch 0/0, Phase train, Running Loss train 2479.664794921875, Time 0.10870981216430664, Overall 0.10970711708068848 
+Fold 0/2, Epoch 26/99, Running Loss train 154.9790496826172, Time 0.10870981216430664, Overall 0.10970711708068848 
+Fold 0/2, Epoch 26/99, Minibatch 0/0, Phase valid, Running Loss valid 770.37548828125, Time 0.10970735549926758, Overall 0.11070466041564941 
+Fold 0/2, Epoch 26/99, Running Loss valid 85.59727647569444, Time 0.10970735549926758, Overall 0.11070466041564941 
+Fold 0/2, Epoch 27/99, Minibatch 0/0, Phase train, Running Loss train 2463.47900390625, Time 0.11269927024841309, Overall 0.11369657516479492 
+Fold 0/2, Epoch 27/99, Running Loss train 153.96743774414062, Time 0.11269927024841309, Overall 0.11369657516479492 
+Fold 0/2, Epoch 27/99, Minibatch 0/0, Phase valid, Running Loss valid 769.8414306640625, Time 0.11369657516479492, Overall 0.11469388008117676 
+Fold 0/2, Epoch 27/99, Running Loss valid 85.53793674045139, Time 0.11369657516479492, Overall 0.11469388008117676 
+Fold 0/2, Epoch 28/99, Minibatch 0/0, Phase train, Running Loss train 2502.51611328125, Time 0.11569094657897949, Overall 0.11668825149536133 
+Fold 0/2, Epoch 28/99, Running Loss train 156.40725708007812, Time 0.11569094657897949, Overall 0.11668825149536133 
+Fold 0/2, Epoch 28/99, Minibatch 0/0, Phase valid, Running Loss valid 767.9939575195312, Time 0.11668872833251953, Overall 0.11768603324890137 
+Fold 0/2, Epoch 28/99, Running Loss valid 85.33266194661458, Time 0.11668872833251953, Overall 0.11768603324890137 
+Fold 0/2, Epoch 29/99, Minibatch 0/0, Phase train, Running Loss train 2479.263671875, Time 0.11968040466308594, Overall 0.12067770957946777 
+Fold 0/2, Epoch 29/99, Running Loss train 154.9539794921875, Time 0.11968040466308594, Overall 0.12067770957946777 
+Fold 0/2, Epoch 29/99, Minibatch 0/0, Phase valid, Running Loss valid 765.85400390625, Time 0.12067747116088867, Overall 0.12167477607727051 
+Fold 0/2, Epoch 29/99, Running Loss valid 85.09488932291667, Time 0.12067747116088867, Overall 0.12167477607727051 
+Fold 0/2, Epoch 30/99, Minibatch 0/0, Phase train, Running Loss train 2474.22607421875, Time 0.12267231941223145, Overall 0.12366962432861328 
+Fold 0/2, Epoch 30/99, Running Loss train 154.63912963867188, Time 0.12267231941223145, Overall 0.12366962432861328 
+Fold 0/2, Epoch 30/99, Minibatch 0/0, Phase valid, Running Loss valid 764.005126953125, Time 0.12367391586303711, Overall 0.12467122077941895 
+Fold 0/2, Epoch 30/99, Running Loss valid 84.88945855034723, Time 0.12367391586303711, Overall 0.12467122077941895 
+Fold 0/2, Epoch 31/99, Minibatch 0/0, Phase train, Running Loss train 2484.449951171875, Time 0.1266617774963379, Overall 0.12765908241271973 
+Fold 0/2, Epoch 31/99, Running Loss train 155.2781219482422, Time 0.1266617774963379, Overall 0.12765908241271973 
+Fold 0/2, Epoch 31/99, Minibatch 0/0, Phase valid, Running Loss valid 763.2078857421875, Time 0.12766146659851074, Overall 0.12865877151489258 
+Fold 0/2, Epoch 31/99, Running Loss valid 84.80087619357639, Time 0.12766146659851074, Overall 0.12865877151489258 
+Fold 0/2, Epoch 32/99, Minibatch 0/0, Phase train, Running Loss train 2480.50927734375, Time 0.1296536922454834, Overall 0.13065099716186523 
+Fold 0/2, Epoch 32/99, Running Loss train 155.03182983398438, Time 0.1296536922454834, Overall 0.13065099716186523 
+Fold 0/2, Epoch 32/99, Minibatch 0/0, Phase valid, Running Loss valid 763.9161987304688, Time 0.13065123558044434, Overall 0.13164854049682617 
+Fold 0/2, Epoch 32/99, Running Loss valid 84.87957763671875, Time 0.13065123558044434, Overall 0.13164854049682617 
+Fold 0/2, Epoch 33/99, Minibatch 0/0, Phase train, Running Loss train 2495.220947265625, Time 0.13364291191101074, Overall 0.13464021682739258 
+Fold 0/2, Epoch 33/99, Running Loss train 155.95130920410156, Time 0.13364291191101074, Overall 0.13464021682739258 
+Fold 0/2, Epoch 33/99, Minibatch 0/0, Phase valid, Running Loss valid 765.7662963867188, Time 0.13464021682739258, Overall 0.13563752174377441 
+Fold 0/2, Epoch 33/99, Running Loss valid 85.08514404296875, Time 0.13464021682739258, Overall 0.13563752174377441 
+Fold 0/2, Epoch 34/99, Minibatch 0/0, Phase train, Running Loss train 2482.176025390625, Time 0.1376326084136963, Overall 0.13862991333007812 
+Fold 0/2, Epoch 34/99, Running Loss train 155.13600158691406, Time 0.1376326084136963, Overall 0.13862991333007812 
+Fold 0/2, Epoch 34/99, Minibatch 0/0, Phase valid, Running Loss valid 767.81103515625, Time 0.13862943649291992, Overall 0.13962674140930176 
+Fold 0/2, Epoch 34/99, Running Loss valid 85.31233723958333, Time 0.13862943649291992, Overall 0.13962674140930176 
+Fold 0/2, Epoch 35/99, Minibatch 0/0, Phase train, Running Loss train 2483.58935546875, Time 0.1406242847442627, Overall 0.14162158966064453 
+Fold 0/2, Epoch 35/99, Running Loss train 155.22433471679688, Time 0.1406242847442627, Overall 0.14162158966064453 
+Fold 0/2, Epoch 35/99, Minibatch 0/0, Phase valid, Running Loss valid 770.763427734375, Time 0.14261937141418457, Overall 0.1436166763305664 
+Fold 0/2, Epoch 35/99, Running Loss valid 85.640380859375, Time 0.14261937141418457, Overall 0.1436166763305664 
+Fold 0/2, Epoch 36/99, Minibatch 0/0, Phase train, Running Loss train 2494.37255859375, Time 0.14461350440979004, Overall 0.14561080932617188 
+Fold 0/2, Epoch 36/99, Running Loss train 155.89828491210938, Time 0.14461350440979004, Overall 0.14561080932617188 
+Fold 0/2, Epoch 36/99, Minibatch 0/0, Phase valid, Running Loss valid 771.9266357421875, Time 0.14561104774475098, Overall 0.1466083526611328 
+Fold 0/2, Epoch 36/99, Running Loss valid 85.76962619357639, Time 0.14561104774475098, Overall 0.1466083526611328 
+Fold 0/2, Epoch 37/99, Minibatch 0/0, Phase train, Running Loss train 2494.345703125, Time 0.14860320091247559, Overall 0.14960050582885742 
+Fold 0/2, Epoch 37/99, Running Loss train 155.8966064453125, Time 0.14860320091247559, Overall 0.14960050582885742 
+Fold 0/2, Epoch 37/99, Minibatch 0/0, Phase valid, Running Loss valid 772.2935180664062, Time 0.14960050582885742, Overall 0.15059781074523926 
+Fold 0/2, Epoch 37/99, Running Loss valid 85.81039089626736, Time 0.14960050582885742, Overall 0.15059781074523926 
+Fold 0/2, Epoch 38/99, Minibatch 0/0, Phase train, Running Loss train 2477.470947265625, Time 0.15259242057800293, Overall 0.15358972549438477 
+Fold 0/2, Epoch 38/99, Running Loss train 154.84193420410156, Time 0.15259242057800293, Overall 0.15358972549438477 
+Fold 0/2, Epoch 38/99, Minibatch 0/0, Phase valid, Running Loss valid 770.9306030273438, Time 0.15359020233154297, Overall 0.1545875072479248 
+Fold 0/2, Epoch 38/99, Running Loss valid 85.65895589192708, Time 0.15359020233154297, Overall 0.1545875072479248 
+Fold 0/2, Epoch 39/99, Minibatch 0/0, Phase train, Running Loss train 2490.755126953125, Time 0.15658164024353027, Overall 0.1575789451599121 
+Fold 0/2, Epoch 39/99, Running Loss train 155.6721954345703, Time 0.15658164024353027, Overall 0.1575789451599121 
+Fold 0/2, Epoch 39/99, Minibatch 0/0, Phase valid, Running Loss valid 768.7192993164062, Time 0.1575791835784912, Overall 0.15857648849487305 
+Fold 0/2, Epoch 39/99, Running Loss valid 85.41325547960069, Time 0.1575791835784912, Overall 0.15857648849487305 
+Fold 0/2, Epoch 40/99, Minibatch 0/0, Phase train, Running Loss train 2474.430419921875, Time 0.16057109832763672, Overall 0.16156840324401855 
+Fold 0/2, Epoch 40/99, Running Loss train 154.6519012451172, Time 0.16057109832763672, Overall 0.16156840324401855 
+Fold 0/2, Epoch 40/99, Minibatch 0/0, Phase valid, Running Loss valid 766.5930786132812, Time 0.16156840324401855, Overall 0.1625657081604004 
+Fold 0/2, Epoch 40/99, Running Loss valid 85.17700873480902, Time 0.1625659465789795, Overall 0.16356325149536133 
+Fold 0/2, Epoch 41/99, Minibatch 0/0, Phase train, Running Loss train 2470.501953125, Time 0.16456031799316406, Overall 0.1655576229095459 
+Fold 0/2, Epoch 41/99, Running Loss train 154.4063720703125, Time 0.16456031799316406, Overall 0.1655576229095459 
+Fold 0/2, Epoch 41/99, Minibatch 0/0, Phase valid, Running Loss valid 763.9058837890625, Time 0.16655516624450684, Overall 0.16755247116088867 
+Fold 0/2, Epoch 41/99, Running Loss valid 84.87843153211806, Time 0.16655516624450684, Overall 0.16755247116088867 
+Fold 0/2, Epoch 42/99, Minibatch 0/0, Phase train, Running Loss train 2480.344482421875, Time 0.16954731941223145, Overall 0.17054462432861328 
+Fold 0/2, Epoch 42/99, Running Loss train 155.0215301513672, Time 0.16954731941223145, Overall 0.17054462432861328 
+Fold 0/2, Epoch 42/99, Minibatch 0/0, Phase valid, Running Loss valid 761.5651245117188, Time 0.17054438591003418, Overall 0.17154169082641602 
+Fold 0/2, Epoch 42/99, Running Loss valid 84.61834716796875, Time 0.17054438591003418, Overall 0.17154169082641602 
+Fold 0/2, Epoch 43/99, Minibatch 0/0, Phase train, Running Loss train 2466.1796875, Time 0.1735365390777588, Overall 0.17453384399414062 
+Fold 0/2, Epoch 43/99, Running Loss train 154.13623046875, Time 0.1735365390777588, Overall 0.17453384399414062 
+Fold 0/2, Epoch 43/99, Minibatch 0/0, Phase valid, Running Loss valid 759.2697143554688, Time 0.17453384399414062, Overall 0.17553114891052246 
+Fold 0/2, Epoch 43/99, Running Loss valid 84.36330159505208, Time 0.17453384399414062, Overall 0.17553114891052246 
+Fold 0/2, Epoch 44/99, Minibatch 0/0, Phase train, Running Loss train 2481.3681640625, Time 0.17754077911376953, Overall 0.17853808403015137 
+Fold 0/2, Epoch 44/99, Running Loss train 155.08551025390625, Time 0.17754077911376953, Overall 0.17853808403015137 
+Fold 0/2, Epoch 44/99, Minibatch 0/0, Phase valid, Running Loss valid 759.079833984375, Time 0.17852330207824707, Overall 0.1795206069946289 
+Fold 0/2, Epoch 44/99, Running Loss valid 84.34220377604167, Time 0.17852330207824707, Overall 0.1795206069946289 
+Fold 0/2, Epoch 45/99, Minibatch 0/0, Phase train, Running Loss train 2481.022705078125, Time 0.18152952194213867, Overall 0.1825268268585205 
+Fold 0/2, Epoch 45/99, Running Loss train 155.0639190673828, Time 0.18152952194213867, Overall 0.1825268268585205 
+Fold 0/2, Epoch 45/99, Minibatch 0/0, Phase valid, Running Loss valid 759.6070556640625, Time 0.18251299858093262, Overall 0.18351030349731445 
+Fold 0/2, Epoch 45/99, Running Loss valid 84.40078396267361, Time 0.18251299858093262, Overall 0.18351030349731445 
+Fold 0/2, Epoch 46/99, Minibatch 0/0, Phase train, Running Loss train 2499.134765625, Time 0.18550467491149902, Overall 0.18650197982788086 
+Fold 0/2, Epoch 46/99, Running Loss train 156.1959228515625, Time 0.18550467491149902, Overall 0.18650197982788086 
+Fold 0/2, Epoch 46/99, Minibatch 0/0, Phase valid, Running Loss valid 761.2495727539062, Time 0.18650221824645996, Overall 0.1874995231628418 
+Fold 0/2, Epoch 46/99, Running Loss valid 84.58328586154514, Time 0.18650221824645996, Overall 0.1874995231628418 
+Fold 0/2, Epoch 47/99, Minibatch 0/0, Phase train, Running Loss train 2445.799560546875, Time 0.18949437141418457, Overall 0.1904916763305664 
+Fold 0/2, Epoch 47/99, Running Loss train 152.8624725341797, Time 0.18949437141418457, Overall 0.1904916763305664 
+Fold 0/2, Epoch 47/99, Minibatch 0/0, Phase valid, Running Loss valid 763.6278686523438, Time 0.1904914379119873, Overall 0.19148874282836914 
+Fold 0/2, Epoch 47/99, Running Loss valid 84.84754096137152, Time 0.1904914379119873, Overall 0.19148874282836914 
+Fold 0/2, Epoch 48/99, Minibatch 0/0, Phase train, Running Loss train 2475.51123046875, Time 0.19348359107971191, Overall 0.19448089599609375 
+Fold 0/2, Epoch 48/99, Running Loss train 154.71945190429688, Time 0.19348359107971191, Overall 0.19448089599609375 
+Fold 0/2, Epoch 48/99, Minibatch 0/0, Phase valid, Running Loss valid 765.2203979492188, Time 0.19448089599609375, Overall 0.19547820091247559 
+Fold 0/2, Epoch 48/99, Running Loss valid 85.02448866102431, Time 0.19448089599609375, Overall 0.19547820091247559 
+Fold 0/2, Epoch 49/99, Minibatch 0/0, Phase train, Running Loss train 2467.105712890625, Time 0.19747304916381836, Overall 0.1984703540802002 
+Fold 0/2, Epoch 49/99, Running Loss train 154.19410705566406, Time 0.19747304916381836, Overall 0.1984703540802002 
+Fold 0/2, Epoch 49/99, Minibatch 0/0, Phase valid, Running Loss valid 766.1785278320312, Time 0.19946742057800293, Overall 0.20046472549438477 
+Fold 0/2, Epoch 49/99, Running Loss valid 85.13094753689236, Time 0.19946742057800293, Overall 0.20046472549438477 
+Fold 0/2, Epoch 50/99, Minibatch 0/0, Phase train, Running Loss train 2479.808349609375, Time 0.20245981216430664, Overall 0.20345711708068848 
+Fold 0/2, Epoch 50/99, Running Loss train 154.98802185058594, Time 0.20245981216430664, Overall 0.20345711708068848 
+Fold 0/2, Epoch 50/99, Minibatch 0/0, Phase valid, Running Loss valid 766.34814453125, Time 0.20345711708068848, Overall 0.2044544219970703 
+Fold 0/2, Epoch 50/99, Running Loss valid 85.14979383680556, Time 0.20345711708068848, Overall 0.2044544219970703 
+Fold 0/2, Epoch 51/99, Minibatch 0/0, Phase train, Running Loss train 2456.529296875, Time 0.20644879341125488, Overall 0.20744609832763672 
+Fold 0/2, Epoch 51/99, Running Loss train 153.5330810546875, Time 0.20644879341125488, Overall 0.20744609832763672 
+Fold 0/2, Epoch 51/99, Minibatch 0/0, Phase valid, Running Loss valid 766.7003784179688, Time 0.20744609832763672, Overall 0.20844340324401855 
+Fold 0/2, Epoch 51/99, Running Loss valid 85.18893093532986, Time 0.20744609832763672, Overall 0.20844340324401855 
+Fold 0/2, Epoch 52/99, Minibatch 0/0, Phase train, Running Loss train 2474.608154296875, Time 0.21043848991394043, Overall 0.21143579483032227 
+Fold 0/2, Epoch 52/99, Running Loss train 154.6630096435547, Time 0.21043848991394043, Overall 0.21143579483032227 
+Fold 0/2, Epoch 52/99, Minibatch 0/0, Phase valid, Running Loss valid 766.3564453125, Time 0.21143555641174316, Overall 0.212432861328125 
+Fold 0/2, Epoch 52/99, Running Loss valid 85.15071614583333, Time 0.21143555641174316, Overall 0.212432861328125 
+Fold 0/2, Epoch 53/99, Minibatch 0/0, Phase train, Running Loss train 2477.1806640625, Time 0.21442794799804688, Overall 0.2154252529144287 
+Fold 0/2, Epoch 53/99, Running Loss train 154.82379150390625, Time 0.21442794799804688, Overall 0.2154252529144287 
+Fold 0/2, Epoch 53/99, Minibatch 0/0, Phase valid, Running Loss valid 766.7681274414062, Time 0.2154250144958496, Overall 0.21642231941223145 
+Fold 0/2, Epoch 53/99, Running Loss valid 85.19645860460069, Time 0.2154250144958496, Overall 0.21642231941223145 
+Fold 0/2, Epoch 54/99, Minibatch 0/0, Phase train, Running Loss train 2460.659423828125, Time 0.21841692924499512, Overall 0.21941423416137695 
+Fold 0/2, Epoch 54/99, Running Loss train 153.7912139892578, Time 0.21841692924499512, Overall 0.21941423416137695 
+Fold 0/2, Epoch 54/99, Minibatch 0/0, Phase valid, Running Loss valid 766.5672607421875, Time 0.21941447257995605, Overall 0.2204117774963379 
+Fold 0/2, Epoch 54/99, Running Loss valid 85.17414008246527, Time 0.21941447257995605, Overall 0.2204117774963379 
+Fold 0/2, Epoch 55/99, Minibatch 0/0, Phase train, Running Loss train 2460.6748046875, Time 0.2234036922454834, Overall 0.22440099716186523 
+Fold 0/2, Epoch 55/99, Running Loss train 153.79217529296875, Time 0.2234036922454834, Overall 0.22440099716186523 
+Fold 0/2, Epoch 55/99, Minibatch 0/0, Phase valid, Running Loss valid 765.9603881835938, Time 0.22440099716186523, Overall 0.22539830207824707 
+Fold 0/2, Epoch 55/99, Running Loss valid 85.10670979817708, Time 0.22440099716186523, Overall 0.22539830207824707 
+Epoch    56: reducing learning rate of group 0 to 5.0000e-02.
+Fold 0/2, Epoch 56/99, Minibatch 0/0, Phase train, Running Loss train 2455.768798828125, Time 0.2274017333984375, Overall 0.22839903831481934 
+Fold 0/2, Epoch 56/99, Running Loss train 153.4855499267578, Time 0.2274017333984375, Overall 0.22839903831481934 
+Fold 0/2, Epoch 56/99, Minibatch 0/0, Phase valid, Running Loss valid 765.521484375, Time 0.22839045524597168, Overall 0.22938776016235352 
+Fold 0/2, Epoch 56/99, Running Loss valid 85.05794270833333, Time 0.22839045524597168, Overall 0.22938776016235352 
+Fold 0/2, Epoch 57/99, Minibatch 0/0, Phase train, Running Loss train 2463.427734375, Time 0.2313823699951172, Overall 0.23237967491149902 
+Fold 0/2, Epoch 57/99, Running Loss train 153.9642333984375, Time 0.2313823699951172, Overall 0.23237967491149902 
+Fold 0/2, Epoch 57/99, Minibatch 0/0, Phase valid, Running Loss valid 765.1856079101562, Time 0.23237943649291992, Overall 0.23337674140930176 
+Fold 0/2, Epoch 57/99, Running Loss valid 85.02062310112848, Time 0.23237943649291992, Overall 0.23337674140930176 
+Fold 0/2, Epoch 58/99, Minibatch 0/0, Phase train, Running Loss train 2497.911376953125, Time 0.2343740463256836, Overall 0.23537135124206543 
+Fold 0/2, Epoch 58/99, Running Loss train 156.1194610595703, Time 0.2343740463256836, Overall 0.23537135124206543 
+Fold 0/2, Epoch 58/99, Minibatch 0/0, Phase valid, Running Loss valid 764.7221069335938, Time 0.23537158966064453, Overall 0.23636889457702637 
+Fold 0/2, Epoch 58/99, Running Loss valid 84.96912299262152, Time 0.23537158966064453, Overall 0.23636889457702637 
+Fold 0/2, Epoch 59/99, Minibatch 0/0, Phase train, Running Loss train 2450.222412109375, Time 0.23836374282836914, Overall 0.23936104774475098 
+Fold 0/2, Epoch 59/99, Running Loss train 153.13890075683594, Time 0.23836374282836914, Overall 0.23936104774475098 
+Fold 0/2, Epoch 59/99, Minibatch 0/0, Phase valid, Running Loss valid 764.1881103515625, Time 0.23936080932617188, Overall 0.2403581142425537 
+Fold 0/2, Epoch 59/99, Running Loss valid 84.9097900390625, Time 0.23936080932617188, Overall 0.2403581142425537 
+Fold 0/2, Epoch 60/99, Minibatch 0/0, Phase train, Running Loss train 2466.336181640625, Time 0.24135541915893555, Overall 0.24235272407531738 
+Fold 0/2, Epoch 60/99, Running Loss train 154.14601135253906, Time 0.24135541915893555, Overall 0.24235272407531738 
+Fold 0/2, Epoch 60/99, Minibatch 0/0, Phase valid, Running Loss valid 763.8721923828125, Time 0.24235320091247559, Overall 0.24335050582885742 
+Fold 0/2, Epoch 60/99, Running Loss valid 84.87468804253473, Time 0.24235320091247559, Overall 0.24335050582885742 
+Fold 0/2, Epoch 61/99, Minibatch 0/0, Phase train, Running Loss train 2452.28369140625, Time 0.24535036087036133, Overall 0.24634766578674316 
+Fold 0/2, Epoch 61/99, Running Loss train 153.26773071289062, Time 0.24535036087036133, Overall 0.24634766578674316 
+Fold 0/2, Epoch 61/99, Minibatch 0/0, Phase valid, Running Loss valid 763.66943359375, Time 0.24634242057800293, Overall 0.24733972549438477 
+Fold 0/2, Epoch 61/99, Running Loss valid 84.85215928819444, Time 0.24634242057800293, Overall 0.24733972549438477 
+Fold 0/2, Epoch 62/99, Minibatch 0/0, Phase train, Running Loss train 2478.120361328125, Time 0.24933743476867676, Overall 0.2503347396850586 
+Fold 0/2, Epoch 62/99, Running Loss train 154.8825225830078, Time 0.24933743476867676, Overall 0.2503347396850586 
+Fold 0/2, Epoch 62/99, Minibatch 0/0, Phase valid, Running Loss valid 763.825439453125, Time 0.25033140182495117, Overall 0.251328706741333 
+Fold 0/2, Epoch 62/99, Running Loss valid 84.86949327256944, Time 0.25033140182495117, Overall 0.251328706741333 
+Fold 0/2, Epoch 63/99, Minibatch 0/0, Phase train, Running Loss train 2456.0009765625, Time 0.2533237934112549, Overall 0.2543210983276367 
+Fold 0/2, Epoch 63/99, Running Loss train 153.50006103515625, Time 0.2533237934112549, Overall 0.2543210983276367 
+Fold 0/2, Epoch 63/99, Minibatch 0/0, Phase valid, Running Loss valid 763.8086547851562, Time 0.2543208599090576, Overall 0.25531816482543945 
+Fold 0/2, Epoch 63/99, Running Loss valid 84.86762830946181, Time 0.2543208599090576, Overall 0.25531816482543945 
+Fold 0/2, Epoch 64/99, Minibatch 0/0, Phase train, Running Loss train 2461.468505859375, Time 0.257326602935791, Overall 0.25832390785217285 
+Fold 0/2, Epoch 64/99, Running Loss train 153.84178161621094, Time 0.257326602935791, Overall 0.25832390785217285 
+Fold 0/2, Epoch 64/99, Minibatch 0/0, Phase valid, Running Loss valid 763.6664428710938, Time 0.25831007957458496, Overall 0.2593073844909668 
+Fold 0/2, Epoch 64/99, Running Loss valid 84.85182698567708, Time 0.25831007957458496, Overall 0.2593073844909668 
+Fold 0/2, Epoch 65/99, Minibatch 0/0, Phase train, Running Loss train 2458.47509765625, Time 0.26130223274230957, Overall 0.2622995376586914 
+Fold 0/2, Epoch 65/99, Running Loss train 153.65469360351562, Time 0.26130223274230957, Overall 0.2622995376586914 
+Fold 0/2, Epoch 65/99, Minibatch 0/0, Phase valid, Running Loss valid 763.7540283203125, Time 0.2622995376586914, Overall 0.26329684257507324 
+Fold 0/2, Epoch 65/99, Running Loss valid 84.86155870225694, Time 0.2622995376586914, Overall 0.26329684257507324 
+Fold 0/2, Epoch 66/99, Minibatch 0/0, Phase train, Running Loss train 2463.6396484375, Time 0.2642946243286133, Overall 0.2652919292449951 
+Fold 0/2, Epoch 66/99, Running Loss train 153.97747802734375, Time 0.2642946243286133, Overall 0.2652919292449951 
+Fold 0/2, Epoch 66/99, Minibatch 0/0, Phase valid, Running Loss valid 763.895751953125, Time 0.2652921676635742, Overall 0.26628947257995605 
+Fold 0/2, Epoch 66/99, Running Loss valid 84.87730577256944, Time 0.2652921676635742, Overall 0.26628947257995605 
+Epoch    67: reducing learning rate of group 0 to 2.5000e-02.
+Fold 0/2, Epoch 67/99, Minibatch 0/0, Phase train, Running Loss train 2472.6259765625, Time 0.2682838439941406, Overall 0.26928114891052246 
+Fold 0/2, Epoch 67/99, Running Loss train 154.53912353515625, Time 0.2682838439941406, Overall 0.26928114891052246 
+Fold 0/2, Epoch 67/99, Minibatch 0/0, Phase valid, Running Loss valid 763.9867553710938, Time 0.26928114891052246, Overall 0.2702784538269043 
+Fold 0/2, Epoch 67/99, Running Loss valid 84.88741726345486, Time 0.26928114891052246, Overall 0.2702784538269043 
+Fold 0/2, Epoch 68/99, Minibatch 0/0, Phase train, Running Loss train 2470.66064453125, Time 0.27227330207824707, Overall 0.2732706069946289 
+Fold 0/2, Epoch 68/99, Running Loss train 154.41629028320312, Time 0.27227330207824707, Overall 0.2732706069946289 
+Fold 0/2, Epoch 68/99, Minibatch 0/0, Phase valid, Running Loss valid 764.0079345703125, Time 0.2732706069946289, Overall 0.27426791191101074 
+Fold 0/2, Epoch 68/99, Running Loss valid 84.8897705078125, Time 0.2732706069946289, Overall 0.27426791191101074 
+Fold 0/2, Epoch 69/99, Minibatch 0/0, Phase train, Running Loss train 2471.1689453125, Time 0.2752652168273926, Overall 0.2762625217437744 
+Fold 0/2, Epoch 69/99, Running Loss train 154.44805908203125, Time 0.2752652168273926, Overall 0.2762625217437744 
+Fold 0/2, Epoch 69/99, Minibatch 0/0, Phase valid, Running Loss valid 763.955078125, Time 0.2762622833251953, Overall 0.27725958824157715 
+Fold 0/2, Epoch 69/99, Running Loss valid 84.88389756944444, Time 0.2762622833251953, Overall 0.27725958824157715 
+Fold 0/2, Epoch 70/99, Minibatch 0/0, Phase train, Running Loss train 2472.16357421875, Time 0.2792544364929199, Overall 0.28025174140930176 
+Fold 0/2, Epoch 70/99, Running Loss train 154.51022338867188, Time 0.2792544364929199, Overall 0.28025174140930176 
+Fold 0/2, Epoch 70/99, Minibatch 0/0, Phase valid, Running Loss valid 764.064208984375, Time 0.2802603244781494, Overall 0.28125762939453125 
+Fold 0/2, Epoch 70/99, Running Loss valid 84.89602322048611, Time 0.2802603244781494, Overall 0.28125762939453125 
+Fold 0/2, Epoch 71/99, Minibatch 0/0, Phase train, Running Loss train 2490.6591796875, Time 0.28224706649780273, Overall 0.28324437141418457 
+Fold 0/2, Epoch 71/99, Running Loss train 155.66619873046875, Time 0.28224706649780273, Overall 0.2842409610748291 
+Fold 0/2, Epoch 71/99, Minibatch 0/0, Phase valid, Running Loss valid 763.9503784179688, Time 0.28324365615844727, Overall 0.2842409610748291 
+Fold 0/2, Epoch 71/99, Running Loss valid 84.88337537977431, Time 0.28324365615844727, Overall 0.2842409610748291 
+Fold 0/2, Epoch 72/99, Minibatch 0/0, Phase train, Running Loss train 2454.050048828125, Time 0.2862358093261719, Overall 0.2872331142425537 
+Fold 0/2, Epoch 72/99, Running Loss train 153.3781280517578, Time 0.2862358093261719, Overall 0.2872331142425537 
+Fold 0/2, Epoch 72/99, Minibatch 0/0, Phase valid, Running Loss valid 763.9037475585938, Time 0.2872331142425537, Overall 0.28823041915893555 
+Fold 0/2, Epoch 72/99, Running Loss valid 84.87819417317708, Time 0.2872331142425537, Overall 0.28823041915893555 
+Fold 0/2, Epoch 73/99, Minibatch 0/0, Phase train, Running Loss train 2464.4755859375, Time 0.2902250289916992, Overall 0.29122233390808105 
+Fold 0/2, Epoch 73/99, Running Loss train 154.02972412109375, Time 0.2902250289916992, Overall 0.29122233390808105 
+Fold 0/2, Epoch 73/99, Minibatch 0/0, Phase valid, Running Loss valid 764.0836791992188, Time 0.2902250289916992, Overall 0.29122233390808105 
+Fold 0/2, Epoch 73/99, Running Loss valid 84.89818657769098, Time 0.29122233390808105, Overall 0.2922196388244629 
+Fold 0/2, Epoch 74/99, Minibatch 0/0, Phase train, Running Loss train 2456.072509765625, Time 0.2932276725769043, Overall 0.29422497749328613 
+Fold 0/2, Epoch 74/99, Running Loss train 153.50453186035156, Time 0.2932276725769043, Overall 0.29422497749328613 
+Fold 0/2, Epoch 74/99, Minibatch 0/0, Phase valid, Running Loss valid 764.28955078125, Time 0.29421496391296387, Overall 0.2952122688293457 
+Fold 0/2, Epoch 74/99, Running Loss valid 84.92106119791667, Time 0.2952120304107666, Overall 0.29620933532714844 
+Fold 0/2, Epoch 75/99, Minibatch 0/0, Phase train, Running Loss train 2457.945068359375, Time 0.29721593856811523, Overall 0.29821324348449707 
+Fold 0/2, Epoch 75/99, Running Loss train 153.62156677246094, Time 0.2982041835784912, Overall 0.29920148849487305 
+Fold 0/2, Epoch 75/99, Minibatch 0/0, Phase valid, Running Loss valid 764.4190063476562, Time 0.29920125007629395, Overall 0.3001985549926758 
+Fold 0/2, Epoch 75/99, Running Loss valid 84.93544514973958, Time 0.29920125007629395, Overall 0.3001985549926758 
+Fold 0/2, Epoch 76/99, Minibatch 0/0, Phase train, Running Loss train 2462.525146484375, Time 0.30219340324401855, Overall 0.3031907081604004 
+Fold 0/2, Epoch 76/99, Running Loss train 153.90782165527344, Time 0.30219340324401855, Overall 0.3031907081604004 
+Fold 0/2, Epoch 76/99, Minibatch 0/0, Phase valid, Running Loss valid 764.490234375, Time 0.30319905281066895, Overall 0.3041963577270508 
+Fold 0/2, Epoch 76/99, Running Loss valid 84.943359375, Time 0.30319905281066895, Overall 0.3041963577270508 
+Fold 0/2, Epoch 77/99, Minibatch 0/0, Phase train, Running Loss train 2458.031005859375, Time 0.30518531799316406, Overall 0.3061826229095459 
+Fold 0/2, Epoch 77/99, Running Loss train 153.62693786621094, Time 0.30518531799316406, Overall 0.3061826229095459 
+Fold 0/2, Epoch 77/99, Minibatch 0/0, Phase valid, Running Loss valid 764.570068359375, Time 0.30619335174560547, Overall 0.3071906566619873 
+Fold 0/2, Epoch 77/99, Running Loss valid 84.95222981770833, Time 0.30619335174560547, Overall 0.3071906566619873 
+Epoch    78: reducing learning rate of group 0 to 1.2500e-02.
+Fold 0/2, Epoch 78/99, Minibatch 0/0, Phase train, Running Loss train 2462.416259765625, Time 0.3091747760772705, Overall 0.31017208099365234 
+Fold 0/2, Epoch 78/99, Running Loss train 153.90101623535156, Time 0.3091747760772705, Overall 0.31017208099365234 
+Fold 0/2, Epoch 78/99, Minibatch 0/0, Phase valid, Running Loss valid 764.6148071289062, Time 0.31017184257507324, Overall 0.3111691474914551 
+Fold 0/2, Epoch 78/99, Running Loss valid 84.95720079210069, Time 0.31017184257507324, Overall 0.3111691474914551 
+Fold 0/2, Epoch 79/99, Minibatch 0/0, Phase train, Running Loss train 2460.865234375, Time 0.312166690826416, Overall 0.31316399574279785 
+Fold 0/2, Epoch 79/99, Running Loss train 153.8040771484375, Time 0.312166690826416, Overall 0.31316399574279785 
+Fold 0/2, Epoch 79/99, Minibatch 0/0, Phase valid, Running Loss valid 764.656494140625, Time 0.31316423416137695, Overall 0.3141615390777588 
+Fold 0/2, Epoch 79/99, Running Loss valid 84.96183268229167, Time 0.31316423416137695, Overall 0.3141615390777588 
+Fold 0/2, Epoch 80/99, Minibatch 0/0, Phase train, Running Loss train 2444.462646484375, Time 0.31615638732910156, Overall 0.3171536922454834 
+Fold 0/2, Epoch 80/99, Running Loss train 152.77891540527344, Time 0.31615638732910156, Overall 0.3171536922454834 
+Fold 0/2, Epoch 80/99, Minibatch 0/0, Phase valid, Running Loss valid 764.7616577148438, Time 0.3171532154083252, Overall 0.31815052032470703 
+Fold 0/2, Epoch 80/99, Running Loss valid 84.97351752387152, Time 0.3171532154083252, Overall 0.31815052032470703 
+Fold 0/2, Epoch 81/99, Minibatch 0/0, Phase train, Running Loss train 2461.408447265625, Time 0.3201456069946289, Overall 0.32114291191101074 
+Fold 0/2, Epoch 81/99, Running Loss train 153.83802795410156, Time 0.3201456069946289, Overall 0.32114291191101074 
+Fold 0/2, Epoch 81/99, Minibatch 0/0, Phase valid, Running Loss valid 764.909423828125, Time 0.32114267349243164, Overall 0.3221399784088135 
+Fold 0/2, Epoch 81/99, Running Loss valid 84.98993598090277, Time 0.32114267349243164, Overall 0.3221399784088135 
+Fold 0/2, Epoch 82/99, Minibatch 0/0, Phase train, Running Loss train 2457.019287109375, Time 0.3231375217437744, Overall 0.32413482666015625 
+Fold 0/2, Epoch 82/99, Running Loss train 153.56370544433594, Time 0.3231375217437744, Overall 0.32413482666015625 
+Fold 0/2, Epoch 82/99, Minibatch 0/0, Phase valid, Running Loss valid 764.9791870117188, Time 0.32413482666015625, Overall 0.3251321315765381 
+Fold 0/2, Epoch 82/99, Running Loss valid 84.99768744574652, Time 0.3251323699951172, Overall 0.326129674911499 
+Fold 0/2, Epoch 83/99, Minibatch 0/0, Phase train, Running Loss train 2465.241943359375, Time 0.32712721824645996, Overall 0.3281245231628418 
+Fold 0/2, Epoch 83/99, Running Loss train 154.07762145996094, Time 0.32712721824645996, Overall 0.3281245231628418 
+Fold 0/2, Epoch 83/99, Minibatch 0/0, Phase valid, Running Loss valid 765.0562133789062, Time 0.3281242847442627, Overall 0.32912158966064453 
+Fold 0/2, Epoch 83/99, Running Loss valid 85.00624593098958, Time 0.3281242847442627, Overall 0.32912158966064453 
+Fold 0/2, Epoch 84/99, Minibatch 0/0, Phase train, Running Loss train 2451.697998046875, Time 0.33211374282836914, Overall 0.333111047744751 
+Fold 0/2, Epoch 84/99, Running Loss train 153.2311248779297, Time 0.33211374282836914, Overall 0.333111047744751 
+Fold 0/2, Epoch 84/99, Minibatch 0/0, Phase valid, Running Loss valid 765.1158447265625, Time 0.3331108093261719, Overall 0.3341081142425537 
+Fold 0/2, Epoch 84/99, Running Loss valid 85.01287163628473, Time 0.3331108093261719, Overall 0.3341081142425537 
+Fold 0/2, Epoch 85/99, Minibatch 0/0, Phase train, Running Loss train 2458.329345703125, Time 0.33510541915893555, Overall 0.3361027240753174 
+Fold 0/2, Epoch 85/99, Running Loss train 153.6455841064453, Time 0.33510541915893555, Overall 0.3361027240753174 
+Fold 0/2, Epoch 85/99, Minibatch 0/0, Phase valid, Running Loss valid 765.1311645507812, Time 0.3361029624938965, Overall 0.3371002674102783 
+Fold 0/2, Epoch 85/99, Running Loss valid 85.01457383897569, Time 0.3361029624938965, Overall 0.3371002674102783 
+Fold 0/2, Epoch 86/99, Minibatch 0/0, Phase train, Running Loss train 2458.751220703125, Time 0.3390953540802002, Overall 0.34009265899658203 
+Fold 0/2, Epoch 86/99, Running Loss train 153.6719512939453, Time 0.3390953540802002, Overall 0.34009265899658203 
+Fold 0/2, Epoch 86/99, Minibatch 0/0, Phase valid, Running Loss valid 765.08740234375, Time 0.34009575843811035, Overall 0.3410930633544922 
+Fold 0/2, Epoch 86/99, Running Loss valid 85.00971137152777, Time 0.34009575843811035, Overall 0.3410930633544922 
+Fold 0/2, Epoch 87/99, Minibatch 0/0, Phase train, Running Loss train 2458.168701171875, Time 0.3430953025817871, Overall 0.34409260749816895 
+Fold 0/2, Epoch 87/99, Running Loss train 153.6355438232422, Time 0.3430953025817871, Overall 0.34409260749816895 
+Fold 0/2, Epoch 87/99, Minibatch 0/0, Phase valid, Running Loss valid 765.0799560546875, Time 0.34408140182495117, Overall 0.345078706741333 
+Fold 0/2, Epoch 87/99, Running Loss valid 85.00888400607639, Time 0.34408140182495117, Overall 0.345078706741333 
+Fold 0/2, Epoch 88/99, Minibatch 0/0, Phase train, Running Loss train 2452.955322265625, Time 0.34607625007629395, Overall 0.3470735549926758 
+Fold 0/2, Epoch 88/99, Running Loss train 153.30970764160156, Time 0.34607625007629395, Overall 0.3470735549926758 
+Fold 0/2, Epoch 88/99, Minibatch 0/0, Phase valid, Running Loss valid 765.0963134765625, Time 0.3470737934112549, Overall 0.3480710983276367 
+Fold 0/2, Epoch 88/99, Running Loss valid 85.01070149739583, Time 0.3470737934112549, Overall 0.3480710983276367 
+Epoch    89: reducing learning rate of group 0 to 6.2500e-03.
+Fold 0/2, Epoch 89/99, Minibatch 0/0, Phase train, Running Loss train 2447.874267578125, Time 0.3500659465789795, Overall 0.35106325149536133 
+Fold 0/2, Epoch 89/99, Running Loss train 152.9921417236328, Time 0.3500659465789795, Overall 0.35106325149536133 
+Fold 0/2, Epoch 89/99, Minibatch 0/0, Phase valid, Running Loss valid 765.0589599609375, Time 0.35106325149536133, Overall 0.35206055641174316 
+Fold 0/2, Epoch 89/99, Running Loss valid 85.00655110677083, Time 0.35106325149536133, Overall 0.35206055641174316 
+Fold 0/2, Epoch 90/99, Minibatch 0/0, Phase train, Running Loss train 2476.257568359375, Time 0.35405516624450684, Overall 0.35505247116088867 
+Fold 0/2, Epoch 90/99, Running Loss train 154.76609802246094, Time 0.35405516624450684, Overall 0.35505247116088867 
+Fold 0/2, Epoch 90/99, Minibatch 0/0, Phase valid, Running Loss valid 764.9793090820312, Time 0.35505199432373047, Overall 0.3560492992401123 
+Fold 0/2, Epoch 90/99, Running Loss valid 84.99770100911458, Time 0.35505199432373047, Overall 0.3560492992401123 
+Fold 0/2, Epoch 91/99, Minibatch 0/0, Phase train, Running Loss train 2454.231689453125, Time 0.35704684257507324, Overall 0.3580441474914551 
+Fold 0/2, Epoch 91/99, Running Loss train 153.3894805908203, Time 0.35704684257507324, Overall 0.3580441474914551 
+Fold 0/2, Epoch 91/99, Minibatch 0/0, Phase valid, Running Loss valid 764.8840942382812, Time 0.3580441474914551, Overall 0.3590414524078369 
+Fold 0/2, Epoch 91/99, Running Loss valid 84.98712158203125, Time 0.3580441474914551, Overall 0.3590414524078369 
+Fold 0/2, Epoch 92/99, Minibatch 0/0, Phase train, Running Loss train 2502.107666015625, Time 0.36003899574279785, Overall 0.3610363006591797 
+Fold 0/2, Epoch 92/99, Running Loss train 156.38172912597656, Time 0.36003899574279785, Overall 0.3610363006591797 
+Fold 0/2, Epoch 92/99, Minibatch 0/0, Phase valid, Running Loss valid 764.8072509765625, Time 0.3610363006591797, Overall 0.3620336055755615 
+Fold 0/2, Epoch 92/99, Running Loss valid 84.97858344184027, Time 0.3610363006591797, Overall 0.3620336055755615 
+Fold 0/2, Epoch 93/99, Minibatch 0/0, Phase train, Running Loss train 2473.426513671875, Time 0.3640284538269043, Overall 0.36502575874328613 
+Fold 0/2, Epoch 93/99, Running Loss train 154.5891571044922, Time 0.3640284538269043, Overall 0.36502575874328613 
+Fold 0/2, Epoch 93/99, Minibatch 0/0, Phase valid, Running Loss valid 764.7777099609375, Time 0.36502552032470703, Overall 0.36602282524108887 
+Fold 0/2, Epoch 93/99, Running Loss valid 84.97530110677083, Time 0.36502552032470703, Overall 0.36602282524108887 
+Fold 0/2, Epoch 94/99, Minibatch 0/0, Phase train, Running Loss train 2454.163330078125, Time 0.3670203685760498, Overall 0.36801767349243164 
+Fold 0/2, Epoch 94/99, Running Loss train 153.3852081298828, Time 0.3670203685760498, Overall 0.36801767349243164 
+Fold 0/2, Epoch 94/99, Minibatch 0/0, Phase valid, Running Loss valid 764.703369140625, Time 0.36801767349243164, Overall 0.3690149784088135 
+Fold 0/2, Epoch 94/99, Running Loss valid 84.967041015625, Time 0.36801767349243164, Overall 0.3690149784088135 
+Fold 0/2, Epoch 95/99, Minibatch 0/0, Phase train, Running Loss train 2476.6494140625, Time 0.37101006507873535, Overall 0.3720073699951172 
+Fold 0/2, Epoch 95/99, Running Loss train 154.79058837890625, Time 0.37101006507873535, Overall 0.3720073699951172 
+Fold 0/2, Epoch 95/99, Minibatch 0/0, Phase valid, Running Loss valid 764.6116943359375, Time 0.3720071315765381, Overall 0.3730044364929199 
+Fold 0/2, Epoch 95/99, Running Loss valid 84.95685492621527, Time 0.3720071315765381, Overall 0.3730044364929199 
+Fold 0/2, Epoch 96/99, Minibatch 0/0, Phase train, Running Loss train 2443.44091796875, Time 0.37400197982788086, Overall 0.3749992847442627 
+Fold 0/2, Epoch 96/99, Running Loss train 152.71505737304688, Time 0.37400197982788086, Overall 0.3749992847442627 
+Fold 0/2, Epoch 96/99, Minibatch 0/0, Phase valid, Running Loss valid 764.5306396484375, Time 0.3749990463256836, Overall 0.37599635124206543 
+Fold 0/2, Epoch 96/99, Running Loss valid 84.94784884982639, Time 0.3749990463256836, Overall 0.37599635124206543 
+Fold 0/2, Epoch 97/99, Minibatch 0/0, Phase train, Running Loss train 2449.000732421875, Time 0.3779911994934082, Overall 0.37898850440979004 
+Fold 0/2, Epoch 97/99, Running Loss train 153.0625457763672, Time 0.3779911994934082, Overall 0.37898850440979004 
+Fold 0/2, Epoch 97/99, Minibatch 0/0, Phase valid, Running Loss valid 764.4259643554688, Time 0.37898826599121094, Overall 0.3799855709075928 
+Fold 0/2, Epoch 97/99, Running Loss valid 84.93621826171875, Time 0.37898826599121094, Overall 0.3799855709075928 
+Fold 0/2, Epoch 98/99, Minibatch 0/0, Phase train, Running Loss train 2451.866943359375, Time 0.3809833526611328, Overall 0.38198065757751465 
+Fold 0/2, Epoch 98/99, Running Loss train 153.24168395996094, Time 0.3809833526611328, Overall 0.38198065757751465 
+Fold 0/2, Epoch 98/99, Minibatch 0/0, Phase valid, Running Loss valid 764.3334350585938, Time 0.38198065757751465, Overall 0.3829779624938965 
+Fold 0/2, Epoch 98/99, Running Loss valid 84.92593722873264, Time 0.38198065757751465, Overall 0.3829779624938965 
+Fold 0/2, Epoch 99/99, Minibatch 0/0, Phase train, Running Loss train 2457.66455078125, Time 0.38497257232666016, Overall 0.385969877243042 
+Fold 0/2, Epoch 99/99, Running Loss train 153.60403442382812, Time 0.38497257232666016, Overall 0.385969877243042 
+Fold 0/2, Epoch 99/99, Minibatch 0/0, Phase valid, Running Loss valid 764.2976684570312, Time 0.385969877243042, Overall 0.38696718215942383 
+Fold 0/2, Epoch 99/99, Running Loss valid 84.92196316189236, Time 0.385969877243042, Overall 0.38696718215942383 
+Epoch   100: reducing learning rate of group 0 to 3.1250e-03.
+Fold 1/2, Epoch 0/99, Minibatch 0/0, Phase train, Running Loss train 3232.02978515625, Time 0.0019948482513427734, Overall 0.3919539451599121 
+Fold 1/2, Epoch 0/99, Running Loss train 190.11939912683823, Time 0.0019948482513427734, Overall 0.3919539451599121 
+Fold 1/2, Epoch 0/99, Minibatch 0/0, Phase valid, Running Loss valid 1256.265869140625, Time 0.0029921531677246094, Overall 0.39295125007629395 
+Fold 1/2, Epoch 0/99, Running Loss valid 157.03323364257812, Time 0.0029921531677246094, Overall 0.39295125007629395 
+Fold 1/2, Epoch 1/99, Minibatch 0/0, Phase train, Running Loss train 7096.875, Time 0.005984306335449219, Overall 0.39594340324401855 
+Fold 1/2, Epoch 1/99, Running Loss train 417.4632352941176, Time 0.005984306335449219, Overall 0.39594340324401855 
+Fold 1/2, Epoch 1/99, Minibatch 0/0, Phase valid, Running Loss valid 4939.4658203125, Time 0.006987571716308594, Overall 0.39694666862487793 
+Fold 1/2, Epoch 1/99, Running Loss valid 617.4332275390625, Time 0.006987571716308594, Overall 0.39694666862487793 
+Fold 1/2, Epoch 2/99, Minibatch 0/0, Phase train, Running Loss train 18994.423828125, Time 0.008976221084594727, Overall 0.39893531799316406 
+Fold 1/2, Epoch 2/99, Running Loss train 1117.3190487132354, Time 0.008976221084594727, Overall 0.39893531799316406 
+Fold 1/2, Epoch 2/99, Minibatch 0/0, Phase valid, Running Loss valid 1820.61328125, Time 0.009973764419555664, Overall 0.399932861328125 
+Fold 1/2, Epoch 2/99, Running Loss valid 227.57666015625, Time 0.009973764419555664, Overall 0.399932861328125 
+Fold 1/2, Epoch 3/99, Minibatch 0/0, Phase train, Running Loss train 8508.8603515625, Time 0.013962745666503906, Overall 0.40392184257507324 
+Fold 1/2, Epoch 3/99, Running Loss train 500.5211971507353, Time 0.013962745666503906, Overall 0.40392184257507324 
+Fold 1/2, Epoch 3/99, Minibatch 0/0, Phase valid, Running Loss valid 1305.296630859375, Time 0.01495981216430664, Overall 0.404918909072876 
+Fold 1/2, Epoch 3/99, Running Loss valid 163.16207885742188, Time 0.01495981216430664, Overall 0.404918909072876 
+Fold 1/2, Epoch 4/99, Minibatch 0/0, Phase train, Running Loss train 7080.98583984375, Time 0.01795220375061035, Overall 0.4079113006591797 
+Fold 1/2, Epoch 4/99, Running Loss train 416.52857881433823, Time 0.01795220375061035, Overall 0.4079113006591797 
+Fold 1/2, Epoch 4/99, Minibatch 0/0, Phase valid, Running Loss valid 1151.94091796875, Time 0.01795220375061035, Overall 0.4079113006591797 
+Fold 1/2, Epoch 4/99, Running Loss valid 143.99261474609375, Time 0.01795220375061035, Overall 0.4079113006591797 
+Fold 1/2, Epoch 5/99, Minibatch 0/0, Phase train, Running Loss train 6153.9658203125, Time 0.02094435691833496, Overall 0.4109034538269043 
+Fold 1/2, Epoch 5/99, Running Loss train 361.9979894301471, Time 0.02094435691833496, Overall 0.4109034538269043 
+Fold 1/2, Epoch 5/99, Minibatch 0/0, Phase valid, Running Loss valid 736.7011108398438, Time 0.021941423416137695, Overall 0.41190052032470703 
+Fold 1/2, Epoch 5/99, Running Loss valid 92.08763885498047, Time 0.021941423416137695, Overall 0.41190052032470703 
+Fold 1/2, Epoch 6/99, Minibatch 0/0, Phase train, Running Loss train 4227.70751953125, Time 0.024933815002441406, Overall 0.41489291191101074 
+Fold 1/2, Epoch 6/99, Running Loss train 248.6886776194853, Time 0.024933815002441406, Overall 0.41489291191101074 
+Fold 1/2, Epoch 6/99, Minibatch 0/0, Phase valid, Running Loss valid 650.9901733398438, Time 0.02593064308166504, Overall 0.4158897399902344 
+Fold 1/2, Epoch 6/99, Running Loss valid 81.37377166748047, Time 0.02593064308166504, Overall 0.4158897399902344 
+Fold 1/2, Epoch 7/99, Minibatch 0/0, Phase train, Running Loss train 3642.43896484375, Time 0.02892279624938965, Overall 0.418881893157959 
+Fold 1/2, Epoch 7/99, Running Loss train 214.26111557904412, Time 0.02892279624938965, Overall 0.418881893157959 
+Fold 1/2, Epoch 7/99, Minibatch 0/0, Phase valid, Running Loss valid 713.5703735351562, Time 0.029920101165771484, Overall 0.4198791980743408 
+Fold 1/2, Epoch 7/99, Running Loss valid 89.19629669189453, Time 0.029920101165771484, Overall 0.4198791980743408 
+Fold 1/2, Epoch 8/99, Minibatch 0/0, Phase train, Running Loss train 3223.83984375, Time 0.032912254333496094, Overall 0.42287135124206543 
+Fold 1/2, Epoch 8/99, Running Loss train 189.63763786764707, Time 0.032912254333496094, Overall 0.42287135124206543 
+Fold 1/2, Epoch 8/99, Minibatch 0/0, Phase valid, Running Loss valid 720.4177856445312, Time 0.03390955924987793, Overall 0.42386865615844727 
+Fold 1/2, Epoch 8/99, Running Loss valid 90.0522232055664, Time 0.03390955924987793, Overall 0.42386865615844727 
+Fold 1/2, Epoch 9/99, Minibatch 0/0, Phase train, Running Loss train 3252.71044921875, Time 0.03690171241760254, Overall 0.4268608093261719 
+Fold 1/2, Epoch 9/99, Running Loss train 191.33590877757354, Time 0.03690171241760254, Overall 0.4268608093261719 
+Fold 1/2, Epoch 9/99, Minibatch 0/0, Phase valid, Running Loss valid 678.2755126953125, Time 0.03789877891540527, Overall 0.4278578758239746 
+Fold 1/2, Epoch 9/99, Running Loss valid 84.78443908691406, Time 0.03789877891540527, Overall 0.4278578758239746 
+Fold 1/2, Epoch 10/99, Minibatch 0/0, Phase train, Running Loss train 3215.125732421875, Time 0.04089093208312988, Overall 0.4308500289916992 
+Fold 1/2, Epoch 10/99, Running Loss train 189.1250430836397, Time 0.04089093208312988, Overall 0.4308500289916992 
+Fold 1/2, Epoch 10/99, Minibatch 0/0, Phase valid, Running Loss valid 600.7914428710938, Time 0.04188847541809082, Overall 0.43184757232666016 
+Fold 1/2, Epoch 10/99, Running Loss valid 75.09893035888672, Time 0.04188847541809082, Overall 0.43184757232666016 
+Fold 1/2, Epoch 11/99, Minibatch 0/0, Phase train, Running Loss train 3098.7138671875, Time 0.04488039016723633, Overall 0.43483948707580566 
+Fold 1/2, Epoch 11/99, Running Loss train 182.27728630514707, Time 0.04488039016723633, Overall 0.43483948707580566 
+Fold 1/2, Epoch 11/99, Minibatch 0/0, Phase valid, Running Loss valid 609.379638671875, Time 0.045877695083618164, Overall 0.4358367919921875 
+Fold 1/2, Epoch 11/99, Running Loss valid 76.17245483398438, Time 0.045877695083618164, Overall 0.4358367919921875 
+Fold 1/2, Epoch 12/99, Minibatch 0/0, Phase train, Running Loss train 3036.442626953125, Time 0.04888105392456055, Overall 0.4388401508331299 
+Fold 1/2, Epoch 12/99, Running Loss train 178.61427217371323, Time 0.04888105392456055, Overall 0.4388401508331299 
+Fold 1/2, Epoch 12/99, Minibatch 0/0, Phase valid, Running Loss valid 590.0634155273438, Time 0.04986691474914551, Overall 0.43982601165771484 
+Fold 1/2, Epoch 12/99, Running Loss valid 73.75792694091797, Time 0.04986691474914551, Overall 0.43982601165771484 
+Fold 1/2, Epoch 13/99, Minibatch 0/0, Phase train, Running Loss train 2979.54248046875, Time 0.052858829498291016, Overall 0.44281792640686035 
+Fold 1/2, Epoch 13/99, Running Loss train 175.26720473345588, Time 0.052858829498291016, Overall 0.44281792640686035 
+Fold 1/2, Epoch 13/99, Minibatch 0/0, Phase valid, Running Loss valid 582.5719604492188, Time 0.05385613441467285, Overall 0.4438152313232422 
+Fold 1/2, Epoch 13/99, Running Loss valid 72.82149505615234, Time 0.05385613441467285, Overall 0.4438152313232422 
+Fold 1/2, Epoch 14/99, Minibatch 0/0, Phase train, Running Loss train 2977.3701171875, Time 0.05684828758239746, Overall 0.4468073844909668 
+Fold 1/2, Epoch 14/99, Running Loss train 175.13941865808823, Time 0.05684828758239746, Overall 0.4468073844909668 
+Fold 1/2, Epoch 14/99, Minibatch 0/0, Phase valid, Running Loss valid 603.0372314453125, Time 0.05784797668457031, Overall 0.44780707359313965 
+Fold 1/2, Epoch 14/99, Running Loss valid 75.37965393066406, Time 0.05784797668457031, Overall 0.44780707359313965 
+Fold 1/2, Epoch 15/99, Minibatch 0/0, Phase train, Running Loss train 2939.6884765625, Time 0.05984044075012207, Overall 0.4497995376586914 
+Fold 1/2, Epoch 15/99, Running Loss train 172.9228515625, Time 0.05984044075012207, Overall 0.4497995376586914 
+Fold 1/2, Epoch 15/99, Minibatch 0/0, Phase valid, Running Loss valid 581.5401000976562, Time 0.060837507247924805, Overall 0.45079660415649414 
+Fold 1/2, Epoch 15/99, Running Loss valid 72.69251251220703, Time 0.060837507247924805, Overall 0.45079660415649414 
+Fold 1/2, Epoch 16/99, Minibatch 0/0, Phase train, Running Loss train 2868.7060546875, Time 0.06382942199707031, Overall 0.45378851890563965 
+Fold 1/2, Epoch 16/99, Running Loss train 168.74741498161765, Time 0.06382942199707031, Overall 0.45378851890563965 
+Fold 1/2, Epoch 16/99, Minibatch 0/0, Phase valid, Running Loss valid 581.390625, Time 0.06482696533203125, Overall 0.4547860622406006 
+Fold 1/2, Epoch 16/99, Running Loss valid 72.673828125, Time 0.06482696533203125, Overall 0.4547860622406006 
+Fold 1/2, Epoch 17/99, Minibatch 0/0, Phase train, Running Loss train 2983.245849609375, Time 0.06682133674621582, Overall 0.45678043365478516 
+Fold 1/2, Epoch 17/99, Running Loss train 175.48504997702207, Time 0.06682133674621582, Overall 0.45678043365478516 
+Fold 1/2, Epoch 17/99, Minibatch 0/0, Phase valid, Running Loss valid 621.6118774414062, Time 0.06781935691833496, Overall 0.4577784538269043 
+Fold 1/2, Epoch 17/99, Running Loss valid 77.70148468017578, Time 0.06781935691833496, Overall 0.4577784538269043 
+Fold 1/2, Epoch 18/99, Minibatch 0/0, Phase train, Running Loss train 2908.342041015625, Time 0.07082247734069824, Overall 0.4607815742492676 
+Fold 1/2, Epoch 18/99, Running Loss train 171.07894358915442, Time 0.07082247734069824, Overall 0.4607815742492676 
+Fold 1/2, Epoch 18/99, Minibatch 0/0, Phase valid, Running Loss valid 607.9558715820312, Time 0.0718083381652832, Overall 0.46176743507385254 
+Fold 1/2, Epoch 18/99, Running Loss valid 75.9944839477539, Time 0.0718083381652832, Overall 0.46176743507385254 
+Fold 1/2, Epoch 19/99, Minibatch 0/0, Phase train, Running Loss train 2831.458740234375, Time 0.07381772994995117, Overall 0.4637768268585205 
+Fold 1/2, Epoch 19/99, Running Loss train 166.556396484375, Time 0.07381772994995117, Overall 0.4637768268585205 
+Fold 1/2, Epoch 19/99, Minibatch 0/0, Phase valid, Running Loss valid 593.5740966796875, Time 0.07481551170349121, Overall 0.46477460861206055 
+Fold 1/2, Epoch 19/99, Running Loss valid 74.19676208496094, Time 0.07481551170349121, Overall 0.46477460861206055 
+Fold 1/2, Epoch 20/99, Minibatch 0/0, Phase train, Running Loss train 2833.701416015625, Time 0.07780718803405762, Overall 0.46776628494262695 
+Fold 1/2, Epoch 20/99, Running Loss train 166.68831858915442, Time 0.07780718803405762, Overall 0.46776628494262695 
+Fold 1/2, Epoch 20/99, Minibatch 0/0, Phase valid, Running Loss valid 585.146240234375, Time 0.07880449295043945, Overall 0.4687635898590088 
+Fold 1/2, Epoch 20/99, Running Loss valid 73.14328002929688, Time 0.07880449295043945, Overall 0.4687635898590088 
+Fold 1/2, Epoch 21/99, Minibatch 0/0, Phase train, Running Loss train 2848.84375, Time 0.08079910278320312, Overall 0.47075819969177246 
+Fold 1/2, Epoch 21/99, Running Loss train 167.57904411764707, Time 0.08079910278320312, Overall 0.47075819969177246 
+Fold 1/2, Epoch 21/99, Minibatch 0/0, Phase valid, Running Loss valid 589.80908203125, Time 0.0823068618774414, Overall 0.47226595878601074 
+Fold 1/2, Epoch 21/99, Running Loss valid 73.72613525390625, Time 0.0823068618774414, Overall 0.47226595878601074 
+Fold 1/2, Epoch 22/99, Minibatch 0/0, Phase train, Running Loss train 2880.591796875, Time 0.08480429649353027, Overall 0.4747633934020996 
+Fold 1/2, Epoch 22/99, Running Loss train 169.4465762867647, Time 0.08480429649353027, Overall 0.4747633934020996 
+Fold 1/2, Epoch 22/99, Minibatch 0/0, Phase valid, Running Loss valid 585.57470703125, Time 0.08580136299133301, Overall 0.47576045989990234 
+Fold 1/2, Epoch 22/99, Running Loss valid 73.19683837890625, Time 0.08580136299133301, Overall 0.47576045989990234 
+Fold 1/2, Epoch 23/99, Minibatch 0/0, Phase train, Running Loss train 2798.458984375, Time 0.08779621124267578, Overall 0.4777553081512451 
+Fold 1/2, Epoch 23/99, Running Loss train 164.615234375, Time 0.08779621124267578, Overall 0.4777553081512451 
+Fold 1/2, Epoch 23/99, Minibatch 0/0, Phase valid, Running Loss valid 582.2017211914062, Time 0.08879351615905762, Overall 0.47875261306762695 
+Fold 1/2, Epoch 23/99, Running Loss valid 72.77521514892578, Time 0.08879351615905762, Overall 0.47875261306762695 
+Fold 1/2, Epoch 24/99, Minibatch 0/0, Phase train, Running Loss train 2809.0498046875, Time 0.09178590774536133, Overall 0.48174500465393066 
+Fold 1/2, Epoch 24/99, Running Loss train 165.23822380514707, Time 0.09178590774536133, Overall 0.48174500465393066 
+Fold 1/2, Epoch 24/99, Minibatch 0/0, Phase valid, Running Loss valid 577.8696899414062, Time 0.09281134605407715, Overall 0.4827704429626465 
+Fold 1/2, Epoch 24/99, Running Loss valid 72.23371124267578, Time 0.09281134605407715, Overall 0.4827704429626465 
+Fold 1/2, Epoch 25/99, Minibatch 0/0, Phase train, Running Loss train 2807.020751953125, Time 0.09480142593383789, Overall 0.4847605228424072 
+Fold 1/2, Epoch 25/99, Running Loss train 165.11886776194854, Time 0.09480142593383789, Overall 0.4847605228424072 
+Fold 1/2, Epoch 25/99, Minibatch 0/0, Phase valid, Running Loss valid 583.9766235351562, Time 0.09579873085021973, Overall 0.48575782775878906 
+Fold 1/2, Epoch 25/99, Running Loss valid 72.99707794189453, Time 0.09579873085021973, Overall 0.48575782775878906 
+Fold 1/2, Epoch 26/99, Minibatch 0/0, Phase train, Running Loss train 2929.9384765625, Time 0.09879112243652344, Overall 0.4887502193450928 
+Fold 1/2, Epoch 26/99, Running Loss train 172.3493221507353, Time 0.09879112243652344, Overall 0.4887502193450928 
+Fold 1/2, Epoch 26/99, Minibatch 0/0, Phase valid, Running Loss valid 572.3180541992188, Time 0.09879112243652344, Overall 0.4887502193450928 
+Fold 1/2, Epoch 26/99, Running Loss valid 71.53975677490234, Time 0.09978795051574707, Overall 0.4897470474243164 
+Fold 1/2, Epoch 27/99, Minibatch 0/0, Phase train, Running Loss train 2806.852294921875, Time 0.10178327560424805, Overall 0.4917423725128174 
+Fold 1/2, Epoch 27/99, Running Loss train 165.1089585248162, Time 0.10178327560424805, Overall 0.4917423725128174 
+Fold 1/2, Epoch 27/99, Minibatch 0/0, Phase valid, Running Loss valid 571.1221313476562, Time 0.10377788543701172, Overall 0.49373698234558105 
+Fold 1/2, Epoch 27/99, Running Loss valid 71.39026641845703, Time 0.10377788543701172, Overall 0.49373698234558105 
+Fold 1/2, Epoch 28/99, Minibatch 0/0, Phase train, Running Loss train 2838.439208984375, Time 0.10676980018615723, Overall 0.49672889709472656 
+Fold 1/2, Epoch 28/99, Running Loss train 166.96701229319854, Time 0.10676980018615723, Overall 0.49672889709472656 
+Fold 1/2, Epoch 28/99, Minibatch 0/0, Phase valid, Running Loss valid 570.8946533203125, Time 0.10776710510253906, Overall 0.4977262020111084 
+Fold 1/2, Epoch 28/99, Running Loss valid 71.36183166503906, Time 0.10776710510253906, Overall 0.4977262020111084 
+Fold 1/2, Epoch 29/99, Minibatch 0/0, Phase train, Running Loss train 2817.60986328125, Time 0.11075925827026367, Overall 0.500718355178833 
+Fold 1/2, Epoch 29/99, Running Loss train 165.74175666360293, Time 0.11075925827026367, Overall 0.500718355178833 
+Fold 1/2, Epoch 29/99, Minibatch 0/0, Phase valid, Running Loss valid 571.7254638671875, Time 0.11175656318664551, Overall 0.5017156600952148 
+Fold 1/2, Epoch 29/99, Running Loss valid 71.46568298339844, Time 0.11175656318664551, Overall 0.5017156600952148 
+Fold 1/2, Epoch 30/99, Minibatch 0/0, Phase train, Running Loss train 2802.01953125, Time 0.11474871635437012, Overall 0.5047078132629395 
+Fold 1/2, Epoch 30/99, Running Loss train 164.82467830882354, Time 0.11474871635437012, Overall 0.5047078132629395 
+Fold 1/2, Epoch 30/99, Minibatch 0/0, Phase valid, Running Loss valid 575.757568359375, Time 0.11474871635437012, Overall 0.5047078132629395 
+Fold 1/2, Epoch 30/99, Running Loss valid 71.96969604492188, Time 0.11574578285217285, Overall 0.5057048797607422 
+Fold 1/2, Epoch 31/99, Minibatch 0/0, Phase train, Running Loss train 2829.477783203125, Time 0.11774396896362305, Overall 0.5077030658721924 
+Fold 1/2, Epoch 31/99, Running Loss train 166.4398696001838, Time 0.11774396896362305, Overall 0.5077030658721924 
+Fold 1/2, Epoch 31/99, Minibatch 0/0, Phase valid, Running Loss valid 576.4036254882812, Time 0.11873793601989746, Overall 0.5086970329284668 
+Fold 1/2, Epoch 31/99, Running Loss valid 72.05045318603516, Time 0.11873793601989746, Overall 0.5086970329284668 
+Fold 1/2, Epoch 32/99, Minibatch 0/0, Phase train, Running Loss train 2808.63623046875, Time 0.12172985076904297, Overall 0.5116889476776123 
+Fold 1/2, Epoch 32/99, Running Loss train 165.21389590992646, Time 0.12172985076904297, Overall 0.5116889476776123 
+Fold 1/2, Epoch 32/99, Minibatch 0/0, Phase valid, Running Loss valid 579.4987182617188, Time 0.1227269172668457, Overall 0.512686014175415 
+Fold 1/2, Epoch 32/99, Running Loss valid 72.43733978271484, Time 0.1227269172668457, Overall 0.512686014175415 
+Fold 1/2, Epoch 33/99, Minibatch 0/0, Phase train, Running Loss train 2806.271728515625, Time 0.1257188320159912, Overall 0.5156779289245605 
+Fold 1/2, Epoch 33/99, Running Loss train 165.07480755974265, Time 0.1257188320159912, Overall 0.5156779289245605 
+Fold 1/2, Epoch 33/99, Minibatch 0/0, Phase valid, Running Loss valid 582.5475463867188, Time 0.12671637535095215, Overall 0.5166754722595215 
+Fold 1/2, Epoch 33/99, Running Loss valid 72.81844329833984, Time 0.12671637535095215, Overall 0.5166754722595215 
+Fold 1/2, Epoch 34/99, Minibatch 0/0, Phase train, Running Loss train 2822.03857421875, Time 0.12970829010009766, Overall 0.519667387008667 
+Fold 1/2, Epoch 34/99, Running Loss train 166.0022690716912, Time 0.12970829010009766, Overall 0.519667387008667 
+Fold 1/2, Epoch 34/99, Minibatch 0/0, Phase valid, Running Loss valid 585.04345703125, Time 0.1307058334350586, Overall 0.5206649303436279 
+Fold 1/2, Epoch 34/99, Running Loss valid 73.13043212890625, Time 0.1307058334350586, Overall 0.5206649303436279 
+Fold 1/2, Epoch 35/99, Minibatch 0/0, Phase train, Running Loss train 2816.62548828125, Time 0.1336977481842041, Overall 0.5236568450927734 
+Fold 1/2, Epoch 35/99, Running Loss train 165.68385225183823, Time 0.13469505310058594, Overall 0.5246541500091553 
+Fold 1/2, Epoch 35/99, Minibatch 0/0, Phase valid, Running Loss valid 586.5328369140625, Time 0.13569259643554688, Overall 0.5256516933441162 
+Fold 1/2, Epoch 35/99, Running Loss valid 73.31660461425781, Time 0.13569259643554688, Overall 0.5256516933441162 
+Fold 1/2, Epoch 36/99, Minibatch 0/0, Phase train, Running Loss train 2810.609619140625, Time 0.13868474960327148, Overall 0.5286438465118408 
+Fold 1/2, Epoch 36/99, Running Loss train 165.32997759650735, Time 0.13868474960327148, Overall 0.5286438465118408 
+Fold 1/2, Epoch 36/99, Minibatch 0/0, Phase valid, Running Loss valid 587.7801513671875, Time 0.13968181610107422, Overall 0.5296409130096436 
+Fold 1/2, Epoch 36/99, Running Loss valid 73.47251892089844, Time 0.13968181610107422, Overall 0.5296409130096436 
+Fold 1/2, Epoch 37/99, Minibatch 0/0, Phase train, Running Loss train 2803.5107421875, Time 0.14267396926879883, Overall 0.5326330661773682 
+Fold 1/2, Epoch 37/99, Running Loss train 164.9123965992647, Time 0.14267396926879883, Overall 0.5326330661773682 
+Fold 1/2, Epoch 37/99, Minibatch 0/0, Phase valid, Running Loss valid 588.0996704101562, Time 0.14367127418518066, Overall 0.53363037109375 
+Fold 1/2, Epoch 37/99, Running Loss valid 73.51245880126953, Time 0.14367127418518066, Overall 0.53363037109375 
+Fold 1/2, Epoch 38/99, Minibatch 0/0, Phase train, Running Loss train 2808.69677734375, Time 0.14666318893432617, Overall 0.5366222858428955 
+Fold 1/2, Epoch 38/99, Running Loss train 165.2174574908088, Time 0.14666318893432617, Overall 0.5366222858428955 
+Fold 1/2, Epoch 38/99, Minibatch 0/0, Phase valid, Running Loss valid 587.8646850585938, Time 0.1476609706878662, Overall 0.5376200675964355 
+Fold 1/2, Epoch 38/99, Running Loss valid 73.48308563232422, Time 0.1476609706878662, Overall 0.5376200675964355 
+Fold 1/2, Epoch 39/99, Minibatch 0/0, Phase train, Running Loss train 2808.031982421875, Time 0.15065264701843262, Overall 0.540611743927002 
+Fold 1/2, Epoch 39/99, Running Loss train 165.17835190716912, Time 0.15065264701843262, Overall 0.540611743927002 
+Fold 1/2, Epoch 39/99, Minibatch 0/0, Phase valid, Running Loss valid 587.3154907226562, Time 0.15165090560913086, Overall 0.5416100025177002 
+Fold 1/2, Epoch 39/99, Running Loss valid 73.41443634033203, Time 0.15165090560913086, Overall 0.5416100025177002 
+Epoch    40: reducing learning rate of group 0 to 5.0000e-02.
+Fold 1/2, Epoch 40/99, Minibatch 0/0, Phase train, Running Loss train 2799.630615234375, Time 0.15464186668395996, Overall 0.5446009635925293 
+Fold 1/2, Epoch 40/99, Running Loss train 164.6841538373162, Time 0.1556396484375, Overall 0.5455987453460693 
+Fold 1/2, Epoch 40/99, Minibatch 0/0, Phase valid, Running Loss valid 586.6940307617188, Time 0.1556396484375, Overall 0.5455987453460693 
+Fold 1/2, Epoch 40/99, Running Loss valid 73.33675384521484, Time 0.1556396484375, Overall 0.5455987453460693 
+Fold 1/2, Epoch 41/99, Minibatch 0/0, Phase train, Running Loss train 2798.727294921875, Time 0.15962862968444824, Overall 0.5495877265930176 
+Fold 1/2, Epoch 41/99, Running Loss train 164.63101734834558, Time 0.15962862968444824, Overall 0.5495877265930176 
+Fold 1/2, Epoch 41/99, Minibatch 0/0, Phase valid, Running Loss valid 585.7507934570312, Time 0.15962862968444824, Overall 0.5495877265930176 
+Fold 1/2, Epoch 41/99, Running Loss valid 73.2188491821289, Time 0.16062593460083008, Overall 0.5505850315093994 
+Fold 1/2, Epoch 42/99, Minibatch 0/0, Phase train, Running Loss train 2823.966796875, Time 0.1636180877685547, Overall 0.553577184677124 
+Fold 1/2, Epoch 42/99, Running Loss train 166.11569393382354, Time 0.1636180877685547, Overall 0.553577184677124 
+Fold 1/2, Epoch 42/99, Minibatch 0/0, Phase valid, Running Loss valid 584.2728881835938, Time 0.16461515426635742, Overall 0.5545742511749268 
+Fold 1/2, Epoch 42/99, Running Loss valid 73.03411102294922, Time 0.16461515426635742, Overall 0.5545742511749268 
+Fold 1/2, Epoch 43/99, Minibatch 0/0, Phase train, Running Loss train 2807.35986328125, Time 0.16760754585266113, Overall 0.5575666427612305 
+Fold 1/2, Epoch 43/99, Running Loss train 165.13881548713235, Time 0.16760754585266113, Overall 0.5575666427612305 
+Fold 1/2, Epoch 43/99, Minibatch 0/0, Phase valid, Running Loss valid 582.5374145507812, Time 0.16861224174499512, Overall 0.5585713386535645 
+Fold 1/2, Epoch 43/99, Running Loss valid 72.81717681884766, Time 0.16861224174499512, Overall 0.5585713386535645 
+Fold 1/2, Epoch 44/99, Minibatch 0/0, Phase train, Running Loss train 2804.795654296875, Time 0.17159676551818848, Overall 0.5615558624267578 
+Fold 1/2, Epoch 44/99, Running Loss train 164.98797966452207, Time 0.17159676551818848, Overall 0.5615558624267578 
+Fold 1/2, Epoch 44/99, Minibatch 0/0, Phase valid, Running Loss valid 580.9109497070312, Time 0.1725938320159912, Overall 0.5625529289245605 
+Fold 1/2, Epoch 44/99, Running Loss valid 72.6138687133789, Time 0.1725938320159912, Overall 0.5625529289245605 
+Fold 1/2, Epoch 45/99, Minibatch 0/0, Phase train, Running Loss train 2792.9873046875, Time 0.17558598518371582, Overall 0.5655450820922852 
+Fold 1/2, Epoch 45/99, Running Loss train 164.29337086397058, Time 0.17558598518371582, Overall 0.5655450820922852 
+Fold 1/2, Epoch 45/99, Minibatch 0/0, Phase valid, Running Loss valid 579.3250732421875, Time 0.17658305168151855, Overall 0.5665421485900879 
+Fold 1/2, Epoch 45/99, Running Loss valid 72.41563415527344, Time 0.17658305168151855, Overall 0.5665421485900879 
+Fold 1/2, Epoch 46/99, Minibatch 0/0, Phase train, Running Loss train 2793.3271484375, Time 0.17957544326782227, Overall 0.5695345401763916 
+Fold 1/2, Epoch 46/99, Running Loss train 164.31336167279412, Time 0.17957544326782227, Overall 0.5695345401763916 
+Fold 1/2, Epoch 46/99, Minibatch 0/0, Phase valid, Running Loss valid 578.2435302734375, Time 0.1805727481842041, Overall 0.5705318450927734 
+Fold 1/2, Epoch 46/99, Running Loss valid 72.28044128417969, Time 0.1805727481842041, Overall 0.5705318450927734 
+Fold 1/2, Epoch 47/99, Minibatch 0/0, Phase train, Running Loss train 2792.30322265625, Time 0.1835649013519287, Overall 0.573523998260498 
+Fold 1/2, Epoch 47/99, Running Loss train 164.2531307444853, Time 0.1835649013519287, Overall 0.573523998260498 
+Fold 1/2, Epoch 47/99, Minibatch 0/0, Phase valid, Running Loss valid 577.513427734375, Time 0.18506669998168945, Overall 0.5750257968902588 
+Fold 1/2, Epoch 47/99, Running Loss valid 72.18917846679688, Time 0.18506669998168945, Overall 0.5750257968902588 
+Fold 1/2, Epoch 48/99, Minibatch 0/0, Phase train, Running Loss train 2805.14404296875, Time 0.18805861473083496, Overall 0.5780177116394043 
+Fold 1/2, Epoch 48/99, Running Loss train 165.0084731158088, Time 0.18805861473083496, Overall 0.5780177116394043 
+Fold 1/2, Epoch 48/99, Minibatch 0/0, Phase valid, Running Loss valid 576.8884887695312, Time 0.1890559196472168, Overall 0.5790150165557861 
+Fold 1/2, Epoch 48/99, Running Loss valid 72.1110610961914, Time 0.1890559196472168, Overall 0.5790150165557861 
+Fold 1/2, Epoch 49/99, Minibatch 0/0, Phase train, Running Loss train 2800.819091796875, Time 0.1920483112335205, Overall 0.5820074081420898 
+Fold 1/2, Epoch 49/99, Running Loss train 164.75406422334558, Time 0.1920483112335205, Overall 0.5820074081420898 
+Fold 1/2, Epoch 49/99, Minibatch 0/0, Phase valid, Running Loss valid 576.437255859375, Time 0.19304513931274414, Overall 0.5830042362213135 
+Fold 1/2, Epoch 49/99, Running Loss valid 72.05465698242188, Time 0.19304513931274414, Overall 0.5830042362213135 
+Fold 1/2, Epoch 50/99, Minibatch 0/0, Phase train, Running Loss train 2807.278076171875, Time 0.19603705406188965, Overall 0.585996150970459 
+Fold 1/2, Epoch 50/99, Running Loss train 165.13400448069854, Time 0.19603705406188965, Overall 0.585996150970459 
+Fold 1/2, Epoch 50/99, Minibatch 0/0, Phase valid, Running Loss valid 576.1993408203125, Time 0.19703459739685059, Overall 0.5869936943054199 
+Fold 1/2, Epoch 50/99, Running Loss valid 72.02491760253906, Time 0.19703459739685059, Overall 0.5869936943054199 
+Epoch    51: reducing learning rate of group 0 to 2.5000e-02.
+Fold 1/2, Epoch 51/99, Minibatch 0/0, Phase train, Running Loss train 2794.27685546875, Time 0.2000265121459961, Overall 0.5899856090545654 
+Fold 1/2, Epoch 51/99, Running Loss train 164.36922679227942, Time 0.2000265121459961, Overall 0.5899856090545654 
+Fold 1/2, Epoch 51/99, Minibatch 0/0, Phase valid, Running Loss valid 576.1854858398438, Time 0.20102405548095703, Overall 0.5909831523895264 
+Fold 1/2, Epoch 51/99, Running Loss valid 72.02318572998047, Time 0.20102405548095703, Overall 0.5909831523895264 
+Fold 1/2, Epoch 52/99, Minibatch 0/0, Phase train, Running Loss train 2802.10302734375, Time 0.20401620864868164, Overall 0.593975305557251 
+Fold 1/2, Epoch 52/99, Running Loss train 164.82958984375, Time 0.20401620864868164, Overall 0.593975305557251 
+Fold 1/2, Epoch 52/99, Minibatch 0/0, Phase valid, Running Loss valid 576.1437377929688, Time 0.2050166130065918, Overall 0.5949757099151611 
+Fold 1/2, Epoch 52/99, Running Loss valid 72.0179672241211, Time 0.2050166130065918, Overall 0.5949757099151611 
+Fold 1/2, Epoch 53/99, Minibatch 0/0, Phase train, Running Loss train 2800.1298828125, Time 0.20800566673278809, Overall 0.5979647636413574 
+Fold 1/2, Epoch 53/99, Running Loss train 164.71352251838235, Time 0.20800566673278809, Overall 0.5979647636413574 
+Fold 1/2, Epoch 53/99, Minibatch 0/0, Phase valid, Running Loss valid 576.1773071289062, Time 0.20900273323059082, Overall 0.5989618301391602 
+Fold 1/2, Epoch 53/99, Running Loss valid 72.02216339111328, Time 0.20900273323059082, Overall 0.5989618301391602 
+Fold 1/2, Epoch 54/99, Minibatch 0/0, Phase train, Running Loss train 2799.81787109375, Time 0.21199464797973633, Overall 0.6019537448883057 
+Fold 1/2, Epoch 54/99, Running Loss train 164.69516888786765, Time 0.21199464797973633, Overall 0.6019537448883057 
+Fold 1/2, Epoch 54/99, Minibatch 0/0, Phase valid, Running Loss valid 576.727294921875, Time 0.21299195289611816, Overall 0.6029510498046875 
+Fold 1/2, Epoch 54/99, Running Loss valid 72.09091186523438, Time 0.21299195289611816, Overall 0.6029510498046875 
+Fold 1/2, Epoch 55/99, Minibatch 0/0, Phase train, Running Loss train 2793.2373046875, Time 0.21649456024169922, Overall 0.6064536571502686 
+Fold 1/2, Epoch 55/99, Running Loss train 164.30807674632354, Time 0.21649456024169922, Overall 0.6064536571502686 
+Fold 1/2, Epoch 55/99, Minibatch 0/0, Phase valid, Running Loss valid 577.1356201171875, Time 0.21749162673950195, Overall 0.6074507236480713 
+Fold 1/2, Epoch 55/99, Running Loss valid 72.14195251464844, Time 0.21749162673950195, Overall 0.6074507236480713 
+Fold 1/2, Epoch 56/99, Minibatch 0/0, Phase train, Running Loss train 2807.540771484375, Time 0.21948647499084473, Overall 0.6094455718994141 
+Fold 1/2, Epoch 56/99, Running Loss train 165.1494571461397, Time 0.21948647499084473, Overall 0.6094455718994141 
+Fold 1/2, Epoch 56/99, Minibatch 0/0, Phase valid, Running Loss valid 577.5364379882812, Time 0.22048354148864746, Overall 0.6104426383972168 
+Fold 1/2, Epoch 56/99, Running Loss valid 72.19205474853516, Time 0.22048354148864746, Overall 0.6104426383972168 
+Fold 1/2, Epoch 57/99, Minibatch 0/0, Phase train, Running Loss train 2798.641845703125, Time 0.22247862815856934, Overall 0.6124377250671387 
+Fold 1/2, Epoch 57/99, Running Loss train 164.62599092371323, Time 0.22247862815856934, Overall 0.6124377250671387 
+Fold 1/2, Epoch 57/99, Minibatch 0/0, Phase valid, Running Loss valid 578.1201782226562, Time 0.22347593307495117, Overall 0.6134350299835205 
+Fold 1/2, Epoch 57/99, Running Loss valid 72.26502227783203, Time 0.22347593307495117, Overall 0.6134350299835205 
+Fold 1/2, Epoch 58/99, Minibatch 0/0, Phase train, Running Loss train 2796.916748046875, Time 0.22646784782409668, Overall 0.616426944732666 
+Fold 1/2, Epoch 58/99, Running Loss train 164.52451459099265, Time 0.22646784782409668, Overall 0.616426944732666 
+Fold 1/2, Epoch 58/99, Minibatch 0/0, Phase valid, Running Loss valid 578.6967163085938, Time 0.22746491432189941, Overall 0.6174240112304688 
+Fold 1/2, Epoch 58/99, Running Loss valid 72.33708953857422, Time 0.22746491432189941, Overall 0.6174240112304688 
+Fold 1/2, Epoch 59/99, Minibatch 0/0, Phase train, Running Loss train 2803.007568359375, Time 0.2294597625732422, Overall 0.6194188594818115 
+Fold 1/2, Epoch 59/99, Running Loss train 164.88279813878677, Time 0.2294597625732422, Overall 0.6194188594818115 
+Fold 1/2, Epoch 59/99, Minibatch 0/0, Phase valid, Running Loss valid 579.1810913085938, Time 0.23045754432678223, Overall 0.6204166412353516 
+Fold 1/2, Epoch 59/99, Running Loss valid 72.39763641357422, Time 0.23045754432678223, Overall 0.6204166412353516 
+Fold 1/2, Epoch 60/99, Minibatch 0/0, Phase train, Running Loss train 2813.955078125, Time 0.23344898223876953, Overall 0.6234080791473389 
+Fold 1/2, Epoch 60/99, Running Loss train 165.52676930147058, Time 0.23344898223876953, Overall 0.6234080791473389 
+Fold 1/2, Epoch 60/99, Minibatch 0/0, Phase valid, Running Loss valid 579.7034301757812, Time 0.23444652557373047, Overall 0.6244056224822998 
+Fold 1/2, Epoch 60/99, Running Loss valid 72.46292877197266, Time 0.23444652557373047, Overall 0.6244056224822998 
+Fold 1/2, Epoch 61/99, Minibatch 0/0, Phase train, Running Loss train 2797.98046875, Time 0.23644113540649414, Overall 0.6264002323150635 
+Fold 1/2, Epoch 61/99, Running Loss train 164.5870863970588, Time 0.23644113540649414, Overall 0.6264002323150635 
+Fold 1/2, Epoch 61/99, Minibatch 0/0, Phase valid, Running Loss valid 580.1145629882812, Time 0.23743867874145508, Overall 0.6273977756500244 
+Fold 1/2, Epoch 61/99, Running Loss valid 72.51432037353516, Time 0.23743867874145508, Overall 0.6273977756500244 
+Epoch    62: reducing learning rate of group 0 to 1.2500e-02.
+Fold 1/2, Epoch 62/99, Minibatch 0/0, Phase train, Running Loss train 2804.336181640625, Time 0.24043035507202148, Overall 0.6303894519805908 
+Fold 1/2, Epoch 62/99, Running Loss train 164.96095186121323, Time 0.24043035507202148, Overall 0.6303894519805908 
+Fold 1/2, Epoch 62/99, Minibatch 0/0, Phase valid, Running Loss valid 580.2394409179688, Time 0.24142789840698242, Overall 0.6313869953155518 
+Fold 1/2, Epoch 62/99, Running Loss valid 72.5299301147461, Time 0.24142789840698242, Overall 0.6313869953155518 
+Fold 1/2, Epoch 63/99, Minibatch 0/0, Phase train, Running Loss train 2798.36572265625, Time 0.2434227466583252, Overall 0.6333818435668945 
+Fold 1/2, Epoch 63/99, Running Loss train 164.60974839154412, Time 0.2434227466583252, Overall 0.6333818435668945 
+Fold 1/2, Epoch 63/99, Minibatch 0/0, Phase valid, Running Loss valid 580.383056640625, Time 0.24442076683044434, Overall 0.6343798637390137 
+Fold 1/2, Epoch 63/99, Running Loss valid 72.54788208007812, Time 0.24442076683044434, Overall 0.6343798637390137 
+Fold 1/2, Epoch 64/99, Minibatch 0/0, Phase train, Running Loss train 2801.20068359375, Time 0.2469189167022705, Overall 0.6368780136108398 
+Fold 1/2, Epoch 64/99, Running Loss train 164.77651079963235, Time 0.2469189167022705, Overall 0.6368780136108398 
+Fold 1/2, Epoch 64/99, Minibatch 0/0, Phase valid, Running Loss valid 580.5325927734375, Time 0.24791622161865234, Overall 0.6378753185272217 
+Fold 1/2, Epoch 64/99, Running Loss valid 72.56657409667969, Time 0.24791622161865234, Overall 0.6378753185272217 
+Fold 1/2, Epoch 65/99, Minibatch 0/0, Phase train, Running Loss train 2802.1298828125, Time 0.25090837478637695, Overall 0.6408674716949463 
+Fold 1/2, Epoch 65/99, Running Loss train 164.83116957720588, Time 0.25090837478637695, Overall 0.6408674716949463 
+Fold 1/2, Epoch 65/99, Minibatch 0/0, Phase valid, Running Loss valid 580.67724609375, Time 0.2519059181213379, Overall 0.6418650150299072 
+Fold 1/2, Epoch 65/99, Running Loss valid 72.58465576171875, Time 0.2519059181213379, Overall 0.6418650150299072 
+Fold 1/2, Epoch 66/99, Minibatch 0/0, Phase train, Running Loss train 2800.12646484375, Time 0.2549009323120117, Overall 0.644860029220581 
+Fold 1/2, Epoch 66/99, Running Loss train 164.71332146139707, Time 0.2549009323120117, Overall 0.644860029220581 
+Fold 1/2, Epoch 66/99, Minibatch 0/0, Phase valid, Running Loss valid 580.8157348632812, Time 0.25589537620544434, Overall 0.6458544731140137 
+Fold 1/2, Epoch 66/99, Running Loss valid 72.60196685791016, Time 0.25589537620544434, Overall 0.6458544731140137 
+Fold 1/2, Epoch 67/99, Minibatch 0/0, Phase train, Running Loss train 2812.95849609375, Time 0.25888705253601074, Overall 0.6488461494445801 
+Fold 1/2, Epoch 67/99, Running Loss train 165.46814682904412, Time 0.2598843574523926, Overall 0.6498434543609619 
+Fold 1/2, Epoch 67/99, Minibatch 0/0, Phase valid, Running Loss valid 581.0360107421875, Time 0.2598843574523926, Overall 0.6498434543609619 
+Fold 1/2, Epoch 67/99, Running Loss valid 72.62950134277344, Time 0.2608816623687744, Overall 0.6508407592773438 
+Fold 1/2, Epoch 68/99, Minibatch 0/0, Phase train, Running Loss train 2800.255615234375, Time 0.2628765106201172, Overall 0.6528356075286865 
+Fold 1/2, Epoch 68/99, Running Loss train 164.72091854319854, Time 0.2628765106201172, Overall 0.6528356075286865 
+Fold 1/2, Epoch 68/99, Minibatch 0/0, Phase valid, Running Loss valid 581.2062377929688, Time 0.263873815536499, Overall 0.6538329124450684 
+Fold 1/2, Epoch 68/99, Running Loss valid 72.6507797241211, Time 0.263873815536499, Overall 0.6538329124450684 
+Fold 1/2, Epoch 69/99, Minibatch 0/0, Phase train, Running Loss train 2803.6923828125, Time 0.2673771381378174, Overall 0.6573362350463867 
+Fold 1/2, Epoch 69/99, Running Loss train 164.92308134191177, Time 0.2673771381378174, Overall 0.6573362350463867 
+Fold 1/2, Epoch 69/99, Minibatch 0/0, Phase valid, Running Loss valid 581.3452758789062, Time 0.26836633682250977, Overall 0.6583254337310791 
+Fold 1/2, Epoch 69/99, Running Loss valid 72.66815948486328, Time 0.26836633682250977, Overall 0.6583254337310791 
+Fold 1/2, Epoch 70/99, Minibatch 0/0, Phase train, Running Loss train 2802.360107421875, Time 0.2713584899902344, Overall 0.6613175868988037 
+Fold 1/2, Epoch 70/99, Running Loss train 164.84471220128677, Time 0.2713584899902344, Overall 0.6613175868988037 
+Fold 1/2, Epoch 70/99, Minibatch 0/0, Phase valid, Running Loss valid 581.50146484375, Time 0.2723555564880371, Overall 0.6623146533966064 
+Fold 1/2, Epoch 70/99, Running Loss valid 72.68768310546875, Time 0.2723555564880371, Overall 0.6623146533966064 
+Fold 1/2, Epoch 71/99, Minibatch 0/0, Phase train, Running Loss train 2799.26123046875, Time 0.274350643157959, Overall 0.6643097400665283 
+Fold 1/2, Epoch 71/99, Running Loss train 164.6624253216912, Time 0.274350643157959, Overall 0.6643097400665283 
+Fold 1/2, Epoch 71/99, Minibatch 0/0, Phase valid, Running Loss valid 581.69482421875, Time 0.2753479480743408, Overall 0.6653070449829102 
+Fold 1/2, Epoch 71/99, Running Loss valid 72.71185302734375, Time 0.2753479480743408, Overall 0.6653070449829102 
+Fold 1/2, Epoch 72/99, Minibatch 0/0, Phase train, Running Loss train 2798.5888671875, Time 0.27833986282348633, Overall 0.6682989597320557 
+Fold 1/2, Epoch 72/99, Running Loss train 164.6228745404412, Time 0.27833986282348633, Overall 0.6682989597320557 
+Fold 1/2, Epoch 72/99, Minibatch 0/0, Phase valid, Running Loss valid 581.907470703125, Time 0.27933692932128906, Overall 0.6692960262298584 
+Fold 1/2, Epoch 72/99, Running Loss valid 72.73843383789062, Time 0.27933692932128906, Overall 0.6692960262298584 
+Epoch    73: reducing learning rate of group 0 to 6.2500e-03.
+Fold 1/2, Epoch 73/99, Minibatch 0/0, Phase train, Running Loss train 2796.568115234375, Time 0.2823350429534912, Overall 0.6722941398620605 
+Fold 1/2, Epoch 73/99, Running Loss train 164.50400677849265, Time 0.2823350429534912, Overall 0.6722941398620605 
+Fold 1/2, Epoch 73/99, Minibatch 0/0, Phase valid, Running Loss valid 581.9932861328125, Time 0.2833261489868164, Overall 0.6732852458953857 
+Fold 1/2, Epoch 73/99, Running Loss valid 72.74916076660156, Time 0.2833261489868164, Overall 0.6732852458953857 
+Fold 1/2, Epoch 74/99, Minibatch 0/0, Phase train, Running Loss train 2811.068115234375, Time 0.28533196449279785, Overall 0.6752910614013672 
+Fold 1/2, Epoch 74/99, Running Loss train 165.35694795496323, Time 0.28533196449279785, Overall 0.6752910614013672 
+Fold 1/2, Epoch 74/99, Minibatch 0/0, Phase valid, Running Loss valid 582.0360717773438, Time 0.286318302154541, Overall 0.6762773990631104 
+Fold 1/2, Epoch 74/99, Running Loss valid 72.75450897216797, Time 0.286318302154541, Overall 0.6762773990631104 
+Fold 1/2, Epoch 75/99, Minibatch 0/0, Phase train, Running Loss train 2795.516845703125, Time 0.2893104553222656, Overall 0.679269552230835 
+Fold 1/2, Epoch 75/99, Running Loss train 164.44216739430146, Time 0.2893104553222656, Overall 0.679269552230835 
+Fold 1/2, Epoch 75/99, Minibatch 0/0, Phase valid, Running Loss valid 582.0610961914062, Time 0.29030776023864746, Overall 0.6802668571472168 
+Fold 1/2, Epoch 75/99, Running Loss valid 72.75763702392578, Time 0.29030776023864746, Overall 0.6802668571472168 
+Fold 1/2, Epoch 76/99, Minibatch 0/0, Phase train, Running Loss train 2803.391845703125, Time 0.29330015182495117, Overall 0.6832592487335205 
+Fold 1/2, Epoch 76/99, Running Loss train 164.90540268841912, Time 0.29330015182495117, Overall 0.6832592487335205 
+Fold 1/2, Epoch 76/99, Minibatch 0/0, Phase valid, Running Loss valid 582.1118774414062, Time 0.2943115234375, Overall 0.6842706203460693 
+Fold 1/2, Epoch 76/99, Running Loss valid 72.76398468017578, Time 0.2943115234375, Overall 0.6842706203460693 
+Fold 1/2, Epoch 77/99, Minibatch 0/0, Phase train, Running Loss train 2796.047607421875, Time 0.2967963218688965, Overall 0.6867554187774658 
+Fold 1/2, Epoch 77/99, Running Loss train 164.473388671875, Time 0.2967963218688965, Overall 0.6867554187774658 
+Fold 1/2, Epoch 77/99, Minibatch 0/0, Phase valid, Running Loss valid 582.13037109375, Time 0.2977931499481201, Overall 0.6877522468566895 
+Fold 1/2, Epoch 77/99, Running Loss valid 72.76629638671875, Time 0.2977931499481201, Overall 0.6877522468566895 
+Fold 1/2, Epoch 78/99, Minibatch 0/0, Phase train, Running Loss train 2797.395751953125, Time 0.30078554153442383, Overall 0.6907446384429932 
+Fold 1/2, Epoch 78/99, Running Loss train 164.5526912913603, Time 0.30078554153442383, Overall 0.6907446384429932 
+Fold 1/2, Epoch 78/99, Minibatch 0/0, Phase valid, Running Loss valid 582.1173095703125, Time 0.3017909526824951, Overall 0.6917500495910645 
+Fold 1/2, Epoch 78/99, Running Loss valid 72.76466369628906, Time 0.3017909526824951, Overall 0.6917500495910645 
+Fold 1/2, Epoch 79/99, Minibatch 0/0, Phase train, Running Loss train 2800.534423828125, Time 0.3037912845611572, Overall 0.6937503814697266 
+Fold 1/2, Epoch 79/99, Running Loss train 164.73731904871323, Time 0.3047749996185303, Overall 0.6947340965270996 
+Fold 1/2, Epoch 79/99, Minibatch 0/0, Phase valid, Running Loss valid 582.0676879882812, Time 0.3057718276977539, Overall 0.6957309246063232 
+Fold 1/2, Epoch 79/99, Running Loss valid 72.75846099853516, Time 0.3057718276977539, Overall 0.6957309246063232 
+Fold 1/2, Epoch 80/99, Minibatch 0/0, Phase train, Running Loss train 2800.73974609375, Time 0.3087644577026367, Overall 0.698723554611206 
+Fold 1/2, Epoch 80/99, Running Loss train 164.74939682904412, Time 0.3087644577026367, Overall 0.698723554611206 
+Fold 1/2, Epoch 80/99, Minibatch 0/0, Phase valid, Running Loss valid 582.0394897460938, Time 0.30976152420043945, Overall 0.6997206211090088 
+Fold 1/2, Epoch 80/99, Running Loss valid 72.75493621826172, Time 0.30976152420043945, Overall 0.6997206211090088 
+Fold 1/2, Epoch 81/99, Minibatch 0/0, Phase train, Running Loss train 2807.716796875, Time 0.3117561340332031, Overall 0.7017152309417725 
+Fold 1/2, Epoch 81/99, Running Loss train 165.15981158088235, Time 0.3117561340332031, Overall 0.7017152309417725 
+Fold 1/2, Epoch 81/99, Minibatch 0/0, Phase valid, Running Loss valid 581.9647216796875, Time 0.31275391578674316, Overall 0.7027130126953125 
+Fold 1/2, Epoch 81/99, Running Loss valid 72.74559020996094, Time 0.31275391578674316, Overall 0.7027130126953125 
+Fold 1/2, Epoch 82/99, Minibatch 0/0, Phase train, Running Loss train 2811.4296875, Time 0.31575989723205566, Overall 0.705718994140625 
+Fold 1/2, Epoch 82/99, Running Loss train 165.3782169117647, Time 0.31575989723205566, Overall 0.705718994140625 
+Fold 1/2, Epoch 82/99, Minibatch 0/0, Phase valid, Running Loss valid 581.8739624023438, Time 0.3167428970336914, Overall 0.7067019939422607 
+Fold 1/2, Epoch 82/99, Running Loss valid 72.73424530029297, Time 0.3167428970336914, Overall 0.7067019939422607 
+Fold 1/2, Epoch 83/99, Minibatch 0/0, Phase train, Running Loss train 2807.27685546875, Time 0.3197348117828369, Overall 0.7096939086914062 
+Fold 1/2, Epoch 83/99, Running Loss train 165.13393267463235, Time 0.3197348117828369, Overall 0.7096939086914062 
+Fold 1/2, Epoch 83/99, Minibatch 0/0, Phase valid, Running Loss valid 581.7225341796875, Time 0.32073187828063965, Overall 0.710690975189209 
+Fold 1/2, Epoch 83/99, Running Loss valid 72.71531677246094, Time 0.32073187828063965, Overall 0.710690975189209 
+Epoch    84: reducing learning rate of group 0 to 3.1250e-03.
+Fold 1/2, Epoch 84/99, Minibatch 0/0, Phase train, Running Loss train 2793.267822265625, Time 0.32372426986694336, Overall 0.7136833667755127 
+Fold 1/2, Epoch 84/99, Running Loss train 164.30987189797793, Time 0.32372426986694336, Overall 0.7136833667755127 
+Fold 1/2, Epoch 84/99, Minibatch 0/0, Phase valid, Running Loss valid 581.6447143554688, Time 0.3247237205505371, Overall 0.7146828174591064 
+Fold 1/2, Epoch 84/99, Running Loss valid 72.7055892944336, Time 0.3247237205505371, Overall 0.7146828174591064 
+Fold 1/2, Epoch 85/99, Minibatch 0/0, Phase train, Running Loss train 2791.76611328125, Time 0.3282175064086914, Overall 0.7181766033172607 
+Fold 1/2, Epoch 85/99, Running Loss train 164.22153607536765, Time 0.3282175064086914, Overall 0.7181766033172607 
+Fold 1/2, Epoch 85/99, Minibatch 0/0, Phase valid, Running Loss valid 581.556396484375, Time 0.32921481132507324, Overall 0.7191739082336426 
+Fold 1/2, Epoch 85/99, Running Loss valid 72.69454956054688, Time 0.32921481132507324, Overall 0.7191739082336426 
+Fold 1/2, Epoch 86/99, Minibatch 0/0, Phase train, Running Loss train 2797.2646484375, Time 0.33220672607421875, Overall 0.7221658229827881 
+Fold 1/2, Epoch 86/99, Running Loss train 164.54497931985293, Time 0.33220672607421875, Overall 0.7221658229827881 
+Fold 1/2, Epoch 86/99, Minibatch 0/0, Phase valid, Running Loss valid 581.4818725585938, Time 0.3332042694091797, Overall 0.723163366317749 
+Fold 1/2, Epoch 86/99, Running Loss valid 72.68523406982422, Time 0.3332042694091797, Overall 0.723163366317749 
+Fold 1/2, Epoch 87/99, Minibatch 0/0, Phase train, Running Loss train 2803.533935546875, Time 0.3361966609954834, Overall 0.7261557579040527 
+Fold 1/2, Epoch 87/99, Running Loss train 164.91376091452207, Time 0.3361966609954834, Overall 0.7261557579040527 
+Fold 1/2, Epoch 87/99, Minibatch 0/0, Phase valid, Running Loss valid 581.401611328125, Time 0.33719348907470703, Overall 0.7271525859832764 
+Fold 1/2, Epoch 87/99, Running Loss valid 72.67520141601562, Time 0.33719348907470703, Overall 0.7271525859832764 
+Fold 1/2, Epoch 88/99, Minibatch 0/0, Phase train, Running Loss train 2795.6875, Time 0.3391880989074707, Overall 0.72914719581604 
+Fold 1/2, Epoch 88/99, Running Loss train 164.45220588235293, Time 0.3391880989074707, Overall 0.72914719581604 
+Fold 1/2, Epoch 88/99, Minibatch 0/0, Phase valid, Running Loss valid 581.3163452148438, Time 0.34018564224243164, Overall 0.730144739151001 
+Fold 1/2, Epoch 88/99, Running Loss valid 72.66454315185547, Time 0.34018564224243164, Overall 0.730144739151001 
+Fold 1/2, Epoch 89/99, Minibatch 0/0, Phase train, Running Loss train 2802.349609375, Time 0.34317755699157715, Overall 0.7331366539001465 
+Fold 1/2, Epoch 89/99, Running Loss train 164.84409466911765, Time 0.34317755699157715, Overall 0.7331366539001465 
+Fold 1/2, Epoch 89/99, Minibatch 0/0, Phase valid, Running Loss valid 581.227783203125, Time 0.344174861907959, Overall 0.7341339588165283 
+Fold 1/2, Epoch 89/99, Running Loss valid 72.65347290039062, Time 0.344174861907959, Overall 0.7341339588165283 
+Fold 1/2, Epoch 90/99, Minibatch 0/0, Phase train, Running Loss train 2799.96240234375, Time 0.3471670150756836, Overall 0.7371261119842529 
+Fold 1/2, Epoch 90/99, Running Loss train 164.70367072610293, Time 0.3471670150756836, Overall 0.7371261119842529 
+Fold 1/2, Epoch 90/99, Minibatch 0/0, Phase valid, Running Loss valid 581.1475830078125, Time 0.34816408157348633, Overall 0.7381231784820557 
+Fold 1/2, Epoch 90/99, Running Loss valid 72.64344787597656, Time 0.34816408157348633, Overall 0.7381231784820557 
+Fold 1/2, Epoch 91/99, Minibatch 0/0, Phase train, Running Loss train 2802.4765625, Time 0.3501589298248291, Overall 0.7401180267333984 
+Fold 1/2, Epoch 91/99, Running Loss train 164.8515625, Time 0.3501589298248291, Overall 0.7401180267333984 
+Fold 1/2, Epoch 91/99, Minibatch 0/0, Phase valid, Running Loss valid 581.0737915039062, Time 0.35115647315979004, Overall 0.7411155700683594 
+Fold 1/2, Epoch 91/99, Running Loss valid 72.63422393798828, Time 0.35115647315979004, Overall 0.7411155700683594 
+Fold 1/2, Epoch 92/99, Minibatch 0/0, Phase train, Running Loss train 2803.958984375, Time 0.35414838790893555, Overall 0.7441074848175049 
+Fold 1/2, Epoch 92/99, Running Loss train 164.9387637867647, Time 0.35414838790893555, Overall 0.7441074848175049 
+Fold 1/2, Epoch 92/99, Minibatch 0/0, Phase valid, Running Loss valid 580.9922485351562, Time 0.35414838790893555, Overall 0.7441074848175049 
+Fold 1/2, Epoch 92/99, Running Loss valid 72.62403106689453, Time 0.35414838790893555, Overall 0.7441074848175049 
+Fold 1/2, Epoch 93/99, Minibatch 0/0, Phase train, Running Loss train 2793.8203125, Time 0.35665154457092285, Overall 0.7476038932800293 
+Fold 1/2, Epoch 93/99, Running Loss train 164.34237132352942, Time 0.35764479637145996, Overall 0.7476038932800293 
+Fold 1/2, Epoch 93/99, Minibatch 0/0, Phase valid, Running Loss valid 580.917724609375, Time 0.35764479637145996, Overall 0.7476038932800293 
+Fold 1/2, Epoch 93/99, Running Loss valid 72.61471557617188, Time 0.35764479637145996, Overall 0.7476038932800293 
+Fold 1/2, Epoch 94/99, Minibatch 0/0, Phase train, Running Loss train 2794.494140625, Time 0.36063647270202637, Overall 0.7505955696105957 
+Fold 1/2, Epoch 94/99, Running Loss train 164.3820082720588, Time 0.36063647270202637, Overall 0.7505955696105957 
+Fold 1/2, Epoch 94/99, Minibatch 0/0, Phase valid, Running Loss valid 580.8507690429688, Time 0.3616337776184082, Overall 0.7515928745269775 
+Fold 1/2, Epoch 94/99, Running Loss valid 72.6063461303711, Time 0.3616337776184082, Overall 0.7515928745269775 
+Epoch    95: reducing learning rate of group 0 to 1.5625e-03.
+Fold 1/2, Epoch 95/99, Minibatch 0/0, Phase train, Running Loss train 2799.203125, Time 0.3646259307861328, Overall 0.7545850276947021 
+Fold 1/2, Epoch 95/99, Running Loss train 164.6590073529412, Time 0.3646259307861328, Overall 0.7545850276947021 
+Fold 1/2, Epoch 95/99, Minibatch 0/0, Phase valid, Running Loss valid 580.8198852539062, Time 0.36562299728393555, Overall 0.7555820941925049 
+Fold 1/2, Epoch 95/99, Running Loss valid 72.60248565673828, Time 0.36562299728393555, Overall 0.7555820941925049 
+Fold 1/2, Epoch 96/99, Minibatch 0/0, Phase train, Running Loss train 2801.497802734375, Time 0.36861515045166016, Overall 0.7585742473602295 
+Fold 1/2, Epoch 96/99, Running Loss train 164.7939883961397, Time 0.36861515045166016, Overall 0.7585742473602295 
+Fold 1/2, Epoch 96/99, Minibatch 0/0, Phase valid, Running Loss valid 580.78955078125, Time 0.3696122169494629, Overall 0.7595713138580322 
+Fold 1/2, Epoch 96/99, Running Loss valid 72.59869384765625, Time 0.3696122169494629, Overall 0.7595713138580322 
+Fold 1/2, Epoch 97/99, Minibatch 0/0, Phase train, Running Loss train 2799.141845703125, Time 0.3726043701171875, Overall 0.7625634670257568 
+Fold 1/2, Epoch 97/99, Running Loss train 164.65540268841912, Time 0.3726043701171875, Overall 0.7625634670257568 
+Fold 1/2, Epoch 97/99, Minibatch 0/0, Phase valid, Running Loss valid 580.7640991210938, Time 0.37360167503356934, Overall 0.7635607719421387 
+Fold 1/2, Epoch 97/99, Running Loss valid 72.59551239013672, Time 0.37360167503356934, Overall 0.7635607719421387 
+Fold 1/2, Epoch 98/99, Minibatch 0/0, Phase train, Running Loss train 2809.05859375, Time 0.37710118293762207, Overall 0.7670602798461914 
+Fold 1/2, Epoch 98/99, Running Loss train 165.23874080882354, Time 0.37710118293762207, Overall 0.7670602798461914 
+Fold 1/2, Epoch 98/99, Minibatch 0/0, Phase valid, Running Loss valid 580.7451171875, Time 0.3780946731567383, Overall 0.7680537700653076 
+Fold 1/2, Epoch 98/99, Running Loss valid 72.5931396484375, Time 0.3780946731567383, Overall 0.7680537700653076 
+Fold 1/2, Epoch 99/99, Minibatch 0/0, Phase train, Running Loss train 2800.66357421875, Time 0.3810865879058838, Overall 0.7710456848144531 
+Fold 1/2, Epoch 99/99, Running Loss train 164.7449161305147, Time 0.3810865879058838, Overall 0.7710456848144531 
+Fold 1/2, Epoch 99/99, Minibatch 0/0, Phase valid, Running Loss valid 580.7249145507812, Time 0.3820841312408447, Overall 0.7720432281494141 
+Fold 1/2, Epoch 99/99, Running Loss valid 72.59061431884766, Time 0.3820841312408447, Overall 0.7720432281494141 
+Fold 2/2, Epoch 0/99, Minibatch 0/0, Phase train, Running Loss train 3257.626708984375, Time 0.001994609832763672, Overall 0.7760326862335205 
+Fold 2/2, Epoch 0/99, Running Loss train 191.62510052849265, Time 0.001994609832763672, Overall 0.7760326862335205 
+Fold 2/2, Epoch 0/99, Minibatch 0/0, Phase valid, Running Loss valid 1692.442626953125, Time 0.0029921531677246094, Overall 0.7770302295684814 
+Fold 2/2, Epoch 0/99, Running Loss valid 211.55532836914062, Time 0.0029921531677246094, Overall 0.7770302295684814 
+Fold 2/2, Epoch 1/99, Minibatch 0/0, Phase train, Running Loss train 6108.9453125, Time 0.006981372833251953, Overall 0.7810194492340088 
+Fold 2/2, Epoch 1/99, Running Loss train 359.34972426470586, Time 0.006981372833251953, Overall 0.7810194492340088 
+Fold 2/2, Epoch 1/99, Minibatch 0/0, Phase valid, Running Loss valid 2257.496337890625, Time 0.007978677749633789, Overall 0.7820167541503906 
+Fold 2/2, Epoch 1/99, Running Loss valid 282.1870422363281, Time 0.007978677749633789, Overall 0.7820167541503906 
+Fold 2/2, Epoch 2/99, Minibatch 0/0, Phase train, Running Loss train 8594.376953125, Time 0.010970592498779297, Overall 0.7850086688995361 
+Fold 2/2, Epoch 2/99, Running Loss train 505.55158547794116, Time 0.010970592498779297, Overall 0.7850086688995361 
+Fold 2/2, Epoch 2/99, Minibatch 0/0, Phase valid, Running Loss valid 2493.408447265625, Time 0.011967897415161133, Overall 0.786005973815918 
+Fold 2/2, Epoch 2/99, Running Loss valid 311.6760559082031, Time 0.011967897415161133, Overall 0.786005973815918 
+Fold 2/2, Epoch 3/99, Minibatch 0/0, Phase train, Running Loss train 11601.3017578125, Time 0.014960050582885742, Overall 0.7889981269836426 
+Fold 2/2, Epoch 3/99, Running Loss train 682.4295151654412, Time 0.014960050582885742, Overall 0.7889981269836426 
+Fold 2/2, Epoch 3/99, Minibatch 0/0, Phase valid, Running Loss valid 1856.438720703125, Time 0.015957117080688477, Overall 0.7899951934814453 
+Fold 2/2, Epoch 3/99, Running Loss valid 232.05484008789062, Time 0.015957117080688477, Overall 0.7899951934814453 
+Fold 2/2, Epoch 4/99, Minibatch 0/0, Phase train, Running Loss train 6317.0693359375, Time 0.01795220375061035, Overall 0.7919902801513672 
+Fold 2/2, Epoch 4/99, Running Loss train 371.59231387867646, Time 0.01795220375061035, Overall 0.7919902801513672 
+Fold 2/2, Epoch 4/99, Minibatch 0/0, Phase valid, Running Loss valid 1984.802734375, Time 0.018949508666992188, Overall 0.792987585067749 
+Fold 2/2, Epoch 4/99, Running Loss valid 248.100341796875, Time 0.018949508666992188, Overall 0.792987585067749 
+Fold 2/2, Epoch 5/99, Minibatch 0/0, Phase train, Running Loss train 6784.85009765625, Time 0.021941423416137695, Overall 0.7959794998168945 
+Fold 2/2, Epoch 5/99, Running Loss train 399.1088292738971, Time 0.021941423416137695, Overall 0.7959794998168945 
+Fold 2/2, Epoch 5/99, Minibatch 0/0, Phase valid, Running Loss valid 1333.826416015625, Time 0.021941423416137695, Overall 0.7959794998168945 
+Fold 2/2, Epoch 5/99, Running Loss valid 166.72830200195312, Time 0.021941423416137695, Overall 0.7959794998168945 
+Fold 2/2, Epoch 6/99, Minibatch 0/0, Phase train, Running Loss train 4041.12646484375, Time 0.025437355041503906, Overall 0.7994754314422607 
+Fold 2/2, Epoch 6/99, Running Loss train 237.71332146139707, Time 0.025437355041503906, Overall 0.7994754314422607 
+Fold 2/2, Epoch 6/99, Minibatch 0/0, Phase valid, Running Loss valid 902.6514282226562, Time 0.02643442153930664, Overall 0.8004724979400635 
+Fold 2/2, Epoch 6/99, Running Loss valid 112.83142852783203, Time 0.02643442153930664, Overall 0.8004724979400635 
+Fold 2/2, Epoch 7/99, Minibatch 0/0, Phase train, Running Loss train 5102.5146484375, Time 0.028429269790649414, Overall 0.8024673461914062 
+Fold 2/2, Epoch 7/99, Running Loss train 300.14792049632354, Time 0.028429269790649414, Overall 0.8024673461914062 
+Fold 2/2, Epoch 7/99, Minibatch 0/0, Phase valid, Running Loss valid 830.6725463867188, Time 0.02942657470703125, Overall 0.8034646511077881 
+Fold 2/2, Epoch 7/99, Running Loss valid 103.83406829833984, Time 0.02942657470703125, Overall 0.8034646511077881 
+Fold 2/2, Epoch 8/99, Minibatch 0/0, Phase train, Running Loss train 3311.3740234375, Time 0.03241896629333496, Overall 0.8064570426940918 
+Fold 2/2, Epoch 8/99, Running Loss train 194.78670726102942, Time 0.03241896629333496, Overall 0.8064570426940918 
+Fold 2/2, Epoch 8/99, Minibatch 0/0, Phase valid, Running Loss valid 947.317138671875, Time 0.03241896629333496, Overall 0.8064570426940918 
+Fold 2/2, Epoch 8/99, Running Loss valid 118.41464233398438, Time 0.033415794372558594, Overall 0.8074538707733154 
+Fold 2/2, Epoch 9/99, Minibatch 0/0, Phase train, Running Loss train 2920.36083984375, Time 0.0364079475402832, Overall 0.81044602394104 
+Fold 2/2, Epoch 9/99, Running Loss train 171.7859317555147, Time 0.0364079475402832, Overall 0.81044602394104 
+Fold 2/2, Epoch 9/99, Minibatch 0/0, Phase valid, Running Loss valid 1006.6422119140625, Time 0.03740525245666504, Overall 0.8114433288574219 
+Fold 2/2, Epoch 9/99, Running Loss valid 125.83027648925781, Time 0.03740525245666504, Overall 0.8114433288574219 
+Fold 2/2, Epoch 10/99, Minibatch 0/0, Phase train, Running Loss train 2877.76513671875, Time 0.04039740562438965, Overall 0.8144354820251465 
+Fold 2/2, Epoch 10/99, Running Loss train 169.28030215992646, Time 0.04039740562438965, Overall 0.8144354820251465 
+Fold 2/2, Epoch 10/99, Minibatch 0/0, Phase valid, Running Loss valid 944.654052734375, Time 0.04139447212219238, Overall 0.8154325485229492 
+Fold 2/2, Epoch 10/99, Running Loss valid 118.08175659179688, Time 0.04139447212219238, Overall 0.8154325485229492 
+Fold 2/2, Epoch 11/99, Minibatch 0/0, Phase train, Running Loss train 2748.150390625, Time 0.044386863708496094, Overall 0.8184249401092529 
+Fold 2/2, Epoch 11/99, Running Loss train 161.65590533088235, Time 0.044386863708496094, Overall 0.8184249401092529 
+Fold 2/2, Epoch 11/99, Minibatch 0/0, Phase valid, Running Loss valid 919.91552734375, Time 0.04538369178771973, Overall 0.8194217681884766 
+Fold 2/2, Epoch 11/99, Running Loss valid 114.98944091796875, Time 0.04538369178771973, Overall 0.8194217681884766 
+Fold 2/2, Epoch 12/99, Minibatch 0/0, Phase train, Running Loss train 2719.646728515625, Time 0.048375844955444336, Overall 0.8224139213562012 
+Fold 2/2, Epoch 12/99, Running Loss train 159.97921932444854, Time 0.048375844955444336, Overall 0.8224139213562012 
+Fold 2/2, Epoch 12/99, Minibatch 0/0, Phase valid, Running Loss valid 826.2137451171875, Time 0.04937338829040527, Overall 0.8234114646911621 
+Fold 2/2, Epoch 12/99, Running Loss valid 103.27671813964844, Time 0.04937338829040527, Overall 0.8234114646911621 
+Fold 2/2, Epoch 13/99, Minibatch 0/0, Phase train, Running Loss train 2801.138671875, Time 0.05336260795593262, Overall 0.8274006843566895 
+Fold 2/2, Epoch 13/99, Running Loss train 164.77286305147058, Time 0.05336260795593262, Overall 0.8274006843566895 
+Fold 2/2, Epoch 13/99, Minibatch 0/0, Phase valid, Running Loss valid 732.0270385742188, Time 0.053870439529418945, Overall 0.8279085159301758 
+Fold 2/2, Epoch 13/99, Running Loss valid 91.50337982177734, Time 0.053870439529418945, Overall 0.8279085159301758 
+Fold 2/2, Epoch 14/99, Minibatch 0/0, Phase train, Running Loss train 2861.83935546875, Time 0.05685830116271973, Overall 0.8308963775634766 
+Fold 2/2, Epoch 14/99, Running Loss train 168.34349149816177, Time 0.05685830116271973, Overall 0.8308963775634766 
+Fold 2/2, Epoch 14/99, Minibatch 0/0, Phase valid, Running Loss valid 777.558837890625, Time 0.05785560607910156, Overall 0.8318936824798584 
+Fold 2/2, Epoch 14/99, Running Loss valid 97.19485473632812, Time 0.0588529109954834, Overall 0.8328909873962402 
+Fold 2/2, Epoch 15/99, Minibatch 0/0, Phase train, Running Loss train 2709.302001953125, Time 0.061844825744628906, Overall 0.8358829021453857 
+Fold 2/2, Epoch 15/99, Running Loss train 159.37070599724265, Time 0.061844825744628906, Overall 0.8358829021453857 
+Fold 2/2, Epoch 15/99, Minibatch 0/0, Phase valid, Running Loss valid 806.475830078125, Time 0.06284213066101074, Overall 0.8368802070617676 
+Fold 2/2, Epoch 15/99, Running Loss valid 100.80947875976562, Time 0.06284213066101074, Overall 0.8368802070617676 
+Fold 2/2, Epoch 16/99, Minibatch 0/0, Phase train, Running Loss train 2617.47119140625, Time 0.06483674049377441, Overall 0.8388748168945312 
+Fold 2/2, Epoch 16/99, Running Loss train 153.96889361213235, Time 0.06483674049377441, Overall 0.8388748168945312 
+Fold 2/2, Epoch 16/99, Minibatch 0/0, Phase valid, Running Loss valid 827.5294189453125, Time 0.06583404541015625, Overall 0.8398721218109131 
+Fold 2/2, Epoch 16/99, Running Loss valid 103.44117736816406, Time 0.06583404541015625, Overall 0.8398721218109131 
+Fold 2/2, Epoch 17/99, Minibatch 0/0, Phase train, Running Loss train 2640.181396484375, Time 0.06882619857788086, Overall 0.8428642749786377 
+Fold 2/2, Epoch 17/99, Running Loss train 155.30478802849265, Time 0.06882619857788086, Overall 0.8428642749786377 
+Fold 2/2, Epoch 17/99, Minibatch 0/0, Phase valid, Running Loss valid 880.6126708984375, Time 0.0698235034942627, Overall 0.8438615798950195 
+Fold 2/2, Epoch 17/99, Running Loss valid 110.07658386230469, Time 0.0698235034942627, Overall 0.8438615798950195 
+Fold 2/2, Epoch 18/99, Minibatch 0/0, Phase train, Running Loss train 2619.044921875, Time 0.07181811332702637, Overall 0.8458561897277832 
+Fold 2/2, Epoch 18/99, Running Loss train 154.06146599264707, Time 0.07181811332702637, Overall 0.8458561897277832 
+Fold 2/2, Epoch 18/99, Minibatch 0/0, Phase valid, Running Loss valid 896.9044799804688, Time 0.0728156566619873, Overall 0.8468537330627441 
+Fold 2/2, Epoch 18/99, Running Loss valid 112.1130599975586, Time 0.0728156566619873, Overall 0.8468537330627441 
+Fold 2/2, Epoch 19/99, Minibatch 0/0, Phase train, Running Loss train 2603.1455078125, Time 0.07580757141113281, Overall 0.8498456478118896 
+Fold 2/2, Epoch 19/99, Running Loss train 153.12620634191177, Time 0.07580757141113281, Overall 0.8498456478118896 
+Fold 2/2, Epoch 19/99, Minibatch 0/0, Phase valid, Running Loss valid 914.8646240234375, Time 0.07680487632751465, Overall 0.8508429527282715 
+Fold 2/2, Epoch 19/99, Running Loss valid 114.35807800292969, Time 0.07680487632751465, Overall 0.8508429527282715 
+Fold 2/2, Epoch 20/99, Minibatch 0/0, Phase train, Running Loss train 2527.24267578125, Time 0.07879972457885742, Overall 0.8528378009796143 
+Fold 2/2, Epoch 20/99, Running Loss train 148.6613338694853, Time 0.07979679107666016, Overall 0.853834867477417 
+Fold 2/2, Epoch 20/99, Minibatch 0/0, Phase valid, Running Loss valid 925.903076171875, Time 0.07979679107666016, Overall 0.853834867477417 
+Fold 2/2, Epoch 20/99, Running Loss valid 115.73788452148438, Time 0.07979679107666016, Overall 0.853834867477417 
+Fold 2/2, Epoch 21/99, Minibatch 0/0, Phase train, Running Loss train 2551.462890625, Time 0.08278894424438477, Overall 0.8568270206451416 
+Fold 2/2, Epoch 21/99, Running Loss train 150.08605238970588, Time 0.08278894424438477, Overall 0.8568270206451416 
+Fold 2/2, Epoch 21/99, Minibatch 0/0, Phase valid, Running Loss valid 928.5323486328125, Time 0.0837862491607666, Overall 0.8578243255615234 
+Fold 2/2, Epoch 21/99, Running Loss valid 116.06654357910156, Time 0.0837862491607666, Overall 0.8578243255615234 
+Fold 2/2, Epoch 22/99, Minibatch 0/0, Phase train, Running Loss train 2556.666748046875, Time 0.08628416061401367, Overall 0.8603222370147705 
+Fold 2/2, Epoch 22/99, Running Loss train 150.3921616498162, Time 0.08628416061401367, Overall 0.8603222370147705 
+Fold 2/2, Epoch 22/99, Minibatch 0/0, Phase valid, Running Loss valid 918.6970825195312, Time 0.08728146553039551, Overall 0.8613195419311523 
+Fold 2/2, Epoch 22/99, Running Loss valid 114.8371353149414, Time 0.08728146553039551, Overall 0.8613195419311523 
+Fold 2/2, Epoch 23/99, Minibatch 0/0, Phase train, Running Loss train 2546.492919921875, Time 0.08927607536315918, Overall 0.863314151763916 
+Fold 2/2, Epoch 23/99, Running Loss train 149.793701171875, Time 0.08927607536315918, Overall 0.863314151763916 
+Fold 2/2, Epoch 23/99, Minibatch 0/0, Phase valid, Running Loss valid 901.9330444335938, Time 0.09027338027954102, Overall 0.8643114566802979 
+Fold 2/2, Epoch 23/99, Running Loss valid 112.74163055419922, Time 0.09027338027954102, Overall 0.8643114566802979 
+Fold 2/2, Epoch 24/99, Minibatch 0/0, Phase train, Running Loss train 2512.762939453125, Time 0.09326553344726562, Overall 0.8673036098480225 
+Fold 2/2, Epoch 24/99, Running Loss train 147.80958467371323, Time 0.09326553344726562, Overall 0.8673036098480225 
+Fold 2/2, Epoch 24/99, Minibatch 0/0, Phase valid, Running Loss valid 880.9198608398438, Time 0.09426259994506836, Overall 0.8683006763458252 
+Fold 2/2, Epoch 24/99, Running Loss valid 110.11498260498047, Time 0.09426259994506836, Overall 0.8683006763458252 
+Epoch    25: reducing learning rate of group 0 to 5.0000e-02.
+Fold 2/2, Epoch 25/99, Minibatch 0/0, Phase train, Running Loss train 2512.614990234375, Time 0.09627103805541992, Overall 0.8703091144561768 
+Fold 2/2, Epoch 25/99, Running Loss train 147.80088177849265, Time 0.09627103805541992, Overall 0.8703091144561768 
+Fold 2/2, Epoch 25/99, Minibatch 0/0, Phase valid, Running Loss valid 872.1316528320312, Time 0.09725499153137207, Overall 0.8712930679321289 
+Fold 2/2, Epoch 25/99, Running Loss valid 109.0164566040039, Time 0.09725499153137207, Overall 0.8712930679321289 
+Fold 2/2, Epoch 26/99, Minibatch 0/0, Phase train, Running Loss train 2488.81982421875, Time 0.10024690628051758, Overall 0.8742849826812744 
+Fold 2/2, Epoch 26/99, Running Loss train 146.4011661305147, Time 0.10024690628051758, Overall 0.8742849826812744 
+Fold 2/2, Epoch 26/99, Minibatch 0/0, Phase valid, Running Loss valid 875.7415771484375, Time 0.10124397277832031, Overall 0.8752820491790771 
+Fold 2/2, Epoch 26/99, Running Loss valid 109.46769714355469, Time 0.10124397277832031, Overall 0.8752820491790771 
+Fold 2/2, Epoch 27/99, Minibatch 0/0, Phase train, Running Loss train 2502.708984375, Time 0.10324311256408691, Overall 0.8772811889648438 
+Fold 2/2, Epoch 27/99, Running Loss train 147.21817555147058, Time 0.10324311256408691, Overall 0.8772811889648438 
+Fold 2/2, Epoch 27/99, Minibatch 0/0, Phase valid, Running Loss valid 881.6690063476562, Time 0.10474276542663574, Overall 0.8787808418273926 
+Fold 2/2, Epoch 27/99, Running Loss valid 110.20862579345703, Time 0.10474276542663574, Overall 0.8787808418273926 
+Fold 2/2, Epoch 28/99, Minibatch 0/0, Phase train, Running Loss train 2496.014892578125, Time 0.1067342758178711, Overall 0.8807723522186279 
+Fold 2/2, Epoch 28/99, Running Loss train 146.82440544577207, Time 0.1067342758178711, Overall 0.8807723522186279 
+Fold 2/2, Epoch 28/99, Minibatch 0/0, Phase valid, Running Loss valid 886.1286010742188, Time 0.10773181915283203, Overall 0.8817698955535889 
+Fold 2/2, Epoch 28/99, Running Loss valid 110.76607513427734, Time 0.10773181915283203, Overall 0.8817698955535889 
+Fold 2/2, Epoch 29/99, Minibatch 0/0, Phase train, Running Loss train 2492.926025390625, Time 0.11072373390197754, Overall 0.8847618103027344 
+Fold 2/2, Epoch 29/99, Running Loss train 146.64270737591912, Time 0.11072373390197754, Overall 0.8847618103027344 
+Fold 2/2, Epoch 29/99, Minibatch 0/0, Phase valid, Running Loss valid 890.382568359375, Time 0.11172103881835938, Overall 0.8857591152191162 
+Fold 2/2, Epoch 29/99, Running Loss valid 111.29782104492188, Time 0.11172103881835938, Overall 0.8857591152191162 
+Fold 2/2, Epoch 30/99, Minibatch 0/0, Phase train, Running Loss train 2486.535888671875, Time 0.11471319198608398, Overall 0.8887512683868408 
+Fold 2/2, Epoch 30/99, Running Loss train 146.26681698069854, Time 0.11471319198608398, Overall 0.8887512683868408 
+Fold 2/2, Epoch 30/99, Minibatch 0/0, Phase valid, Running Loss valid 893.9891967773438, Time 0.11471319198608398, Overall 0.8887512683868408 
+Fold 2/2, Epoch 30/99, Running Loss valid 111.74864959716797, Time 0.11471319198608398, Overall 0.8887512683868408 
+Fold 2/2, Epoch 31/99, Minibatch 0/0, Phase train, Running Loss train 2497.9599609375, Time 0.1177053451538086, Overall 0.8917434215545654 
+Fold 2/2, Epoch 31/99, Running Loss train 146.93882123161765, Time 0.1177053451538086, Overall 0.8917434215545654 
+Fold 2/2, Epoch 31/99, Minibatch 0/0, Phase valid, Running Loss valid 897.0887451171875, Time 0.11870241165161133, Overall 0.8927404880523682 
+Fold 2/2, Epoch 31/99, Running Loss valid 112.13609313964844, Time 0.11870241165161133, Overall 0.8927404880523682 
+Fold 2/2, Epoch 32/99, Minibatch 0/0, Phase train, Running Loss train 2494.974365234375, Time 0.120697021484375, Overall 0.8947350978851318 
+Fold 2/2, Epoch 32/99, Running Loss train 146.76319795496323, Time 0.120697021484375, Overall 0.8947350978851318 
+Fold 2/2, Epoch 32/99, Minibatch 0/0, Phase valid, Running Loss valid 898.76220703125, Time 0.12169480323791504, Overall 0.8957328796386719 
+Fold 2/2, Epoch 32/99, Running Loss valid 112.34527587890625, Time 0.12169480323791504, Overall 0.8957328796386719 
+Fold 2/2, Epoch 33/99, Minibatch 0/0, Phase train, Running Loss train 2488.02978515625, Time 0.12470030784606934, Overall 0.8987383842468262 
+Fold 2/2, Epoch 33/99, Running Loss train 146.3546932444853, Time 0.12470030784606934, Overall 0.8987383842468262 
+Fold 2/2, Epoch 33/99, Minibatch 0/0, Phase valid, Running Loss valid 899.4388427734375, Time 0.12579107284545898, Overall 0.8998291492462158 
+Fold 2/2, Epoch 33/99, Running Loss valid 112.42985534667969, Time 0.12579107284545898, Overall 0.8998291492462158 
+Fold 2/2, Epoch 34/99, Minibatch 0/0, Phase train, Running Loss train 2495.613525390625, Time 0.12768173217773438, Overall 0.9017198085784912 
+Fold 2/2, Epoch 34/99, Running Loss train 146.80079561121323, Time 0.12768173217773438, Overall 0.9017198085784912 
+Fold 2/2, Epoch 34/99, Minibatch 0/0, Phase valid, Running Loss valid 900.280029296875, Time 0.128676176071167, Overall 0.9027142524719238 
+Fold 2/2, Epoch 34/99, Running Loss valid 112.53500366210938, Time 0.128676176071167, Overall 0.9027142524719238 
+Fold 2/2, Epoch 35/99, Minibatch 0/0, Phase train, Running Loss train 2489.8330078125, Time 0.1316678524017334, Overall 0.9057059288024902 
+Fold 2/2, Epoch 35/99, Running Loss train 146.4607651654412, Time 0.1316678524017334, Overall 0.9057059288024902 
+Fold 2/2, Epoch 35/99, Minibatch 0/0, Phase valid, Running Loss valid 900.5645141601562, Time 0.13266515731811523, Overall 0.9067032337188721 
+Fold 2/2, Epoch 35/99, Running Loss valid 112.57056427001953, Time 0.13266515731811523, Overall 0.9067032337188721 
+Epoch    36: reducing learning rate of group 0 to 2.5000e-02.
+Fold 2/2, Epoch 36/99, Minibatch 0/0, Phase train, Running Loss train 2500.2490234375, Time 0.13516807556152344, Overall 0.9092061519622803 
+Fold 2/2, Epoch 36/99, Running Loss train 147.07347196691177, Time 0.13516807556152344, Overall 0.9092061519622803 
+Fold 2/2, Epoch 36/99, Minibatch 0/0, Phase valid, Running Loss valid 900.8764038085938, Time 0.13616061210632324, Overall 0.9101986885070801 
+Fold 2/2, Epoch 36/99, Running Loss valid 112.60955047607422, Time 0.13616061210632324, Overall 0.9101986885070801 
+Fold 2/2, Epoch 37/99, Minibatch 0/0, Phase train, Running Loss train 2496.22021484375, Time 0.13915276527404785, Overall 0.9131908416748047 
+Fold 2/2, Epoch 37/99, Running Loss train 146.83648322610293, Time 0.13915276527404785, Overall 0.9131908416748047 
+Fold 2/2, Epoch 37/99, Minibatch 0/0, Phase valid, Running Loss valid 900.449951171875, Time 0.13915276527404785, Overall 0.9131908416748047 
+Fold 2/2, Epoch 37/99, Running Loss valid 112.55624389648438, Time 0.1401500701904297, Overall 0.9141881465911865 
+Fold 2/2, Epoch 38/99, Minibatch 0/0, Phase train, Running Loss train 2508.414306640625, Time 0.14214539527893066, Overall 0.9161834716796875 
+Fold 2/2, Epoch 38/99, Running Loss train 147.5537827435662, Time 0.14214539527893066, Overall 0.9161834716796875 
+Fold 2/2, Epoch 38/99, Minibatch 0/0, Phase valid, Running Loss valid 899.58056640625, Time 0.1431419849395752, Overall 0.917180061340332 
+Fold 2/2, Epoch 38/99, Running Loss valid 112.44757080078125, Time 0.1431419849395752, Overall 0.917180061340332 
+Fold 2/2, Epoch 39/99, Minibatch 0/0, Phase train, Running Loss train 2486.914794921875, Time 0.1461341381072998, Overall 0.9201722145080566 
+Fold 2/2, Epoch 39/99, Running Loss train 146.2891055836397, Time 0.1461341381072998, Overall 0.9201722145080566 
+Fold 2/2, Epoch 39/99, Minibatch 0/0, Phase valid, Running Loss valid 898.6856689453125, Time 0.14713144302368164, Overall 0.9211695194244385 
+Fold 2/2, Epoch 39/99, Running Loss valid 112.33570861816406, Time 0.14713144302368164, Overall 0.9211695194244385 
+Fold 2/2, Epoch 40/99, Minibatch 0/0, Phase train, Running Loss train 2476.988037109375, Time 0.14912629127502441, Overall 0.9231643676757812 
+Fold 2/2, Epoch 40/99, Running Loss train 145.70517865349265, Time 0.14912629127502441, Overall 0.9231643676757812 
+Fold 2/2, Epoch 40/99, Minibatch 0/0, Phase valid, Running Loss valid 897.8073120117188, Time 0.15012359619140625, Overall 0.9241616725921631 
+Fold 2/2, Epoch 40/99, Running Loss valid 112.22591400146484, Time 0.15012359619140625, Overall 0.9241616725921631 
+Fold 2/2, Epoch 41/99, Minibatch 0/0, Phase train, Running Loss train 2477.19140625, Time 0.15311551094055176, Overall 0.9271535873413086 
+Fold 2/2, Epoch 41/99, Running Loss train 145.71714154411765, Time 0.1541130542755127, Overall 0.9281511306762695 
+Fold 2/2, Epoch 41/99, Minibatch 0/0, Phase valid, Running Loss valid 896.809814453125, Time 0.15511035919189453, Overall 0.9291484355926514 
+Fold 2/2, Epoch 41/99, Running Loss valid 112.10122680664062, Time 0.15511035919189453, Overall 0.9291484355926514 
+Fold 2/2, Epoch 42/99, Minibatch 0/0, Phase train, Running Loss train 2514.11962890625, Time 0.15810227394104004, Overall 0.9321403503417969 
+Fold 2/2, Epoch 42/99, Running Loss train 147.88938993566177, Time 0.15810227394104004, Overall 0.9321403503417969 
+Fold 2/2, Epoch 42/99, Minibatch 0/0, Phase valid, Running Loss valid 896.2098388671875, Time 0.15909957885742188, Overall 0.9331376552581787 
+Fold 2/2, Epoch 42/99, Running Loss valid 112.02622985839844, Time 0.15909957885742188, Overall 0.9331376552581787 
+Fold 2/2, Epoch 43/99, Minibatch 0/0, Phase train, Running Loss train 2478.5234375, Time 0.16209125518798828, Overall 0.9361293315887451 
+Fold 2/2, Epoch 43/99, Running Loss train 145.79549632352942, Time 0.16209125518798828, Overall 0.9361293315887451 
+Fold 2/2, Epoch 43/99, Minibatch 0/0, Phase valid, Running Loss valid 895.4786987304688, Time 0.16308879852294922, Overall 0.937126874923706 
+Fold 2/2, Epoch 43/99, Running Loss valid 111.9348373413086, Time 0.16308879852294922, Overall 0.937126874923706 
+Fold 2/2, Epoch 44/99, Minibatch 0/0, Phase train, Running Loss train 2506.62255859375, Time 0.16559147834777832, Overall 0.9396295547485352 
+Fold 2/2, Epoch 44/99, Running Loss train 147.44838579963235, Time 0.16658401489257812, Overall 0.940622091293335 
+Fold 2/2, Epoch 44/99, Minibatch 0/0, Phase valid, Running Loss valid 895.5118408203125, Time 0.16758131980895996, Overall 0.9416193962097168 
+Fold 2/2, Epoch 44/99, Running Loss valid 111.93898010253906, Time 0.16758131980895996, Overall 0.9416193962097168 
+Fold 2/2, Epoch 45/99, Minibatch 0/0, Phase train, Running Loss train 2500.146484375, Time 0.17057347297668457, Overall 0.9446115493774414 
+Fold 2/2, Epoch 45/99, Running Loss train 147.06744025735293, Time 0.17057347297668457, Overall 0.9446115493774414 
+Fold 2/2, Epoch 45/99, Minibatch 0/0, Phase valid, Running Loss valid 896.0875244140625, Time 0.17057347297668457, Overall 0.9446115493774414 
+Fold 2/2, Epoch 45/99, Running Loss valid 112.01094055175781, Time 0.1715705394744873, Overall 0.9456086158752441 
+Fold 2/2, Epoch 46/99, Minibatch 0/0, Phase train, Running Loss train 2478.290771484375, Time 0.17356538772583008, Overall 0.9476034641265869 
+Fold 2/2, Epoch 46/99, Running Loss train 145.7818100873162, Time 0.17356538772583008, Overall 0.9476034641265869 
+Fold 2/2, Epoch 46/99, Minibatch 0/0, Phase valid, Running Loss valid 896.6123046875, Time 0.17456269264221191, Overall 0.9486007690429688 
+Fold 2/2, Epoch 46/99, Running Loss valid 112.0765380859375, Time 0.17456269264221191, Overall 0.9486007690429688 
+Epoch    47: reducing learning rate of group 0 to 1.2500e-02.
+Fold 2/2, Epoch 47/99, Minibatch 0/0, Phase train, Running Loss train 2469.806396484375, Time 0.17755484580993652, Overall 0.9515929222106934 
+Fold 2/2, Epoch 47/99, Running Loss train 145.28272920496323, Time 0.17755484580993652, Overall 0.9515929222106934 
+Fold 2/2, Epoch 47/99, Minibatch 0/0, Phase valid, Running Loss valid 896.9856567382812, Time 0.17855191230773926, Overall 0.9525899887084961 
+Fold 2/2, Epoch 47/99, Running Loss valid 112.12320709228516, Time 0.17855191230773926, Overall 0.9525899887084961 
+Fold 2/2, Epoch 48/99, Minibatch 0/0, Phase train, Running Loss train 2474.93505859375, Time 0.18154406547546387, Overall 0.9555821418762207 
+Fold 2/2, Epoch 48/99, Running Loss train 145.58441521139707, Time 0.18154406547546387, Overall 0.9555821418762207 
+Fold 2/2, Epoch 48/99, Minibatch 0/0, Phase valid, Running Loss valid 897.3101806640625, Time 0.18154406547546387, Overall 0.9555821418762207 
+Fold 2/2, Epoch 48/99, Running Loss valid 112.16377258300781, Time 0.18154406547546387, Overall 0.9555821418762207 
+Fold 2/2, Epoch 49/99, Minibatch 0/0, Phase train, Running Loss train 2495.55029296875, Time 0.18453598022460938, Overall 0.9585740566253662 
+Fold 2/2, Epoch 49/99, Running Loss train 146.7970760569853, Time 0.18453598022460938, Overall 0.9585740566253662 
+Fold 2/2, Epoch 49/99, Minibatch 0/0, Phase valid, Running Loss valid 897.73779296875, Time 0.1855332851409912, Overall 0.959571361541748 
+Fold 2/2, Epoch 49/99, Running Loss valid 112.21722412109375, Time 0.1855332851409912, Overall 0.959571361541748 
+Fold 2/2, Epoch 50/99, Minibatch 0/0, Phase train, Running Loss train 2474.12060546875, Time 0.18803167343139648, Overall 0.9620697498321533 
+Fold 2/2, Epoch 50/99, Running Loss train 145.53650620404412, Time 0.18803167343139648, Overall 0.9620697498321533 
+Fold 2/2, Epoch 50/99, Minibatch 0/0, Phase valid, Running Loss valid 898.2216796875, Time 0.18902897834777832, Overall 0.9630670547485352 
+Fold 2/2, Epoch 50/99, Running Loss valid 112.2777099609375, Time 0.18902897834777832, Overall 0.9630670547485352 
+Fold 2/2, Epoch 51/99, Minibatch 0/0, Phase train, Running Loss train 2476.718017578125, Time 0.1910240650177002, Overall 0.965062141418457 
+Fold 2/2, Epoch 51/99, Running Loss train 145.68929515165442, Time 0.1910240650177002, Overall 0.965062141418457 
+Fold 2/2, Epoch 51/99, Minibatch 0/0, Phase valid, Running Loss valid 898.917236328125, Time 0.19202113151550293, Overall 0.9660592079162598 
+Fold 2/2, Epoch 51/99, Running Loss valid 112.36465454101562, Time 0.19202113151550293, Overall 0.9660592079162598 
+Fold 2/2, Epoch 52/99, Minibatch 0/0, Phase train, Running Loss train 2478.940185546875, Time 0.19501304626464844, Overall 0.9690511226654053 
+Fold 2/2, Epoch 52/99, Running Loss train 145.82001091452207, Time 0.19501304626464844, Overall 0.9690511226654053 
+Fold 2/2, Epoch 52/99, Minibatch 0/0, Phase valid, Running Loss valid 899.5037231445312, Time 0.19601011276245117, Overall 0.970048189163208 
+Fold 2/2, Epoch 52/99, Running Loss valid 112.4379653930664, Time 0.19601011276245117, Overall 0.970048189163208 
+Fold 2/2, Epoch 53/99, Minibatch 0/0, Phase train, Running Loss train 2482.0146484375, Time 0.19800496101379395, Overall 0.9720430374145508 
+Fold 2/2, Epoch 53/99, Running Loss train 146.00086167279412, Time 0.19900226593017578, Overall 0.9730403423309326 
+Fold 2/2, Epoch 53/99, Minibatch 0/0, Phase valid, Running Loss valid 900.1447143554688, Time 0.19900226593017578, Overall 0.9730403423309326 
+Fold 2/2, Epoch 53/99, Running Loss valid 112.5180892944336, Time 0.19900226593017578, Overall 0.9730403423309326 
+Fold 2/2, Epoch 54/99, Minibatch 0/0, Phase train, Running Loss train 2485.05419921875, Time 0.2019944190979004, Overall 0.9760324954986572 
+Fold 2/2, Epoch 54/99, Running Loss train 146.17965877757354, Time 0.2019944190979004, Overall 0.9760324954986572 
+Fold 2/2, Epoch 54/99, Minibatch 0/0, Phase valid, Running Loss valid 900.647216796875, Time 0.20299172401428223, Overall 0.9770298004150391 
+Fold 2/2, Epoch 54/99, Running Loss valid 112.58090209960938, Time 0.20299172401428223, Overall 0.9770298004150391 
+Fold 2/2, Epoch 55/99, Minibatch 0/0, Phase train, Running Loss train 2488.109375, Time 0.2049868106842041, Overall 0.9790248870849609 
+Fold 2/2, Epoch 55/99, Running Loss train 146.359375, Time 0.2049868106842041, Overall 0.9790248870849609 
+Fold 2/2, Epoch 55/99, Minibatch 0/0, Phase valid, Running Loss valid 900.9200439453125, Time 0.20598363876342773, Overall 0.9800217151641846 
+Fold 2/2, Epoch 55/99, Running Loss valid 112.61500549316406, Time 0.20598363876342773, Overall 0.9800217151641846 
+Fold 2/2, Epoch 56/99, Minibatch 0/0, Phase train, Running Loss train 2488.997802734375, Time 0.20897579193115234, Overall 0.9830138683319092 
+Fold 2/2, Epoch 56/99, Running Loss train 146.41163545496323, Time 0.20897579193115234, Overall 0.9830138683319092 
+Fold 2/2, Epoch 56/99, Minibatch 0/0, Phase valid, Running Loss valid 901.2052612304688, Time 0.20997309684753418, Overall 0.984011173248291 
+Fold 2/2, Epoch 56/99, Running Loss valid 112.6506576538086, Time 0.20997309684753418, Overall 0.984011173248291 
+Fold 2/2, Epoch 57/99, Minibatch 0/0, Phase train, Running Loss train 2476.9638671875, Time 0.21296477317810059, Overall 0.9870028495788574 
+Fold 2/2, Epoch 57/99, Running Loss train 145.70375689338235, Time 0.21296477317810059, Overall 0.9870028495788574 
+Fold 2/2, Epoch 57/99, Minibatch 0/0, Phase valid, Running Loss valid 901.3378295898438, Time 0.21396255493164062, Overall 0.9880006313323975 
+Fold 2/2, Epoch 57/99, Running Loss valid 112.66722869873047, Time 0.21396255493164062, Overall 0.9880006313323975 
+Epoch    58: reducing learning rate of group 0 to 6.2500e-03.
+Fold 2/2, Epoch 58/99, Minibatch 0/0, Phase train, Running Loss train 2473.360595703125, Time 0.21745729446411133, Overall 0.9914953708648682 
+Fold 2/2, Epoch 58/99, Running Loss train 145.49179974724265, Time 0.21745729446411133, Overall 0.9914953708648682 
+Fold 2/2, Epoch 58/99, Minibatch 0/0, Phase valid, Running Loss valid 901.5377197265625, Time 0.21845459938049316, Overall 0.99249267578125 
+Fold 2/2, Epoch 58/99, Running Loss valid 112.69221496582031, Time 0.21845459938049316, Overall 0.99249267578125 
+Fold 2/2, Epoch 59/99, Minibatch 0/0, Phase train, Running Loss train 2485.9384765625, Time 0.22144675254821777, Overall 0.9954848289489746 
+Fold 2/2, Epoch 59/99, Running Loss train 146.23167509191177, Time 0.22144675254821777, Overall 0.9954848289489746 
+Fold 2/2, Epoch 59/99, Minibatch 0/0, Phase valid, Running Loss valid 901.5917358398438, Time 0.2224440574645996, Overall 0.9964821338653564 
+Fold 2/2, Epoch 59/99, Running Loss valid 112.69896697998047, Time 0.2224440574645996, Overall 0.9964821338653564 
+Fold 2/2, Epoch 60/99, Minibatch 0/0, Phase train, Running Loss train 2505.372314453125, Time 0.22643375396728516, Overall 1.000471830368042 
+Fold 2/2, Epoch 60/99, Running Loss train 147.37484202665442, Time 0.22643375396728516, Overall 1.000471830368042 
+Fold 2/2, Epoch 60/99, Minibatch 0/0, Phase valid, Running Loss valid 901.7281494140625, Time 0.227431058883667, Overall 1.0014691352844238 
+Fold 2/2, Epoch 60/99, Running Loss valid 112.71601867675781, Time 0.227431058883667, Overall 1.0014691352844238 
+Fold 2/2, Epoch 61/99, Minibatch 0/0, Phase train, Running Loss train 2485.09765625, Time 0.2304232120513916, Overall 1.0044612884521484 
+Fold 2/2, Epoch 61/99, Running Loss train 146.18221507352942, Time 0.2304232120513916, Overall 1.0044612884521484 
+Fold 2/2, Epoch 61/99, Minibatch 0/0, Phase valid, Running Loss valid 902.0215454101562, Time 0.23142075538635254, Overall 1.0054588317871094 
+Fold 2/2, Epoch 61/99, Running Loss valid 112.75269317626953, Time 0.23142075538635254, Overall 1.0054588317871094 
+Fold 2/2, Epoch 62/99, Minibatch 0/0, Phase train, Running Loss train 2482.68310546875, Time 0.23540997505187988, Overall 1.0094480514526367 
+Fold 2/2, Epoch 62/99, Running Loss train 146.04018267463235, Time 0.23540997505187988, Overall 1.0094480514526367 
+Fold 2/2, Epoch 62/99, Minibatch 0/0, Phase valid, Running Loss valid 902.2557373046875, Time 0.23640751838684082, Overall 1.0104455947875977 
+Fold 2/2, Epoch 62/99, Running Loss valid 112.78196716308594, Time 0.23640751838684082, Overall 1.0104455947875977 
+Fold 2/2, Epoch 63/99, Minibatch 0/0, Phase train, Running Loss train 2473.146728515625, Time 0.24039697647094727, Overall 1.014435052871704 
+Fold 2/2, Epoch 63/99, Running Loss train 145.47921932444854, Time 0.24039697647094727, Overall 1.014435052871704 
+Fold 2/2, Epoch 63/99, Minibatch 0/0, Phase valid, Running Loss valid 902.3905639648438, Time 0.24239110946655273, Overall 1.0164291858673096 
+Fold 2/2, Epoch 63/99, Running Loss valid 112.79882049560547, Time 0.24239110946655273, Overall 1.0164291858673096 
+Fold 2/2, Epoch 64/99, Minibatch 0/0, Phase train, Running Loss train 2496.970703125, Time 0.24538350105285645, Overall 1.0194215774536133 
+Fold 2/2, Epoch 64/99, Running Loss train 146.88062959558823, Time 0.24638056755065918, Overall 1.020418643951416 
+Fold 2/2, Epoch 64/99, Minibatch 0/0, Phase valid, Running Loss valid 902.374267578125, Time 0.24737811088562012, Overall 1.021416187286377 
+Fold 2/2, Epoch 64/99, Running Loss valid 112.79678344726562, Time 0.24737811088562012, Overall 1.021416187286377 
+Fold 2/2, Epoch 65/99, Minibatch 0/0, Phase train, Running Loss train 2480.12841796875, Time 0.25037050247192383, Overall 1.0244085788726807 
+Fold 2/2, Epoch 65/99, Running Loss train 145.88990693933823, Time 0.25037050247192383, Overall 1.0244085788726807 
+Fold 2/2, Epoch 65/99, Minibatch 0/0, Phase valid, Running Loss valid 902.3314208984375, Time 0.2523643970489502, Overall 1.026402473449707 
+Fold 2/2, Epoch 65/99, Running Loss valid 112.79142761230469, Time 0.2523643970489502, Overall 1.026402473449707 
+Fold 2/2, Epoch 66/99, Minibatch 0/0, Phase train, Running Loss train 2475.1201171875, Time 0.2553565502166748, Overall 1.0293946266174316 
+Fold 2/2, Epoch 66/99, Running Loss train 145.59530101102942, Time 0.2553565502166748, Overall 1.0293946266174316 
+Fold 2/2, Epoch 66/99, Minibatch 0/0, Phase valid, Running Loss valid 902.2564697265625, Time 0.2568633556365967, Overall 1.0309014320373535 
+Fold 2/2, Epoch 66/99, Running Loss valid 112.78205871582031, Time 0.2568633556365967, Overall 1.0309014320373535 
+Fold 2/2, Epoch 67/99, Minibatch 0/0, Phase train, Running Loss train 2477.133544921875, Time 0.2608480453491211, Overall 1.034886121749878 
+Fold 2/2, Epoch 67/99, Running Loss train 145.71373793658088, Time 0.2608480453491211, Overall 1.034886121749878 
+Fold 2/2, Epoch 67/99, Minibatch 0/0, Phase valid, Running Loss valid 902.0108032226562, Time 0.26184535026550293, Overall 1.0358834266662598 
+Fold 2/2, Epoch 67/99, Running Loss valid 112.75135040283203, Time 0.26184535026550293, Overall 1.0358834266662598 
+Fold 2/2, Epoch 68/99, Minibatch 0/0, Phase train, Running Loss train 2466.1162109375, Time 0.26483774185180664, Overall 1.0388758182525635 
+Fold 2/2, Epoch 68/99, Running Loss train 145.06565946691177, Time 0.26483774185180664, Overall 1.0388758182525635 
+Fold 2/2, Epoch 68/99, Minibatch 0/0, Phase valid, Running Loss valid 901.8200073242188, Time 0.2668323516845703, Overall 1.0408704280853271 
+Fold 2/2, Epoch 68/99, Running Loss valid 112.72750091552734, Time 0.2668323516845703, Overall 1.0408704280853271 
+Epoch    69: reducing learning rate of group 0 to 3.1250e-03.
+Fold 2/2, Epoch 69/99, Minibatch 0/0, Phase train, Running Loss train 2474.89111328125, Time 0.2703287601470947, Overall 1.0443668365478516 
+Fold 2/2, Epoch 69/99, Running Loss train 145.5818301930147, Time 0.2703287601470947, Overall 1.0443668365478516 
+Fold 2/2, Epoch 69/99, Minibatch 0/0, Phase valid, Running Loss valid 901.7400512695312, Time 0.27132582664489746, Overall 1.0453639030456543 
+Fold 2/2, Epoch 69/99, Running Loss valid 112.7175064086914, Time 0.27132582664489746, Overall 1.0453639030456543 
+Fold 2/2, Epoch 70/99, Minibatch 0/0, Phase train, Running Loss train 2469.041015625, Time 0.2743184566497803, Overall 1.048356533050537 
+Fold 2/2, Epoch 70/99, Running Loss train 145.23770680147058, Time 0.2743184566497803, Overall 1.048356533050537 
+Fold 2/2, Epoch 70/99, Minibatch 0/0, Phase valid, Running Loss valid 901.6654663085938, Time 0.2753152847290039, Overall 1.0493533611297607 
+Fold 2/2, Epoch 70/99, Running Loss valid 112.70818328857422, Time 0.27631258964538574, Overall 1.0503506660461426 
+Fold 2/2, Epoch 71/99, Minibatch 0/0, Phase train, Running Loss train 2489.359375, Time 0.27930474281311035, Overall 1.0533428192138672 
+Fold 2/2, Epoch 71/99, Running Loss train 146.4329044117647, Time 0.27930474281311035, Overall 1.0533428192138672 
+Fold 2/2, Epoch 71/99, Minibatch 0/0, Phase valid, Running Loss valid 901.517578125, Time 0.280301570892334, Overall 1.0543396472930908 
+Fold 2/2, Epoch 71/99, Running Loss valid 112.689697265625, Time 0.280301570892334, Overall 1.0543396472930908 
+Fold 2/2, Epoch 72/99, Minibatch 0/0, Phase train, Running Loss train 2487.23779296875, Time 0.2832942008972168, Overall 1.0573322772979736 
+Fold 2/2, Epoch 72/99, Running Loss train 146.30810546875, Time 0.2832942008972168, Overall 1.0573322772979736 
+Fold 2/2, Epoch 72/99, Minibatch 0/0, Phase valid, Running Loss valid 901.4367065429688, Time 0.28528904914855957, Overall 1.0593271255493164 
+Fold 2/2, Epoch 72/99, Running Loss valid 112.6795883178711, Time 0.28528904914855957, Overall 1.0593271255493164 
+Fold 2/2, Epoch 73/99, Minibatch 0/0, Phase train, Running Loss train 2469.679443359375, Time 0.2882804870605469, Overall 1.0623185634613037 
+Fold 2/2, Epoch 73/99, Running Loss train 145.27526137408088, Time 0.2882804870605469, Overall 1.0623185634613037 
+Fold 2/2, Epoch 73/99, Minibatch 0/0, Phase valid, Running Loss valid 901.391845703125, Time 0.2892780303955078, Overall 1.0633161067962646 
+Fold 2/2, Epoch 73/99, Running Loss valid 112.67398071289062, Time 0.2892780303955078, Overall 1.0633161067962646 
+Fold 2/2, Epoch 74/99, Minibatch 0/0, Phase train, Running Loss train 2476.605712890625, Time 0.29326748847961426, Overall 1.067305564880371 
+Fold 2/2, Epoch 74/99, Running Loss train 145.6826889935662, Time 0.29326748847961426, Overall 1.067305564880371 
+Fold 2/2, Epoch 74/99, Minibatch 0/0, Phase valid, Running Loss valid 901.3159790039062, Time 0.2942647933959961, Overall 1.068302869796753 
+Fold 2/2, Epoch 74/99, Running Loss valid 112.66449737548828, Time 0.2942647933959961, Overall 1.068302869796753 
+Fold 2/2, Epoch 75/99, Minibatch 0/0, Phase train, Running Loss train 2480.841796875, Time 0.29776787757873535, Overall 1.0718059539794922 
+Fold 2/2, Epoch 75/99, Running Loss train 145.93187040441177, Time 0.29776787757873535, Overall 1.0718059539794922 
+Fold 2/2, Epoch 75/99, Minibatch 0/0, Phase valid, Running Loss valid 901.2125244140625, Time 0.29875874519348145, Overall 1.0727968215942383 
+Fold 2/2, Epoch 75/99, Running Loss valid 112.65156555175781, Time 0.29875874519348145, Overall 1.0727968215942383 
+Fold 2/2, Epoch 76/99, Minibatch 0/0, Phase train, Running Loss train 2468.91259765625, Time 0.30175089836120605, Overall 1.075788974761963 
+Fold 2/2, Epoch 76/99, Running Loss train 145.2301528033088, Time 0.30175089836120605, Overall 1.075788974761963 
+Fold 2/2, Epoch 76/99, Minibatch 0/0, Phase valid, Running Loss valid 901.0482177734375, Time 0.3027615547180176, Overall 1.0767996311187744 
+Fold 2/2, Epoch 76/99, Running Loss valid 112.63102722167969, Time 0.3027615547180176, Overall 1.0767996311187744 
+Fold 2/2, Epoch 77/99, Minibatch 0/0, Phase train, Running Loss train 2473.1953125, Time 0.30673742294311523, Overall 1.080775499343872 
+Fold 2/2, Epoch 77/99, Running Loss train 145.48207720588235, Time 0.30673742294311523, Overall 1.080775499343872 
+Fold 2/2, Epoch 77/99, Minibatch 0/0, Phase valid, Running Loss valid 900.8236083984375, Time 0.30773496627807617, Overall 1.081773042678833 
+Fold 2/2, Epoch 77/99, Running Loss valid 112.60295104980469, Time 0.30773496627807617, Overall 1.081773042678833 
+Fold 2/2, Epoch 78/99, Minibatch 0/0, Phase train, Running Loss train 2468.862060546875, Time 0.3107271194458008, Overall 1.0847651958465576 
+Fold 2/2, Epoch 78/99, Running Loss train 145.22718003216912, Time 0.3117246627807617, Overall 1.0857627391815186 
+Fold 2/2, Epoch 78/99, Minibatch 0/0, Phase valid, Running Loss valid 900.60009765625, Time 0.31272149085998535, Overall 1.0867595672607422 
+Fold 2/2, Epoch 78/99, Running Loss valid 112.57501220703125, Time 0.31272149085998535, Overall 1.0867595672607422 
+Fold 2/2, Epoch 79/99, Minibatch 0/0, Phase train, Running Loss train 2473.6181640625, Time 0.31571412086486816, Overall 1.089752197265625 
+Fold 2/2, Epoch 79/99, Running Loss train 145.50695082720588, Time 0.31571412086486816, Overall 1.089752197265625 
+Fold 2/2, Epoch 79/99, Minibatch 0/0, Phase valid, Running Loss valid 900.4326171875, Time 0.3167111873626709, Overall 1.0907492637634277 
+Fold 2/2, Epoch 79/99, Running Loss valid 112.5540771484375, Time 0.3167111873626709, Overall 1.0907492637634277 
+Epoch    80: reducing learning rate of group 0 to 1.5625e-03.
+Fold 2/2, Epoch 80/99, Minibatch 0/0, Phase train, Running Loss train 2474.22607421875, Time 0.3197174072265625, Overall 1.0937554836273193 
+Fold 2/2, Epoch 80/99, Running Loss train 145.54271024816177, Time 0.3197174072265625, Overall 1.0937554836273193 
+Fold 2/2, Epoch 80/99, Minibatch 0/0, Phase valid, Running Loss valid 900.3424072265625, Time 0.32070016860961914, Overall 1.094738245010376 
+Fold 2/2, Epoch 80/99, Running Loss valid 112.54280090332031, Time 0.32070016860961914, Overall 1.094738245010376 
+Fold 2/2, Epoch 81/99, Minibatch 0/0, Phase train, Running Loss train 2480.713623046875, Time 0.3246898651123047, Overall 1.0987279415130615 
+Fold 2/2, Epoch 81/99, Running Loss train 145.92433076746323, Time 0.3246898651123047, Overall 1.0987279415130615 
+Fold 2/2, Epoch 81/99, Minibatch 0/0, Phase valid, Running Loss valid 900.275390625, Time 0.3256869316101074, Overall 1.0997250080108643 
+Fold 2/2, Epoch 81/99, Running Loss valid 112.534423828125, Time 0.3256869316101074, Overall 1.0997250080108643 
+Fold 2/2, Epoch 82/99, Minibatch 0/0, Phase train, Running Loss train 2479.670654296875, Time 0.32918286323547363, Overall 1.1032209396362305 
+Fold 2/2, Epoch 82/99, Running Loss train 145.86297966452207, Time 0.32918286323547363, Overall 1.1032209396362305 
+Fold 2/2, Epoch 82/99, Minibatch 0/0, Phase valid, Running Loss valid 900.2221069335938, Time 0.33017992973327637, Overall 1.1042180061340332 
+Fold 2/2, Epoch 82/99, Running Loss valid 112.52776336669922, Time 0.33017992973327637, Overall 1.1042180061340332 
+Fold 2/2, Epoch 83/99, Minibatch 0/0, Phase train, Running Loss train 2465.741455078125, Time 0.3331723213195801, Overall 1.107210397720337 
+Fold 2/2, Epoch 83/99, Running Loss train 145.04361500459558, Time 0.3331723213195801, Overall 1.107210397720337 
+Fold 2/2, Epoch 83/99, Minibatch 0/0, Phase valid, Running Loss valid 900.1807861328125, Time 0.3341693878173828, Overall 1.1082074642181396 
+Fold 2/2, Epoch 83/99, Running Loss valid 112.52259826660156, Time 0.3341693878173828, Overall 1.1082074642181396 
+Fold 2/2, Epoch 84/99, Minibatch 0/0, Phase train, Running Loss train 2468.478515625, Time 0.3371613025665283, Overall 1.1111993789672852 
+Fold 2/2, Epoch 84/99, Running Loss train 145.20461856617646, Time 0.3371613025665283, Overall 1.1111993789672852 
+Fold 2/2, Epoch 84/99, Minibatch 0/0, Phase valid, Running Loss valid 900.1618041992188, Time 0.33815860748291016, Overall 1.112196683883667 
+Fold 2/2, Epoch 84/99, Running Loss valid 112.52022552490234, Time 0.33815860748291016, Overall 1.112196683883667 
+Fold 2/2, Epoch 85/99, Minibatch 0/0, Phase train, Running Loss train 2480.82080078125, Time 0.34115076065063477, Overall 1.1151888370513916 
+Fold 2/2, Epoch 85/99, Running Loss train 145.93063534007354, Time 0.34115076065063477, Overall 1.1151888370513916 
+Fold 2/2, Epoch 85/99, Minibatch 0/0, Phase valid, Running Loss valid 900.1507568359375, Time 0.3421483039855957, Overall 1.1161863803863525 
+Fold 2/2, Epoch 85/99, Running Loss valid 112.51884460449219, Time 0.3421483039855957, Overall 1.1161863803863525 
+Fold 2/2, Epoch 86/99, Minibatch 0/0, Phase train, Running Loss train 2479.559814453125, Time 0.34613776206970215, Overall 1.120175838470459 
+Fold 2/2, Epoch 86/99, Running Loss train 145.85645967371323, Time 0.34613776206970215, Overall 1.120175838470459 
+Fold 2/2, Epoch 86/99, Minibatch 0/0, Phase valid, Running Loss valid 900.1210327148438, Time 0.347135066986084, Overall 1.1211731433868408 
+Fold 2/2, Epoch 86/99, Running Loss valid 112.51512908935547, Time 0.347135066986084, Overall 1.1211731433868408 
+Fold 2/2, Epoch 87/99, Minibatch 0/0, Phase train, Running Loss train 2475.092529296875, Time 0.3501269817352295, Overall 1.1241650581359863 
+Fold 2/2, Epoch 87/99, Running Loss train 145.5936781939338, Time 0.3501269817352295, Overall 1.1241650581359863 
+Fold 2/2, Epoch 87/99, Minibatch 0/0, Phase valid, Running Loss valid 900.055908203125, Time 0.3511240482330322, Overall 1.125162124633789 
+Fold 2/2, Epoch 87/99, Running Loss valid 112.50698852539062, Time 0.3511240482330322, Overall 1.125162124633789 
+Fold 2/2, Epoch 88/99, Minibatch 0/0, Phase train, Running Loss train 2501.99560546875, Time 0.35411691665649414, Overall 1.128154993057251 
+Fold 2/2, Epoch 88/99, Running Loss train 147.17621208639707, Time 0.35411691665649414, Overall 1.128154993057251 
+Fold 2/2, Epoch 88/99, Minibatch 0/0, Phase valid, Running Loss valid 899.9641723632812, Time 0.35511350631713867, Overall 1.1291515827178955 
+Fold 2/2, Epoch 88/99, Running Loss valid 112.49552154541016, Time 0.35511350631713867, Overall 1.1291515827178955 
+Fold 2/2, Epoch 89/99, Minibatch 0/0, Phase train, Running Loss train 2474.42919921875, Time 0.3586311340332031, Overall 1.13266921043396 
+Fold 2/2, Epoch 89/99, Running Loss train 145.55465877757354, Time 0.3586311340332031, Overall 1.13266921043396 
+Fold 2/2, Epoch 89/99, Minibatch 0/0, Phase valid, Running Loss valid 899.8787231445312, Time 0.35960817337036133, Overall 1.1336462497711182 
+Fold 2/2, Epoch 89/99, Running Loss valid 112.4848403930664, Time 0.35960817337036133, Overall 1.1336462497711182 
+Fold 2/2, Epoch 90/99, Minibatch 0/0, Phase train, Running Loss train 2493.11328125, Time 0.36260032653808594, Overall 1.1366384029388428 
+Fold 2/2, Epoch 90/99, Running Loss train 146.65372242647058, Time 0.36260032653808594, Overall 1.1366384029388428 
+Fold 2/2, Epoch 90/99, Minibatch 0/0, Phase valid, Running Loss valid 899.828369140625, Time 0.3635976314544678, Overall 1.1376357078552246 
+Fold 2/2, Epoch 90/99, Running Loss valid 112.47854614257812, Time 0.3635976314544678, Overall 1.1376357078552246 
+Epoch    91: reducing learning rate of group 0 to 7.8125e-04.
+Fold 2/2, Epoch 91/99, Minibatch 0/0, Phase train, Running Loss train 2479.406005859375, Time 0.3665897846221924, Overall 1.1406278610229492 
+Fold 2/2, Epoch 91/99, Running Loss train 145.847412109375, Time 0.3675868511199951, Overall 1.141624927520752 
+Fold 2/2, Epoch 91/99, Minibatch 0/0, Phase valid, Running Loss valid 899.8193359375, Time 0.3675868511199951, Overall 1.141624927520752 
+Fold 2/2, Epoch 91/99, Running Loss valid 112.4774169921875, Time 0.3675868511199951, Overall 1.141624927520752 
+Fold 2/2, Epoch 92/99, Minibatch 0/0, Phase train, Running Loss train 2468.69873046875, Time 0.3705790042877197, Overall 1.1446170806884766 
+Fold 2/2, Epoch 92/99, Running Loss train 145.2175723805147, Time 0.3705790042877197, Overall 1.1446170806884766 
+Fold 2/2, Epoch 92/99, Minibatch 0/0, Phase valid, Running Loss valid 899.7977294921875, Time 0.3715839385986328, Overall 1.1456220149993896 
+Fold 2/2, Epoch 92/99, Running Loss valid 112.47471618652344, Time 0.3715839385986328, Overall 1.1456220149993896 
+Fold 2/2, Epoch 93/99, Minibatch 0/0, Phase train, Running Loss train 2467.438720703125, Time 0.37456846237182617, Overall 1.148606538772583 
+Fold 2/2, Epoch 93/99, Running Loss train 145.14345415900735, Time 0.37456846237182617, Overall 1.148606538772583 
+Fold 2/2, Epoch 93/99, Minibatch 0/0, Phase valid, Running Loss valid 899.7908935546875, Time 0.3755662441253662, Overall 1.149604320526123 
+Fold 2/2, Epoch 93/99, Running Loss valid 112.47386169433594, Time 0.3755662441253662, Overall 1.149604320526123 
+Fold 2/2, Epoch 94/99, Minibatch 0/0, Phase train, Running Loss train 2471.534423828125, Time 0.37906956672668457, Overall 1.1531076431274414 
+Fold 2/2, Epoch 94/99, Running Loss train 145.38437787224265, Time 0.37906956672668457, Overall 1.1531076431274414 
+Fold 2/2, Epoch 94/99, Minibatch 0/0, Phase valid, Running Loss valid 899.7822265625, Time 0.38005995750427246, Overall 1.1540980339050293 
+Fold 2/2, Epoch 94/99, Running Loss valid 112.4727783203125, Time 0.38005995750427246, Overall 1.1540980339050293 
+Fold 2/2, Epoch 95/99, Minibatch 0/0, Phase train, Running Loss train 2467.281494140625, Time 0.3840498924255371, Overall 1.158087968826294 
+Fold 2/2, Epoch 95/99, Running Loss train 145.1342055376838, Time 0.3840498924255371, Overall 1.158087968826294 
+Fold 2/2, Epoch 95/99, Minibatch 0/0, Phase valid, Running Loss valid 899.7753295898438, Time 0.38504672050476074, Overall 1.1590847969055176 
+Fold 2/2, Epoch 95/99, Running Loss valid 112.47191619873047, Time 0.38504672050476074, Overall 1.1590847969055176 
+Fold 2/2, Epoch 96/99, Minibatch 0/0, Phase train, Running Loss train 2462.308349609375, Time 0.38803911209106445, Overall 1.1620771884918213 
+Fold 2/2, Epoch 96/99, Running Loss train 144.84166762408088, Time 0.38803911209106445, Overall 1.1620771884918213 
+Fold 2/2, Epoch 96/99, Minibatch 0/0, Phase valid, Running Loss valid 899.7747802734375, Time 0.3890364170074463, Overall 1.1630744934082031 
+Fold 2/2, Epoch 96/99, Running Loss valid 112.47184753417969, Time 0.3890364170074463, Overall 1.1630744934082031 
+Fold 2/2, Epoch 97/99, Minibatch 0/0, Phase train, Running Loss train 2473.4052734375, Time 0.3920283317565918, Overall 1.1660664081573486 
+Fold 2/2, Epoch 97/99, Running Loss train 145.4944278492647, Time 0.3920283317565918, Overall 1.1660664081573486 
+Fold 2/2, Epoch 97/99, Minibatch 0/0, Phase valid, Running Loss valid 899.76708984375, Time 0.39303016662597656, Overall 1.1670682430267334 
+Fold 2/2, Epoch 97/99, Running Loss valid 112.47088623046875, Time 0.39303016662597656, Overall 1.1670682430267334 
+Fold 2/2, Epoch 98/99, Minibatch 0/0, Phase train, Running Loss train 2485.718017578125, Time 0.3960254192352295, Overall 1.1700634956359863 
+Fold 2/2, Epoch 98/99, Running Loss train 146.2187069163603, Time 0.397014856338501, Overall 1.1710529327392578 
+Fold 2/2, Epoch 98/99, Minibatch 0/0, Phase valid, Running Loss valid 899.7708740234375, Time 0.397014856338501, Overall 1.1710529327392578 
+Fold 2/2, Epoch 98/99, Running Loss valid 112.47135925292969, Time 0.3980121612548828, Overall 1.1720502376556396 
+Fold 2/2, Epoch 99/99, Minibatch 0/0, Phase train, Running Loss train 2475.979248046875, Time 0.4010040760040283, Overall 1.1750421524047852 
+Fold 2/2, Epoch 99/99, Running Loss train 145.64583812040442, Time 0.4010040760040283, Overall 1.1750421524047852 
+Fold 2/2, Epoch 99/99, Minibatch 0/0, Phase valid, Running Loss valid 899.7850341796875, Time 0.40200161933898926, Overall 1.176039695739746 
+Fold 2/2, Epoch 99/99, Running Loss valid 112.47312927246094, Time 0.40200161933898926, Overall 1.176039695739746 
+It took 1.177037000656128 to train the model.
+Building pytrec_eval input for 5 instances ...
+Evaluating {'recall_2,5,10', 'ndcg_cut_2,5,10', 'P_2,5,10', 'map_cut_2,5,10'} ...
+Averaging ...
+Building pytrec_eval input for 5 instances ...
+Evaluating {'recall_2,5,10', 'ndcg_cut_2,5,10', 'P_2,5,10', 'map_cut_2,5,10'} ...
+Averaging ...
+Building pytrec_eval input for 5 instances ...
+Evaluating {'recall_2,5,10', 'ndcg_cut_2,5,10', 'P_2,5,10', 'map_cut_2,5,10'} ...
+Averaging ...
+Building pytrec_eval input for 16 instances ...
+Evaluating {'recall_2,5,10', 'ndcg_cut_2,5,10', 'P_2,5,10', 'map_cut_2,5,10'} ...
+Averaging ...
+Building pytrec_eval input for 17 instances ...
+Evaluating {'recall_2,5,10', 'ndcg_cut_2,5,10', 'P_2,5,10', 'map_cut_2,5,10'} ...
+Averaging ...
+Building pytrec_eval input for 17 instances ...
+Evaluating {'recall_2,5,10', 'ndcg_cut_2,5,10', 'P_2,5,10', 'map_cut_2,5,10'} ...
+Averaging ...
+Building pytrec_eval input for 9 instances ...
+Evaluating {'recall_2,5,10', 'ndcg_cut_2,5,10', 'P_2,5,10', 'map_cut_2,5,10'} ...
+Averaging ...
+Building pytrec_eval input for 8 instances ...
+Evaluating {'recall_2,5,10', 'ndcg_cut_2,5,10', 'P_2,5,10', 'map_cut_2,5,10'} ...
+Averaging ...
+Building pytrec_eval input for 8 instances ...
+Evaluating {'recall_2,5,10', 'ndcg_cut_2,5,10', 'P_2,5,10', 'map_cut_2,5,10'} ...
+Averaging ...
