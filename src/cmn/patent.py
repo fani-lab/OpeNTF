@@ -107,32 +107,52 @@ class Patent(Team):
 
         except FileNotFoundError:
             stats = {}
+            with open(teamsvecs, 'rb') as infile:
+                teamsvecs = pickle.load(infile)
+
+            with open(teams, 'rb') as infile1:
+                teams = pickle.load(infile1)
+
             stats.update(super().get_stats(teamsvecs, output, plot))
-
-            #dic[patent.country] +=1
-            #dic[patent.country, skill] +=1
-
-            #dict[inventor.country] +=1 over inventors' locations
-
-            #inventors' location != patent.location
 
             city = {}; state = {}; country = {}
             geo_loc = [city, state, country]
             loc_pat = {}; city_mem = {}; state_mem = {}; country_mem = {}
+            avg_country = {}; avg_state = {}; avg_city = {}
+            unq_country = set(); unq_state = set(); unq_city = set()
+
             for key in teams.keys():
+                t_city = set(); t_state = set(); t_country = set()
                 loc = teams[key].members_details[0:]
                 for item in loc:
-                    city[key], state[key], country[key] = item
+                    city_name, state_name, country_name = item
+                    t_city.add(city_name); t_state.add(state_name); t_country.add(country_name)
+                    if city_name in city.keys(): city[city_name] = city[city_name] + 1;
+                    else:
+                        city[city_name] = 1
+                        unq_city.add(city_name)
+                    if state_name in state.keys(): state[state_name] = state[state_name] + 1;
+                    else:
+                        state[state_name] = 1
+                        unq_state.add(state_name)
+                    if country_name in country.keys(): country[country_name] = country[country_name] + 1;
+                    else:
+                        country[country_name] = 1
+                        unq_country.add(country_name)
+                avg_city[key] = len(t_city)
+                avg_state[key] = len(t_state)
+                avg_country[key] = len(t_country)
 
-            for loc_dict in geo_loc:
-                new_dict = {}
-                for k, v in loc_dict.items():
-                    if v in new_dict.keys(): new_dict[v].append(k)
-                    else: new_dict[v] = [k]
-                loc_pat.update(new_dict)
-            for k, v in loc_pat.items():
-                loc_pat[k] = len(v)
-            stats['patents_over_location'] = loc_pat
+            stats['npatents_avgcity'] = avg_city
+            stats['npatents_avgstate'] = avg_state
+            stats['npatents_avgcountry'] = avg_country
+            stats['ninventors_city'] = city
+            stats['ninventors_state'] = state
+            stats['ninventors_country'] = country
+            stats['nunique_city'] = unq_city
+            stats['nunique_state'] = set(filter(lambda x: x == x , unq_state))
+            stats['nunique_country'] = unq_country
+
             max_records = teamsvecs['id'].shape[0]
             for i in range(0, max_records):
                 id = teamsvecs['id'][i].astype(int).toarray()[0][0].tolist()
@@ -160,7 +180,6 @@ class Patent(Team):
             stats['nmembers_city-idx'] = city_mem
             stats['nmembers_state-idx'] = state_mem
             stats['nmembers_country-idx'] = country_mem
-
             with open(f'{output}/stats.pkl', 'wb') as outfile: pickle.dump(stats, outfile)
             if plot: Team.plot_stats(stats, output)
             return stats
