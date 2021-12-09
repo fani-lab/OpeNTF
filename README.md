@@ -14,6 +14,7 @@ You need to have ``Python >= 3.8`` and install the following main packages, amon
 ```
 torch==1.6.0
 pytre_eval==0.5
+gensim==3.8.3
 ```
 By ``pip``, clone the codebase and install the required packages:
 ```sh
