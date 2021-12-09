@@ -16,7 +16,7 @@ from cmn.movie import Movie
 
 from cmn.patent import Patent
 output = '../data/preprocessed/uspt/toy.patent.tsv'
-stats = Patent.get_stats(f'{output}/teamsvecs.pkl', output, plot=False)
+stats = Patent.get_stats(f'{output}/teams.pkl', f'{output}/teamsvecs.pkl', output, plot=False)
 
 with open(f'{output}/teamsvecs.pkl', 'rb') as infile:
     teamsvecs = pickle.load(infile)
