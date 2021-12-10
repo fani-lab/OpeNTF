@@ -46,14 +46,14 @@ def run(datapath, domain, filter, model, output, settings):
         bnn_main.main(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}/bnn', settings['model']['baseline']['fnn'], settings['model']['cmd'])
 
     if model == 'fnn_emb':
-        t2v = Team2Vec(vecs, 'skill', f'./../data/preprocessed/{domain}/{os.path.split(datapath)[-1]}')
+        t2v = Team2Vec(vecs, 'skill', f'./../data/preprocessed/{domain}/{os.path.split(datapath)[-1]}', settings['data']['filter'] if filter else None)
         emb_setting = settings['model']['baseline']['emb']
         t2v.train(emb_setting['d'], emb_setting['w'], emb_setting['dm'], emb_setting['e'])
         vecs['skill'] = t2v.dv()
         fnn_main.main(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}/fnn_emb', settings['model']['baseline']['fnn'], settings['model']['cmd'])
 
     if model == 'bnn_emb':
-        t2v = Team2Vec(vecs, 'skill', f'./../data/preprocessed/{domain}/{os.path.split(datapath)[-1]}')
+        t2v = Team2Vec(vecs, 'skill', f'./../data/preprocessed/{domain}/{os.path.split(datapath)[-1]}', settings['data']['filter'] if filter else None)
         emb_setting = settings['model']['baseline']['emb']
         t2v.train(emb_setting['d'], emb_setting['w'], emb_setting['dm'], emb_setting['e'])
         vecs['skill'] = t2v.dv()

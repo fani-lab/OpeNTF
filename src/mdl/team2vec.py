@@ -14,8 +14,8 @@ import argparse
 # label_list = ['t1','t2','t3']
 
 class Team2Vec:
-    def __init__(self, teamsvecs, embtype, output):
-        self.output = output
+    def __init__(self, teamsvecs, embtype, output, filter):
+        self.output = output + (f".filtered.mt{filter['min_nteam']}.ts{filter['min_team_size']}" if filter else None)
         self.embtype = embtype
         self.docs = []
         self.settings = ''
@@ -30,7 +30,7 @@ class Team2Vec:
         except FileNotFoundError:
             print(f"File not found! Generating {self.embtype} documents ...")
             for i, id in enumerate(self.teamsvecs['id']):
-                td = gensim.models.doc2vec.TaggedDocument([f'{"s" if self.embtype == "skill" else "m"}{str(skill_idx)}' for skill_idx in self.teamsvecs[self.embtype][i].nonzero()[1]], [int(id[0,0])])
+                td = gensim.models.doc2vec.TaggedDocument([f'{"s" if self.embtype == "skill" else "m"}{str(skill_idx)}' for skill_idx in self.teamsvecs[self.embtype][i].nonzero()[1]], [str(int(id[0,0]))])
                 self.docs.append(td)
             print(f'#Documents with word type of {self.embtype} have created: {len(self.docs)}')
             print(f'Saving the {self.embtype} documents ...')
@@ -51,7 +51,7 @@ class Team2Vec:
                                                # training algorithm. If dm=1, ‘distributed memory’ (PV-DM) is used. Otherwise, distributed bag of words (PV-DBOW) is employed.
                                                vector_size=dimension,
                                                window=window,
-                                               dbow_words=1,
+                                               dbow_words=0,
                                                # ({1,0}, optional) – If set to 1 trains word-vectors (in skip-gram fashion) simultaneous with DBOW doc-vector training; If 0, only trains doc-vectors (faster).
                                                min_alpha=0.025,
                                                min_count=0,
