@@ -19,6 +19,9 @@ settings = {
                 'nns': None,  # number of negative samples
                 'ns': None,  # 'uniform', 'unigram', 'unigram_b'
             },
+            'bnn':{ # sample_elbo for bnn
+                's': 1  # number of sampling for bayesian nn
+            },
             'emb':{
                 'd': 100,# embedding dimension
                 'e': 100,# epoch
