@@ -46,4 +46,4 @@ class BNN(nn.Module):
         #log_likes = F.nll_loss(outputs.mean(0), target, size_average=False)
         # log_likes = F.nll_loss(outputs.mean(0), target, reduction='sum')
         # loss = (log_post - log_prior)/num_batches + log_likes
-        return loss, outputs
+        return loss, outputs.reshape((target.shape[0], samples, self.output_size))
