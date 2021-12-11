@@ -15,7 +15,7 @@ from mdl.team2vec import Team2Vec
 sys.path.extend(['../cmn'])
 
 def create_evaluation_splits(n_sample, n_folds, train_ratio=0.85):
-    train, test = train_test_split(np.arange(n_sample), train_size=train_ratio, test_size=1-train_ratio, random_state=0, shuffle=True)
+    train, test = train_test_split(np.arange(n_sample), train_size=train_ratio, random_state=0, shuffle=True)
     splits = dict()
     splits['test'] = test
     splits['folds'] = dict()
