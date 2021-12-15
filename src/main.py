@@ -1,7 +1,8 @@
-import sys,os
+import sys,os, json
 import argparse
 import numpy as np
 from sklearn.model_selection import KFold, train_test_split
+from json import JSONEncoder
 
 import param
 from cmn.publication import Publication
@@ -14,8 +15,14 @@ from mdl.team2vec import Team2Vec
 
 sys.path.extend(['../cmn'])
 
-def create_evaluation_splits(n_sample, n_folds, train_ratio=0.85):
-    train, test = train_test_split(np.arange(n_sample), train_size=train_ratio, test_size=1-train_ratio, random_state=0, shuffle=True)
+class NumpyArrayEncoder(JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return JSONEncoder.default(self, obj)
+
+def create_evaluation_splits(n_sample, n_folds, train_ratio=0.85, output='./'):
+    train, test = train_test_split(np.arange(n_sample), train_size=train_ratio, random_state=0, shuffle=True)
     splits = dict()
     splits['test'] = test
     splits['folds'] = dict()
@@ -25,19 +32,23 @@ def create_evaluation_splits(n_sample, n_folds, train_ratio=0.85):
         splits['folds'][k]['train'] = train[trainIdx]
         splits['folds'][k]['valid'] = train[validIdx]
 
+    with open(f'{output}/splits.json', 'w') as f:
+        json.dump(splits, f, cls=NumpyArrayEncoder, indent=1)
+
     return splits
 
 def run(datapath, domain, filter, model, output, settings):
+    prep_output = f'./../data/preprocessed/{domain}/{os.path.split(datapath)[-1]}'
     if domain == 'dblp':
-        vecs, indexes = Publication.generate_sparse_vectors(datapath, f'./../data/preprocessed/dblp/{os.path.split(datapath)[-1]}', filter, settings['data'])
+        vecs, indexes = Publication.generate_sparse_vectors(datapath, prep_output, filter, settings['data'])
 
     if domain == 'imdb':
-        vecs, indexes = Movie.generate_sparse_vectors(datapath, f'./../data/preprocessed/imdb/{os.path.split(datapath)[-1]}', filter, settings['data'])
+        vecs, indexes = Movie.generate_sparse_vectors(datapath, prep_output, filter, settings['data'])
 
     if domain == 'uspt':
-        vecs, indexes = Patent.generate_sparse_vectors(datapath, f'./../data/preprocessed/uspt/{os.path.split(datapath)[-1]}', filter, settings['data'])
+        vecs, indexes = Patent.generate_sparse_vectors(datapath, prep_output, filter, settings['data'])
 
-    splits = create_evaluation_splits(len(indexes['t2i']), settings['model']['nfolds'], settings['model']['train_test_split'])
+    splits = create_evaluation_splits(len(indexes['t2i']), settings['model']['nfolds'], settings['model']['train_test_split'], output=prep_output)
 
     if model == 'fnn':
         fnn_main.main(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}/fnn', settings['model']['baseline']['fnn'], settings['model']['cmd'])
