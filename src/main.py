@@ -50,21 +50,22 @@ def run(datapath, domain, filter, model, output, settings):
 
     splits = create_evaluation_splits(len(indexes['t2i']), settings['model']['nfolds'], settings['model']['train_test_split'], output=prep_output)
 
+    filter_str = f".filtered.mt{settings['data']['filter']['min_nteam']}.ts{settings['data']['filter']['min_team_size']}" if filter else None
     if model == 'fnn':
-        fnn_main.main(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}/fnn', settings['model']['baseline']['fnn'], settings['model']['cmd'])
+        fnn_main.main(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}{filter_str}/fnn', settings['model']['baseline']['fnn'], settings['model']['cmd'])
 
     if model == 'bnn':
-        bnn_main.main(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}/bnn', settings['model']['baseline']['fnn'], settings['model']['cmd'])
+        bnn_main.main(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}{filter_str}/bnn', settings['model']['baseline']['fnn'], settings['model']['cmd'])
 
     if model == 'fnn_emb':
-        t2v = Team2Vec(vecs, 'skill', f'./../data/preprocessed/{domain}/{os.path.split(datapath)[-1]}', settings['data']['filter'] if filter else None)
+        t2v = Team2Vec(vecs, 'skill', f'./../data/preprocessed/{domain}/{os.path.split(datapath)[-1]}{filter_str}')
         emb_setting = settings['model']['baseline']['emb']
         t2v.train(emb_setting['d'], emb_setting['w'], emb_setting['dm'], emb_setting['e'])
         vecs['skill'] = t2v.dv()
         fnn_main.main(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}/fnn_emb', settings['model']['baseline']['fnn'], settings['model']['cmd'])
 
     if model == 'bnn_emb':
-        t2v = Team2Vec(vecs, 'skill', f'./../data/preprocessed/{domain}/{os.path.split(datapath)[-1]}', settings['data']['filter'] if filter else None)
+        t2v = Team2Vec(vecs, 'skill', f'./../data/preprocessed/{domain}/{os.path.split(datapath)[-1]}{filter_str}')
         emb_setting = settings['model']['baseline']['emb']
         t2v.train(emb_setting['d'], emb_setting['w'], emb_setting['dm'], emb_setting['e'])
         vecs['skill'] = t2v.dv()
