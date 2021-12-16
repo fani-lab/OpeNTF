@@ -9,13 +9,16 @@ import os, getopt, sys, multiprocessing
 from tqdm import tqdm
 import argparse
 
+import logging
+logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
+
 # teams as documents, members/skills as words
 # doc_list = ['m1 m2 m3','m2 m3','m1 m2 m1 m2'] or ['s1 s3 s4', 's3 s6']
 # label_list = ['t1','t2','t3']
 
 class Team2Vec:
-    def __init__(self, teamsvecs, embtype, output, filter):
-        self.output = output + (f".filtered.mt{filter['min_nteam']}.ts{filter['min_team_size']}" if filter else None)
+    def __init__(self, teamsvecs, embtype, output):
+        self.output = output
         self.embtype = embtype
         self.docs = []
         self.settings = ''
@@ -38,7 +41,7 @@ class Team2Vec:
                 pickle.dump(self.docs, f)
             return self.docs
 
-    def train(self, dimension=300, window=1, dm=1, epochs=10):
+    def train(self, dimension=300, window=1, dm=1, dbow_words=0, epochs=10):
         self.settings = f'{self.embtype}emb.d{dimension}.w{window}.dm{dm}'
         try:
             print(f"Loading the {self.embtype} embedding pickle ...")
@@ -51,7 +54,7 @@ class Team2Vec:
                                                # training algorithm. If dm=1, ‘distributed memory’ (PV-DM) is used. Otherwise, distributed bag of words (PV-DBOW) is employed.
                                                vector_size=dimension,
                                                window=window,
-                                               dbow_words=0,
+                                               dbow_words=dbow_words,
                                                # ({1,0}, optional) – If set to 1 trains word-vectors (in skip-gram fashion) simultaneous with DBOW doc-vector training; If 0, only trains doc-vectors (faster).
                                                min_alpha=0.025,
                                                min_count=0,
@@ -85,26 +88,27 @@ def addargs(parser):
     embedding = parser.add_argument_group('embedding')
     embedding.add_argument('-teamsvecs', type=str, required=True, help='The path to the teamsvecs.pkl file; (e.g., ../data/preprocessed/dblp/toy.dblp.v12.json/teamsvecs.pkl')
     embedding.add_argument('-dm', type=int, default=1, help='The training algorithm; (1: distributed memory (default), 0: CBOW')
+    embedding.add_argument('-dbow_words', type=int, default=0, help='Train word-vectors in skip-gram fashion; (0: no (default), 1: yes')
     embedding.add_argument('-dim', type=int, default=100, help='Embedding vector dimension; (100 default)')
     embedding.add_argument('-window', type=int, default=1, help='Coocurrence window; (1 default)')
     embedding.add_argument('-epochs', type=int, default=10, help='Training epoch; (10 default)')
-    embedding.add_argument('-embtypes', type=str, default='skill', help='Embedding type; ([skill, member] default)')
+    embedding.add_argument('-embtypes', type=str, default='skill', help="Embedding type; (-embtypes=skill (default); -embtypes=member; -embtypes=skill,member)")
     embedding.add_argument('-output', type=str, required=True, help='Output folder; (e.g., ../data/preprocessed/dblp/toy.dblp.v12.json/')
 
-#python -u main.py -teamsvecs=../data/preprocessed/dblp/toy.dblp.v12.json/teamsvecs.pkl -output=../data/preprocessed/dblp/toy.dblp.v12.json/
-def run(teamsvecs_file, dm, dim, window, embtypes, epochs, output):
+#python -u team2vec.py -teamsvecs=../../data/preprocessed/dblp/toy.dblp.v12.json/teamsvecs.pkl -output=../../data/preprocessed/dblp/toy.dblp.v12.json/
+def run(teamsvecs_file, dm, dbow_words, dim, window, embtypes, epochs, output):
     with open(teamsvecs_file, 'rb') as infile:
         teamsvecs = pickle.load(infile)
         for embtype in embtypes:
             t2v = Team2Vec(teamsvecs, embtype, output)
             # t2v.init()
-            t2v.train(dim, window, dm, epochs)
-            print(t2v.model['s5' if embtype == 'skill' else 'm5'])
+            t2v.train(dim, window, dm, dbow_words, epochs)
+            # print(t2v.model['s5' if embtype == 'skill' else 'm5'])
             print(t2v.model.docvecs[10])#teamid
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Team Embedding')
     addargs(parser)
     args = parser.parse_args()
-    run(args.teamsvecs, args.dm, args.dim, args.window, args.embtypes.split(','), args.epochs, args.output)
+    run(args.teamsvecs, args.dm, args.dbow_words, args.dim, args.window, args.embtypes.split(','), args.epochs, args.output)
 
