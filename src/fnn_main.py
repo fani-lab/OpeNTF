@@ -221,21 +221,13 @@ def evaluate(model_path, splits, vecs, on_train_valid_set=False, per_instance=Fa
             else: Y = y_test
             Y_ = torch.load(f'{model_path}/f{foldidx}.{pred_set}.pred')
             df, df_mean, (fpr, tpr) = calculate_metrics(Y, Y_, per_instance)
-            plt.plot(fpr, tpr, label=f'micro-average fold{foldidx} on {pred_set} set', linestyle=':', linewidth=4)
             if per_instance: df.to_csv(f'{model_path}/f{foldidx}.{pred_set}.pred.eval.csv', float_format='%.15f')
             df_mean.to_csv(f'{model_path}/f{foldidx}.{pred_set}.pred.eval.mean.csv')
             with open(f'{model_path}/f{foldidx}.{pred_set}.pred.eval.roc.pkl', 'wb') as outfile:
                 pickle.dump((fpr, tpr), outfile)
             fold_mean = pd.concat([fold_mean, df_mean], axis=1)
-        plt.xlabel('false positive rate')
-        plt.ylabel('true positive rate')
-        plt.title(f'ROC curves for {pred_set} set')
-        plt.legend()
-        plt.savefig(f'{model_path}/{pred_set}.roc.png', dpi=100, bbox_inches='tight')
-        plt.show()
         #the last row is a list of roc values
         fold_mean.mean(axis=1).to_csv(f'{model_path}/{pred_set}.pred.eval.mean.csv')
-
 
 def plot_roc(model_path, splits, on_train_valid_set=False):
     for pred_set in (['test', 'train', 'valid'] if on_train_valid_set else ['test']):

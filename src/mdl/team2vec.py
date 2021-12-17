@@ -27,22 +27,29 @@ class Team2Vec:
     def init(self):
         try:
             print(f"Loading the {self.embtype} documents pickle ...")
-            with open(f'{self.output}/{self.embtype}docs.pkl', 'rb') as infile:
+            with open(f'{self.output}/{self.embtype}.docs.pkl', 'rb') as infile:
                 self.docs = pickle.load(infile)
                 return self.docs
         except FileNotFoundError:
             print(f"File not found! Generating {self.embtype} documents ...")
             for i, id in enumerate(self.teamsvecs['id']):
-                td = gensim.models.doc2vec.TaggedDocument([f'{"s" if self.embtype == "skill" else "m"}{str(skill_idx)}' for skill_idx in self.teamsvecs[self.embtype][i].nonzero()[1]], [str(int(id[0,0]))])
+                skill_doc = [f's{str(skill_idx)}' for skill_idx in self.teamsvecs['skill'][i].nonzero()[1]]
+                member_doc = [f'm{str(member_idx)}' for member_idx in self.teamsvecs['member'][i].nonzero()[1]]
+                if self.embtype == 'skill':
+                    td = gensim.models.doc2vec.TaggedDocument(skill_doc, [str(int(id[0, 0]))])
+                elif self.embtype == 'member':
+                    td = gensim.models.doc2vec.TaggedDocument(member_doc, [str(int(id[0, 0]))])
+                elif self.embtype == 'joint':
+                    td = gensim.models.doc2vec.TaggedDocument(skill_doc + member_doc, [str(int(id[0, 0]))])
                 self.docs.append(td)
             print(f'#Documents with word type of {self.embtype} have created: {len(self.docs)}')
             print(f'Saving the {self.embtype} documents ...')
-            with open(f'{self.output}/{self.embtype}docs.pkl', 'wb') as f:
+            with open(f'{self.output}/{self.embtype}.docs.pkl', 'wb') as f:
                 pickle.dump(self.docs, f)
             return self.docs
 
     def train(self, dimension=300, window=1, dm=1, dbow_words=0, epochs=10):
-        self.settings = f'{self.embtype}emb.d{dimension}.w{window}.dm{dm}'
+        self.settings = f'{self.embtype}.emb.d{dimension}.w{window}.dm{dm}'
         try:
             print(f"Loading the {self.embtype} embedding pickle ...")
             self.model = gensim.models.Doc2Vec.load(f'{self.output}/{self.settings}.mdl')
@@ -92,20 +99,26 @@ def addargs(parser):
     embedding.add_argument('-dim', type=int, default=100, help='Embedding vector dimension; (100 default)')
     embedding.add_argument('-window', type=int, default=1, help='Coocurrence window; (1 default)')
     embedding.add_argument('-epochs', type=int, default=10, help='Training epoch; (10 default)')
-    embedding.add_argument('-embtypes', type=str, default='skill', help="Embedding type; (-embtypes=skill (default); -embtypes=member; -embtypes=skill,member)")
+    embedding.add_argument('-embtypes', type=str, default='skill', help="Embedding type; (-embtypes=skill (default); member; joint; skill,member; skill, joint; ...)")
     embedding.add_argument('-output', type=str, required=True, help='Output folder; (e.g., ../data/preprocessed/dblp/toy.dblp.v12.json/')
 
-#python -u team2vec.py -teamsvecs=../../data/preprocessed/dblp/toy.dblp.v12.json/teamsvecs.pkl -output=../../data/preprocessed/dblp/toy.dblp.v12.json/
 def run(teamsvecs_file, dm, dbow_words, dim, window, embtypes, epochs, output):
     with open(teamsvecs_file, 'rb') as infile:
         teamsvecs = pickle.load(infile)
         for embtype in embtypes:
             t2v = Team2Vec(teamsvecs, embtype, output)
-            # t2v.init()
+            #2v.init()
             t2v.train(dim, window, dm, dbow_words, epochs)
-            # print(t2v.model['s5' if embtype == 'skill' else 'm5'])
-            print(t2v.model.docvecs[10])#teamid
 
+            #unit tests :D
+            # if embtype == 'skill': print(t2v.model['s5'])
+            # if embtype == 'member': print(t2v.model['m5'])
+            # if embtype == 'joint':
+            #     print(t2v.model['s5'])
+            #     print(t2v.model['m5'])
+            # print(t2v.model.docvecs[10])#teamid
+
+#python -u team2vec.py -teamsvecs=../data/preprocessed/dblp/toy.dblp.v12.json/teamsvecs.pkl -embtypes=skill,member,joint -dim=100 -dbow_words=1 -output=../data/preprocessed/dblp/toy.dblp.v12.json/
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Team Embedding')
     addargs(parser)
