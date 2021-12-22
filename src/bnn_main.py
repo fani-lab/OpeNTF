@@ -111,11 +111,12 @@ def learn(splits, indexes, vecs, params, output):
     with open(f"{output}/train_valid_loss.json", 'w') as outfile:
         json.dump(train_valid_loss, outfile)
         for foldidx in train_valid_loss.keys():
+            plt.figure()
             plt.plot(train_valid_loss[foldidx]['train'], label='Training Loss')
             plt.plot(train_valid_loss[foldidx]['valid'], label='Validation Loss')
             plt.legend(loc='upper right')
             plt.title(f'Training and Validation Loss for fold #{foldidx}')
-            plt.savefig(f'{output}/fold{foldidx}.png', dpi=100, bbox_inches='tight')
+            plt.savefig(f'{output}/f{foldidx}.train_valid_loss.png', dpi=100, bbox_inches='tight')
             plt.show()
 
 def main(splits, vecs, indexes, output, settings, cmd):
