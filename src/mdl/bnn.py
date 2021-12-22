@@ -30,13 +30,13 @@ class BNN(nn.Module):
         return self.h1.log_post + self.h2.log_post + self.out.log_post
 
     def sample_elbo(self, input, target, samples):
-        outputs = torch.zeros(samples, target.shape[0], self.output_size)
+        outputs = torch.zeros(target.shape[0], samples, self.output_size)
         # print(outputs[0].size())
         log_priors = torch.zeros(samples)
         log_posts = torch.zeros(samples)
         #log_likes = torch.zeros(samples)
         for i in range(samples):
-          outputs[i] = self(input)
+          outputs[:, i, :] = self(input)
           log_priors[i] = self.log_prior()
           log_posts[i] = self.log_post()
           #log_likes[i] = torch.log(outputs[i, torch.arange(outputs.shape[1]), target]).sum(dim=-1)

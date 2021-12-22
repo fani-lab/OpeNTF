@@ -142,7 +142,7 @@ class Team(object):
             st = time()
             # parallel
             with multiprocessing.Pool() as p:
-                n_core = multiprocessing.cpu_count() if settings['ncore'] < 0 else settings['ncore']
+                n_core = multiprocessing.cpu_count() if settings['ncore'] <= 0 else settings['ncore']
                 subteams = np.array_split(list(teams.values()), n_core)
                 func = partial(Team.bucketing, settings['bucket_size'], indexes['s2i'], indexes['c2i'])
                 data = p.map(func, subteams)
