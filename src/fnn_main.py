@@ -26,6 +26,8 @@ def cross_entropy(y_, y, ns, nns, unigram):
     return weighted(y_, y)
 
 def weighted(logits, targets, pos_weight=2.5):
+    targets = targets.squeeze(1)
+    logits = logits.squeeze(1)
     return (-targets * torch.log(logits) * pos_weight + (1 - targets) * - torch.log(1 - logits)).sum()
 
 def ns_uniform(logits, targets, neg_samples=5):
