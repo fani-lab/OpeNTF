@@ -86,11 +86,20 @@ def addargs(parser):
     output = parser.add_argument_group('output')
     output.add_argument('-output', type=str, default='./../output/', help='The output path (default: ./../output/)')
 
-# python -u main.py -data=./../data/raw/dblp/toy.dblp.v12.json -domain=dblp -model=fnn  2>&1 | tee ./../output/toy.log &
-# python -u main.py -data=./../data/raw/dblp/dblp.v12.json -domain=dblp -model=fnn 2>&1 | tee ./../output/dblp.log &
+# python -u main.py -data=./../data/raw/dblp/toy.dblp.v12.json -domain=dblp -model=fnn
+# python -u main.py -data=./../data/raw/dblp/toy.dblp.v12.json -domain=dblp -model=bnn
+# python -u main.py -data=./../data/raw/dblp/toy.dblp.v12.json -domain=dblp -model=fnn_emb
+# python -u main.py -data=./../data/raw/dblp/toy.dblp.v12.json -domain=dblp -model=bnn_emb
+#
 # python -u main.py -data=./../data/raw/imdb/toy.title.basics.tsv -domain=imdb -model=fnn
-# python -u main.py -data=./../data/raw/imdb/title.basics.tsv -domain=imdb -model=fnn
+# python -u main.py -data=./../data/raw/imdb/toy.title.basics.tsv -domain=imdb -model=bnn
+# python -u main.py -data=./../data/raw/imdb/toy.title.basics.tsv -domain=imdb -model=fnn_emb
+# python -u main.py -data=./../data/raw/imdb/toy.title.basics.tsv -domain=imdb -model=bnn_emb
+#
 # python -u main.py -data=./../data/raw/uspt/toy.patent.tsv -domain=uspt -model=fnn
+# python -u main.py -data=./../data/raw/uspt/toy.patent.tsv -domain=uspt -model=bnn
+# python -u main.py -data=./../data/raw/uspt/toy.patent.tsv -domain=uspt -model=fnn_emb
+# python -u main.py -data=./../data/raw/uspt/toy.patent.tsv -domain=uspt -model=fnn_emb
 
 global ncores
 if __name__ == '__main__':
