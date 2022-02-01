@@ -63,7 +63,7 @@ The sparse matrices and the indices will be persisted in [``data/preprocessed/{d
 
 > Our pipeline benefits from parallel generation of sparse matrices for teams that significantly reduces the preprocessing time as shown below:
 > 
-> <p align="center"><img src="https://user-images.githubusercontent.com/8619934/151902054-f46d33a5-ce81-4ff6-87d8-5e3622d6743d.png" width="400"></p>
+> <p align="center"><img src="./data/parallel_sequential_sparse_matrix_creation.png" width="400"></p>
 
 
 Please note that the preprocessing step will be executed once. Subsequent runs loads the persisted pickle files. In order to regenerate them, one should simply delete them. 
