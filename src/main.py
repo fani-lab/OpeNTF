@@ -101,7 +101,6 @@ def addargs(parser):
 # python -u main.py -data=./../data/raw/uspt/toy.patent.tsv -domain=uspt -model=fnn_emb
 # python -u main.py -data=./../data/raw/uspt/toy.patent.tsv -domain=uspt -model=fnn_emb
 
-global ncores
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Team Formation')
     addargs(parser)
