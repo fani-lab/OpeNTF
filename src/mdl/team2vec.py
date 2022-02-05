@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Thursday Nov 21 2019
-@author: Hossein Fani (sites.google.com/site/hosseinfani/)
-"""
 
 import gensim, numpy, pylab, random, pickle
 import os, getopt, sys, multiprocessing
