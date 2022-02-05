@@ -119,8 +119,20 @@ We used [``pytrec_eval``](https://github.com/cvangysel/pytrec_eval) to evaluate 
 2) [``f0.test.pred.eval.csv``](./output/toy.dblp.v12.json/fnn/t30.s11.m12.l[100].lr0.1.b4096.e100/f0.test.pred.eval.csv) is the values of evaluation metrics 
 3) [``f0.test.pred.eval.mean.csv``](./output/toy.dblp.v12.json/fnn/t30.s11.m12.l[100].lr0.1.b4096.e100/f0.test.pred.eval.mean.csv) is the average of values for evaluation metrics.
 
+||min. #member's team: 75, min team size: 3, epochs: 20, learning rate: 0.1, hidden layer: [1, 100d], minibath: 4096, #negative samples: 3|
+|--------|------|
+|Datasets|[dblp.v13](https://originalstatic.aminer.cn/misc/dblp.v12.7z), [imdb](imdb.com/interfaces/)|
+|Metrics|recall@2,5,10, map@2,5,10, ndcg@2,5,10, p@2,5,10, auc|
+|Baselines|{fnn,bnn}×{sparse, emb}×{none, uniform, unigram, unigram_b}|
 
-TODO: Put result figures and explain them.
+<p align="center">
+<img src='https://user-images.githubusercontent.com/8619934/152638261-d35c72b9-6e21-4be0-8898-93e802a6cc87.png' >
+<img src='https://user-images.githubusercontent.com/8619934/152659546-cb205bd2-d334-46c2-9e64-593e84f26ba8.png' width=500>
+>
+  
+Full evaluation results available at: [results_dblp_imdb_fnn_bnn_emb_nns.xlsx](https://github.com/fani-lab/neural_team_formation/files/8008954/results_dblp_imdb_fnn_bnn_emb_nns.xlsx)
+
+Full predictions of all models on test and training sets, per instance and average, are available in a rar file of size ``74.8GB`` and will be delivered upon request! 
 
 ## 5. Acknowledgement:
 We benefit from [``pytrec_eval``](https://github.com/cvangysel/pytrec_eval), [``gensim``](https://radimrehurek.com/gensim/), [Josh Feldman's blog](https://joshfeldman.net/WeightUncertainty/), and other libraries. We would like to thank the authors of these libraries and helpful resources.
