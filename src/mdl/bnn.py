@@ -1,3 +1,5 @@
+#We benefit from Josh Feldman's great blog at https://joshfeldman.net/WeightUncertainty/
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
