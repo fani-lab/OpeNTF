@@ -141,13 +141,15 @@ class Team(object):
             indexes, teams = cls.read_data(datapath, output, index=False, filter=filter, settings=settings)
             st = time()
             # parallel
-            with multiprocessing.Pool() as p:
-                n_core = multiprocessing.cpu_count() if settings['ncore'] <= 0 else settings['ncore']
-                subteams = np.array_split(list(teams.values()), n_core)
-                func = partial(Team.bucketing, settings['bucket_size'], indexes['s2i'], indexes['c2i'])
-                data = p.map(func, subteams)
+            if settings['parallel']:
+                with multiprocessing.Pool() as p:
+                    n_core = multiprocessing.cpu_count() if settings['ncore'] <= 0 else settings['ncore']
+                    subteams = np.array_split(list(teams.values()), n_core)
+                    func = partial(Team.bucketing, settings['bucket_size'], indexes['s2i'], indexes['c2i'])
+                    data = p.map(func, subteams)
             # serial
-            # data = Team.bucketing(1000, s2i, c2i, teams.values())
+            else:
+                data = Team.bucketing(settings['bucket_size'], indexes['s2i'], indexes['c2i'], teams.values())
             data = scipy.sparse.vstack(data, 'lil')#{'bsr', 'coo', 'csc', 'csr', 'dia', 'dok', 'lil'}, By default an appropriate sparse matrix format is returned!!
             vecs = {'id': data[:, 0], 'skill': data[:, 1:len(indexes['s2i']) + 1], 'member':data[:, - len(indexes['c2i']):]}
 

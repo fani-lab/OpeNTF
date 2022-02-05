@@ -61,10 +61,10 @@ Also, indexes will be created to map the vector's indexes to members' names and 
 
 The sparse matrices and the indices will be persisted in [``data/preprocessed/{dblp,imdb,uspt}/{name of dataset}``](data/preprocessed/) as pickles ``teamsvecs.pkl`` and ``indexes.pkl``. For example, the preprocessed data for our dblp toy example are [``data/preprocessed/dblp/toy.dblp.v12.json/teams.pkl``](data/preprocessed/dblp/toy.dblp.v12.json/teams.pkl) and [``data/preprocessed/dblp/toy.dblp.v12.json/indexes.pkl``](data/preprocessed/dblp/toy.dblp.v12.json/indexes.pkl).
 
-> Our pipeline benefits from parallel generation of sparse matrices for teams that significantly reduces the preprocessing time. For instance, 
-> 1) it reduced 11 days to ** hours for the dblp.v12 dataset of ** papers.
-> 2) it reduced ** days to ** hours for the imdb dataset of ** moview.
-> 3) it reduced ** days to ** hours for the uspt dataset of ** patents.
+> Our pipeline benefits from parallel generation of sparse matrices for teams that significantly reduces the preprocessing time as shown below:
+> 
+> <p align="center"><img src="./data/parallel_sequential_sparse_matrix_creation.png" width="400"></p>
+
 
 Please note that the preprocessing step will be executed once. Subsequent runs loads the persisted pickle files. In order to regenerate them, one should simply delete them. 
 

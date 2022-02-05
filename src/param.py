@@ -35,7 +35,7 @@ settings = {
     },
     'data':{
         'domain': {
-            'dblp':{},
+            'dblp':{'nrow':1000},
             'uspt':{},
             'imdb':{},
         },
@@ -43,6 +43,7 @@ settings = {
             'min_nteam': 0,
             'min_team_size': 0,
         },
+        'parallel': 1,
         'ncore': 0,# <= 0 for all
         'bucket_size': 500
     },
