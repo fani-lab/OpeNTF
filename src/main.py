@@ -50,7 +50,7 @@ def run(datapath, domain, filter, model, output, settings):
 
     splits = create_evaluation_splits(len(indexes['t2i']), settings['model']['nfolds'], settings['model']['train_test_split'], output=prep_output)
 
-    filter_str = f".filtered.mt{settings['data']['filter']['min_nteam']}.ts{settings['data']['filter']['min_team_size']}" if filter else None
+    filter_str = f".filtered.mt{settings['data']['filter']['min_nteam']}.ts{settings['data']['filter']['min_team_size']}" if filter else ""
     if model == 'fnn':
         fnn_main.main(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}{filter_str}/fnn', settings['model']['baseline']['fnn'], settings['model']['cmd'])
 
@@ -62,17 +62,17 @@ def run(datapath, domain, filter, model, output, settings):
         emb_setting = settings['model']['baseline']['emb']
         t2v.train(emb_setting['d'], emb_setting['w'], emb_setting['dm'], emb_setting['e'])
         vecs['skill'] = t2v.dv()
-        fnn_main.main(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}/fnn_emb', settings['model']['baseline']['fnn'], settings['model']['cmd'])
+        fnn_main.main(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}{filter_str}/fnn_emb', settings['model']['baseline']['fnn'], settings['model']['cmd'])
 
     if model == 'bnn_emb':
         t2v = Team2Vec(vecs, 'skill', f'./../data/preprocessed/{domain}/{os.path.split(datapath)[-1]}{filter_str}')
         emb_setting = settings['model']['baseline']['emb']
         t2v.train(emb_setting['d'], emb_setting['w'], emb_setting['dm'], emb_setting['e'])
         vecs['skill'] = t2v.dv()
-        bnn_main.main(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}/bnn_emb', settings['model']['baseline']['fnn'], settings['model']['cmd'])
+        bnn_main.main(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}{filter_str}/bnn_emb', settings['model']['baseline']['fnn'], settings['model']['cmd'])
 
     if model == 'nmt':
-        nmt_main.main(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}/nmt', './nmt_base_config.yaml', cmd=['train', 'test', 'eval'])
+        nmt_main.main(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}{filter_str}/nmt', './nmt_base_config.yaml', cmd=['train', 'test', 'eval'])
 
 def addargs(parser):
     dataset = parser.add_argument_group('dataset')
@@ -86,13 +86,21 @@ def addargs(parser):
     output = parser.add_argument_group('output')
     output.add_argument('-output', type=str, default='./../output/', help='The output path (default: ./../output/)')
 
-# python -u main.py -data=./../data/raw/dblp/toy.dblp.v12.json -domain=dblp -model=fnn  2>&1 | tee ./../output/toy.log &
-# python -u main.py -data=./../data/raw/dblp/dblp.v12.json -domain=dblp -model=fnn 2>&1 | tee ./../output/dblp.log &
+# python -u main.py -data=./../data/raw/dblp/toy.dblp.v12.json -domain=dblp -model=fnn
+# python -u main.py -data=./../data/raw/dblp/toy.dblp.v12.json -domain=dblp -model=bnn
+# python -u main.py -data=./../data/raw/dblp/toy.dblp.v12.json -domain=dblp -model=fnn_emb
+# python -u main.py -data=./../data/raw/dblp/toy.dblp.v12.json -domain=dblp -model=bnn_emb
+#
 # python -u main.py -data=./../data/raw/imdb/toy.title.basics.tsv -domain=imdb -model=fnn
-# python -u main.py -data=./../data/raw/imdb/title.basics.tsv -domain=imdb -model=fnn
+# python -u main.py -data=./../data/raw/imdb/toy.title.basics.tsv -domain=imdb -model=bnn
+# python -u main.py -data=./../data/raw/imdb/toy.title.basics.tsv -domain=imdb -model=fnn_emb
+# python -u main.py -data=./../data/raw/imdb/toy.title.basics.tsv -domain=imdb -model=bnn_emb
+#
 # python -u main.py -data=./../data/raw/uspt/toy.patent.tsv -domain=uspt -model=fnn
+# python -u main.py -data=./../data/raw/uspt/toy.patent.tsv -domain=uspt -model=bnn
+# python -u main.py -data=./../data/raw/uspt/toy.patent.tsv -domain=uspt -model=fnn_emb
+# python -u main.py -data=./../data/raw/uspt/toy.patent.tsv -domain=uspt -model=fnn_emb
 
-global ncores
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Team Formation')
     addargs(parser)
