@@ -115,9 +115,9 @@ The pipeline accepts three required input values:
 
 We used [``pytrec_eval``](https://github.com/cvangysel/pytrec_eval) to evaluate the performance of models on the test set as well as on their own train sets (should overfit) and validation sets. We report the predictions, evaluation metrics on each test instance, and average on all test instances in ``./output/{dataset name}/{model name}/{model's running setting}/``.  For example:
 
-1) [``f0.test.pred``](./output/toy.dblp.v12.json/fnn/t30.s11.m12.l[100].lr0.1.b4096.e100/f0.test.pred) is the predictions on each instance of the test set for a model which is trained folds [1,2,3,4] and validated on fold [5].
-2) [``f0.test.pred.eval.csv``](./output/toy.dblp.v12.json/fnn/t30.s11.m12.l[100].lr0.1.b4096.e100/f0.test.pred.eval.csv) is the values of evaluation metrics 
-3) [``f0.test.pred.eval.mean.csv``](./output/toy.dblp.v12.json/fnn/t30.s11.m12.l[100].lr0.1.b4096.e100/f0.test.pred.eval.mean.csv) is the average of values for evaluation metrics.
+1) [``f0.test.pred``](./output/toy.dblp.v12.json/fnn/t30.s11.m12.l[100].lr0.1.b4096.e100/f0.test.pred) is the predictions per test instance for a model which is trained folds [1,2,3,4] and validated on fold [0].
+2) [``f0.test.pred.eval.csv``](./output/toy.dblp.v12.json/fnn/t30.s11.m12.l[100].lr0.1.b4096.e100/f0.test.pred.eval.csv) is the values of evaluation metrics for the predictions per test instance
+3) [``f0.test.pred.eval.mean.csv``](./output/toy.dblp.v12.json/fnn/t30.s11.m12.l[100].lr0.1.b4096.e100/f0.test.pred.eval.mean.csv) is the average of values for evaluation metrics over all test instances.
 
 ||min. #member's team: 75, min team size: 3, epochs: 20, learning rate: 0.1, hidden layer: [1, 100d], minibath: 4096, #negative samples: 3|
 |--------|------|
@@ -130,9 +130,7 @@ We used [``pytrec_eval``](https://github.com/cvangysel/pytrec_eval) to evaluate 
 <img src='https://user-images.githubusercontent.com/8619934/152659546-cb205bd2-d334-46c2-9e64-593e84f26ba8.png' width=500>
 >
   
-Full evaluation results available at: [results_dblp_imdb_fnn_bnn_emb_nns.xlsx](https://github.com/fani-lab/neural_team_formation/files/8008954/results_dblp_imdb_fnn_bnn_emb_nns.xlsx)
-
-Full predictions of all models on test and training sets, per instance and average, are available in a rar file of size ``74.8GB`` and will be delivered upon request! 
+Full predictions of all models on test and training sets and the values of evaluation metrics, per instance and average, are available in a rar file of size ``74.8GB`` and will be delivered upon request! 
 
 ## 5. Acknowledgement:
 We benefit from [``pytrec_eval``](https://github.com/cvangysel/pytrec_eval), [``gensim``](https://radimrehurek.com/gensim/), [Josh Feldman's blog](https://joshfeldman.net/WeightUncertainty/), and other libraries. We would like to thank the authors of these libraries and helpful resources.
