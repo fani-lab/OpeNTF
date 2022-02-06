@@ -120,7 +120,7 @@ class Team(object):
             except Exception as ex:
                 raise ex
 
-            if (i % bucket_size == 0): print(f'Loading {i}/{len(teams)} instances by {multiprocessing.current_process()}! {time() - st}')
+            # if (i % bucket_size == 0): print(f'Loading {i}/{len(teams)} instances by {multiprocessing.current_process()}! {time() - st}')
 
         if j > -1: data[-(j+1):] = data_[0:j+1]
         return data
