@@ -73,37 +73,41 @@ from cmn.publication import Publication
 #######################
 # stat generation and figure for parallel sparse matrix creation
 #######################
-# import re
-# import matplotlib.pyplot as plt
-# if __name__ == "__main__":
-#     # for i in range(1000, 1000000, 1000):
-#     #     param.settings['data']['domain']['dblp']['nrow'] = i
-#     #     Publication.generate_sparse_vectors('./../data/raw/dblp/dblp.v12.json', f"./serial/{param.settings['data']['domain']['dblp']['nrow']}", 0, param.settings['data'])
-#
-#     plt.figure()
-#     with open('./parallel.log', "r", encoding='utf-8') as p, open('./serial_.log', "r", encoding='utf-8') as s:
-#         pkl_lines_par = {}; vec_lines_par = {}
-#         pkl_lines_ser = {}; vec_lines_ser = {}
-#         for i, line in enumerate(p):
-#             if i % 9 in {7}:
-#                 numbers = [float(s) for s in re.findall(r'\d+\.?\d*', line)]
-#                 pkl_lines_par[numbers[1]] = numbers[0]
-#             if i % 9 in {8}:
-#                 vec_lines_par[numbers[1]] = float(re.findall(r'\d+\.?\d*', line)[0])
-#         for i, line in enumerate(s):
-#             if i % 9 in {7}:
-#                 numbers = [float(s) for s in re.findall(r'\d+\.?\d*', line)]
-#                 pkl_lines_ser[numbers[1]] = numbers[0]
-#             if i % 9 in {8}:
-#                 vec_lines_ser[numbers[1]] = float(re.findall(r'\d+\.?\d*', line)[0])
-#
-#     plt.xlabel('#papers (teams)')
-#     plt.ylabel('time (second)')
-#     plt.title(f'intel xeon e-2236 3.40 ghz (12 cores), 64 gb memory')
-#     plt.plot(pkl_lines_par.keys(), pkl_lines_par.values(), label='pickling raw data (dblp.v12)')
-#     plt.plot(vec_lines_par.keys(), vec_lines_par.values(), label='creating sparse matrix in parallel')
-#     # plt.plot(pkl_lines_ser.keys(), pkl_lines_ser.values(), label='pickling raw data')
-#     plt.plot(vec_lines_ser.keys(), vec_lines_ser.values(), label='creating sparse matrix in sequential')
-#     plt.legend()
-#     plt.show()
+import re
+import matplotlib.pyplot as plt
+if __name__ == "__main__":
+    # for i in range(1000, 1000000, 1000):
+    #     param.settings['data']['domain']['dblp']['nrow'] = i
+    #     Publication.generate_sparse_vectors('./../data/raw/dblp/dblp.v12.json', f"./serial/{param.settings['data']['domain']['dblp']['nrow']}", 0, param.settings['data'])
+
+    # plt.figure()
+    # with open('./parallel.log', "r", encoding='utf-8') as p, open('./serial_.log', "r", encoding='utf-8') as s:
+    #     pkl_lines_par = {}; vec_lines_par = {}
+    #     pkl_lines_ser = {}; vec_lines_ser = {}
+    #     for i, line in enumerate(p):
+    #         if i % 9 in {7}:
+    #             numbers = [float(s) for s in re.findall(r'\d+\.?\d*', line)]
+    #             pkl_lines_par[numbers[1]] = numbers[0]
+    #         if i % 9 in {8}:
+    #             vec_lines_par[numbers[1]] = float(re.findall(r'\d+\.?\d*', line)[0])
+    #     for i, line in enumerate(s):
+    #         if i % 9 in {7}:
+    #             numbers = [float(s) for s in re.findall(r'\d+\.?\d*', line)]
+    #             pkl_lines_ser[numbers[1]] = numbers[0]
+    #         if i % 9 in {8}:
+    #             vec_lines_ser[numbers[1]] = float(re.findall(r'\d+\.?\d*', line)[0])
+    #
+    # plt.xlabel('#papers (teams)')
+    # plt.ylabel('time (second)')
+    # plt.title(f'intel xeon e-2236 3.40 ghz (12 cores), 64 gb memory, bucket size = 500')
+    # plt.plot(pkl_lines_par.keys(), pkl_lines_par.values(), label='pickling raw data (dblp.v12)')
+    # plt.plot(vec_lines_par.keys(), vec_lines_par.values(), label='creating sparse matrix in parallel')
+    # # plt.plot(pkl_lines_ser.keys(), pkl_lines_ser.values(), label='pickling raw data')
+    # plt.plot(vec_lines_ser.keys(), vec_lines_ser.values(), label='creating sparse matrix in sequential')
+    # plt.legend()
+    # plt.show()
+
+    Yann LeCun : 2053214915
+    Geoffrey E.Hinton : 563069026
+    Yoshua Bengio : 161269817
 
