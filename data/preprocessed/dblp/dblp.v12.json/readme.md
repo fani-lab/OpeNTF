@@ -1,8 +1,8 @@
 Public link to download: https://originalstatic.aminer.cn/misc/dblp.v12.7z
 
-![image](https://user-images.githubusercontent.com/8619934/144217360-00675fc0-da7e-42cb-8140-424a46fd7c98.png)
+File structure:
 
-**Stats:**
+![image](https://user-images.githubusercontent.com/8619934/144217360-00675fc0-da7e-42cb-8140-424a46fd7c98.png)
 
 |Stat| Value|
 |-----|------|
