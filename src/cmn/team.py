@@ -221,6 +221,8 @@ class Team(object):
 
     @staticmethod
     def plot_stats(stats, output):
+        csfont = {'fontname': 'Consolas'}
+        hfont = {'fontname': 'Consolas'}
         for k, v in stats.items():
             if '*' in k:
                 print(f'{k} : {v}')
@@ -228,8 +230,8 @@ class Team(object):
             fig = plt.figure(figsize=(3, 3))
             ax = fig.add_subplot(1, 1, 1)
             ax.loglog(*zip(*stats[k].items()), marker='x', linestyle='None')
-            ax.set_xlabel(k.split('_')[1].replace('n', '#', 0))
-            ax.set_ylabel(k.split('_')[0].replace('n', '#', 0))
+            ax.set_xlabel(k.split('_')[1][0].replace('n', '#') + k.split('_')[1][1:], **hfont)
+            ax.set_ylabel(k.split('_')[0][0].replace('n', '#') + k.split('_')[0][1:], **hfont)
             ax.grid(True, color="#93a1a1", alpha=0.3)
             ax.spines['right'].set_color((.8, .8, .8))
             ax.spines['top'].set_color((.8, .8, .8))
