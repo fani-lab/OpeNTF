@@ -11,7 +11,11 @@
 *.pkl
 *.png
 src/tmp.py
-/output/
 *.log
-/baseline/Team_Formation_Library/teamFormationLibrary/dataset
-/baseline/Team_Formation_Library/teamFormationLibrary/output/Models
+*.pred
+output/toy.dblp.v12.json/nmt/
+*.7z
+data/raw/dblp/dblp.v12.json
+*.npy
+*.rar
+*.mdl
