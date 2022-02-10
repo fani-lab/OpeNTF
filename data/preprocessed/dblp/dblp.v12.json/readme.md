@@ -1,4 +1,6 @@
-Public link to download: https://originalstatic.aminer.cn/misc/dblp.v12.7z
+Public link to download: 
+https://aminer.org/citation
+https://originalstatic.aminer.cn/misc/dblp.v12.7z
 
 File structure:
 
