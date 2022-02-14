@@ -11,16 +11,25 @@ np.random.seed(0)
 settings = {
     'model':{
         'baseline': {
+            'random': {
+                'b': 4096
+            },
             'fnn':{
                 'l': [100],  # list of number of nodes in each layer
                 'lr': 0.1,  # learning rate
                 'b': 4096,  # batch size
-                'e': 100,  # epoch
+                'e': 20,  # epoch
                 'nns': None,  # number of negative samples
                 'ns': None,  # 'uniform', 'unigram', 'unigram_b'
             },
-            'bnn':{ # sample_elbo for bnn
-                's': 1  # number of sampling for bayesian nn
+            'bnn':{
+                'l': [100],  # list of number of nodes in each layer
+                'lr': 0.1,  # learning rate
+                'b': 4096,  # batch size
+                'e': 20,  # epoch
+                'nns': None,  # number of negative samples
+                'ns': None,  # 'uniform', 'unigram', 'unigram_b'
+                's': 1  # # sample_elbo for bnn
             },
             'emb':{
                 'd': 100,# embedding dimension
@@ -35,13 +44,13 @@ settings = {
     },
     'data':{
         'domain': {
-            'dblp':{'nrow':1000},
+            'dblp':{},
             'uspt':{},
             'imdb':{},
         },
         'filter': {
-            'min_nteam': 0,
-            'min_team_size': 0,
+            'min_nteam': 75,
+            'min_team_size': 3,
         },
         'parallel': 1,
         'ncore': 0,# <= 0 for all
