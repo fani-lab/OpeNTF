@@ -130,7 +130,7 @@ We used [``pytrec_eval``](https://github.com/cvangysel/pytrec_eval) to evaluate 
 |Results|[``./output/dblp.v12.json.filtered.mt75.ts3/``](./output/dblp.v12.json.filtered.mt75.ts3/), [``./output/title.basics.tsv.filtered.mt75.ts3/``](./output/title.basics.tsv.filtered.mt75.ts3/)|
 
 <p align="center">
-<img src='https://user-images.githubusercontent.com/8619934/153869667-fe75ee6a-350f-400d-810a-9a7812fcd492.png' >
+<img src='https://user-images.githubusercontent.com/8619934/153897600-2cabc7ed-e971-4562-83fa-d5abd22166f4.png' >
 
 
 Full predictions of all models on test and training sets and the values of evaluation metrics, per instance and average, are available in a rar file of size ``74.8GB`` and will be delivered upon request! 
