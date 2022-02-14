@@ -1,19 +1,34 @@
-#We benefit from Josh Feldman's great blog at https://joshfeldman.net/WeightUncertainty/
+import os
+import time
+import matplotlib as plt
+import json
+import matplotlib.pyplot as plt
 
 import torch
+from torch import optim
+from torch.utils.data import DataLoader
+from torch.optim.lr_scheduler import StepLR, ReduceLROnPlateau
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn.functional import leaky_relu
-import torch.optim as optim
 from torch.distributions import Normal
 
-class BNN(nn.Module):
-    def __init__(self, input_size, output_size, param):
+#We benefit from Josh Feldman's great blog at https://joshfeldman.net/WeightUncertainty/
+
+from mdl.custom_dataset import TFDataset
+from mdl.fnn import Fnn
+from cmn.team import Team
+
+class Bnn(Fnn):
+    def __init__(self):
         super().__init__()
+
+    def init(self, input_size, output_size, param):
         self.h1 = BayesianLayer(input_size, param['l'][0])
         self.h2 = BayesianLayer(param['l'][0], param['l'][0])
         self.out = BayesianLayer(param['l'][0], output_size)
         self.output_size = output_size
+        return self
 
     def forward(self, x):
         x = leaky_relu(self.h1(x))
@@ -45,6 +60,115 @@ class BNN(nn.Module):
         # log_likes = F.nll_loss(outputs.mean(0), target, reduction='sum')
         # loss = (log_post - log_prior)/num_batches + log_likes
         return loss, outputs
+
+    # TODO: there is huge code overlapp with bnn training and fnn training. Trying to generalize as we did in test and eval
+    def learn(self, splits, indexes, vecs, params, output):
+        layers = params['l'];
+        learning_rate = params['lr'];
+        batch_size = params['b'];
+        num_epochs = params['e'];
+        nns = params['nns'];
+        ns = params['ns']
+        s = params['s']
+        # input_size = len(indexes['i2s'])
+        input_size = vecs['skill'].shape[1]
+        output_size = len(indexes['i2c'])
+
+        unigram = Team.get_unigram(vecs['member'])
+
+        # Prime a dict for train and valid loss
+        train_valid_loss = dict()
+        for i in range(len(splits['folds'].keys())):
+            train_valid_loss[i] = {'train': [], 'valid': []}
+
+        start_time = time.time()
+        # Training K-fold
+        for foldidx in splits['folds'].keys():
+            # Retrieving the folds
+            X_train = vecs['skill'][splits['folds'][foldidx]['train'], :];
+            y_train = vecs['member'][splits['folds'][foldidx]['train']]
+            X_valid = vecs['skill'][splits['folds'][foldidx]['valid'], :];
+            y_valid = vecs['member'][splits['folds'][foldidx]['valid']]
+
+            # Building custom dataset
+            training_matrix = TFDataset(X_train, y_train)
+            validation_matrix = TFDataset(X_valid, y_valid)
+
+            # Generating data loaders
+            training_dataloader = DataLoader(training_matrix, batch_size=batch_size, shuffle=True, num_workers=0)
+            validation_dataloader = DataLoader(validation_matrix, batch_size=batch_size, shuffle=True, num_workers=0)
+            data_loaders = {"train": training_dataloader, "valid": validation_dataloader}
+
+            # Initialize network
+            self.init(input_size=input_size, output_size=output_size, param=params).to(self.device)
+
+            optimizer = optim.Adam(self.parameters(), lr=learning_rate)
+            scheduler = ReduceLROnPlateau(optimizer, factor=0.5, patience=10, verbose=True)
+            # scheduler = StepLR(optimizer, step_size=3, gamma=0.9)
+
+            train_loss_values = []
+            valid_loss_values = []
+            fold_time = time.time()
+            # Train Network
+            for epoch in range(num_epochs):
+                train_running_loss = valid_running_loss = 0.0
+                # Each epoch has a training and validation phase
+                for phase in ['train', 'valid']:
+                    for batch_idx, (X, y) in enumerate(data_loaders[phase]):
+                        torch.cuda.empty_cache()
+                        X = X.float().to(device=self.device)  # Get data to cuda if possible
+                        y = y.float().to(device=self.device)
+                        if phase == 'train':
+                            self.train(True)  # scheduler.step()
+                            # forward
+                            optimizer.zero_grad()
+                            layer_loss, y_ = self.sample_elbo(X.squeeze(1), y, s)
+                            loss = self.cross_entropy(y_.to(self.device), y, ns, nns, unigram) + layer_loss / batch_size
+                            # backward
+                            loss.backward()
+                            # clip_grad_value_(model.parameters(), 1)
+                            optimizer.step()
+                            train_running_loss += loss.item()
+                        else:  # valid
+                            self.train(False)  # Set model to valid mode
+                            layer_loss, y_ = self.sample_elbo(X.squeeze(1), y, 1)
+                            loss = self.cross_entropy(y_.to(self.device), y, ns, nns, unigram) + layer_loss / batch_size
+                            valid_running_loss += loss.item()
+                        print(
+                            f'Fold {foldidx}/{len(splits["folds"]) - 1}, Epoch {epoch}/{num_epochs - 1}, Minibatch {batch_idx}/{int(X_train.shape[0] / batch_size)}, Phase {phase}'
+                            f', Running Loss {phase} {loss.item()}'
+                            f", Time {time.time() - fold_time}, Overall {time.time() - start_time} "
+                        )
+                    # Appending the loss of each epoch to plot later
+                    if phase == 'train':
+                        train_loss_values.append(train_running_loss / X_train.shape[0])
+                    else:
+                        valid_loss_values.append(valid_running_loss / X_valid.shape[0])
+                    print(f'Fold {foldidx}/{len(splits["folds"]) - 1}, Epoch {epoch}/{num_epochs - 1}'
+                          f', Running Loss {phase} {train_loss_values[-1] if phase == "train" else valid_loss_values[-1]}'
+                          f", Time {time.time() - fold_time}, Overall {time.time() - start_time} "
+                          )
+                torch.save(self.state_dict(), f"{output}/state_dict_model.f{foldidx}.e{epoch}.pt", pickle_protocol=4)
+                scheduler.step(valid_running_loss / X_valid.shape[0])
+
+            model_path = f"{output}/state_dict_model_f{foldidx}.pt"
+
+            # Save
+            torch.save(self.state_dict(), model_path, pickle_protocol=4)
+            train_valid_loss[foldidx]['train'] = train_loss_values
+            train_valid_loss[foldidx]['valid'] = valid_loss_values
+
+        print(f"It took {time.time() - start_time} to train the model.")
+        with open(f"{output}/train_valid_loss.json", 'w') as outfile:
+            json.dump(train_valid_loss, outfile)
+            for foldidx in train_valid_loss.keys():
+                plt.figure()
+                plt.plot(train_valid_loss[foldidx]['train'], label='Training Loss')
+                plt.plot(train_valid_loss[foldidx]['valid'], label='Validation Loss')
+                plt.legend(loc='upper right')
+                plt.title(f'Training and Validation Loss for fold #{foldidx}')
+                plt.savefig(f'{output}/f{foldidx}.train_valid_loss.png', dpi=100, bbox_inches='tight')
+                plt.show()
 
 class BayesianLayer(nn.Module):
     def __init__(self, input_features, output_features, prior_var=1.):
