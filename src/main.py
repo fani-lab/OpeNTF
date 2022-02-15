@@ -8,12 +8,11 @@ import param
 from cmn.publication import Publication
 from cmn.movie import Movie
 from cmn.patent import Patent
-import fnn_main
-import bnn_main
+from mdl.fnn import Fnn
+from mdl.bnn import Bnn
+from mdl.rnd import Rnd
 import nmt_main
 from mdl.team2vec import Team2Vec
-
-sys.path.extend(['../cmn'])
 
 class NumpyArrayEncoder(JSONEncoder):
     def default(self, obj):
@@ -39,37 +38,31 @@ def create_evaluation_splits(n_sample, n_folds, train_ratio=0.85, output='./'):
 
 def run(datapath, domain, filter, model, output, settings):
     prep_output = f'./../data/preprocessed/{domain}/{os.path.split(datapath)[-1]}'
-    if domain == 'dblp':
-        vecs, indexes = Publication.generate_sparse_vectors(datapath, prep_output, filter, settings['data'])
-
-    if domain == 'imdb':
-        vecs, indexes = Movie.generate_sparse_vectors(datapath, prep_output, filter, settings['data'])
-
-    if domain == 'uspt':
-        vecs, indexes = Patent.generate_sparse_vectors(datapath, prep_output, filter, settings['data'])
-
-    splits = create_evaluation_splits(len(indexes['t2i']), settings['model']['nfolds'], settings['model']['train_test_split'], output=prep_output)
-
     filter_str = f".filtered.mt{settings['data']['filter']['min_nteam']}.ts{settings['data']['filter']['min_team_size']}" if filter else ""
-    if model == 'fnn':
-        fnn_main.main(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}{filter_str}/fnn', settings['model']['baseline']['fnn'], settings['model']['cmd'])
 
-    if model == 'bnn':
-        bnn_main.main(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}{filter_str}/bnn', settings['model']['baseline']['fnn'], settings['model']['cmd'])
+    if domain == 'dblp': vecs, indexes = Publication.generate_sparse_vectors(datapath, f'{prep_output}{filter_str}', filter, settings['data'])
+    if domain == 'imdb': vecs, indexes = Movie.generate_sparse_vectors(datapath, f'{prep_output}{filter_str}', filter, settings['data'])
+    if domain == 'uspt': vecs, indexes = Patent.generate_sparse_vectors(datapath, f'{prep_output}{filter_str}', filter, settings['data'])
+
+    splits = create_evaluation_splits(len(indexes['t2i']), settings['model']['nfolds'], settings['model']['train_test_split'], output=f'{prep_output}{filter_str}')
+
+    if model == 'random': Rnd().run(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}{filter_str}/random', settings['model']['baseline']['random'], settings['model']['cmd'])
+    if model == 'fnn': Fnn().run(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}{filter_str}/fnn', settings['model']['baseline']['fnn'], settings['model']['cmd'])
+    if model == 'bnn': Bnn().run(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}{filter_str}/bnn', settings['model']['baseline']['bnn'], settings['model']['cmd'])
 
     if model == 'fnn_emb':
         t2v = Team2Vec(vecs, 'skill', f'./../data/preprocessed/{domain}/{os.path.split(datapath)[-1]}{filter_str}')
         emb_setting = settings['model']['baseline']['emb']
         t2v.train(emb_setting['d'], emb_setting['w'], emb_setting['dm'], emb_setting['e'])
         vecs['skill'] = t2v.dv()
-        fnn_main.main(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}{filter_str}/fnn_emb', settings['model']['baseline']['fnn'], settings['model']['cmd'])
+        Fnn().run(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}{filter_str}/fnn_emb', settings['model']['baseline']['fnn'], settings['model']['cmd'])
 
     if model == 'bnn_emb':
         t2v = Team2Vec(vecs, 'skill', f'./../data/preprocessed/{domain}/{os.path.split(datapath)[-1]}{filter_str}')
         emb_setting = settings['model']['baseline']['emb']
         t2v.train(emb_setting['d'], emb_setting['w'], emb_setting['dm'], emb_setting['e'])
         vecs['skill'] = t2v.dv()
-        bnn_main.main(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}{filter_str}/bnn_emb', settings['model']['baseline']['fnn'], settings['model']['cmd'])
+        Bnn().run(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}{filter_str}/bnn_emb', settings['model']['baseline']['fnn'], settings['model']['cmd'])
 
     if model == 'nmt':
         nmt_main.main(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}{filter_str}/nmt', './nmt_base_config.yaml', cmd=['train', 'test', 'eval'])
@@ -81,28 +74,31 @@ def addargs(parser):
     dataset.add_argument('-filter', type=int, default=0, choices=[0, 1], help='Remove outliers? (0=False(default), 1=True)')
 
     baseline = parser.add_argument_group('baseline')
-    baseline.add_argument('-model', type=str, required=True, choices=['fnn', 'bnn', 'fnn_emb', 'bnn_emb', 'nmt'], help='The model name (example: fnn)')
+    baseline.add_argument('-model', type=str, required=True, choices=['random', 'fnn', 'bnn', 'fnn_emb', 'bnn_emb', 'nmt'], help='The model name (example: fnn)')
 
     output = parser.add_argument_group('output')
     output.add_argument('-output', type=str, default='./../output/', help='The output path (default: ./../output/)')
 
-# python -u main.py -data=./../data/raw/dblp/toy.dblp.v12.json -domain=dblp -model=fnn
-# python -u main.py -data=./../data/raw/dblp/toy.dblp.v12.json -domain=dblp -model=bnn
-# python -u main.py -data=./../data/raw/dblp/toy.dblp.v12.json -domain=dblp -model=fnn_emb
-# python -u main.py -data=./../data/raw/dblp/toy.dblp.v12.json -domain=dblp -model=bnn_emb
+# python -u main.py -data=./../data/raw/dblp/toy.dblp.v12.json -domain=dblp -model=fnn 2>&1 | tee toy.dblp.v12.json.fnn.log.txt
+# python -u main.py -data=./../data/raw/dblp/toy.dblp.v12.json -domain=dblp -model=bnn 2>&1 | tee toy.dblp.v12.json.bnn.log.txt
+# python -u main.py -data=./../data/raw/dblp/toy.dblp.v12.json -domain=dblp -model=fnn_emb 2>&1 | tee toy.dblp.v12.json.fnn_emb.log.txt
+# python -u main.py -data=./../data/raw/dblp/toy.dblp.v12.json -domain=dblp -model=bnn_emb 2>&1 | tee toy.dblp.v12.json.bnn_emb.log.txt
+# python -u main.py -data=./../data/raw/dblp/toy.dblp.v12.json -domain=dblp -model=random 2>&1 | tee toy.dblp.v12.json.random.log.txt
 #
-# python -u main.py -data=./../data/raw/imdb/toy.title.basics.tsv -domain=imdb -model=fnn
-# python -u main.py -data=./../data/raw/imdb/toy.title.basics.tsv -domain=imdb -model=bnn
-# python -u main.py -data=./../data/raw/imdb/toy.title.basics.tsv -domain=imdb -model=fnn_emb
-# python -u main.py -data=./../data/raw/imdb/toy.title.basics.tsv -domain=imdb -model=bnn_emb
+# python -u main.py -data=./../data/raw/imdb/toy.title.basics.tsv -domain=imdb -model=fnn 2>&1 | tee toy.title.basics.tsv.fnn.log.txt
+# python -u main.py -data=./../data/raw/imdb/toy.title.basics.tsv -domain=imdb -model=bnn 2>&1 | tee toy.title.basics.tsv.bnn.log.txt
+# python -u main.py -data=./../data/raw/imdb/toy.title.basics.tsv -domain=imdb -model=fnn_emb 2>&1 | tee toy.title.basics.tsv.fnn_emb.log.txt
+# python -u main.py -data=./../data/raw/imdb/toy.title.basics.tsv -domain=imdb -model=bnn_emb 2>&1 | tee toy.title.basics.tsv.bnn_emb.log.txt
+# python -u main.py -data=./../data/raw/imdb/toy.title.basics.tsv -domain=imdb -model=random 2>&1 | tee toy.title.basics.tsv.random.log.txt
 #
-# python -u main.py -data=./../data/raw/uspt/toy.patent.tsv -domain=uspt -model=fnn
-# python -u main.py -data=./../data/raw/uspt/toy.patent.tsv -domain=uspt -model=bnn
-# python -u main.py -data=./../data/raw/uspt/toy.patent.tsv -domain=uspt -model=fnn_emb
-# python -u main.py -data=./../data/raw/uspt/toy.patent.tsv -domain=uspt -model=fnn_emb
+# python -u main.py -data=./../data/raw/uspt/toy.patent.tsv -domain=uspt -model=fnn 2>&1 | tee toy.patent.tsv.fnn.log.txt
+# python -u main.py -data=./../data/raw/uspt/toy.patent.tsv -domain=uspt -model=bnn 2>&1 | tee toy.patent.tsv.bnn.log.txt
+# python -u main.py -data=./../data/raw/uspt/toy.patent.tsv -domain=uspt -model=fnn_emb 2>&1 | tee toy.patent.tsv.fnn_emb.log.txt
+# python -u main.py -data=./../data/raw/uspt/toy.patent.tsv -domain=uspt -model=fnn_emb 2>&1 | tee toy.patent.tsv.bnn_emb.log.txt
+# python -u main.py -data=./../data/raw/uspt/toy.patent.tsv -domain=uspt -model=random 2>&1 | tee toy.patent.tsv.random.log.txt
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Team Formation')
+    parser = argparse.ArgumentParser(description='Neural Team Formation')
     addargs(parser)
     args = parser.parse_args()
 
