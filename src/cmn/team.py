@@ -127,7 +127,6 @@ class Team(object):
 
     @classmethod
     def generate_sparse_vectors(cls, datapath, output, filter, settings):
-        output += f'.filtered.mt{settings["filter"]["min_nteam"]}.ts{settings["filter"]["min_team_size"]}' if filter else ""
         pkl = f'{output}/teamsvecs.pkl'
         try:
             st = time()
