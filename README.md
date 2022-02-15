@@ -110,7 +110,7 @@ To include a negative sampling strategy, there are two parameters for a model to
 The pipeline accepts three required input values:
 1) ``-data``: the path to the raw datafile, e.g., ``-data=./../data/raw/dblp/dblp.v12.json``, or the main file of a dataset, e.g., ``-data=./../data/raw/imdb/title.basics.tsv``
 2) ``-domain``: the domain of the raw data file that could be ``dblp``, ``imdb``, or `uspt`; e.g., ``-domain=dblp``.
-3) ``-model``: the baseline model that could be ``fnn``, ``fnn_emb``, ``bnn``, ``bnn_emb``; e.g., ``-model=fnn`` 
+3) ``-model``: the baseline model that could be ``fnn``, ``fnn_emb``, ``bnn``, ``bnn_emb``, ``random``; e.g., ``-model=fnn`` 
 
 ## 4. Results:
 
