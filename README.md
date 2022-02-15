@@ -9,6 +9,7 @@ We propose ``neural machine learning`` approaches to Team Formation. We will tra
 3. [Features](#3-features)
 4. [Results](#4-results)
 5. [Acknowledgement](#5-acknowledgement)
+6. [License](#6-license)
 
 ## 1. Setup
 You need to have ``Python >= 3.8`` and install the following main packages, among others listed in [``requirements.txt``](requirements.txt):
@@ -137,3 +138,6 @@ Full predictions of all models on test and training sets and the values of evalu
 
 ## 5. Acknowledgement:
 We benefit from [``pytrec_eval``](https://github.com/cvangysel/pytrec_eval), [``gensim``](https://radimrehurek.com/gensim/), [Josh Feldman's blog](https://joshfeldman.net/WeightUncertainty/), and other libraries. We would like to thank the authors of these libraries and helpful resources.
+  
+## 6. License:
+©2021. This work is licensed under a CC BY-NC-SA 4.0 license.
