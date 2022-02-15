@@ -169,12 +169,12 @@ class Team(object):
         return teams
 
     @classmethod
-    def get_stats(cls, teamsvecs, output, plot=False):
+    def get_stats(cls, teamsvecs, output, plot=False, plot_title=None):
         try:
             print("Loading the stats pickle ...")
             with open(f'{output}/stats.pkl', 'rb') as infile:
                 stats = pickle.load(infile)
-                if plot: Team.plot_stats(stats, output)
+                if plot: Team.plot_stats(stats, output, plot_title)
                 return stats
 
         except FileNotFoundError:
@@ -215,31 +215,32 @@ class Team(object):
             #TODO: skills_years (2-D image)
             #TODO: candidate_years (2-D image)
             with open(f'{output}/stats.pkl', 'wb') as outfile: pickle.dump(stats, outfile)
-            if plot: Team.plot_stats(stats, output)
+            if plot: Team.plot_stats(stats, output, plot_title)
         return stats
 
     @staticmethod
-    def plot_stats(stats, output):
-        csfont = {'fontname': 'Consolas'}
-        hfont = {'fontname': 'Consolas'}
+    def plot_stats(stats, output, plot_title):
+        plt.rcParams.update({'font.family': 'Consolas'})
         for k, v in stats.items():
             if '*' in k:
                 print(f'{k} : {v}')
                 continue
-            fig = plt.figure(figsize=(3, 3))
+            fig = plt.figure(figsize=(2, 2))
             ax = fig.add_subplot(1, 1, 1)
-            ax.loglog(*zip(*stats[k].items()), marker='x', linestyle='None')
-            ax.set_xlabel(k.split('_')[1][0].replace('n', '#') + k.split('_')[1][1:], **hfont)
-            ax.set_ylabel(k.split('_')[0][0].replace('n', '#') + k.split('_')[0][1:], **hfont)
+            ax.loglog(*zip(*stats[k].items()), marker='x', linestyle='None', markeredgecolor='b')
+            ax.set_xlabel(k.split('_')[1][0].replace('n', '#') + k.split('_')[1][1:])
+            ax.set_ylabel(k.split('_')[0][0].replace('n', '#') + k.split('_')[0][1:])
             ax.grid(True, color="#93a1a1", alpha=0.3)
-            ax.spines['right'].set_color((.8, .8, .8))
-            ax.spines['top'].set_color((.8, .8, .8))
+            # ax.spines['right'].set_color((.8, .8, .8))
+            # ax.spines['top'].set_color((.8, .8, .8))
             ax.minorticks_off()
-            ax.xaxis.set_tick_params(size=1)
-            ax.yaxis.set_tick_params(size=1)
+            ax.xaxis.set_tick_params(size=2, direction='in')
+            ax.yaxis.set_tick_params(size=2, direction='in')
             ax.xaxis.get_label().set_size(12)
             ax.yaxis.get_label().set_size(12)
-            fig.savefig(f'{output}/{k}.png', dpi=100, bbox_inches='tight')
+            ax.set_title(plot_title, x=0.7, y=0.8, fontsize=11)
+            ax.set_facecolor('whitesmoke')
+            fig.savefig(f'{output}/{k}.pdf', dpi=100, bbox_inches='tight')
             plt.show()
 
     @staticmethod

@@ -234,9 +234,7 @@ class Fnn(Ntf):
                     matrix = TFDataset(X, y)
                     dl = DataLoader(matrix, batch_size=params['b'], shuffle=True, num_workers=0)
                 else:
-                    X = X_test;
-                    y = y_test;
-                    matrix = test_matrix;
+                    X = X_test; y = y_test; matrix = test_matrix
                     dl = test_dl
 
                 torch.cuda.empty_cache()
