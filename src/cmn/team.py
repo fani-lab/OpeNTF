@@ -169,9 +169,10 @@ class Team(object):
         return teams
 
     @classmethod
-    def get_stats(cls, teamsvecs, output, plot=False, plot_title=None):
+    def get_stats(cls, teamsvecs, output, cache=True, plot=False, plot_title=None):
         try:
             print("Loading the stats pickle ...")
+            if not cache: raise FileNotFoundError
             with open(f'{output}/stats.pkl', 'rb') as infile:
                 stats = pickle.load(infile)
                 if plot: Team.plot_stats(stats, output, plot_title)
