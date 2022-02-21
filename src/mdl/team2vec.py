@@ -9,7 +9,9 @@ import logging
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 
 # teams as documents, members/skills as words
-# doc_list = ['m1 m2 m3','m2 m3','m1 m2 m1 m2'] or ['s1 s3 s4', 's3 s6']
+# doc_list = ['m1 m2 m3','m2 m4'] or
+# doc_list = ['s1 s2', 's3'] or
+# doc_list = ['s1 s2 m1 m2 m3','s3 m2 m4']
 # label_list = ['t1','t2','t3']
 
 class Team2Vec:
@@ -95,7 +97,7 @@ def addargs(parser):
     embedding.add_argument('-dim', type=int, default=100, help='Embedding vector dimension; (100 default)')
     embedding.add_argument('-window', type=int, default=1, help='Coocurrence window; (1 default)')
     embedding.add_argument('-epochs', type=int, default=10, help='Training epoch; (10 default)')
-    embedding.add_argument('-embtypes', type=str, default='skill', help="Embedding type; (-embtypes=skill (default); member; joint; skill,member; skill, joint; ...)")
+    embedding.add_argument('-embtypes', type=str, default='skill', help="Embedding types; (-embtypes=skill (default); member; joint; skill,member; skill,joint; ...)")
     embedding.add_argument('-output', type=str, required=True, help='Output folder; (e.g., ../data/preprocessed/dblp/toy.dblp.v12.json/')
 
 def run(teamsvecs_file, dm, dbow_words, dim, window, embtypes, epochs, output):

@@ -3,6 +3,7 @@ import argparse
 import numpy as np
 from sklearn.model_selection import KFold, train_test_split
 from json import JSONEncoder
+from itertools import product
 
 import param
 from cmn.publication import Publication
@@ -37,35 +38,31 @@ def create_evaluation_splits(n_sample, n_folds, train_ratio=0.85, output='./'):
     return splits
 
 def run(datapath, domain, filter, model, output, settings):
-    prep_output = f'./../data/preprocessed/{domain}/{os.path.split(datapath)[-1]}'
     filter_str = f".filtered.mt{settings['data']['filter']['min_nteam']}.ts{settings['data']['filter']['min_team_size']}" if filter else ""
 
-    if domain == 'dblp': vecs, indexes = Publication.generate_sparse_vectors(datapath, f'{prep_output}{filter_str}', filter, settings['data'])
-    if domain == 'imdb': vecs, indexes = Movie.generate_sparse_vectors(datapath, f'{prep_output}{filter_str}', filter, settings['data'])
-    if domain == 'uspt': vecs, indexes = Patent.generate_sparse_vectors(datapath, f'{prep_output}{filter_str}', filter, settings['data'])
+    datasets = {}
+    models = {}
+    if 'dblp' in domain: datasets['dblp'] = Publication
+    if 'imdb' in domain: datasets['imdb'] = Movie
+    if 'uspt' in domain: datasets['uspt'] = Patent
 
-    splits = create_evaluation_splits(len(indexes['t2i']), settings['model']['nfolds'], settings['model']['train_test_split'], output=f'{prep_output}{filter_str}')
+    if 'random' in model: models['random'] = Rnd()
+    if 'fnn' in model: models['fnn'] = Fnn()
+    if 'bnn' in model: models['bnn'] = Bnn()
+    if 'fnn_emb' in model: models['fnn_emb'] = Fnn()
+    if 'bnn_emb' in model: models['bnn_emb'] = Bnn()
 
-    if model == 'random': Rnd().run(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}{filter_str}/random', settings['model']['baseline']['random'], settings['model']['cmd'])
-    if model == 'fnn': Fnn().run(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}{filter_str}/fnn', settings['model']['baseline']['fnn'], settings['model']['cmd'])
-    if model == 'bnn': Bnn().run(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}{filter_str}/bnn', settings['model']['baseline']['bnn'], settings['model']['cmd'])
+    for (d_name, d_cls), (m_name, m_obj) in product(datasets.items(), models.items()):
+        prep_output = f'./../data/preprocessed/{d_name}/{os.path.split(datapath)[-1]}'
+        vecs, indexes = d_cls.generate_sparse_vectors(datapath, f'{prep_output}{filter_str}', filter, settings['data'])
+        splits = create_evaluation_splits(len(indexes['t2i']), settings['model']['nfolds'], settings['model']['train_test_split'], output=f'{prep_output}{filter_str}')
+        if m_name.find('_emb') > 0:
+            t2v = Team2Vec(vecs, 'skill', f'./../data/preprocessed/{d_name}/{os.path.split(datapath)[-1]}{filter_str}')
+            emb_setting = settings['model']['baseline']['emb']
+            t2v.train(emb_setting['d'], emb_setting['w'], emb_setting['dm'], emb_setting['e'])
+            vecs['skill'] = t2v.dv()
 
-    if model == 'fnn_emb':
-        t2v = Team2Vec(vecs, 'skill', f'./../data/preprocessed/{domain}/{os.path.split(datapath)[-1]}{filter_str}')
-        emb_setting = settings['model']['baseline']['emb']
-        t2v.train(emb_setting['d'], emb_setting['w'], emb_setting['dm'], emb_setting['e'])
-        vecs['skill'] = t2v.dv()
-        Fnn().run(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}{filter_str}/fnn_emb', settings['model']['baseline']['fnn'], settings['model']['cmd'])
-
-    if model == 'bnn_emb':
-        t2v = Team2Vec(vecs, 'skill', f'./../data/preprocessed/{domain}/{os.path.split(datapath)[-1]}{filter_str}')
-        emb_setting = settings['model']['baseline']['emb']
-        t2v.train(emb_setting['d'], emb_setting['w'], emb_setting['dm'], emb_setting['e'])
-        vecs['skill'] = t2v.dv()
-        Bnn().run(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}{filter_str}/bnn_emb', settings['model']['baseline']['fnn'], settings['model']['cmd'])
-
-    if model == 'nmt':
-        nmt_main.main(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}{filter_str}/nmt', './nmt_base_config.yaml', cmd=['train', 'test', 'eval'])
+        m_obj.run(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}{filter_str}/{m_name}', settings['model']['baseline'][m_name.replace('_emb', '')], settings['model']['cmd'])
 
 def addargs(parser):
     dataset = parser.add_argument_group('dataset')
