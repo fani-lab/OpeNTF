@@ -1,5 +1,5 @@
 # Neural Team Formation 
-Teams are the primary vehicle for coordinating experts with diverse skills needed for a particular collaborative project, and Team Formation (TF) has firsthand effects on creating organizational performance. Social network analysis has been employed for TF by incorporating social ties and interpersonal collaboration features using measures such as degree and closeness centrality. Socially driven methods, however, face two significant challenges, esp., when currency (timeliness) is of the prime concern: ``i) temporality``: the expert's skills and her social attributes constantly change over time. A successful collaboration of experts in a team years ago does not tailor a successful team now, ``ii) Complexity``: optimum teams are found by computationally expensive search over all the subgraphs of a large-scale collaboration graph (search-based.) 
+Teams are the primary vehicle for coordinating experts with diverse skills needed for a particular collaborative project, and Team Formation (TF) has firsthand effects on creating organizational performance. Social network analysis has been employed for TF by incorporating social ties and interpersonal collaboration features using measures such as degree and closeness centrality. Socially driven methods, however, face two significant challenges, esp., when currency (timeliness) is of the prime concern: ``i) temporality``: the expert's skills and her social attributes constantly change over time. A successful collaboration of experts in a team years ago does not tailor a successful team now, ``ii) complexity``: optimum teams are found by computationally expensive search over all the subgraphs of a large-scale collaboration graph (search-based.) 
 
 ## Objectives
 We propose ``neural machine learning`` approaches to Team Formation. We will train neural models that would learn relationships among experts and their social attributes in vector space. Wherein, we consider all past (un)successful team compositions as training samples to predict future teams and the team's level of success. Therefore, we bring efficiency while enhancing efficacy due to the inherently iterative and online learning procedure in neural architectures. More importantly, we will address temporality by incorporating sequences on the neural architecture via recurrence, which yields a richer representation and more accurate team composition within time. We are the first who consider temporal graph neural networks for team formation and will provide major advances via ``1) time-sensitive`` and ``2) scalable`` incorporation of experts' attributes and skills. 
@@ -20,17 +20,17 @@ gensim==3.8.3
 ```
 By ``pip``, clone the codebase and install the required packages:
 ```sh
-git clone https://github.com/Fani-Lab/neural_team_formation
-cd neural_team_formation
+git clone https://github.com/Fani-Lab/opentf
+cd opentf
 pip install -r requirements.txt
 ```
 By [``conda``](https://www.anaconda.com/products/individual):
 
 ```sh
-git clone https://github.com/Fani-Lab/neural_team_formation
-cd neural_team_formation
+git clone https://github.com/Fani-Lab/opentf
+cd opentf
 conda env create -f environment.yml
-conda activate ntf
+conda activate opentf
 ```
 
 For installation of specific version of a python package due to, e.g., ``CUDA`` versions compatibility, one can edit [``requirements.txt``](requirements.txt) or [``environment.yml``](environment.yml) like as follows:
@@ -43,10 +43,10 @@ torch==1.6.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html
 
 ```sh
 cd src
-python main.py -data=data/raw/dblp/toy.dblp.v12.json -domain=dblp -model=fnn
+python main.py -data data/raw/dblp/toy.dblp.v12.json -domain dblp -model fnn bnn
 ```
 
-The above run, loads and preprocesses a tiny-size toy example dataset [``toy.dblp.v12.json``](data/raw/dblp/toy.dblp.v12.json) from [``dblp``](https://originalstatic.aminer.cn/misc/dblp.v12.7z) followed by 5-fold train-evaluation on a training split and final test on the test set for a simple feedforward neural model using default hyperparameters from [``./src/param.py``](./src/param.py).
+The above run, loads and preprocesses a tiny-size toy example dataset [``toy.dblp.v12.json``](data/raw/dblp/toy.dblp.v12.json) from [``dblp``](https://originalstatic.aminer.cn/misc/dblp.v12.7z) followed by 5-fold train-evaluation on a training split and final test on the test set for ``feedforward`` and ``Bayesian`` neural models using default hyperparameters from [``./src/param.py``](./src/param.py).
 
 ## 3. Features:
 **Data Loading and Parallel Preprocessing**
@@ -65,7 +65,7 @@ The sparse matrices and the indices will be persisted in [``data/preprocessed/{d
 
 > Our pipeline benefits from parallel generation of sparse matrices for teams that significantly reduces the preprocessing time as shown below:
 > 
-> <p align="center"><img src="./data/parallel_sequential_sparse_matrix_creation.png" width="400"></p>
+> <p align="center"><img src="./data/speedup.jpg" width="200"><img src="./data/speedup_loglog.jpg" width="190"></p>
 
 
 Please note that the preprocessing step will be executed once. Subsequent runs load the persisted pickle files. In order to regenerate them, one should simply delete them. 
@@ -80,9 +80,11 @@ At each run, we store ids of instances in train-validation folds and test set in
 
 **Model Architecture**
 
-Each model has been defined in [``./src/mdl/``](./src/mdl/) and realized in a submain pipeline that can be executed for ``train``, ``test``, ``eval``, and ``plot`` steps. 
-For example, for our feedforward baseline [``fnn``](./src/mdl/fnn.py), the pipeline has been implemented in [``./src/mdl/fnn.py``](src/mdl/fnn.py) which is realized in [``./src/fnn_main.py``](src/fnn_main.py). Model's hyperparameters such as the learning rate (``lr``) or the number of epochs (``e``) can be set in [``./src/param.py``](src/param.py).
+Each model has been defined in [``./src/mdl/``](./src/mdl/) under an inheritance hierarchy. They override abstract functions for ``train``, ``test``, ``eval``, and ``plot`` steps. 
+For example, for our feedforward baseline [``fnn``](./src/mdl/fnn.py), the model has been implemented in [``./src/mdl/fnn.py``](src/mdl/fnn.py). Model's hyperparameters such as the learning rate (``lr``) or the number of epochs (``e``) can be set in [``./src/param.py``](src/param.py).
 
+<p align="center"><img src='./src/mdl/model_inheritance_hierarchy.png' width="300" ></p>
+  
 Currently, we support neural models:
 1) Baysian [``bnn``](./src/mdl/bnn.py) where model's parameter (weights) is assumed to be drawn from Gaussian (Normal) distribution and the task is to not to learn the weight but the mean (μ) and standard deviation (σ) of the distribution at each parameter.
 2) non-Baysian feedforward [``fnn``](./src/mdl/fnn.py) where the model's parameter (weights) is to be learnt.
@@ -107,10 +109,10 @@ To include a negative sampling strategy, there are two parameters for a model to
 
 **Run**
 
-The pipeline accepts three required input values:
-1) ``-data``: the path to the raw datafile, e.g., ``-data=./../data/raw/dblp/dblp.v12.json``, or the main file of a dataset, e.g., ``-data=./../data/raw/imdb/title.basics.tsv``
-2) ``-domain``: the domain of the raw data file that could be ``dblp``, ``imdb``, or `uspt`; e.g., ``-domain=dblp``.
-3) ``-model``: the baseline model that could be ``fnn``, ``fnn_emb``, ``bnn``, ``bnn_emb``; e.g., ``-model=fnn`` 
+The pipeline accepts three required list of values:
+1) ``-data``: list of path to the raw datafiles, e.g., ``-data ./../data/raw/dblp/dblp.v12.json``, or the main file of a dataset, e.g., ``-data ./../data/raw/imdb/title.basics.tsv``
+2) ``-domain``: list of domains of the raw data files that could be ``dblp``, ``imdb``, or `uspt`; e.g., ``-domain dblp imdb``.
+3) ``-model``: list of baseline models that could be ``fnn``, ``fnn_emb``, ``bnn``, ``bnn_emb``, ``random``; e.g., ``-model random fnn bnn`` 
 
 ## 4. Results:
 
