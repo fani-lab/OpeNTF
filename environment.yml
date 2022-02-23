@@ -1,4 +1,4 @@
-name: ntf
+name: opentf
 channels:
   - defaults
   - conda-forge

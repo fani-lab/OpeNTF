@@ -12,4 +12,4 @@ The filtering settings can be set by the ``filter`` parameter at [``./../src/par
 
 Our pipeline benefits from parallel generation of sparse matrices for teams that significantly reduces the preprocessing time as shown below:
 
-<p align="center"><img src="./parallel_sequential_sparse_matrix_creation.png" width="400"></p>
+<p align="center"><img src="./speedup.jpg" width="400"><img src="./speedup_loglog.jpg" width="370"></p>
