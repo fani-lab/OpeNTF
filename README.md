@@ -20,8 +20,8 @@ gensim==3.8.3
 ```
 By ``pip``, clone the codebase and install the required packages:
 ```sh
-git clone https://github.com/Fani-Lab/neural_team_formation
-cd neural_team_formation
+git clone https://github.com/Fani-Lab/opentf
+cd opentf
 pip install -r requirements.txt
 ```
 By [``conda``](https://www.anaconda.com/products/individual):
