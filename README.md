@@ -27,10 +27,10 @@ pip install -r requirements.txt
 By [``conda``](https://www.anaconda.com/products/individual):
 
 ```sh
-git clone https://github.com/Fani-Lab/neural_team_formation
-cd neural_team_formation
+git clone https://github.com/Fani-Lab/opentf
+cd opentf
 conda env create -f environment.yml
-conda activate ntf
+conda activate opentf
 ```
 
 For installation of specific version of a python package due to, e.g., ``CUDA`` versions compatibility, one can edit [``requirements.txt``](requirements.txt) or [``environment.yml``](environment.yml) like as follows:
@@ -43,10 +43,10 @@ torch==1.6.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html
 
 ```sh
 cd src
-python main.py -data=data/raw/dblp/toy.dblp.v12.json -domain=dblp -model=fnn
+python main.py -data data/raw/dblp/toy.dblp.v12.json -domain dblp -model fnn bnn
 ```
 
-The above run, loads and preprocesses a tiny-size toy example dataset [``toy.dblp.v12.json``](data/raw/dblp/toy.dblp.v12.json) from [``dblp``](https://originalstatic.aminer.cn/misc/dblp.v12.7z) followed by 5-fold train-evaluation on a training split and final test on the test set for a simple feedforward neural model using default hyperparameters from [``./src/param.py``](./src/param.py).
+The above run, loads and preprocesses a tiny-size toy example dataset [``toy.dblp.v12.json``](data/raw/dblp/toy.dblp.v12.json) from [``dblp``](https://originalstatic.aminer.cn/misc/dblp.v12.7z) followed by 5-fold train-evaluation on a training split and final test on the test set for ``feedforward`` and ``Bayesian`` neural models using default hyperparameters from [``./src/param.py``](./src/param.py).
 
 ## 3. Features:
 **Data Loading and Parallel Preprocessing**
@@ -107,10 +107,10 @@ To include a negative sampling strategy, there are two parameters for a model to
 
 **Run**
 
-The pipeline accepts three required input values:
-1) ``-data``: the path to the raw datafile, e.g., ``-data=./../data/raw/dblp/dblp.v12.json``, or the main file of a dataset, e.g., ``-data=./../data/raw/imdb/title.basics.tsv``
-2) ``-domain``: the domain of the raw data file that could be ``dblp``, ``imdb``, or `uspt`; e.g., ``-domain=dblp``.
-3) ``-model``: the baseline model that could be ``fnn``, ``fnn_emb``, ``bnn``, ``bnn_emb``, ``random``; e.g., ``-model=fnn`` 
+The pipeline accepts three required list of values:
+1) ``-data``: list of path to the raw datafiles, e.g., ``-data ./../data/raw/dblp/dblp.v12.json``, or the main file of a dataset, e.g., ``-data ./../data/raw/imdb/title.basics.tsv``
+2) ``-domain``: list of domains of the raw data files that could be ``dblp``, ``imdb``, or `uspt`; e.g., ``-domain dblp imdb``.
+3) ``-model``: list of baseline models that could be ``fnn``, ``fnn_emb``, ``bnn``, ``bnn_emb``, ``random``; e.g., ``-model random fnn bnn`` 
 
 ## 4. Results:
 
