@@ -37,25 +37,28 @@ def create_evaluation_splits(n_sample, n_folds, train_ratio=0.85, output='./'):
 
     return splits
 
-def run(datapath, domain, filter, model, output, settings):
+def run(data_list, domain_list, filter, model_list, output, settings):
     filter_str = f".filtered.mt{settings['data']['filter']['min_nteam']}.ts{settings['data']['filter']['min_team_size']}" if filter else ""
 
     datasets = {}
     models = {}
-    if 'dblp' in domain: datasets['dblp'] = Publication
-    if 'imdb' in domain: datasets['imdb'] = Movie
-    if 'uspt' in domain: datasets['uspt'] = Patent
+    if 'dblp' in domain_list: datasets['dblp'] = Publication
+    if 'imdb' in domain_list: datasets['imdb'] = Movie
+    if 'uspt' in domain_list: datasets['uspt'] = Patent
 
-    if 'random' in model: models['random'] = Rnd()
-    if 'fnn' in model: models['fnn'] = Fnn()
-    if 'bnn' in model: models['bnn'] = Bnn()
-    if 'fnn_emb' in model: models['fnn_emb'] = Fnn()
-    if 'bnn_emb' in model: models['bnn_emb'] = Bnn()
+    if 'random' in model_list: models['random'] = Rnd()
+    if 'fnn' in model_list: models['fnn'] = Fnn()
+    if 'bnn' in model_list: models['bnn'] = Bnn()
+    if 'fnn_emb' in model_list: models['fnn_emb'] = Fnn()
+    if 'bnn_emb' in model_list: models['bnn_emb'] = Bnn()
 
-    for (d_name, d_cls), (m_name, m_obj) in product(datasets.items(), models.items()):
+    for (d_name, d_cls), \
+        (m_name, m_obj) in product(datasets.items(), models.items()):
+        datapath = data_list[domain_list.index(d_name)]
+        print(datapath, d_name, d_cls, m_name, m_obj)
         prep_output = f'./../data/preprocessed/{d_name}/{os.path.split(datapath)[-1]}'
         vecs, indexes = d_cls.generate_sparse_vectors(datapath, f'{prep_output}{filter_str}', filter, settings['data'])
-        splits = create_evaluation_splits(len(indexes['t2i']), settings['model']['nfolds'], settings['model']['train_test_split'], output=f'{prep_output}{filter_str}')
+        splits = create_evaluation_splits(vecs['id'].shape[0], settings['model']['nfolds'], settings['model']['train_test_split'], output=f'{prep_output}{filter_str}')
         if m_name.find('_emb') > 0:
             t2v = Team2Vec(vecs, 'skill', f'./../data/preprocessed/{d_name}/{os.path.split(datapath)[-1]}{filter_str}')
             emb_setting = settings['model']['baseline']['emb']
@@ -66,43 +69,33 @@ def run(datapath, domain, filter, model, output, settings):
 
 def addargs(parser):
     dataset = parser.add_argument_group('dataset')
-    dataset.add_argument('-data', type=str, required=True, help='The dataset path; required; (example: ./../data/raw/toy.json)')
-    dataset.add_argument('-domain', type=str, required=True, choices=['dblp', 'imdb', 'uspt'], help='The dataset path; required; (example: dblp)')
-    dataset.add_argument('-filter', type=int, default=0, choices=[0, 1], help='Remove outliers? (0=False(default), 1=True)')
+    dataset.add_argument('-data', '--data-list', nargs='+', default=[], required=True, help='a list of dataset paths; required; (eg. -data ./../data/raw/toy.json)')
+    dataset.add_argument('-domain', '--domain-list', nargs='+', default=[], required=True, help='a list of domains; required; (eg. -domain dblp imdb uspt)')
+    dataset.add_argument('-filter', type=int, default=0, choices=[0, 1], help='remove outliers? (e.g., -filter 0 (default) or 1)')
 
     baseline = parser.add_argument_group('baseline')
-    baseline.add_argument('-model', type=str, required=True, choices=['random', 'fnn', 'bnn', 'fnn_emb', 'bnn_emb', 'nmt'], help='The model name (example: fnn)')
+    baseline.add_argument('-model', '--model-list', nargs='+', default=[], required=True, help='a list of neural models (eg. -model random fnn bnn fnn_emb bnn_emb nmt)')
 
     output = parser.add_argument_group('output')
-    output.add_argument('-output', type=str, default='./../output/', help='The output path (default: ./../output/)')
+    output.add_argument('-output', type=str, default='./../output/', help='The output path (default: -output ./../output/)')
 
-# python -u main.py -data=./../data/raw/dblp/toy.dblp.v12.json -domain=dblp -model=fnn 2>&1 | tee toy.dblp.v12.json.fnn.log.txt
-# python -u main.py -data=./../data/raw/dblp/toy.dblp.v12.json -domain=dblp -model=bnn 2>&1 | tee toy.dblp.v12.json.bnn.log.txt
-# python -u main.py -data=./../data/raw/dblp/toy.dblp.v12.json -domain=dblp -model=fnn_emb 2>&1 | tee toy.dblp.v12.json.fnn_emb.log.txt
-# python -u main.py -data=./../data/raw/dblp/toy.dblp.v12.json -domain=dblp -model=bnn_emb 2>&1 | tee toy.dblp.v12.json.bnn_emb.log.txt
-# python -u main.py -data=./../data/raw/dblp/toy.dblp.v12.json -domain=dblp -model=random 2>&1 | tee toy.dblp.v12.json.random.log.txt
-#
-# python -u main.py -data=./../data/raw/imdb/toy.title.basics.tsv -domain=imdb -model=fnn 2>&1 | tee toy.title.basics.tsv.fnn.log.txt
-# python -u main.py -data=./../data/raw/imdb/toy.title.basics.tsv -domain=imdb -model=bnn 2>&1 | tee toy.title.basics.tsv.bnn.log.txt
-# python -u main.py -data=./../data/raw/imdb/toy.title.basics.tsv -domain=imdb -model=fnn_emb 2>&1 | tee toy.title.basics.tsv.fnn_emb.log.txt
-# python -u main.py -data=./../data/raw/imdb/toy.title.basics.tsv -domain=imdb -model=bnn_emb 2>&1 | tee toy.title.basics.tsv.bnn_emb.log.txt
-# python -u main.py -data=./../data/raw/imdb/toy.title.basics.tsv -domain=imdb -model=random 2>&1 | tee toy.title.basics.tsv.random.log.txt
-#
-# python -u main.py -data=./../data/raw/uspt/toy.patent.tsv -domain=uspt -model=fnn 2>&1 | tee toy.patent.tsv.fnn.log.txt
-# python -u main.py -data=./../data/raw/uspt/toy.patent.tsv -domain=uspt -model=bnn 2>&1 | tee toy.patent.tsv.bnn.log.txt
-# python -u main.py -data=./../data/raw/uspt/toy.patent.tsv -domain=uspt -model=fnn_emb 2>&1 | tee toy.patent.tsv.fnn_emb.log.txt
-# python -u main.py -data=./../data/raw/uspt/toy.patent.tsv -domain=uspt -model=fnn_emb 2>&1 | tee toy.patent.tsv.bnn_emb.log.txt
-# python -u main.py -data=./../data/raw/uspt/toy.patent.tsv -domain=uspt -model=random 2>&1 | tee toy.patent.tsv.random.log.txt
+
+# python -u main.py -data toy.dblp.v12.json
+# 						  toy.title.basics.tsv
+# 						  toy.patent.tsv
+# 				    -domain dblp imdb uspt
+# 				    -model random fnn fnn_emb bnn bnn_emb
+#                    2>&1 | tee toy.log.txt
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Neural Team Formation')
     addargs(parser)
     args = parser.parse_args()
 
-    run(datapath=args.data,
-        domain=args.domain,
+    run(data_list=args.data_list,
+        domain_list=args.domain_list,
         filter=args.filter,
-        model=args.model,
+        model_list=args.model_list,
         output=args.output,
         settings=param.settings)
 
