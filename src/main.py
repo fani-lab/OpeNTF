@@ -52,10 +52,8 @@ def run(data_list, domain_list, filter, model_list, output, settings):
     if 'fnn_emb' in model_list: models['fnn_emb'] = Fnn()
     if 'bnn_emb' in model_list: models['bnn_emb'] = Bnn()
 
-    for (d_name, d_cls), \
-        (m_name, m_obj) in product(datasets.items(), models.items()):
+    for (d_name, d_cls), (m_name, m_obj) in product(datasets.items(), models.items()):
         datapath = data_list[domain_list.index(d_name)]
-        print(datapath, d_name, d_cls, m_name, m_obj)
         prep_output = f'./../data/preprocessed/{d_name}/{os.path.split(datapath)[-1]}'
         vecs, indexes = d_cls.generate_sparse_vectors(datapath, f'{prep_output}{filter_str}', filter, settings['data'])
         splits = create_evaluation_splits(vecs['id'].shape[0], settings['model']['nfolds'], settings['model']['train_test_split'], output=f'{prep_output}{filter_str}')
