@@ -86,8 +86,8 @@ For example, for our feedforward baseline [``fnn``](./src/mdl/fnn.py), the model
 <p align="center"><img src='./src/mdl/model_inheritance_hierarchy.png' width="300" ></p>
   
 Currently, we support neural models:
-1) Baysian [``bnn``](./src/mdl/bnn.py) where model's parameter (weights) is assumed to be drawn from Gaussian (Normal) distribution and the task is to not to learn the weight but the mean (μ) and standard deviation (σ) of the distribution at each parameter.
-2) non-Baysian feedforward [``fnn``](./src/mdl/fnn.py) where the model's parameter (weights) is to be learnt.
+1) Bayesian [``bnn``](./src/mdl/bnn.py) where model's parameter (weights) is assumed to be drawn from Gaussian (Normal) distribution and the task is to not to learn the weight but the mean (μ) and standard deviation (σ) of the distribution at each parameter.
+2) non-Bayesian feedforward [``fnn``](./src/mdl/fnn.py) where the model's parameter (weights) is to be learnt.
 
 The input to the models is the vector representations for skills and the output is the vector representation for members. In another word, given the input skills, the models predict the members from the pool of candidates. We support two vector representations:
 1) Sparse vector representation (occurrence or boolean vector): See preprocessing section above.
@@ -125,7 +125,7 @@ We used [``pytrec_eval``](https://github.com/cvangysel/pytrec_eval) to evaluate 
 
 **Benchmarks at Scale**
 
-||min. #member's team: 75, min team size: 3, epochs: 20, learning rate: 0.1, hidden layer: [1, 100d], minibath: 4096, #negative samples: 3|
+||min. #member's team: 75, min team size: 3, epochs: 20, learning rate: 0.1, hidden layer: [1, 100d], minibatch: 4096, #negative samples: 3|
 |--------|------|
 |Datasets|[dblp.v13](https://originalstatic.aminer.cn/misc/dblp.v12.7z), [imdb](imdb.com/interfaces/)|
 |Metrics|recall@2,5,10, map@2,5,10, ndcg@2,5,10, p@2,5,10, auc|
