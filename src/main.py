@@ -12,7 +12,6 @@ from cmn.patent import Patent
 from mdl.fnn import Fnn
 from mdl.bnn import Bnn
 from mdl.rnd import Rnd
-import nmt_main
 from mdl.team2vec import Team2Vec
 
 class NumpyArrayEncoder(JSONEncoder):
