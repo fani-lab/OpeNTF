@@ -39,7 +39,7 @@ For installation of specific version of a python package due to, e.g., ``CUDA`` 
 # CUDA 10.1
 torch==1.6.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html
 ```
-## 2. Quickstart
+## 2. [Quickstart](./quick_start.ipynb)
 
 ```sh
 cd src
