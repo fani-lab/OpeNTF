@@ -33,7 +33,7 @@ class Ntf(nn.Module):
                     pickle.dump((fpr, tpr), outfile)
                 fold_mean = pd.concat([fold_mean, df_mean], axis=1)
             # the last row is a list of roc values
-            fold_mean.mean(axis=1).to_csv(f'{model_path}/{pred_set}.pred.eval.mean.csv')
+            fold_mean.mean(axis=1).to_frame('mean').to_csv(f'{model_path}/{pred_set}.pred.eval.mean.csv')
 
     def plot_roc(self, model_path, splits, on_train_valid_set=False):
         for pred_set in (['test', 'train', 'valid'] if on_train_valid_set else ['test']):
