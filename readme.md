@@ -11,7 +11,7 @@ We propose ``neural machine learning`` approaches to Team Formation. We will tra
 5. [Acknowledgement](#5-acknowledgement)
 6. [License](#6-license)
 
-## 1. Setup
+## 1. [Setup](https://colab.research.google.com/github/fani-lab/OpeNTF/blob/main/quick_start.ipynb)
 You need to have ``Python >= 3.8`` and install the following main packages, among others listed in [``requirements.txt``](requirements.txt):
 ```
 torch==1.6.0
