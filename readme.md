@@ -15,7 +15,7 @@ We propose ``neural machine learning`` approaches to Team Formation. We will tra
 You need to have ``Python >= 3.8`` and install the following main packages, among others listed in [``requirements.txt``](requirements.txt):
 ```
 torch==1.6.0
-pytre_eval==0.5
+pytrec-eval-terrier==0.5.2
 gensim==3.8.3
 ```
 By ``pip``, clone the codebase and install the required packages:
