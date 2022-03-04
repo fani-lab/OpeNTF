@@ -77,12 +77,11 @@ def addargs(parser):
     output.add_argument('-output', type=str, default='./../output/', help='The output path (default: -output ./../output/)')
 
 
-# python -u main.py -data toy.dblp.v12.json
-# 						  toy.title.basics.tsv
-# 						  toy.patent.tsv
-# 				    -domain dblp imdb uspt
-# 				    -model random fnn fnn_emb bnn bnn_emb
-#                    2>&1 | tee toy.log.txt
+# python -u main.py -data ../data/raw/dblp/toy.dblp.v12.json
+# 						  ../data/raw/imdb/toy.title.basics.tsv
+# 						  ../data/raw/uspt/toy.patent.tsv
+# 					-domain dblp imdb uspt
+# 					-model random fnn fnn_emb bnn bnn_emb
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Neural Team Formation')

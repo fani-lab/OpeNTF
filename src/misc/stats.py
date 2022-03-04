@@ -2,6 +2,8 @@ import pickle, sys, time
 import matplotlib.pyplot as pyplot
 from collections import Counter
 
+sys.path.extend(["./"])
+
 import param
 from cmn.team import Team
 
