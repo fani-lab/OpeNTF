@@ -12,6 +12,7 @@ from cmn.patent import Patent
 from mdl.fnn import Fnn
 from mdl.bnn import Bnn
 from mdl.rnd import Rnd
+from mdl.nmt import Nmt
 from mdl.team2vec import Team2Vec
 
 class NumpyArrayEncoder(JSONEncoder):
@@ -50,6 +51,7 @@ def run(data_list, domain_list, filter, model_list, output, settings):
     if 'bnn' in model_list: models['bnn'] = Bnn()
     if 'fnn_emb' in model_list: models['fnn_emb'] = Fnn()
     if 'bnn_emb' in model_list: models['bnn_emb'] = Bnn()
+    if 'nmt' in model_list: models['nmt'] = Nmt()
 
     for (d_name, d_cls), (m_name, m_obj) in product(datasets.items(), models.items()):
         datapath = data_list[domain_list.index(d_name)]
