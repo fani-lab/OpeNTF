@@ -1,7 +1,5 @@
-import os
-import time
+import os, time, json, re
 import numpy as np
-import json
 import matplotlib.pyplot as plt
 
 import torch
@@ -211,7 +209,7 @@ class Fnn(Ntf):
                 plt.savefig(f'{output}/f{foldidx}.train_valid_loss.png', dpi=100, bbox_inches='tight')
                 plt.show()
 
-    def test(self, model_path, splits, indexes, vecs, params, on_train_valid_set=False):
+    def test(self, model_path, splits, indexes, vecs, params, on_train_valid_set=False, per_epoch=False):
         if not os.path.isdir(model_path): raise Exception("The model does not exist!")
         # input_size = len(indexes['i2s'])
         input_size = vecs['skill'].shape[1]
@@ -223,28 +221,32 @@ class Fnn(Ntf):
         test_dl = DataLoader(test_matrix, batch_size=params['b'], shuffle=True, num_workers=0)
 
         for foldidx in splits['folds'].keys():
-            self.init(input_size=input_size, output_size=output_size, param=params).to(self.device)
-            self.load_state_dict(torch.load(f'{model_path}/state_dict_model_f{foldidx}.pt'))
-            self.eval()
+            modelfiles = [f'{model_path}/state_dict_model.f{foldidx}.pt']
+            if per_epoch: modelfiles = [f'{model_path}/{_}' for _ in os.listdir(model_path) if re.match(f'state_dict_model.f{foldidx}.e\d+.pt', _)]
 
-            for pred_set in (['test', 'train', 'valid'] if on_train_valid_set else ['test']):
-                if pred_set != 'test':
-                    X = vecs['skill'][splits['folds'][foldidx][pred_set], :]
-                    y = vecs['member'][splits['folds'][foldidx][pred_set]]
-                    matrix = TFDataset(X, y)
-                    dl = DataLoader(matrix, batch_size=params['b'], shuffle=True, num_workers=0)
-                else:
-                    X = X_test; y = y_test; matrix = test_matrix
-                    dl = test_dl
+            for modelfile in modelfiles:
+                self.init(input_size=input_size, output_size=output_size, param=params).to(self.device)
+                self.load_state_dict(torch.load(modelfile))
+                self.eval()
 
-                torch.cuda.empty_cache()
-                with torch.no_grad():
-                    y_pred = torch.empty(0, dl.dataset.output.shape[1])
-                    for x, y in dl:
-                        x = x.to(device=self.device)
-                        scores = self.forward(x)
-                        scores = scores.squeeze(1).cpu().numpy()
-                        y_pred = np.vstack((y_pred, scores))
+                for pred_set in (['test', 'train', 'valid'] if on_train_valid_set else ['test']):
+                    if pred_set != 'test':
+                        X = vecs['skill'][splits['folds'][foldidx][pred_set], :]
+                        y = vecs['member'][splits['folds'][foldidx][pred_set]]
+                        matrix = TFDataset(X, y)
+                        dl = DataLoader(matrix, batch_size=params['b'], shuffle=True, num_workers=0)
+                    else:
+                        X = X_test; y = y_test; matrix = test_matrix
+                        dl = test_dl
 
-                torch.save(y_pred, f'{model_path}/f{foldidx}.{pred_set}.pred', pickle_protocol=4)
+                    torch.cuda.empty_cache()
+                    with torch.no_grad():
+                        y_pred = torch.empty(0, dl.dataset.output.shape[1])
+                        for x, y in dl:
+                            x = x.to(device=self.device)
+                            scores = self.forward(x)
+                            scores = scores.squeeze(1).cpu().numpy()
+                            y_pred = np.vstack((y_pred, scores))
+                    epoch = modelfile.split('.')[-2] + '.' if per_epoch else ''
+                    torch.save(y_pred, f'{model_path}/f{foldidx}.{pred_set}.{epoch}pred', pickle_protocol=4)
 
