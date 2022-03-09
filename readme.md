@@ -118,12 +118,12 @@ The pipeline accepts three required list of values:
 
 ## 4. Results
 
-We used [``pytrec_eval``](https://github.com/cvangysel/pytrec_eval) to evaluate the performance of models on the test set as well as on their own train sets (should overfit) and validation sets. We report the predictions, evaluation metrics on each test instance, and average on all test instances in ``./output/{dataset name}/{model name}/{model's running setting}/``.  For example for our toy dataset:
+We used [``pytrec_eval``](https://github.com/cvangysel/pytrec_eval) to evaluate the performance of models on the test set as well as on their own train sets (should overfit) and validation sets. We report the predictions, evaluation metrics on each test instance, and average on all test instances in ``./output/{dataset name}/{model name}/{model's running setting}/``.  For example:
 
-1) [``f0.test.pred``](./output/toy.dblp.v12.json/fnn/t30.s11.m12.l[100].lr0.1.b4096.e100/f0.test.pred) is the predictions per test instance for a model which is trained folds [1,2,3,4] and validated on fold [0].
-2) [``f0.test.pred.eval.csv``](./output/toy.dblp.v12.json/fnn/t30.s11.m12.l[100].lr0.1.b4096.e100/f0.test.pred.eval.csv) is the values of evaluation metrics for the predictions per test instance
-3) [``f0.test.pred.eval.mean.csv``](./output/toy.dblp.v12.json/fnn/t30.s11.m12.l[100].lr0.1.b4096.e100/f0.test.pred.eval.mean.csv) is the average of values for evaluation metrics over all test instances.
-4) [``test.pred.eval.mean.csv``](./output/toy.dblp.v12.json/fnn/t30.s11.m12.l[100].lr0.1.b4096.e100/test.pred.eval.mean.csv) is the average of values for evaluation metrics over all _n_ fold models.
+1) ``f0.test.pred`` is the predictions per test instance for a model which is trained folds [1,2,3,4] and validated on fold [0].
+2) ``f0.test.pred.eval.csv`` is the values of evaluation metrics for the predictions per test instance
+3) ``f0.test.pred.eval.mean.csv`` is the average of values for evaluation metrics over all test instances.
+4) ``test.pred.eval.mean.csv`` is the average of values for evaluation metrics over all _n_ fold models.
 
 **Benchmarks at Scale**
 
