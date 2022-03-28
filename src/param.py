@@ -31,6 +31,9 @@ settings = {
                 'ns': None,  # 'uniform', 'unigram', 'unigram_b'
                 's': 1  # # sample_elbo for bnn
             },
+            'nmt': {
+                'base_config': './mdl/nmt_config.yaml'
+            },
             'emb':{
                 'd': 100,# embedding dimension
                 'e': 100,# epoch
