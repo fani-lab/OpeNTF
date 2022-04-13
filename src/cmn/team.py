@@ -139,6 +139,9 @@ class Team(object):
             print("File not found! Generating the sparse matrices ...")
             indexes, teams = cls.read_data(datapath, output, index=False, filter=filter, settings=settings)
             st = time()
+            # sort by datetime
+            if settings['temporal']:
+                teams = {k: v for k, v in sorted(teams.items(), key=lambda x: x[1].datetime)}
             # parallel
             if settings['parallel']:
                 with multiprocessing.Pool() as p:
