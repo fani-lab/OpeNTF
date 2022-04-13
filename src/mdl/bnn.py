@@ -151,7 +151,7 @@ class Bnn(Fnn):
                 torch.save(self.state_dict(), f"{output}/state_dict_model.f{foldidx}.e{epoch}.pt", pickle_protocol=4)
                 scheduler.step(valid_running_loss / X_valid.shape[0])
 
-            model_path = f"{output}/state_dict_model_f{foldidx}.pt"
+            model_path = f"{output}/state_dict_model.f{foldidx}.pt"
 
             # Save
             torch.save(self.state_dict(), model_path, pickle_protocol=4)
