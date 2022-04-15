@@ -105,7 +105,6 @@ class TBnn(Bnn):
 
     def test(self, model_path, splits, indexes, vecs, params, on_train_valid_set=False, per_epoch=False):
         if not os.path.isdir(model_path): raise Exception("The model does not exist!")
-        # input_size = len(indexes['i2s'])
         input_size = vecs['skill'].shape[1]
         output_size = len(indexes['i2c'])
 
@@ -140,14 +139,13 @@ class TBnn(Bnn):
                         scores = self.forward(x)
                         scores = scores.squeeze(1).cpu().numpy()
                         y_pred = np.vstack((y_pred, scores))
-                epoch = modelfile.split('.')[-1] + '.' if per_epoch else ''
+                epoch = modelfile.split('.')[-2] + '.' if per_epoch else ''
                 torch.save(y_pred, f'{model_path}/{pred_set}.{epoch}pred', pickle_protocol=4)
 
     def evaluate(self, model_path, splits, vecs, on_train_valid_set=False, per_instance=False, per_epoch=False):
         if not os.path.isdir(model_path): raise Exception("The predictions do not exist!")
         y_test = vecs['member'][splits['test']]
         for pred_set in (['test', 'train'] if on_train_valid_set else ['test']):
-            # fold_mean = pd.DataFrame()
             epoch_re = 'state_dict_model.e\d+' if per_epoch else 'state_dict_model.pt'
             predfiles = [f'{model_path}/{_}' for _ in os.listdir(model_path) if re.match(epoch_re, _)]
 
@@ -163,21 +161,20 @@ class TBnn(Bnn):
                 df_mean.to_csv(f'{model_path}/{pred_set}.{epoch}pred.eval.mean.csv')
                 with open(f'{model_path}/{pred_set}.{epoch}pred.eval.roc.pkl', 'wb') as outfile:
                     pickle.dump((fpr, tpr), outfile)
-                # fold_mean = pd.concat([fold_mean, df_mean], axis=1)
-                # the last row is a list of roc values
-                # fold_mean.mean(axis=1).to_frame('mean').to_csv(f'{model_path}/{pred_set}.{epoch}pred.eval.mean.csv')
 
-    def plot_roc(self, model_path, splits, on_train_valid_set=False):
+    def plot_roc(self, model_path, splits, on_train_valid_set=False, per_epoch=False):
         for pred_set in (['test', 'train'] if on_train_valid_set else ['test']):
-            plt.figure()
-            with open(f'{model_path}/{pred_set}.pred.eval.roc.pkl', 'rb') as infile: (fpr, tpr) = pickle.load(infile)
-                
-            # fpr, tpr = eval(pd.read_csv(f'{model_path}/f{foldidx}.{pred_set}.pred.eval.mean.csv', index_col=0).loc['roc'][0].replace('array', 'np.array'))
-            plt.plot(fpr, tpr, label=f'micro-average on {pred_set} set', linestyle=':', linewidth=4)
+            epoch_re = 'state_dict_model.e\d+' if per_epoch else 'state_dict_model.pt'
+            predfiles = [f'{model_path}/{_}' for _ in os.listdir(model_path) if re.match(epoch_re, _)]
 
-            plt.xlabel('false positive rate')
-            plt.ylabel('true positive rate')
-            plt.title(f'ROC curves for {pred_set} set')
-            plt.legend()
-            plt.savefig(f'{model_path}/{pred_set}.roc.png', dpi=100, bbox_inches='tight')
-            plt.show()
+            for e in range(len(predfiles)):
+                epoch = f'e{e}.' if per_epoch else ""
+                plt.figure()
+                with open(f'{model_path}/{pred_set}.{epoch}pred.eval.roc.pkl', 'rb') as infile: (fpr, tpr) = pickle.load(infile)
+                plt.plot(fpr, tpr, label=f'micro-average on {pred_set} set {epoch}', linestyle=':', linewidth=4)
+                plt.xlabel('false positive rate')
+                plt.ylabel('true positive rate')
+                plt.title(f'ROC curves for {pred_set} set {epoch}')
+                plt.legend()
+                plt.savefig(f'{model_path}/{pred_set}.{epoch}roc.png', dpi=100, bbox_inches='tight')
+                plt.show()
