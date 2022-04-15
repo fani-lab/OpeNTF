@@ -40,21 +40,26 @@ class Ntf(nn.Module):
                 # the last row is a list of roc values
                 fold_mean.mean(axis=1).to_frame('mean').to_csv(f'{model_path}/{pred_set}.{epoch}pred.eval.mean.csv')
 
-    def plot_roc(self, model_path, splits, on_train_valid_set=False):
+    def plot_roc(self, model_path, splits, on_train_valid_set=False, per_epoch=False):
         for pred_set in (['test', 'train', 'valid'] if on_train_valid_set else ['test']):
-            plt.figure()
-            for foldidx in splits['folds'].keys():
-                with open(f'{model_path}/f{foldidx}.{pred_set}.pred.eval.roc.pkl', 'rb') as infile: (
-                    fpr, tpr) = pickle.load(infile)
-                # fpr, tpr = eval(pd.read_csv(f'{model_path}/f{foldidx}.{pred_set}.pred.eval.mean.csv', index_col=0).loc['roc'][0].replace('array', 'np.array'))
-                plt.plot(fpr, tpr, label=f'micro-average fold{foldidx} on {pred_set} set', linestyle=':', linewidth=4)
+            epoch_re = 'state_dict_model.f\d+.e\d+' if per_epoch else 'state_dict_model.f\d+.pt'
+            predfiles = [f'{model_path}/{_}' for _ in os.listdir(model_path) if re.match(epoch_re, _)]
 
-            plt.xlabel('false positive rate')
-            plt.ylabel('true positive rate')
-            plt.title(f'ROC curves for {pred_set} set')
-            plt.legend()
-            plt.savefig(f'{model_path}/{pred_set}.roc.png', dpi=100, bbox_inches='tight')
-            plt.show()
+            for e in range(len(predfiles)//len(splits['folds'].keys())):
+                epoch = f'e{e}.' if per_epoch else ""
+                plt.figure()
+                for foldidx in splits['folds'].keys():
+                    with open(f'{model_path}/f{foldidx}.{pred_set}.{epoch}pred.eval.roc.pkl', 'rb') as infile: (
+                        fpr, tpr) = pickle.load(infile)
+                    # fpr, tpr = eval(pd.read_csv(f'{model_path}/f{foldidx}.{pred_set}.pred.eval.mean.csv', index_col=0).loc['roc'][0].replace('array', 'np.array'))
+                    plt.plot(fpr, tpr, label=f'micro-average fold{foldidx} on {pred_set} set {epoch}', linestyle=':', linewidth=4)
+
+                plt.xlabel('false positive rate')
+                plt.ylabel('true positive rate')
+                plt.title(f'ROC curves for {pred_set} set {epoch}')
+                plt.legend()
+                plt.savefig(f'{model_path}/{pred_set}.{epoch}roc.png', dpi=100, bbox_inches='tight')
+                plt.show()
 
     def run(self, splits, vecs, indexes, output, settings, cmd):
         output = f"{output}/t{vecs['skill'].shape[0]}.s{vecs['skill'].shape[1]}.m{vecs['member'].shape[1]}.{'.'.join([k + str(v).replace(' ', '') for k, v in settings.items() if v])}"
@@ -63,7 +68,7 @@ class Ntf(nn.Module):
         if 'train' in cmd: self.learn(splits, indexes, vecs, settings, output)
         if 'test' in cmd: self.test(output, splits, indexes, vecs, settings, on_train_valid_set=False, per_epoch=False)
         if 'eval' in cmd: self.evaluate(output, splits, vecs, on_train_valid_set=False, per_instance=False, per_epoch=False)
-        if 'plot' in cmd: self.plot_roc(output, splits, on_train_valid_set=False)
+        if 'plot' in cmd: self.plot_roc(output, splits, on_train_valid_set=False, per_epoch=False)
 
 
 
