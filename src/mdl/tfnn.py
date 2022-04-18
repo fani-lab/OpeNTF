@@ -11,6 +11,7 @@ from torch.optim.lr_scheduler import StepLR, ReduceLROnPlateau
 from eval.metric import *
 from mdl.fnn import Fnn
 from mdl.custom_dataset import TFDataset
+from mdl.temporal_dataset import TTFDataset
 
 from cmn.team import Team
 
@@ -42,12 +43,16 @@ class TFnn(Fnn):
         # Retrieving the folds
         X_train = vecs['skill'][splits['train'], :]
         y_train = vecs['member'][splits['train']]
+        list_n_teams_per_year = vecs['year_idx']
+
+        list_n_teams_per_year = [x for x in list_n_teams_per_year if x < splits['train'][-1]]
+        list_n_teams_per_year.append(splits['train'][-1])
 
         # Building custom dataset
-        training_matrix = TFDataset(X_train, y_train)
+        training_matrix = TTFDataset(X_train, y_train, list_n_teams_per_year)
 
         # Generating data loaders
-        training_dataloader = DataLoader(training_matrix, batch_size=batch_size, shuffle=False, num_workers=0)
+        training_dataloader = DataLoader(training_matrix, batch_size=1, shuffle=False, num_workers=0)
         
         # Initialize network
         self.init(input_size=input_size, output_size=output_size, param=params).to(self.device)
@@ -69,14 +74,14 @@ class TFnn(Fnn):
                 # forward
                 optimizer.zero_grad()
                 y_ = self.forward(X)
-                loss = self.cross_entropy(y_, y, ns, nns, unigram)
+                loss = self.cross_entropy(y_.squeeze(0), y.squeeze(0), ns, nns, unigram)
                 # backward
                 loss.backward()
                 # clip_grad_value_(model.parameters(), 1)
                 optimizer.step()
                 train_running_loss += loss.item()
                 print(
-                    f'Minibatch {batch_idx}/{int(X_train.shape[0] / batch_size)}, Epoch {epoch}/{num_epochs - 1}, Phase train'
+                    f'Minibatch {batch_idx}/{len(list_n_teams_per_year) - 2}, Epoch {epoch}/{num_epochs - 1}, Phase train'
                     f', Running Loss of training {loss.item()}'
                     f", Epoch time {time.time() - epoch_time}, Overall {time.time() - start_time} "
                 )
