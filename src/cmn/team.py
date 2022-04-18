@@ -142,6 +142,13 @@ class Team(object):
             # sort by datetime
             if settings['temporal']:
                 teams = {k: v for k, v in sorted(teams.items(), key=lambda x: x[1].datetime)}
+                list_n_teams_per_year = [0]
+                start_year = list(teams.values())[0].datetime
+                for i, v in enumerate(teams.values()):
+                    if v.datetime != start_year:
+                        list_n_teams_per_year.append(i)
+                        start_year = v.datetime
+                list_n_teams_per_year.append(len(teams))
             # parallel
             if settings['parallel']:
                 with multiprocessing.Pool() as p:
@@ -154,7 +161,7 @@ class Team(object):
                 data = Team.bucketing(settings['bucket_size'], indexes['s2i'], indexes['c2i'], teams.values())
             data = scipy.sparse.vstack(data, 'lil')#{'bsr', 'coo', 'csc', 'csr', 'dia', 'dok', 'lil'}, By default an appropriate sparse matrix format is returned!!
             if settings['temporal']:
-                vecs = {'id': data[:, 0], 'skill': lil_matrix(scipy.sparse.hstack((data[:, 1:len(indexes['s2i']) + 1], lil_matrix(np.ones((data.shape[0],1)))))), 'member':data[:, - len(indexes['c2i']):]}
+                vecs = {'id': data[:, 0], 'skill': lil_matrix(scipy.sparse.hstack((data[:, 1:len(indexes['s2i']) + 1], lil_matrix(np.ones((data.shape[0],1)))))), 'member':data[:, - len(indexes['c2i']):], 'year_idx': list_n_teams_per_year}
             else:
                 vecs = {'id': data[:, 0], 'skill': data[:, 1:len(indexes['s2i']) + 1], 'member':data[:, - len(indexes['c2i']):]}
             with open(pkl, 'wb') as outfile: pickle.dump(vecs, outfile)
