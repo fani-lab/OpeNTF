@@ -10,7 +10,7 @@ class Rnd(Ntf):
     def __init__(self):
         super(Rnd, self).__init__()
 
-    def test(self, model_path, splits, indexes, vecs, params, on_train_valid_set=False):
+    def test(self, model_path, splits, indexes, vecs, params, on_train_valid_set=False, per_epoch=False):
         X_test = vecs['skill'][splits['test'], :]
         y_test = vecs['member'][splits['test']]
         test_matrix = TFDataset(X_test, y_test)
