@@ -20,6 +20,7 @@ class Ntf(nn.Module):
         y_test = vecs['member'][splits['test']]
         for pred_set in (['test', 'train', 'valid'] if on_train_valid_set else ['test']):
             fold_mean = pd.DataFrame()
+            #there is not such files for random model!!
             epoch_re = 'state_dict_model.f\d+.e\d+' if per_epoch else 'state_dict_model.f\d+.pt'
             predfiles = [f'{model_path}/{_}' for _ in os.listdir(model_path) if re.match(epoch_re, _)]
 
