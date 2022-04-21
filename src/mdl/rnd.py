@@ -25,8 +25,8 @@ class Rnd(Ntf):
                     scores = self.forward(None, y)#we need y to know the size of output
                     scores = scores.squeeze(1).cpu().numpy()
                     y_pred = np.vstack((y_pred, scores))
+            torch.save(self, f'{model_path}/state_dict_model.f{foldidx}.pt', pickle_protocol=4)#dummy model save
             torch.save(y_pred, f'{model_path}/f{foldidx}.test.pred', pickle_protocol=4)
-
 
     def forward(self, x, y):
         x = torch.clamp(torch.rand(y.shape), min=1.e-6, max=1. - 1.e-6)
