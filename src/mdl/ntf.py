@@ -42,7 +42,7 @@ class Ntf(nn.Module):
                 # the last row is a list of roc values
                 fold_mean.mean(axis=1).to_frame('mean').to_csv(f'{model_path}/{pred_set}.{epoch}pred.eval.mean.csv')
 
-    def plot_roc(self, model_path, splits, on_train_valid_set=False):
+    def plot_roc(self, model_path, splits, on_train_valid_set=False, per_epoch=False):
         for pred_set in (['test', 'train', 'valid'] if on_train_valid_set else ['test']):
             plt.figure()
             for foldidx in splits['folds'].keys():
@@ -52,9 +52,9 @@ class Ntf(nn.Module):
 
             plt.xlabel('false positive rate')
             plt.ylabel('true positive rate')
-            plt.title(f'ROC curves for {pred_set} set')
+            plt.title(f'ROC curves for {pred_set} set {epoch}')
             plt.legend()
-            plt.savefig(f'{model_path}/{pred_set}.roc.png', dpi=100, bbox_inches='tight')
+            plt.savefig(f'{model_path}/{pred_set}.{epoch}roc.png', dpi=100, bbox_inches='tight')
             plt.show()
 
     def run(self, splits, vecs, indexes, output, settings, cmd):
@@ -69,6 +69,3 @@ class Ntf(nn.Module):
         if 'test' in cmd: self.test(output, splits, indexes, vecs, settings, on_train_valid_set, per_epoch)
         if 'eval' in cmd: self.evaluate(output, splits, vecs, on_train_valid_set, per_instance, per_epoch)
         if 'plot' in cmd: self.plot_roc(output, splits, on_train_valid_set)
-
-
-

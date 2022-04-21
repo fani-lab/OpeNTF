@@ -127,7 +127,7 @@ class Team(object):
 
     @classmethod
     def generate_sparse_vectors(cls, datapath, output, filter, settings):
-        pkl = f'{output}/teamsvecs.pkl'
+        pkl = f'{output}/temporal_teamsvecs.pkl' if settings['temporal'] else f'{output}/teamsvecs.pkl'
         try:
             st = time()
             print(f"Loading sparse matrices from {pkl} ...")
@@ -139,6 +139,16 @@ class Team(object):
             print("File not found! Generating the sparse matrices ...")
             indexes, teams = cls.read_data(datapath, output, index=False, filter=filter, settings=settings)
             st = time()
+            # sort by datetime
+            if settings['temporal']:
+                teams = {k: v for k, v in sorted(teams.items(), key=lambda x: x[1].datetime)}
+                list_n_teams_per_year = [0]
+                start_year = list(teams.values())[0].datetime
+                for i, v in enumerate(teams.values()):
+                    if v.datetime != start_year:
+                        list_n_teams_per_year.append(i)
+                        start_year = v.datetime
+                list_n_teams_per_year.append(len(teams))
             # parallel
             if settings['parallel']:
                 with multiprocessing.Pool() as p:
@@ -150,8 +160,10 @@ class Team(object):
             else:
                 data = Team.bucketing(settings['bucket_size'], indexes['s2i'], indexes['c2i'], teams.values())
             data = scipy.sparse.vstack(data, 'lil')#{'bsr', 'coo', 'csc', 'csr', 'dia', 'dok', 'lil'}, By default an appropriate sparse matrix format is returned!!
-            vecs = {'id': data[:, 0], 'skill': data[:, 1:len(indexes['s2i']) + 1], 'member':data[:, - len(indexes['c2i']):]}
-
+            if settings['temporal']:
+                vecs = {'id': data[:, 0], 'skill': lil_matrix(scipy.sparse.hstack((data[:, 1:len(indexes['s2i']) + 1], lil_matrix(np.ones((data.shape[0],1)))))), 'member':data[:, - len(indexes['c2i']):], 'year_idx': list_n_teams_per_year}
+            else:
+                vecs = {'id': data[:, 0], 'skill': data[:, 1:len(indexes['s2i']) + 1], 'member':data[:, - len(indexes['c2i']):]}
             with open(pkl, 'wb') as outfile: pickle.dump(vecs, outfile)
             print(f"It took {time() - st} seconds to generate and store the sparse matrices of size {data.shape} at {pkl}")
             return vecs, indexes
