@@ -222,7 +222,7 @@ class Fnn(Ntf):
 
         for foldidx in splits['folds'].keys():
             modelfiles = [f'{model_path}/state_dict_model.f{foldidx}.pt']
-            if per_epoch: modelfiles = [f'{model_path}/{_}' for _ in os.listdir(model_path) if re.match(f'state_dict_model.f{foldidx}.e\d+.pt', _)]
+            if per_epoch: modelfiles += [f'{model_path}/{_}' for _ in os.listdir(model_path) if re.match(f'state_dict_model.f{foldidx}.e\d+.pt', _)]
 
             for modelfile in modelfiles:
                 self.init(input_size=input_size, output_size=output_size, param=params).to(self.device)
@@ -248,5 +248,6 @@ class Fnn(Ntf):
                             scores = scores.squeeze(1).cpu().numpy()
                             y_pred = np.vstack((y_pred, scores))
                     epoch = modelfile.split('.')[-2] + '.' if per_epoch else ''
+                    epoch = epoch.replace(f'f{foldidx}.', '')
                     torch.save(y_pred, f'{model_path}/f{foldidx}.{pred_set}.{epoch}pred', pickle_protocol=4)
 
