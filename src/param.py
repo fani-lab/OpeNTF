@@ -57,7 +57,6 @@ settings = {
         },
         'parallel': 1,
         'ncore': 0,# <= 0 for all
-        'bucket_size': 500,
-        'temporal': 1
+        'bucket_size': 500
     },
 }

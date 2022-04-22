@@ -15,18 +15,17 @@ logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=lo
 # label_list = ['t1','t2','t3']
 
 class Team2Vec:
-    def __init__(self, teamsvecs, embtype, output, temporal=0):
+    def __init__(self, teamsvecs, embtype, output):
         self.output = output
         self.embtype = embtype
         self.docs = []
         self.settings = ''
         self.teamsvecs = teamsvecs
-        self.temporal = temporal
 
     def init(self):
         try:
             print(f"Loading the {self.embtype} documents pickle ...")
-            with open(f'{self.output}/temporal.{self.embtype}.docs.pkl' if self.temporal else f'{self.output}/{self.embtype}.docs.pkl', 'rb') as infile:
+            with open(f'{self.output}/{self.embtype}.docs.pkl', 'rb') as infile:
                 self.docs = pickle.load(infile)
                 return self.docs
         except FileNotFoundError:
@@ -43,12 +42,12 @@ class Team2Vec:
                 self.docs.append(td)
             print(f'#Documents with word type of {self.embtype} have created: {len(self.docs)}')
             print(f'Saving the {self.embtype} documents ...')
-            with open(f'{self.output}/temporal.{self.embtype}.docs.pkl' if self.temporal else f'{self.output}/{self.embtype}.docs.pkl', 'wb') as f:
+            with open(f'{self.output}/{self.embtype}.docs.pkl', 'wb') as f:
                 pickle.dump(self.docs, f)
             return self.docs
 
     def train(self, dimension=300, window=1, dm=1, dbow_words=0, epochs=10):
-        self.settings = f'temporal.{self.embtype}.emb.d{dimension}.w{window}.dm{dm}' if self.temporal else f'{self.embtype}.emb.d{dimension}.w{window}.dm{dm}'
+        self.settings = f'{self.embtype}.emb.d{dimension}.w{window}.dm{dm}'
         try:
             print(f"Loading the {self.embtype} embedding pickle ...")
             self.model = gensim.models.Doc2Vec.load(f'{self.output}/{self.settings}.mdl')
