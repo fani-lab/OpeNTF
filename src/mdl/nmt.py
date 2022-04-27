@@ -60,6 +60,8 @@ class Nmt(Ntf):
             print(f'{cli_cmd}')
             subprocess.Popen(shlex.split(cli_cmd)).wait()
 
+    #todo: per_trainstep => per_epoch
+    #todo: eval on prediction files
     def test(self, splits, path):
         for foldidx in splits['folds'].keys():
             cli_cmd = 'onmt_translate '
@@ -72,9 +74,7 @@ class Nmt(Ntf):
             subprocess.Popen(shlex.split(cli_cmd)).wait()
 
     def run(self, splits, vecs, indexes, output, settings, cmd):
-        with open(settings['base_config']) as infile:
-            base_config = yaml.safe_load(infile)
-
+        with open(settings['base_config']) as infile: base_config = yaml.safe_load(infile)
         model_path = f"{output}/t{vecs['skill'].shape[0]}.s{vecs['skill'].shape[1]}.m{vecs['member'].shape[1]}"
         if not os.path.isdir(output): os.makedirs(output)
 
@@ -82,4 +82,4 @@ class Nmt(Ntf):
             input_data, output_data = self.prepare_data(vecs)
             model_path = self.build_vocab(input_data, output_data, splits, base_config, model_path)
             self.learn(splits, model_path)
-        if 'test' in cmd : self.test(splits, model_path)
+        if 'test' in cmd: self.test(splits, model_path)

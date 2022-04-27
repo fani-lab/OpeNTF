@@ -1,6 +1,7 @@
 import sys,os, json
 import argparse
 import numpy as np
+import pandas as pd
 from sklearn.model_selection import KFold, train_test_split
 from json import JSONEncoder
 from itertools import product
@@ -37,6 +38,30 @@ def create_evaluation_splits(n_sample, n_folds, train_ratio=0.85, output='./'):
 
     return splits
 
+def aggregate(output):
+    files = list()
+    for dirpath, dirnames, filenames in os.walk(output):
+        if not dirnames: files += [os.path.join(os.path.normpath(dirpath), file).split(os.sep) for file in filenames if file.endswith("pred.eval.mean.csv")]
+    files = pd.DataFrame(files, columns=['', '', 'domain', 'baseline', 'setting', 'rfile'])
+    rfiles = files.groupby('rfile')
+    for rf, r in rfiles:
+        dfff = pd.DataFrame()
+        rdomains = r.groupby('domain')
+        for rd, rr in rdomains:
+            names = ['metrics']
+            dff = pd.DataFrame()
+            df = rdomains.get_group(rd)
+            hr = False
+            for i, row in df.iterrows():
+                if not hr:
+                    dff = pd.concat([dff, pd.read_csv(f"{output}{rd}/{row['baseline']}/{row['setting']}/{rf}", usecols=[0])], axis=1, ignore_index=True)
+                    hr = True
+                dff = pd.concat([dff, pd.read_csv(f"{output}{rd}/{row['baseline']}/{row['setting']}/{rf}", usecols=[1])], axis=1, ignore_index=True)
+                names += [row['baseline'] + '.' + row['setting']]
+            dfff = pd.concat([dfff, pd.DataFrame({0: [rd]}), dff], ignore_index=True)
+        dfff.set_axis(names, axis=1, inplace=True)
+        dfff.to_csv(f"{output}{rf.replace('.csv', '.agg.csv')}", index=False)
+
 def run(data_list, domain_list, filter, model_list, output, settings):
     filter_str = f".filtered.mt{settings['data']['filter']['min_nteam']}.ts{settings['data']['filter']['min_team_size']}" if filter else ""
 
@@ -53,6 +78,10 @@ def run(data_list, domain_list, filter, model_list, output, settings):
     if 'bnn_emb' in model_list: models['bnn_emb'] = Bnn()
     if 'nmt' in model_list: models['nmt'] = Nmt()
 
+    assert len(datasets) > 0
+    assert len(datasets) == len(domain_list)
+    assert len(models) > 0
+
     for (d_name, d_cls), (m_name, m_obj) in product(datasets.items(), models.items()):
         datapath = data_list[domain_list.index(d_name)]
         prep_output = f'./../data/preprocessed/{d_name}/{os.path.split(datapath)[-1]}'
@@ -65,6 +94,7 @@ def run(data_list, domain_list, filter, model_list, output, settings):
             vecs['skill'] = t2v.dv()
 
         m_obj.run(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}{filter_str}/{m_name}', settings['model']['baseline'][m_name.replace('_emb', '')], settings['model']['cmd'])
+    aggregate(output)
 
 def addargs(parser):
     dataset = parser.add_argument_group('dataset')
@@ -84,6 +114,7 @@ def addargs(parser):
 # 						  ../data/raw/uspt/toy.patent.tsv
 # 					-domain dblp imdb uspt
 # 					-model random fnn fnn_emb bnn bnn_emb
+#                   -filter 1
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Neural Team Formation')
@@ -96,4 +127,6 @@ if __name__ == '__main__':
         model_list=args.model_list,
         output=args.output,
         settings=param.settings)
+
+    # aggregate(args.output)
 
