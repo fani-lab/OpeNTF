@@ -28,7 +28,7 @@ gpu_ranks: [0]
 # Where to save the checkpoints
 save_model: ../output/nmt/run/model
 save_checkpoint_steps: 2000
-train_steps: 100000
+train_steps: 1000
 
 keep_checkpoint: 10
 seed: 0
@@ -47,7 +47,7 @@ learning_rate_decay: 0.9
 start_decay_steps: 50
 decay_steps: 50
 
-batch_size: 32
+batch_size: 1024
 # dropout: 0.5
 
 # copy_attn: 'true'
