@@ -9,8 +9,8 @@ import param
 from cmn.publication import Publication
 from cmn.movie import Movie
 from cmn.patent import Patent
-from mdl.tfnn import TFnn
-from mdl.tbnn import TBnn
+from mdl.ntf import Ntf
+from mdl.tntf import TNtf
 from mdl.rnd import Rnd
 from mdl.nmt import Nmt
 from mdl.team2vec import Team2Vec
@@ -52,29 +52,48 @@ def run(data_list, domain_list, filter, model_list, output, settings):
 
     datasets = {}
     models = {}
+    bayes = settings['model']['baseline']['fnn']['bayesian']
+
     if 'dblp' in domain_list: datasets['dblp'] = Publication
     if 'imdb' in domain_list: datasets['imdb'] = Movie
     if 'uspt' in domain_list: datasets['uspt'] = Patent
 
     if 'random' in model_list: models['random'] = Rnd()
-    if 'tfnn' in model_list: models['tfnn'] = TFnn()
-    if 'tbnn' in model_list: models['tbnn'] = TBnn()
-    if 'tfnn_emb' in model_list: models['tfnn_emb'] = TFnn()
-    if 'tbnn_emb' in model_list: models['tbnn_emb'] = TBnn()
+
+    if not bayes:
+        if not settings['data']['temporal']:
+            if 'fnn' in model_list: models['fnn'] = Ntf()
+            if 'fnn_emb' in model_list: models['fnn_emb'] = Ntf()
+        else:
+            if 'tfnn' in model_list: models['tfnn'] = TNtf()
+            if 'tfnn_emb' in model_list: models['tfnn_emb'] = TNtf()
+    else:
+        if not settings['data']['temporal']:
+            if 'bnn' in model_list: models['bnn'] = Ntf()
+            if 'bnn_emb' in model_list: models['bnn_emb'] = Ntf()
+        else:
+            if 'tbnn' in model_list and bayes: models['tbnn'] = TNtf()
+            if 'tbnn_emb' in model_list: models['tbnn_emb'] = TNtf()
+  
     if 'nmt' in model_list: models['nmt'] = Nmt()
 
     for (d_name, d_cls), (m_name, m_obj) in product(datasets.items(), models.items()):
         datapath = data_list[domain_list.index(d_name)]
         prep_output = f'./../data/preprocessed/{d_name}/{os.path.split(datapath)[-1]}'
         vecs, indexes = d_cls.generate_sparse_vectors(datapath, f'{prep_output}{filter_str}', filter, settings['data'])
-        splits = create_streaming_splits(vecs['id'].shape[0], settings['model']['train_test_split'], output=f'{prep_output}{filter_str}')
+
+        if settings['data']['temporal']:
+            splits = create_streaming_splits(vecs['id'].shape[0], settings['model']['train_test_split'], output=f'{prep_output}{filter_str}')
+        else:
+            splits = create_evaluation_splits(vecs['id'].shape[0], settings['model']['nfolds'], settings['model']['train_test_split'], output=f'{prep_output}{filter_str}')
+        
         if m_name.find('_emb') > 0:
             t2v = Team2Vec(vecs, 'skill', f'./../data/preprocessed/{d_name}/{os.path.split(datapath)[-1]}{filter_str}', settings['data']['temporal'])
             emb_setting = settings['model']['baseline']['emb']
             t2v.train(emb_setting['d'], emb_setting['w'], emb_setting['dm'], emb_setting['e'])
             vecs['skill'] = t2v.dv()
 
-        m_obj.run(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}{filter_str}/{m_name}', settings['model']['baseline'][m_name.replace('t', '').replace('_emb', '')], settings['model']['cmd'])
+        m_obj.run(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}{filter_str}/{m_name}', settings['model']['baseline'][m_name.replace('t', '').replace('_emb', '').replace('bnn', 'fnn')], settings['model']['cmd'])
 
 def addargs(parser):
     dataset = parser.add_argument_group('dataset')
