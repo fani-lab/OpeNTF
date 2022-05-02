@@ -19,8 +19,8 @@ def calculate_metrics(Y, Y_, per_instance=False, metrics={'P_2,5,10', 'recall_2,
     print(f'Evaluating {metrics} ...')
     df = pd.DataFrame.from_dict(pytrec_eval.RelevanceEvaluator(qrel, metrics).evaluate(run))
     print(f'Averaging ...')
-    df = df.mean(axis=1).append(pd.Series([aucroc], index=['aucroc'])).to_frame('mean')
-    return df if per_instance else None, df, (fpr, tpr) # fpr, tpr is a long string that pandas truncate
+    df_mean = df.mean(axis=1).append(pd.Series([aucroc], index=['aucroc'])).to_frame('mean')
+    return df if per_instance else None, df_mean, (fpr, tpr) # fpr, tpr is a long string that pandas truncate
 
 def calculate_auc_roc(Y, Y_):
     auc = roc_auc_score(Y.toarray(), Y_, average='micro', multi_class="ovr")
