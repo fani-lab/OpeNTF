@@ -29,8 +29,8 @@ class Publication(Team):
     def set_skills(self):
         skills = set()
         for skill in self.fos:
-            if skill["w"] != 0.0:
-                skills.add(skill["name"].replace(" ", "_"))
+            #if skill["w"] != 0.0:
+            skills.add(skill["name"].replace(" ", "_"))
         # Extend the fields with keywords
         # if len(self.keywords):
         #     skills.union(set([keyword.replace(" ", "_") for keyword in self.keywords]))
@@ -66,7 +66,7 @@ class Publication(Team):
                         keywords = jsonline['keywords'] if 'keywords' in jsonline.keys() else []
 
                         # a team must have skills and members
-                        try: fos = jsonline['fos']
+                        try: fos = jsonline['fos']# an array of (name, w), w shows a weight. Not sorted! Can be used later!
                         except: continue  #publication must have fos (skills)
                         try: authors = jsonline['authors']
                         except: continue #publication must have authors (members)
@@ -81,6 +81,7 @@ class Publication(Team):
                             members.append(candidates[idname])
                         team = Publication(id, members, title, year, type, venue, references, fos, keywords)
                         teams[team.id] = team
+                        if 'nrow' in settings['domain']['dblp'].keys() and len(teams) > settings['domain']['dblp']['nrow']: break
                     except json.JSONDecodeError as e:  # ideally should happen only for the last line ']'
                         print(f'JSONDecodeError: There has been error in loading json line `{line}`!\n{e}')
                         continue
@@ -89,26 +90,6 @@ class Publication(Team):
             return super(Publication, Publication).read_data(teams, output, filter, settings)
         except Exception as e:
             raise e
-
-    @staticmethod
-    def get_unigram(output, m2i):
-        try:
-            with open(f'{output}/stats.pkl', 'rb') as infile:
-                print("Loading the stat pickle...")
-                stats = pickle.load(infile)
-
-            n_papers = sum(list(stats['n_publications_per_year'].values()))
-            n_authors = len(list(stats['n_publications_per_author'].values()))
-
-            unigram = np.zeros(n_authors)
-            for k, v in stats['n_publications_per_author'].items():
-                unigram[m2i[k]] = v / n_papers
-
-            return unigram
-
-
-        except FileNotFoundError:
-            print("File not found!")
 
     # @classmethod
     # def get_stats(cls, teamsvecs, output, plot=False):
