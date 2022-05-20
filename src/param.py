@@ -11,22 +11,39 @@ np.random.seed(0)
 settings = {
     'model':{
         'baseline': {
-            'dnn': {
-                'd': 100,    # size of hidden space
+            'random': {
+                'b': 4096
+            },
+            'fnn':{
+                'l': [100],  # list of number of nodes in each layer
                 'lr': 0.1,  # learning rate
-                'b': 1000,     # batch_size
-                'e': 200,     # epochs
+                'b': 4096,  # batch size
+                'e': 20,  # epoch
+                'nns': None,  # number of negative samples
+                'ns': None,  # 'uniform', 'unigram', 'unigram_b'
             },
-            'sgns':{
-                'd': 100,
-                'lr': 0.01,
-                'b': 3,
-                'e': 10,
-                'ns': 3,
+            'bnn':{
+                'l': [100],  # list of number of nodes in each layer
+                'lr': 0.1,  # learning rate
+                'b': 4096,  # batch size
+                'e': 20,  # epoch
+                'nns': None,  # number of negative samples
+                'ns': None,  # 'uniform', 'unigram', 'unigram_b'
+                's': 1  # # sample_elbo for bnn
             },
+            'nmt': {
+                'base_config': './mdl/nmt_config.yaml'
+            },
+            'emb':{
+                'd': 100,# embedding dimension
+                'e': 100,# epoch
+                'dm': 1,# training algorithm. 1: distributed memory (PV-DM), 0: distributed bag of words (PV-DBOW)
+                'w': 1 #cooccurrence window
+            }
         },
-        'cmd': ['train', 'plot', 'test', 'eval'],
-        'splits': 5
+        'cmd': ['train', 'test', 'eval', 'plot'],  # 'train', 'test', 'eval'
+        'nfolds': 5,
+        'train_test_split': 0.85
     },
     'data':{
         'domain': {
@@ -35,10 +52,11 @@ settings = {
             'imdb':{},
         },
         'filter': {
-            'min_nteam': 10,
+            'min_nteam': 75,
             'min_team_size': 3,
         },
-        'ncore': 4,
-        'bucket_size': 1000
+        'parallel': 1,
+        'ncore': 0,# <= 0 for all
+        'bucket_size': 500
     },
 }

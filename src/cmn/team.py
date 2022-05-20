@@ -120,14 +120,13 @@ class Team(object):
             except Exception as ex:
                 raise ex
 
-            if (i % bucket_size == 0): print(f'Loading {i}/{len(teams)} instances by {multiprocessing.current_process()}! {time() - st}')
+            # if (i % bucket_size == 0): print(f'Loading {i}/{len(teams)} instances by {multiprocessing.current_process()}! {time() - st}')
 
         if j > -1: data[-(j+1):] = data_[0:j+1]
         return data
 
     @classmethod
     def generate_sparse_vectors(cls, datapath, output, filter, settings):
-        output += f'.filtered.mt{settings["filter"]["min_nteam"]}.ts{settings["filter"]["min_team_size"]}' if filter else ""
         pkl = f'{output}/teamsvecs.pkl'
         try:
             st = time()
@@ -141,13 +140,15 @@ class Team(object):
             indexes, teams = cls.read_data(datapath, output, index=False, filter=filter, settings=settings)
             st = time()
             # parallel
-            with multiprocessing.Pool() as p:
-                n_core = multiprocessing.cpu_count() if settings['ncore'] < 0 else settings['ncore']
-                subteams = np.array_split(list(teams.values()), n_core)
-                func = partial(Team.bucketing, settings['bucket_size'], indexes['s2i'], indexes['c2i'])
-                data = p.map(func, subteams)
+            if settings['parallel']:
+                with multiprocessing.Pool() as p:
+                    n_core = multiprocessing.cpu_count() if settings['ncore'] <= 0 else settings['ncore']
+                    subteams = np.array_split(list(teams.values()), n_core)
+                    func = partial(Team.bucketing, settings['bucket_size'], indexes['s2i'], indexes['c2i'])
+                    data = p.map(func, subteams)
             # serial
-            # data = Team.bucketing(1000, s2i, c2i, teams.values())
+            else:
+                data = Team.bucketing(settings['bucket_size'], indexes['s2i'], indexes['c2i'], teams.values())
             data = scipy.sparse.vstack(data, 'lil')#{'bsr', 'coo', 'csc', 'csr', 'dia', 'dok', 'lil'}, By default an appropriate sparse matrix format is returned!!
             vecs = {'id': data[:, 0], 'skill': data[:, 1:len(indexes['s2i']) + 1], 'member':data[:, - len(indexes['c2i']):]}
 
@@ -168,40 +169,81 @@ class Team(object):
         return teams
 
     @classmethod
-    def get_stats(cls, teamsvecs, output, plot=False):
+    def get_stats(cls, teamsvecs, output, cache=True, plot=False, plot_title=None):
         try:
+            print("Loading the stats pickle ...")
+            if not cache: raise FileNotFoundError
             with open(f'{output}/stats.pkl', 'rb') as infile:
-                print("Loading the stats pickle ...")
                 stats = pickle.load(infile)
-                if plot: Team.plot_stats(stats, output)
+                if plot: Team.plot_stats(stats, output, plot_title)
                 return stats
 
         except FileNotFoundError:
             print("File not found! Generating stats ...")
             stats = {}
             teamids, skillvecs, membervecs = teamsvecs['id'], teamsvecs['skill'], teamsvecs['member']
-            nteams_nskills = Counter(skillvecs.sum(axis=1).A1.astype(int))
-            stats['nteams_nskills'] = {k: v for k, v in sorted(nteams_nskills.items(), key=lambda item: item[1], reverse=True)}
-            stats['nteams_skill-idx'] = {k: v for k, v in enumerate(sorted(skillvecs.sum(axis=0).A1.astype(int), reverse=True))}
 
-            nteams_nmembers = Counter(membervecs.sum(axis=1).A1.astype(int))
+            stats['*nteams'] = teamids.shape[0]
+            stats['*nmembers'] = membervecs.shape[1] #unique members
+            stats['*nskills'] = skillvecs.shape[1]
+
+            #distributions
+            row_sums = skillvecs.sum(axis=1)
+            col_sums = skillvecs.sum(axis=0)
+            nteams_nskills = Counter(row_sums.A1.astype(int))
+            stats['nteams_nskills'] = {k: v for k, v in sorted(nteams_nskills.items(), key=lambda item: item[1], reverse=True)}
+            stats['nteams_skill-idx'] = {k: v for k, v in enumerate(sorted(col_sums.A1.astype(int), reverse=True))}
+            stats['*avg_nskills_team'] = row_sums.mean()
+            stats['*nteams_single_skill'] = stats['nteams_nskills'][1] if 1 in stats['nteams_nskills'] else 0
+            # how many skills have only 1 team, 2 teams, ...
+            nskills_nteams = Counter(col_sums.A1.astype(int))
+            stats['nskills_nteams'] = {k: v for k, v in sorted(nskills_nteams.items(), key=lambda item: item[1], reverse=True)}
+            stats['*avg_nskills_member'] = ((skillvecs.transpose() @ membervecs) > 0).sum(axis=0).mean()
+
+            row_sums = membervecs.sum(axis=1)
+            col_sums = membervecs.sum(axis=0)
+            nteams_nmembers = Counter(row_sums.A1.astype(int))
             stats['nteams_nmembers'] = {k: v for k, v in sorted(nteams_nmembers.items(), key=lambda item: item[1], reverse=True)}
-            stats['nteams_candidate-idx'] = {k: v for k, v in enumerate(sorted(membervecs.sum(axis=0).A1.astype(int), reverse=True))}
+            stats['nteams_candidate-idx'] = {k: v for k, v in enumerate(sorted(col_sums.A1.astype(int), reverse=True))}
+            stats['*avg_nmembers_team'] = row_sums.mean()
+            stats['*nteams_single_member'] = stats['nteams_nmembers'][1] if 1 in stats['nteams_nmembers'] else 0
+            #how many members have only 1 team, 2 teams, ....
+            nmembers_nteams = Counter(col_sums.A1.astype(int))
+            stats['nmembers_nteams'] = {k: v for k, v in sorted(nmembers_nteams.items(), key=lambda item: item[1], reverse=True)}
+            stats['*avg_nteams_member'] = col_sums.mean()
 
             #TODO: temporal stats!
             #TODO: skills_years (2-D image)
             #TODO: candidate_years (2-D image)
             with open(f'{output}/stats.pkl', 'wb') as outfile: pickle.dump(stats, outfile)
-            if plot: Team.plot_stats(stats, output)
+            if plot: Team.plot_stats(stats, output, plot_title)
         return stats
 
     @staticmethod
-    def plot_stats(stats, output):
+    def plot_stats(stats, output, plot_title):
+        plt.rcParams.update({'font.family': 'Consolas'})
         for k, v in stats.items():
-            fig = plt.figure()
+            if '*' in k:
+                print(f'{k} : {v}')
+                continue
+            fig = plt.figure(figsize=(2, 2))
             ax = fig.add_subplot(1, 1, 1)
-            ax.bar(*zip(*stats[k].items()))
-            ax.set_xlabel(k.split('_')[1].replace('n', '#', 0))
-            ax.set_ylabel(k.split('_')[0].replace('n', '#', 0))
-            fig.savefig(f'{output}/{k}.png', dpi=100, bbox_inches='tight')
+            ax.loglog(*zip(*stats[k].items()), marker='x', linestyle='None', markeredgecolor='b')
+            ax.set_xlabel(k.split('_')[1][0].replace('n', '#') + k.split('_')[1][1:])
+            ax.set_ylabel(k.split('_')[0][0].replace('n', '#') + k.split('_')[0][1:])
+            ax.grid(True, color="#93a1a1", alpha=0.3)
+            # ax.spines['right'].set_color((.8, .8, .8))
+            # ax.spines['top'].set_color((.8, .8, .8))
+            ax.minorticks_off()
+            ax.xaxis.set_tick_params(size=2, direction='in')
+            ax.yaxis.set_tick_params(size=2, direction='in')
+            ax.xaxis.get_label().set_size(12)
+            ax.yaxis.get_label().set_size(12)
+            ax.set_title(plot_title, x=0.7, y=0.8, fontsize=11)
+            ax.set_facecolor('whitesmoke')
+            fig.savefig(f'{output}/{k}.pdf', dpi=100, bbox_inches='tight')
             plt.show()
+
+    @staticmethod
+    def get_unigram(membervecs):
+        return membervecs.sum(axis=0)/membervecs.shape[0]
