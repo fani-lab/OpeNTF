@@ -43,11 +43,6 @@ class tNtf(Ntf):
         year_idx = indexes['i2y']
         output_ = f'{output}/{year_idx[-self.step_ahead - 1][1]}' #this folder will be created by the last model training
 
-        splits = {}
-        splits['folds'] = {}
-        splits['test'] = np.arange(year_idx[-self.step_ahead][0], len(indexes['i2t']))
-        for k in range(self.tfold): splits['folds'][k] = {}
-
         if 'train' in cmd: self.learn(splits, indexes, vecs, settings, None, output)
         if 'test' in cmd:# todo: the prediction of each step ahead should be seperate
             # for i, v in enumerate(year_idx[-self.step_ahead:]):  # the last years are for test.
