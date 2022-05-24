@@ -3,10 +3,10 @@ import argparse
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import KFold, train_test_split
-from json import JSONEncoder
 from itertools import product
 
 import param
+from cmn.tools import NumpyArrayEncoder
 from cmn.publication import Publication
 from cmn.movie import Movie
 from cmn.patent import Patent
@@ -14,15 +14,11 @@ from mdl.fnn import Fnn
 from mdl.bnn import Bnn
 from mdl.rnd import Rnd
 from mdl.nmt import Nmt
+from mdl.tntf import tNtf
 from mdl.team2vec import Team2Vec
 
-class NumpyArrayEncoder(JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, np.ndarray):
-            return obj.tolist()
-        return JSONEncoder.default(self, obj)
-
-def create_evaluation_splits(n_sample, n_folds, train_ratio=0.85, output='./'):
+def create_evaluation_splits(n_sample, n_folds, train_ratio=0.85, temporal=False, output='./'):
+    if temporal: return None
     train, test = train_test_split(np.arange(n_sample), train_size=train_ratio, random_state=0, shuffle=True)
     splits = dict()
     splits['test'] = test
@@ -33,9 +29,7 @@ def create_evaluation_splits(n_sample, n_folds, train_ratio=0.85, output='./'):
         splits['folds'][k]['train'] = train[trainIdx]
         splits['folds'][k]['valid'] = train[validIdx]
 
-    with open(f'{output}/splits.json', 'w') as f:
-        json.dump(splits, f, cls=NumpyArrayEncoder, indent=1)
-
+    with open(f'{output}/splits.json', 'w') as f: json.dump(splits, f, cls=NumpyArrayEncoder, indent=1)
     return splits
 
 def aggregate(output):
@@ -76,6 +70,10 @@ def run(data_list, domain_list, filter, model_list, output, settings):
     if 'bnn' in model_list: models['bnn'] = Bnn()
     if 'fnn_emb' in model_list: models['fnn_emb'] = Fnn()
     if 'bnn_emb' in model_list: models['bnn_emb'] = Bnn()
+    if 'tfnn' in model_list: models['tfnn'] = tNtf(Fnn(), settings['model']['nfolds'], step_ahead=1)#more than 1 not supported yet
+    if 'tbnn' in model_list: models['tbnn'] = tNtf(Bnn(), settings['model']['nfolds'], step_ahead=1)#more than 1 not supported yet
+    if 'tfnn_emb' in model_list: models['tfnn_emb'] = tNtf(Fnn(), settings['model']['nfolds'], step_ahead=1)#more than 1 not supported yet
+    if 'tbnn_emb' in model_list: models['tbnn_emb'] = tNtf(Bnn(), settings['model']['nfolds'], step_ahead=1)#more than 1 not supported yet
     if 'nmt' in model_list: models['nmt'] = Nmt()
 
     assert len(datasets) > 0
@@ -86,14 +84,16 @@ def run(data_list, domain_list, filter, model_list, output, settings):
         datapath = data_list[domain_list.index(d_name)]
         prep_output = f'./../data/preprocessed/{d_name}/{os.path.split(datapath)[-1]}'
         vecs, indexes = d_cls.generate_sparse_vectors(datapath, f'{prep_output}{filter_str}', filter, settings['data'])
-        splits = create_evaluation_splits(vecs['id'].shape[0], settings['model']['nfolds'], settings['model']['train_test_split'], output=f'{prep_output}{filter_str}')
+
+        splits = create_evaluation_splits(vecs['id'].shape[0], settings['model']['nfolds'], settings['model']['train_test_split'], m_name.startswith('t'), output=f'{prep_output}{filter_str}')
+
         if m_name.find('_emb') > 0:
             t2v = Team2Vec(vecs, 'skill', f'./../data/preprocessed/{d_name}/{os.path.split(datapath)[-1]}{filter_str}')
             emb_setting = settings['model']['baseline']['emb']
             t2v.train(emb_setting['d'], emb_setting['w'], emb_setting['dm'], emb_setting['e'])
             vecs['skill'] = t2v.dv()
 
-        m_obj.run(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}{filter_str}/{m_name}', settings['model']['baseline'][m_name.replace('_emb', '')], settings['model']['cmd'])
+        m_obj.run(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}{filter_str}/{m_name}', settings['model']['baseline'][m_name.replace('_emb', '').replace('t' if m_name.startswith('t') else '', '')], settings['model']['cmd'])
     aggregate(output)
 
 def addargs(parser):
