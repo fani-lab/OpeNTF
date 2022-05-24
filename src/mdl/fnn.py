@@ -10,7 +10,7 @@ from torch.utils.data import DataLoader
 from torch.optim.lr_scheduler import StepLR, ReduceLROnPlateau
 
 from mdl.ntf import Ntf
-from mdl.custom_dataset import TFDataset
+from mdl.cds import TFDataset
 
 from cmn.team import Team
 
@@ -42,8 +42,6 @@ class Fnn(Ntf):
         for m in self.modules():
             if isinstance(m, nn.Linear):
                 nn.init.xavier_uniform_(m.weight)
-
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     def cross_entropy(self, y_, y, ns, nns, unigram):
         if ns == "uniform": return self.ns_uniform(y_, y, nns)
@@ -101,7 +99,7 @@ class Fnn(Ntf):
                     random_samples[b][idx] = 1
         return (-targets * torch.log(logits) - random_samples * torch.log(1 - logits)).sum()
 
-    def learn(self, splits, indexes, vecs, params, output):
+    def learn(self, splits, indexes, vecs, params, prev_model, output):
 
         layers = params['l'];
         learning_rate = params['lr'];
@@ -140,6 +138,7 @@ class Fnn(Ntf):
 
             # Initialize network
             self.init(input_size=input_size, output_size=output_size, param=params).to(self.device)
+            if prev_model: self.load_state_dict(torch.load(prev_model[foldidx]))
 
             optimizer = optim.Adam(self.parameters(), lr=learning_rate)
             scheduler = ReduceLROnPlateau(optimizer, factor=0.5, patience=10, verbose=True)

@@ -69,11 +69,20 @@ class Team(object):
         # read data from file
         # apply filtering
         if filter: teams = Team.remove_outliers(teams, settings)
+
+        year_idx = []
+        start_year = None
+        for i, v in enumerate(sorted(teams.values(), key=lambda x: x.datetime)):
+            if v.datetime != start_year:
+                year_idx.append((i, v.datetime))
+                start_year = v.datetime
+
         # build indexes
         indexes = {}
         indexes['i2c'], indexes['c2i'] = Team.build_index_candidates(teams.values())
         indexes['i2s'], indexes['s2i'] = Team.build_index_skills(teams.values())
         indexes['i2t'], indexes['t2i'] = Team.build_index_teams(teams.values())
+        indexes['i2y'] = year_idx
         st = time()
 
         try: os.makedirs(output)
