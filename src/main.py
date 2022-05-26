@@ -4,7 +4,8 @@ import numpy as np
 import pandas as pd
 from sklearn.model_selection import KFold, train_test_split
 from itertools import product
-
+from scipy.sparse import lil_matrix
+import scipy.sparse
 import param
 from cmn.tools import NumpyArrayEncoder
 from cmn.publication import Publication
@@ -104,7 +105,10 @@ def run(data_list, domain_list, filter, model_list, output, settings):
                 emb_setting = settings['model']['baseline']['emb']
                 t2v.train(emb_setting['d'], emb_setting['w'], emb_setting['dm'], emb_setting['e'])
                 vecs['skill'] = t2v.dv()
-
+            
+            if m_name.startswith('t'):
+                vecs['skill'] = lil_matrix(scipy.sparse.hstack((vecs['skill'], lil_matrix(np.ones((vecs['skill'].shape[0], 1))))))
+            
             m_obj.run(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}{filter_str}/{m_name}', settings['model']['baseline'][m_name.replace('_emb', '').replace('t' if m_name.startswith('t') else '', '')], settings['model']['cmd'])
     if 'agg' in settings['model']['cmd']: aggregate(output)
 
