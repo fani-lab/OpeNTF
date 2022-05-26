@@ -25,7 +25,6 @@ class Fnn(Ntf):
             hl.append(nn.Linear(param['l'][i - 1], param['l'][i]))
         self.hidden_layer = nn.ModuleList(hl)
         self.fc2 = nn.Linear(param['l'][-1], output_size)
-        self.dp = nn.Dropout(0.5)
         self.initialize_weights()
         return self
 
@@ -33,7 +32,6 @@ class Fnn(Ntf):
         x = leaky_relu(self.fc1(x))
         for i, l in enumerate(self.hidden_layer):
             x = leaky_relu(l(x))
-        x = self.dp(x)
         x = self.fc2(x)
         x = torch.clamp(torch.sigmoid(x), min=1.e-6, max=1. - 1.e-6)
         return x

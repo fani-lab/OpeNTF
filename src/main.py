@@ -17,8 +17,13 @@ from mdl.nmt import Nmt
 from mdl.tntf import tNtf
 from mdl.team2vec import Team2Vec
 
-def create_evaluation_splits(n_sample, n_folds, train_ratio=0.85, year_idx=None, output='./'):
-    train, test = train_test_split(np.arange(n_sample), train_size=train_ratio, random_state=0, shuffle=True)
+def create_evaluation_splits(n_sample, n_folds, train_ratio=0.85, year_idx=None, output='./', step_ahead=1):   
+    if year_idx:
+        train = np.arange(0, year_idx[-step_ahead][0])  # for teamporal folding, we do on each time interval ==> look at tntf.py
+        test = np.arange(year_idx[-step_ahead][0], n_sample)
+    else:
+        train, test = train_test_split(np.arange(n_sample), train_size=train_ratio, random_state=0, shuffle=True)
+        
     splits = dict()
     splits['test'] = test
     splits['folds'] = dict()
@@ -27,10 +32,6 @@ def create_evaluation_splits(n_sample, n_folds, train_ratio=0.85, year_idx=None,
         splits['folds'][k] = dict()
         splits['folds'][k]['train'] = train[trainIdx]
         splits['folds'][k]['valid'] = train[validIdx]
-
-    if year_idx:
-        splits['test'] = np.arange(year_idx[-1][0], n_sample)
-        #for teamporal folding, we do on each time interval ==> look at tntf.py
 
     with open(f'{output}/splits.json', 'w') as f: json.dump(splits, f, cls=NumpyArrayEncoder, indent=1)
     return splits
@@ -80,10 +81,10 @@ def run(data_list, domain_list, filter, model_list, output, settings):
     if 'bnn' in model_list: models['bnn'] = Bnn()
     if 'fnn_emb' in model_list: models['fnn_emb'] = Fnn()
     if 'bnn_emb' in model_list: models['bnn_emb'] = Bnn()
-    if 'tfnn' in model_list: models['tfnn'] = tNtf(Fnn(), settings['model']['nfolds'], step_ahead=1)#more than 1 not supported yet
-    if 'tbnn' in model_list: models['tbnn'] = tNtf(Bnn(), settings['model']['nfolds'], step_ahead=1)#more than 1 not supported yet
-    if 'tfnn_emb' in model_list: models['tfnn_emb'] = tNtf(Fnn(), settings['model']['nfolds'], step_ahead=1)#more than 1 not supported yet
-    if 'tbnn_emb' in model_list: models['tbnn_emb'] = tNtf(Bnn(), settings['model']['nfolds'], step_ahead=1)#more than 1 not supported yet
+    if 'tfnn' in model_list: models['tfnn'] = tNtf(Fnn(), settings['model']['nfolds'], step_ahead=settings['model']['step_ahead'])#more than 1 not supported yet
+    if 'tbnn' in model_list: models['tbnn'] = tNtf(Bnn(), settings['model']['nfolds'], step_ahead=settings['model']['step_ahead'])#more than 1 not supported yet
+    if 'tfnn_emb' in model_list: models['tfnn_emb'] = tNtf(Fnn(), settings['model']['nfolds'], step_ahead=settings['model']['step_ahead'])#more than 1 not supported yet
+    if 'tbnn_emb' in model_list: models['tbnn_emb'] = tNtf(Bnn(), settings['model']['nfolds'], step_ahead=settings['model']['step_ahead'])#more than 1 not supported yet
     if 'nmt' in model_list: models['nmt'] = Nmt()
 
     assert len(datasets) > 0
@@ -95,7 +96,7 @@ def run(data_list, domain_list, filter, model_list, output, settings):
         datapath = data_list[domain_list.index(d_name)]
         prep_output = f'./../data/preprocessed/{d_name}/{os.path.split(datapath)[-1]}'
         vecs, indexes = d_cls.generate_sparse_vectors(datapath, f'{prep_output}{filter_str}', filter, settings['data'])
-        splits = create_evaluation_splits(vecs['id'].shape[0], settings['model']['nfolds'], settings['model']['train_test_split'], indexes['i2y'] if temporal else None, output=f'{prep_output}{filter_str}')
+        splits = create_evaluation_splits(vecs['id'].shape[0], settings['model']['nfolds'], settings['model']['train_test_split'], indexes['i2y'] if temporal else None, output=f'{prep_output}{filter_str}', step_ahead=settings['model']['step_ahead'])
 
         for (m_name, m_obj) in models.items():
             if m_name.find('_emb') > 0:
