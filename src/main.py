@@ -86,6 +86,8 @@ def run(data_list, domain_list, filter, model_list, output, settings):
     if 'tbnn' in model_list: models['tbnn'] = tNtf(Bnn(), settings['model']['nfolds'], step_ahead=settings['model']['step_ahead'])#more than 1 not supported yet
     if 'tfnn_emb' in model_list: models['tfnn_emb'] = tNtf(Fnn(), settings['model']['nfolds'], step_ahead=settings['model']['step_ahead'])#more than 1 not supported yet
     if 'tbnn_emb' in model_list: models['tbnn_emb'] = tNtf(Bnn(), settings['model']['nfolds'], step_ahead=settings['model']['step_ahead'])#more than 1 not supported yet
+    if 'fnn_dt2v_emb' in model_list: models['fnn_dt2v_emb'] = tNtf(Fnn(), settings['model']['nfolds'], step_ahead=settings['model']['step_ahead'])
+    if 'bnn_dt2v_emb' in model_list: models['bnn_dt2v_emb'] = tNtf(Bnn(), settings['model']['nfolds'], step_ahead=settings['model']['step_ahead'])
     if 'nmt' in model_list: models['nmt'] = Nmt()
 
     assert len(datasets) > 0
@@ -101,7 +103,7 @@ def run(data_list, domain_list, filter, model_list, output, settings):
 
         for (m_name, m_obj) in models.items():
             if m_name.find('_emb') > 0:
-                t2v = Team2Vec(vecs, 'skill', f'./../data/preprocessed/{d_name}/{os.path.split(datapath)[-1]}{filter_str}')
+                t2v = Team2Vec(vecs, indexes, 'dt2v' if m_name.find('_dt2v') > 0 else 'skill', f'./../data/preprocessed/{d_name}/{os.path.split(datapath)[-1]}{filter_str}')
                 emb_setting = settings['model']['baseline']['emb']
                 t2v.train(emb_setting['d'], emb_setting['w'], emb_setting['dm'], emb_setting['e'])
                 vecs['skill'] = t2v.dv()
@@ -109,7 +111,7 @@ def run(data_list, domain_list, filter, model_list, output, settings):
             if m_name.startswith('t'):
                 vecs['skill'] = lil_matrix(scipy.sparse.hstack((vecs['skill'], lil_matrix(np.ones((vecs['skill'].shape[0], 1))))))
             
-            m_obj.run(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}{filter_str}/{m_name}', settings['model']['baseline'][m_name.replace('_emb', '').replace('t' if m_name.startswith('t') else '', '')], settings['model']['cmd'])
+            m_obj.run(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}{filter_str}/{m_name}', settings['model']['baseline'][m_name.replace('_emb', '').replace('_dt2v', '').replace('t', '')], settings['model']['cmd'])
     if 'agg' in settings['model']['cmd']: aggregate(output)
 
 def addargs(parser):

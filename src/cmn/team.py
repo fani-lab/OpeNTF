@@ -62,6 +62,22 @@ class Team(object):
             i2t[idx] = t.id
             t2i[t.id] = idx
         return i2t, t2i
+    
+    @staticmethod
+    def build_index_teamdatetimes(teams):
+        i2tdt = {}
+        for team in teams:
+            i2tdt[team.id] = team.datetime
+        return i2tdt
+    
+    @staticmethod 
+    def build_index_datetime(teams):
+        dt2i = {}; i2dt = {}
+        for team in teams:
+            if team.datetime not in dt2i:
+                dt2i[team.datetime] = team.id
+                i2dt[team.id] = team.datetime
+        return i2dt, dt2i
 
     @staticmethod
     def read_data(teams, output, filter, settings):
@@ -70,18 +86,22 @@ class Team(object):
         # apply filtering
         if filter: teams = Team.remove_outliers(teams, settings)
 
+        teams = sorted(teams.values(), key=lambda x: x.datetime)
+
         year_idx = []
         start_year = None
-        for i, v in enumerate(sorted(teams.values(), key=lambda x: x.datetime)):
+        for i, v in enumerate(teams):
             if v.datetime != start_year:
                 year_idx.append((i, v.datetime))
                 start_year = v.datetime
 
         # build indexes
         indexes = {}
-        indexes['i2c'], indexes['c2i'] = Team.build_index_candidates(teams.values())
-        indexes['i2s'], indexes['s2i'] = Team.build_index_skills(teams.values())
-        indexes['i2t'], indexes['t2i'] = Team.build_index_teams(teams.values())
+        indexes['i2c'], indexes['c2i'] = Team.build_index_candidates(teams)
+        indexes['i2s'], indexes['s2i'] = Team.build_index_skills(teams)
+        indexes['i2t'], indexes['t2i'] = Team.build_index_teams(teams)
+        indexes['i2dt'], indexes['dt2i'] = Team.build_index_datetime(teams)
+        indexes['i2tdt'] = Team.build_index_teamdatetimes(teams)
         indexes['i2y'] = year_idx
         st = time()
 
@@ -152,12 +172,12 @@ class Team(object):
             if settings['parallel']:
                 with multiprocessing.Pool() as p:
                     n_core = multiprocessing.cpu_count() if settings['ncore'] <= 0 else settings['ncore']
-                    subteams = np.array_split(list(teams.values()), n_core)
+                    subteams = np.array_split(teams, n_core)
                     func = partial(Team.bucketing, settings['bucket_size'], indexes['s2i'], indexes['c2i'])
                     data = p.map(func, subteams)
             # serial
             else:
-                data = Team.bucketing(settings['bucket_size'], indexes['s2i'], indexes['c2i'], teams.values())
+                data = Team.bucketing(settings['bucket_size'], indexes['s2i'], indexes['c2i'], teams)
             data = scipy.sparse.vstack(data, 'lil')#{'bsr', 'coo', 'csc', 'csr', 'dia', 'dok', 'lil'}, By default an appropriate sparse matrix format is returned!!
             vecs = {'id': data[:, 0], 'skill': data[:, 1:len(indexes['s2i']) + 1], 'member':data[:, - len(indexes['c2i']):]}
 
