@@ -15,6 +15,7 @@ from mdl.fnn import Fnn
 from mdl.bnn import Bnn
 from mdl.rnd import Rnd
 from mdl.nmt import Nmt
+from mdl.tnmt import tNmt
 from mdl.tntf import tNtf
 from mdl.team2vec import Team2Vec
 
@@ -89,6 +90,7 @@ def run(data_list, domain_list, filter, model_list, output, settings):
     if 'fnn_dt2v_emb' in model_list: models['fnn_dt2v_emb'] = tNtf(Fnn(), settings['model']['nfolds'], step_ahead=settings['model']['step_ahead'])
     if 'bnn_dt2v_emb' in model_list: models['bnn_dt2v_emb'] = tNtf(Bnn(), settings['model']['nfolds'], step_ahead=settings['model']['step_ahead'])
     if 'nmt' in model_list: models['nmt'] = Nmt()
+    if 'tnmt' in model_list: models['tnmt'] = tNmt(settings['model']['nfolds'], settings['model']['step_ahead'])
 
     assert len(datasets) > 0
     assert len(datasets) == len(domain_list)
@@ -108,10 +110,10 @@ def run(data_list, domain_list, filter, model_list, output, settings):
                 t2v.train(emb_setting['d'], emb_setting['w'], emb_setting['dm'], emb_setting['e'])
                 vecs['skill'] = t2v.dv()
             
-            if m_name.startswith('t'):
+            if m_name.startswith('t') and not m_name.endswith('nmt'):
                 vecs['skill'] = lil_matrix(scipy.sparse.hstack((vecs['skill'], lil_matrix(np.ones((vecs['skill'].shape[0], 1))))))
             
-            m_obj.run(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}{filter_str}/{m_name}', settings['model']['baseline'][m_name.replace('_emb', '').replace('_dt2v', '').replace('t', '')], settings['model']['cmd'])
+            m_obj.run(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}{filter_str}/{m_name}', settings['model']['baseline'][m_name.lstrip('t').replace('_emb', '').replace('_dt2v', '')], settings['model']['cmd'])
     if 'agg' in settings['model']['cmd']: aggregate(output)
 
 def addargs(parser):
