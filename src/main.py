@@ -21,7 +21,7 @@ from mdl.team2vec import Team2Vec
 
 def create_evaluation_splits(n_sample, n_folds, train_ratio=0.85, year_idx=None, output='./', step_ahead=1):   
     if year_idx:
-        train = np.arange(0, year_idx[-step_ahead][0])  # for teamporal folding, we do on each time interval ==> look at tntf.py
+        train = np.arange(year_idx[0][0], year_idx[-step_ahead][0])  # for teamporal folding, we do on each time interval ==> look at tntf.py
         test = np.arange(year_idx[-step_ahead][0], n_sample)
     else:
         train, test = train_test_split(np.arange(n_sample), train_size=train_ratio, random_state=0, shuffle=True)
@@ -101,6 +101,11 @@ def run(data_list, domain_list, filter, model_list, output, settings):
         datapath = data_list[domain_list.index(d_name)]
         prep_output = f'./../data/preprocessed/{d_name}/{os.path.split(datapath)[-1]}'
         vecs, indexes = d_cls.generate_sparse_vectors(datapath, f'{prep_output}{filter_str}', filter, settings['data'])
+        year_idx = []
+        for i in range(1, len(indexes['i2y'])):
+            if indexes['i2y'][i][0] - indexes['i2y'][i-1][0] > settings['model']['nfolds']:
+                year_idx.append(indexes['i2y'][i])
+        indexes['i2y'] = year_idx
         splits = create_evaluation_splits(vecs['id'].shape[0], settings['model']['nfolds'], settings['model']['train_test_split'], indexes['i2y'] if temporal else None, output=f'{prep_output}{filter_str}', step_ahead=settings['model']['step_ahead'])
 
         for (m_name, m_obj) in models.items():
