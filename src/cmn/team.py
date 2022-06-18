@@ -62,6 +62,22 @@ class Team(object):
             i2t[idx] = t.id
             t2i[t.id] = idx
         return i2t, t2i
+    
+    @staticmethod
+    def build_index_teamdatetimes(teams):
+        i2tdt = {}
+        for team in teams:
+            i2tdt[team.id] = team.datetime
+        return i2tdt
+    
+    @staticmethod 
+    def build_index_datetime(teams):
+        dt2i = {}; i2dt = {}
+        for team in teams:
+            if team.datetime not in dt2i:
+                dt2i[team.datetime] = team.id
+                i2dt[team.id] = team.datetime
+        return i2dt, dt2i
 
     @staticmethod
     def read_data(teams, output, filter, settings):
@@ -69,11 +85,24 @@ class Team(object):
         # read data from file
         # apply filtering
         if filter: teams = Team.remove_outliers(teams, settings)
+
+        teams = sorted(teams.values(), key=lambda x: x.datetime)
+
+        year_idx = []
+        start_year = None
+        for i, v in enumerate(teams):
+            if v.datetime != start_year:
+                year_idx.append((i, v.datetime))
+                start_year = v.datetime
+
         # build indexes
         indexes = {}
-        indexes['i2c'], indexes['c2i'] = Team.build_index_candidates(teams.values())
-        indexes['i2s'], indexes['s2i'] = Team.build_index_skills(teams.values())
-        indexes['i2t'], indexes['t2i'] = Team.build_index_teams(teams.values())
+        indexes['i2c'], indexes['c2i'] = Team.build_index_candidates(teams)
+        indexes['i2s'], indexes['s2i'] = Team.build_index_skills(teams)
+        indexes['i2t'], indexes['t2i'] = Team.build_index_teams(teams)
+        indexes['i2dt'], indexes['dt2i'] = Team.build_index_datetime(teams)
+        indexes['i2tdt'] = Team.build_index_teamdatetimes(teams)
+        indexes['i2y'] = year_idx
         st = time()
 
         try: os.makedirs(output)
@@ -127,7 +156,7 @@ class Team(object):
 
     @classmethod
     def generate_sparse_vectors(cls, datapath, output, filter, settings):
-        pkl = f'{output}/temporal_teamsvecs.pkl' if settings['temporal'] else f'{output}/teamsvecs.pkl'
+        pkl = f'{output}/teamsvecs.pkl'
         try:
             st = time()
             print(f"Loading sparse matrices from {pkl} ...")
@@ -139,31 +168,19 @@ class Team(object):
             print("File not found! Generating the sparse matrices ...")
             indexes, teams = cls.read_data(datapath, output, index=False, filter=filter, settings=settings)
             st = time()
-            # sort by datetime
-            if settings['temporal']:
-                teams = {k: v for k, v in sorted(teams.items(), key=lambda x: x[1].datetime)}
-                list_n_teams_per_year = [0]
-                start_year = list(teams.values())[0].datetime
-                for i, v in enumerate(teams.values()):
-                    if v.datetime != start_year:
-                        list_n_teams_per_year.append(i)
-                        start_year = v.datetime
-                list_n_teams_per_year.append(len(teams))
             # parallel
             if settings['parallel']:
                 with multiprocessing.Pool() as p:
                     n_core = multiprocessing.cpu_count() if settings['ncore'] <= 0 else settings['ncore']
-                    subteams = np.array_split(list(teams.values()), n_core)
+                    subteams = np.array_split(teams, n_core)
                     func = partial(Team.bucketing, settings['bucket_size'], indexes['s2i'], indexes['c2i'])
                     data = p.map(func, subteams)
             # serial
             else:
-                data = Team.bucketing(settings['bucket_size'], indexes['s2i'], indexes['c2i'], teams.values())
+                data = Team.bucketing(settings['bucket_size'], indexes['s2i'], indexes['c2i'], teams)
             data = scipy.sparse.vstack(data, 'lil')#{'bsr', 'coo', 'csc', 'csr', 'dia', 'dok', 'lil'}, By default an appropriate sparse matrix format is returned!!
-            if settings['temporal']:
-                vecs = {'id': data[:, 0], 'skill': lil_matrix(scipy.sparse.hstack((data[:, 1:len(indexes['s2i']) + 1], lil_matrix(np.ones((data.shape[0],1)))))), 'member':data[:, - len(indexes['c2i']):], 'year_idx': list_n_teams_per_year}
-            else:
-                vecs = {'id': data[:, 0], 'skill': data[:, 1:len(indexes['s2i']) + 1], 'member':data[:, - len(indexes['c2i']):]}
+            vecs = {'id': data[:, 0], 'skill': data[:, 1:len(indexes['s2i']) + 1], 'member':data[:, - len(indexes['c2i']):]}
+
             with open(pkl, 'wb') as outfile: pickle.dump(vecs, outfile)
             print(f"It took {time() - st} seconds to generate and store the sparse matrices of size {data.shape} at {pkl}")
             return vecs, indexes
