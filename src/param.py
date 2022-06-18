@@ -15,14 +15,12 @@ settings = {
                 'b': 4096
             },
             'fnn':{
-                'bayesian': 1,
                 'l': [100],  # list of number of nodes in each layer
                 'lr': 0.1,  # learning rate
                 'b': 4096,  # batch size
                 'e': 20,  # epoch
                 'nns': None,  # number of negative samples
                 'ns': None,  # 'uniform', 'unigram', 'unigram_b'
-                's': 1  # sample_elbo for bnn
             },
             'bnn':{
                 'l': [100],  # list of number of nodes in each layer
