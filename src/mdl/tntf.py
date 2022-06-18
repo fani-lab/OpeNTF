@@ -1,183 +1,58 @@
-import os, time, pickle, json, re
-import numpy as np
+import os, pickle, re, time, json
 import matplotlib.pyplot as plt
 import pandas as pd
-import torch
-from torch import optim
-from torch.utils.data import DataLoader
-from eval.metric import *
+import numpy as np
+
+from sklearn.model_selection import KFold
+
+from cmn.tools import NumpyArrayEncoder
 from mdl.ntf import Ntf
-from mdl.custom_dataset import TFDataset
-from mdl.temporal_dataset import TTFDataset
+from mdl.tcds import TTFDataset
 
-from cmn.team import Team
+class tNtf(Ntf):
+    def __init__(self, model, tfold, step_ahead):
+        super(tNtf, self).__init__()
+        self.model = model
+        self.tfold = tfold
+        self.step_ahead = step_ahead #for now, only 1 step ahead
 
-class TNtf(Ntf):
-    def __init__(self):
-        super(TNtf, self).__init__()
+    def learn(self, splits, indexes, vecs, params, prev_model, output):
+        year_idx = indexes['i2y']
+        for i, v in enumerate(year_idx[:-self.step_ahead]):#the last years are for test.
+            skf = KFold(n_splits=self.tfold, random_state=0, shuffle=True)
+            train = np.arange(year_idx[i][0], year_idx[i + 1][0])
+            for k, (trainIdx, validIdx) in enumerate(skf.split(train)):
+                splits['folds'][k]['train'] = train[trainIdx]
+                splits['folds'][k]['valid'] = train[validIdx]
 
-    def learn(self, splits, indexes, vecs, params, output):
-        learning_rate = params['lr']
-        num_epochs = params['e']
-        nns = params['nns']
-        ns = params['ns']
-        s = params['s']
-        input_size = vecs['skill'].shape[1]
-        output_size = len(indexes['i2c'])
+            output_ = f'{output}/{year_idx[i][1]}'
+            if not os.path.isdir(output_): os.makedirs(output_)
+            with open(f'{output_}/splits.json', 'w') as f: json.dump(splits, f, cls=NumpyArrayEncoder, indent=1)
 
-        model_name = "bnn" if params['bayesian'] else "fnn"
+            self.model.learn(splits, indexes, vecs, params, prev_model, output_) #not recursive, but fine-tune over years
+            prev_model = {foldidx: f'{output_}/state_dict_model.f{foldidx}.pt' for foldidx in splits['folds'].keys()}
 
-        unigram = Team.get_unigram(vecs['member'])
+    def run(self, splits, vecs, indexes, output, settings, cmd):
+        output = f"{output}/t{vecs['skill'].shape[0]}.s{vecs['skill'].shape[1]}.m{vecs['member'].shape[1]}.{'.'.join([k + str(v).replace(' ', '') for k, v in settings.items() if v])}"
+        if not os.path.isdir(output): os.makedirs(output)
 
-        # Prime a dict for train and valid loss
-        training_loss = {'train': []}
+        on_train_valid_set = False  # random baseline cannot join this.
+        per_instance = False
+        per_epoch = False
 
-        start_time = time.time()
-        
-        # Retrieving the folds
-        X_train = vecs['skill'][splits['train'], :]
-        y_train = vecs['member'][splits['train']]
-        list_n_teams_per_year = vecs['year_idx']
+        year_idx = indexes['i2y']
+        output_ = f'{output}/{year_idx[-self.step_ahead - 1][1]}' #this folder will be created by the last model training
 
-        list_n_teams_per_year = [x for x in list_n_teams_per_year if x < splits['train'][-1]]
-        list_n_teams_per_year.append(splits['train'][-1])
+        if 'train' in cmd: self.learn(splits, indexes, vecs, settings, None, output)
+        if 'test' in cmd:# todo: the prediction of each step ahead should be seperate
+            # for i, v in enumerate(year_idx[-self.step_ahead:]):  # the last years are for test.
+            #     tsplits['test'] = np.arange(year_idx[i][0], year_idx[i + 1][0] if i < len(year_idx) else len(indexes['i2t']))
+            self.model.test(output_, splits, indexes, vecs, settings, False, False)
 
-        # Building custom dataset
-        training_matrix = TTFDataset(X_train, y_train, list_n_teams_per_year)
+        if 'eval' in cmd:# todo: the evaluation of each step ahead should be seperate
+            self.model.evaluate(output_, splits, vecs, False, per_instance, False)
 
-        # Generating data loaders
-        training_dataloader = DataLoader(training_matrix, batch_size=1, shuffle=False, num_workers=0)
-        
-        # Initialize network
-        self.init(input_size=input_size, output_size=output_size, param=params).to(self.device)
+        if 'plot' in cmd: self.model.plot_roc(output_, splits, False)
 
-        optimizer = optim.Adam(self.parameters(), lr=learning_rate)
 
-        train_loss_values = []
-        # Train Network
-        for batch_idx, (X, y) in enumerate(training_dataloader):
-            train_running_loss = 0.0
-            for epoch in range(num_epochs):
-                epoch_time = time.time()
-            
-                torch.cuda.empty_cache()
-                X = X.float().to(self.device)  # Get data to cuda if possible
-                y = y.float().to(self.device)
 
-                self.train(True)  # scheduler.step()
-                # forward
-                optimizer.zero_grad()
-                y_ = self.forward(X)
-                if params['bayesian']:
-                    layer_loss, y_ = self.sample_elbo(X.squeeze(0), y.squeeze(0), s)
-                    loss = self.cross_entropy(y_.squeeze(0).to(self.device), y.squeeze(0), ns, nns, unigram) + layer_loss / X.shape[1]
-                else:
-                    loss = self.cross_entropy(y_.squeeze(0), y.squeeze(0), ns, nns, unigram)
-                # backward
-                loss.backward()
-                # clip_grad_value_(model.parameters(), 1)
-                optimizer.step()
-                train_running_loss += loss.item()
-                print(
-                    f'Minibatch {batch_idx}/{len(list_n_teams_per_year) - 2}, Epoch {epoch}/{num_epochs - 1}, Phase train'
-                    f', Running Loss of training {loss.item()}'
-                    f", Epoch time {time.time() - epoch_time}, Overall {time.time() - start_time} "
-                )
-            
-            train_loss_values.append(train_running_loss / num_epochs)
-            torch.save(self.state_dict(), f"{output}/state_dict_{model_name}.b{batch_idx}.pt", pickle_protocol=4)
-
-        model_path = f"{output}/state_dict_{model_name}.pt"
-
-        # Save
-        torch.save(self.state_dict(), model_path, pickle_protocol=4)
-
-        training_loss['train'] = train_loss_values
-
-        print(f"It took {time.time() - start_time} to train the model.")
-        with open(f"{output}/train_valid_loss.json", 'w') as outfile:
-            json.dump(training_loss, outfile)
-            plt.figure()
-            plt.plot(training_loss['train'], label='Training Loss')
-            plt.legend(loc='upper right')
-            plt.title('Training loss')
-            plt.savefig(f'{output}/training_loss.png', dpi=100, bbox_inches='tight')
-            plt.show()
-
-    def test(self, model_path, splits, indexes, vecs, params, on_train_valid_set=False, per_epoch=False):
-        if not os.path.isdir(model_path): raise Exception("The model does not exist!")
-        input_size = vecs['skill'].shape[1]
-        output_size = len(indexes['i2c'])
-
-        X_test = vecs['skill'][splits['test'], :]
-        y_test = vecs['member'][splits['test']]
-        test_matrix = TFDataset(X_test, y_test)
-        test_dl = DataLoader(test_matrix, batch_size=params['b'], shuffle=True, num_workers=0)
-
-        model_name = "bnn" if params['bayesian'] else "fnn"
-        modelfiles = [f'{model_path}/state_dict_{model_name}.pt']
-        if per_epoch: modelfiles = [f'{model_path}/{_}' for _ in os.listdir(model_path) if re.match(f'state_dict_{model_name}.b\d+.pt', _)]
-
-        for modelfile in modelfiles:
-            self.init(input_size=input_size, output_size=output_size, param=params).to(self.device)
-            self.load_state_dict(torch.load(modelfile))
-            self.eval()
-            for pred_set in (['test', 'train'] if on_train_valid_set else ['test']):
-                if pred_set != 'test':
-                    X = vecs['skill'][splits[pred_set], :]
-                    y = vecs['member'][splits[pred_set]]
-                    matrix = TFDataset(X, y)
-                    dl = DataLoader(matrix, batch_size=params['b'], shuffle=False, num_workers=0)
-                else:
-                    X = X_test; y = y_test; matrix = test_matrix
-                    dl = test_dl
-
-                torch.cuda.empty_cache()
-                with torch.no_grad():
-                    y_pred = torch.empty(0, dl.dataset.output.shape[1])
-                    for x, y in dl:
-                        x = x.to(device=self.device)
-                        scores = self.forward(x)
-                        scores = scores.squeeze(1).cpu().numpy()
-                        y_pred = np.vstack((y_pred, scores))
-                batch = modelfile.split('.')[-2] + '.' if per_epoch else ''
-                torch.save(y_pred, f'{model_path}/{pred_set}.{batch}pred', pickle_protocol=4)
-
-    def evaluate(self, model_path, splits, vecs, params, on_train_valid_set=False, per_instance=False, per_epoch=False):
-        if not os.path.isdir(model_path): raise Exception("The predictions do not exist!")
-        y_test = vecs['member'][splits['test']]
-        model_name = "bnn" if params['bayesian'] else "fnn"
-        for pred_set in (['test', 'train'] if on_train_valid_set else ['test']):
-            batch_re = f'state_dict_{model_name}.b\d+' if per_epoch else 'state_dict_{model_name}.pt'
-            predfiles = [f'{model_path}/{_}' for _ in os.listdir(model_path) if re.match(batch_re, _)]
-
-            for e in range(len(predfiles)):
-                batch = f'b{e}.' if per_epoch else ""
-                if pred_set != 'test':
-                    Y = vecs['member'][splits[pred_set]]
-                else:
-                    Y = y_test
-                Y_ = torch.load(f'{model_path}/{pred_set}.{batch}pred')
-                df, df_mean, (fpr, tpr) = calculate_metrics(Y, Y_, per_instance)
-                if per_instance: df.to_csv(f'{model_path}/{pred_set}.pred.eval.csv', float_format='%.15f')
-                df_mean.to_csv(f'{model_path}/{pred_set}.{batch}pred.eval.mean.csv')
-                with open(f'{model_path}/{pred_set}.{batch}pred.eval.roc.pkl', 'wb') as outfile:
-                    pickle.dump((fpr, tpr), outfile)
-
-    def plot_roc(self, model_path, splits, params, on_train_valid_set=False, per_epoch=False):
-        model_name = "bnn" if params['bayesian'] else "fnn"
-        for pred_set in (['test', 'train'] if on_train_valid_set else ['test']):
-            batch_re = f'state_dict_{model_name}.b\d+' if per_epoch else f'state_dict_{model_name}.pt'
-            predfiles = [f'{model_path}/{_}' for _ in os.listdir(model_path) if re.match(batch_re, _)]
-
-            for e in range(len(predfiles)):
-                batch = f'b{e}.' if per_epoch else ""
-                plt.figure()
-                with open(f'{model_path}/{pred_set}.{batch}pred.eval.roc.pkl', 'rb') as infile: (fpr, tpr) = pickle.load(infile)
-                plt.plot(fpr, tpr, label=f'micro-average on {pred_set} set {batch}', linestyle=':', linewidth=4)
-                plt.xlabel('false positive rate')
-                plt.ylabel('true positive rate')
-                plt.title(f'ROC curves for {pred_set} set {batch}')
-                plt.legend()
-                plt.savefig(f'{model_path}/{pred_set}.{batch}roc.png', dpi=100, bbox_inches='tight')
-                plt.show()
