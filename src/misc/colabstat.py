@@ -132,9 +132,13 @@ def nwayCollabs(teams_members, nway, topk, names):
         plotTopK_nWays(getTopK_nWays(m, topk), names)
 
 def main():
+    # Test teams: (0,1), (2,3), (0,1,3), (0,1,3), (0,2,3)
     # Test Matrix: rows=teams, columns=members
     A = sci.coo_matrix([[1, 1, 0, 0], [0, 0, 1, 1], [1, 1, 0, 1], [1, 1, 0, 1], [1, 0, 1, 1]])
     names = None
+    # 2 way results: (0,1)=3, (0,3)=3, (1,3)=2, (2,3)=2, (0,2)=1
+    # 3 way results: (0,1,3)=2, (0,2,3)=1
+    # 4 way results: None
 
     # with open('../../data/preprocessed/dblp/toy.dblp.v12.json/teamsvecs.pkl', 'rb') as f: matrix=pickle.load(f)
     # A = matrix['member']
