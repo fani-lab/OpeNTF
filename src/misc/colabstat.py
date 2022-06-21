@@ -12,7 +12,7 @@ from itertools import combinations
 def get2WayCollabs(teams_members):
     return teams_members.transpose() @ teams_members
 
-
+ 
 
 def getTopK_nWays(n_way_collabs, k):
     for i in range(0, len(n_way_collabs) - 1):
