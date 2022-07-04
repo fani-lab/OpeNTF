@@ -14,14 +14,13 @@ def get2WayCollabs(teams_members):
 
 
 def getTopK_nWays(teams_members, nway, k=10):
-    n_way_collabs = getnWayCollabs(teams_members, nway)
-    for i in range(0, len(n_way_collabs) - 1):
-        max = i
-        for j in range(i + 1, len(n_way_collabs)):
-            if (n_way_collabs[j][1] > n_way_collabs[max][1]):
-                max = j
-        n_way_collabs[max], n_way_collabs[i] = n_way_collabs[i], n_way_collabs[max]
+    n_way_collabs = getnWayCollabs(teams_members, nway)    
+    n_way_collabs.sort(key=getKey, reverse=True); # Python default sort: runs at O(n log(n))
     return n_way_collabs[0:k]
+
+def getKey(ele):
+    return ele[1]
+
 
 
 # Plots Results of top-k into a Histogram
@@ -57,19 +56,23 @@ def getnWayCollabs(teams_members, n):
     rowIndexes = []
     for i in range(0, teams_members.shape[1]): rowIndexes.append(i)
 
-    # comb is a list of all the possible combinations (if there are 4 rows) = [0,1,2], [0,1,3], ...
-    comb = combinations(rowIndexes, n)
 
     # Will record the count for each combination
     # The index for count aligns with it's respective combination
+    teams_members = teams_members.transpose()
     collabs = []
-    for testCase in list(comb):
-        dotProduct = (teams_members.transpose().getrow(testCase[0]).toarray())[0]
+    for testCase in list(combinations(rowIndexes, n)):
+        dotProduct = (teams_members.getrow(testCase[0]).toarray())[0]
         for i in range(1, n):
-            dotProduct = dotProduct * (teams_members.transpose().getrow(testCase[i]).toarray())[0]
-        collabs.append([testCase, np.sum(dotProduct)])
+            dotProduct = dotProduct * (teams_members.getrow(testCase[i]).toarray())[0]
+        finalDotProduct = np.sum(dotProduct)
+        # Do not append if there are no collaborations
+        if(finalDotProduct != 0):
+            collabs.append([testCase, np.sum(dotProduct)])
 
     return collabs
+
+
 
 def main():
     # Test teams: (0,1), (2,3), (0,1,3), (0,1,3), (0,2,3)
