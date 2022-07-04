@@ -7,7 +7,6 @@ from sklearn.model_selection import KFold
 
 from cmn.tools import NumpyArrayEncoder
 from mdl.ntf import Ntf
-from mdl.tcds import TTFDataset
 
 class tNtf(Ntf):
     def __init__(self, model, tfold, step_ahead):
