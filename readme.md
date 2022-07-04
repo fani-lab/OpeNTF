@@ -39,7 +39,7 @@ For installation of specific version of a python package due to, e.g., ``CUDA`` 
 # CUDA 10.1
 torch==1.6.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html
 ```
-## 2. [Quickstart](https://colab.research.google.com/github/fani-lab/OpeNTF/blob/main/quickstart.ipynb)
+## 2. Quickstart [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/fani-lab/OpeNTF/blob/main/quickstart.ipynb)
 
 ```sh
 cd src
