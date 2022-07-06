@@ -12,8 +12,9 @@ from itertools import combinations
 def get2WayCollabs(teams_members):
     return teams_members.transpose() @ teams_members
 
-def getTopK_nWays(teams_members, nway, k=10):
-    n_way_collabs = getnWayCollabs(teams_members, nway)    
+def getTopK_nWays(teams_members, nway, k=10, threshold=1):
+    n_way_collabs = getnWayCollabs(teams_members, nway) 
+    n_way_collabs = [collab for collab in n_way_collabs if collab[1] >= threshold] # Filters out anything below the threshold
     n_way_collabs.sort(key=lambda x: x[1], reverse=True) # Python default sort: runs at O(n log(n))
     return n_way_collabs[0:k]
 
@@ -93,8 +94,8 @@ def main():
     names = indexes['i2c']
 
     # print(A.asformat("array"))
-    # plotTopK_nWays(getTopK_nWays(A, nway=2, k=10), names=names)
-    # plotTopK_nWays(getTopK_nWays(A, nway=3, k=10), names=names)
+    # plotTopK_nWays(getTopK_nWays(A, nway=2, k=10, threshold=2), names=names)
+    # plotTopK_nWays(getTopK_nWays(A, nway=3, k=10, threshold=2), names=names)
     # plotTopK_nWays(getTopK_nWays(A, nway=4, k=10), names=names)
 
 
