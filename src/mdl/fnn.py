@@ -43,8 +43,6 @@ class Fnn(Ntf):
             if isinstance(m, nn.Linear):
                 nn.init.xavier_uniform_(m.weight)
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
     def cross_entropy(self, y_, y, ns, nns, unigram):
         if ns == "uniform": return self.ns_uniform(y_, y, nns)
         if ns == "unigram": return self.ns_unigram(y_, y, unigram, nns)

@@ -12,16 +12,10 @@ from itertools import combinations
 def get2WayCollabs(teams_members):
     return teams_members.transpose() @ teams_members
 
-
 def getTopK_nWays(teams_members, nway, k=10):
     n_way_collabs = getnWayCollabs(teams_members, nway)    
-    n_way_collabs.sort(key=getKey, reverse=True); # Python default sort: runs at O(n log(n))
+    n_way_collabs.sort(key=lambda x: x[1], reverse=True) # Python default sort: runs at O(n log(n))
     return n_way_collabs[0:k]
-
-def getKey(ele):
-    return ele[1]
-
-
 
 # Plots Results of top-k into a Histogram
 # result: an array with top-K
@@ -56,7 +50,6 @@ def getnWayCollabs(teams_members, n):
     rowIndexes = []
     for i in range(0, teams_members.shape[1]): rowIndexes.append(i)
 
-
     # Will record the count for each combination
     # The index for count aligns with it's respective combination
     teams_members = teams_members.transpose()
@@ -71,8 +64,6 @@ def getnWayCollabs(teams_members, n):
             collabs.append([testCase, np.sum(dotProduct)])
 
     return collabs
-
-
 
 def main():
     # Test teams: (0,1), (2,3), (0,1,3), (0,1,3), (0,2,3)
