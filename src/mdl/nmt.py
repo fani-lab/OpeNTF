@@ -109,7 +109,7 @@ class Nmt(Ntf):
                 Y_ = np.zeros((test_size, member_count))
                 # Y = np.zeros((test_size, member_count))
                 for i in range(test_size):
-                    yhat_list = (pred_csv.iloc[i])[0].replace('m', '').split(' ')
+                    yhat_list = (pred_csv.iloc[i])[0].replace('m', ''). replace('<unk>', '').split()
                     yhat_count = len(yhat_list)
                     if yhat_count != 0:
                         for pred in yhat_list:
@@ -125,7 +125,6 @@ class Nmt(Ntf):
                     pickle.dump((fpr, tpr), outfile)
                 fold_mean = pd.concat([fold_mean, df_mean], axis=1)
         fold_mean.mean(axis=1).to_frame('mean').to_csv(f'{path}/test.epoch{epoch}.pred.eval.mean.csv')
-                
                       
     def run(self, splits, vecs, indexes, output, settings, cmd):
         with open(settings['base_config']) as infile: base_config = yaml.safe_load(infile)
