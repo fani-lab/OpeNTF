@@ -109,7 +109,7 @@ class Nmt(Ntf):
                 Y_ = np.zeros((test_size, member_count))
                 # Y = np.zeros((test_size, member_count))
                 for i in range(test_size):
-                    yhat_list = (pred_csv.iloc[i])[0].replace('m', ''). replace('<unk>', '').split()
+                    yhat_list = (pred_csv.iloc[i])[0].replace('m', '').replace('<unk>', '').split()
                     yhat_count = len(yhat_list)
                     if yhat_count != 0:
                         for pred in yhat_list:
