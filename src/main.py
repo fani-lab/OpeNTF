@@ -104,7 +104,8 @@ def run(data_list, domain_list, filter, model_list, output, settings):
         year_idx = []
         for i in range(1, len(indexes['i2y'])):
             if indexes['i2y'][i][0] - indexes['i2y'][i-1][0] > settings['model']['nfolds']:
-                year_idx.append(indexes['i2y'][i])
+                year_idx.append(indexes['i2y'][i-1])
+        year_idx.append(indexes['i2y'][-1])
         indexes['i2y'] = year_idx
         splits = create_evaluation_splits(vecs['id'].shape[0], settings['model']['nfolds'], settings['model']['train_test_split'], indexes['i2y'] if temporal else None, output=f'{prep_output}{filter_str}', step_ahead=settings['model']['step_ahead'])
 
