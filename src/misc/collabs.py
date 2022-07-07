@@ -1,4 +1,5 @@
 import pickle
+from tqdm import tqdm
 import multiprocessing
 from functools import partial
 import numpy as np
@@ -12,10 +13,27 @@ from itertools import combinations
 def get2WayCollabs(teams_members):
     return teams_members.transpose() @ teams_members
 
+def getnWayCollabs(teams_members, n, threshold=1):
+    rowIndexes = list(range(0, teams_members.shape[1]))
+
+    # Will record the count for each combination
+    # The index for count aligns with it's respective combination
+    teams_members = teams_members.transpose()
+    collabs = []
+    for testCase in tqdm(list(combinations(rowIndexes, n))):
+        # dotProduct = teams_members.getrow(testCase[0])
+        # for i in range(1, n): dotProduct = dotProduct.multiply(teams_members.getrow(testCase[i]))
+        dotProduct = (teams_members.getrow(testCase[0]).toarray())[0]
+        for i in range(1, n): dotProduct = dotProduct * (teams_members.getrow(testCase[i]).toarray())[0]
+        finalDotProduct = np.sum(dotProduct)
+        # Do not append if there are less thank threshold collaborations
+        if(finalDotProduct > threshold): collabs.append([testCase, finalDotProduct])
+
+    return collabs
+
 def getTopK_nWays(teams_members, nway, k=10, threshold=1):
-    n_way_collabs = getnWayCollabs(teams_members, nway) 
-    n_way_collabs = [collab for collab in n_way_collabs if collab[1] >= threshold] # Filters out anything below the threshold
-    n_way_collabs.sort(key=lambda x: x[1], reverse=True) # Python default sort: runs at O(n log(n))
+    n_way_collabs = getnWayCollabs(teams_members, nway, threshold)
+    n_way_collabs.sort(key=lambda x: x[1], reverse=True)
     return n_way_collabs[0:k]
 
 # Plots Results of top-k into a Histogram
@@ -46,26 +64,6 @@ def plotTopK_nWays(result, names=None):
     plt.xticks(rotation=90)
     plt.show()
 
-
-def getnWayCollabs(teams_members, n):
-    rowIndexes = []
-    for i in range(0, teams_members.shape[1]): rowIndexes.append(i)
-
-    # Will record the count for each combination
-    # The index for count aligns with it's respective combination
-    teams_members = teams_members.transpose()
-    collabs = []
-    for testCase in list(combinations(rowIndexes, n)):
-        dotProduct = (teams_members.getrow(testCase[0]).toarray())[0]
-        for i in range(1, n):
-            dotProduct = dotProduct * (teams_members.getrow(testCase[i]).toarray())[0]
-        finalDotProduct = np.sum(dotProduct)
-        # Do not append if there are no collaborations
-        if(finalDotProduct != 0):
-            collabs.append([testCase, np.sum(dotProduct)])
-
-    return collabs
-
 def main():
     # Test teams: (0,1), (2,3), (0,1,3), (0,1,3), (0,2,3)
     # Test Matrix: rows=teams, columns=members
@@ -75,11 +73,17 @@ def main():
     # 3 way results: (0,1,3)=2, (0,2,3)=1
     # 4 way results: None
 
-    # with open('../../data/preprocessed/dblp/toy.dblp.v12.json/teamsvecs.pkl', 'rb') as f: matrix=pickle.load(f)
-    # A = matrix['member']
-    #
-    # with open('../../data/preprocessed/dblp/toy.dblp.v12.json/indexes.pkl', 'rb') as f: indexes=pickle.load(f)
-    # names = indexes['i2c']
+    # test performance
+    # p = 0.9
+    # N = 200
+    # A = sci.coo_matrix(np.random.choice(a=[False, True], size=(N, N), p=[p, 1-p]))
+    # getTopK_nWays(A, nway=2, k=10, threshold=5)#100%|██████████| 19900/19900 [00:12<00:00, 1543.89it/s]
+
+    with open('../../data/preprocessed/dblp/toy.dblp.v12.json/teamsvecs.pkl', 'rb') as f: matrix=pickle.load(f)
+    A = matrix['member']
+
+    with open('../../data/preprocessed/dblp/toy.dblp.v12.json/indexes.pkl', 'rb') as f: indexes=pickle.load(f)
+    names = indexes['i2c']
 
     # #entire dataset
     # with open('../../data/preprocessed/dblp/dblp.v12.json/teamsvecs.pkl', 'rb') as f: matrix=pickle.load(f)
@@ -94,15 +98,21 @@ def main():
     names = indexes['i2c']
 
     # print(A.asformat("array"))
-    # plotTopK_nWays(getTopK_nWays(A, nway=2, k=10, threshold=2), names=names)
-    # plotTopK_nWays(getTopK_nWays(A, nway=3, k=10, threshold=2), names=names)
+    # plotTopK_nWays(getTopK_nWays(A, nway=2, k=10, threshold=0), names=names)
+    # plotTopK_nWays(getTopK_nWays(A, nway=3, k=10, threshold=0), names=names)
     # plotTopK_nWays(getTopK_nWays(A, nway=4, k=10), names=names)
 
+    data = getTopK_nWays(A, nway=2, k=10, threshold=5)
+    with open('../../data/preprocessed/dblp/dblp.v12.json.filtered.mt75.ts3/collabs-2.pkl', 'wb') as f: pickle.dump(data,f)
+    data = getTopK_nWays(A, nway=3, k=10, threshold=5)
+    with open('../../data/preprocessed/dblp/dblp.v12.json.filtered.mt75.ts3/collabs-3.pkl', 'wb') as f: pickle.dump(data, f)
+    data = getTopK_nWays(A, nway=4, k=10, threshold=5)
+    with open('../../data/preprocessed/dblp/dblp.v12.json.filtered.mt75.ts3/collabs-4.pkl', 'wb') as f: pickle.dump(data, f)
 
-    with multiprocessing.Pool() as p:
-        func = partial(getTopK_nWays, A)
-        data = p.map(func, [2,3,4,5])
-    with open('../../data/preprocessed/dblp/dblp.v12.json.filtered.mt75.ts3/collabs.pkl', 'wb') as f: pickle.dump(data, f)
+    # with multiprocessing.Pool() as p:
+    #     func = partial(getTopK_nWays, A)
+    #     data = p.map(func, [2,3,4,5])
+    # with open('../../data/preprocessed/dblp/dblp.v12.json.filtered.mt75.ts3/collabs.pkl', 'wb') as f: pickle.dump(data, f)
 
 if __name__ == '__main__':
     main()
