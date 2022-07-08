@@ -21,7 +21,7 @@ def getnWayCollabs(teams_members, n, threshold=1):
     # The index for count aligns with it's respective combination
     teams_members = teams_members.transpose()
     collabs = []
-    for testCase in tqdm(combinations(rowIndexes, n), total=comb(len(rowIndexes), n)):#make it list is fast but not memory efficient
+    for testCase in tqdm(combinations(rowIndexes, n), total=comb(len(rowIndexes), n)):
         # dotProduct = teams_members.getrow(testCase[0])
         # for i in range(1, n): dotProduct = dotProduct.multiply(teams_members.getrow(testCase[i]))
         dotProduct = (teams_members.getrow(testCase[0]).toarray())[0]
@@ -78,7 +78,7 @@ def main():
     # p = 0.9
     # N = 200
     # A = sci.coo_matrix(np.random.choice(a=[False, True], size=(N, N), p=[p, 1-p]))
-    # getTopK_nWays(A, nway=2, k=10, threshold=5)#100%|██████████| 19900/19900 [00:12<00:00, 1543.89it/s]
+    # getTopK_nWays(A, nway=2, k=10, threshold=5)
 
     with open('../../data/preprocessed/dblp/toy.dblp.v12.json/teamsvecs.pkl', 'rb') as f: matrix=pickle.load(f)
     A = matrix['member']
@@ -103,11 +103,11 @@ def main():
     # plotTopK_nWays(getTopK_nWays(A, nway=3, k=10, threshold=0), names=names)
     # plotTopK_nWays(getTopK_nWays(A, nway=4, k=10), names=names)
 
-    # data = getTopK_nWays(A, nway=2, k=10, threshold=5)#100%|██████████| 101011791/101011791 [21:21:26<00:00, 1313.78it/s]
+    # data = getTopK_nWays(A, nway=2, k=10, threshold=5)
     # with open('../../data/preprocessed/dblp/dblp.v12.json.filtered.mt75.ts3/collabs-2-top10.pkl', 'wb') as f: pickle.dump(data,f)
-    plotTopK_nWays(data, names=names, savefig="./data/preprocessed/dblp/dblp.v12.json.filtered.mt75.ts3/collabs-2-top10.png")
+    # plotTopK_nWays(data, names=names, savefig="./data/preprocessed/dblp/dblp.v12.json.filtered.mt75.ts3/collabs-2-top10.png")
 
-    data = getTopK_nWays(A, nway=2, k=1000, threshold=5)
+    data = getTopK_nWays(A, nway=2, k=1000, threshold=5)#100%|██████████| 101011791/101011791 [4:32:39<00:00, 6174.42it/s]
     with open('../../data/preprocessed/dblp/dblp.v12.json.filtered.mt75.ts3/collabs-2-top1000.pkl', 'wb') as f: pickle.dump(data,f)
     plotTopK_nWays(data, names=names, savefig="./data/preprocessed/dblp/dblp.v12.json.filtered.mt75.ts3/collabs-2-top1000.png")
 
