@@ -105,15 +105,15 @@ def main():
 
     # data = getTopK_nWays(A, nway=2, k=10, threshold=5)#100%|██████████| 101011791/101011791 [21:21:26<00:00, 1313.78it/s]
     # with open('../../data/preprocessed/dblp/dblp.v12.json.filtered.mt75.ts3/collabs-2-top10.pkl', 'wb') as f: pickle.dump(data,f)
+    plotTopK_nWays(data, names=names, savefig="./data/preprocessed/dblp/dblp.v12.json.filtered.mt75.ts3/collabs-2-top10.png")
 
     data = getTopK_nWays(A, nway=2, k=1000, threshold=5)
     with open('../../data/preprocessed/dblp/dblp.v12.json.filtered.mt75.ts3/collabs-2-top1000.pkl', 'wb') as f: pickle.dump(data,f)
+    plotTopK_nWays(data, names=names, savefig="./data/preprocessed/dblp/dblp.v12.json.filtered.mt75.ts3/collabs-2-top1000.png")
 
     # #not doable! ((478526524564/3500)/3600)/24 = 1582 days
     # data = getTopK_nWays(A, nway=3, k=10, threshold=5)#0%|          | 789041/478526524564 [03:19<36326:36:56, 3659.13it/s]
     # with open('../../data/preprocessed/dblp/dblp.v12.json.filtered.mt75.ts3/collabs-3.pkl', 'wb') as f: pickle.dump(data, f)
-    # data = getTopK_nWays(A, nway=4, k=10, threshold=5)
-    # with open('../../data/preprocessed/dblp/dblp.v12.json.filtered.mt75.ts3/collabs-4.pkl', 'wb') as f: pickle.dump(data, f)
 
     # with multiprocessing.Pool() as p:
     #     func = partial(getTopK_nWays, A)
