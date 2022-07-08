@@ -6,6 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.sparse as sci
 from itertools import combinations
+from math import comb
 
 
 # Returns the pairwise collaborations
@@ -20,7 +21,7 @@ def getnWayCollabs(teams_members, n, threshold=1):
     # The index for count aligns with it's respective combination
     teams_members = teams_members.transpose()
     collabs = []
-    for testCase in tqdm(list(combinations(rowIndexes, n))):
+    for testCase in tqdm(combinations(rowIndexes, n), total=comb(len(rowIndexes), n)):#make it list is fast but not memory efficient
         # dotProduct = teams_members.getrow(testCase[0])
         # for i in range(1, n): dotProduct = dotProduct.multiply(teams_members.getrow(testCase[i]))
         dotProduct = (teams_members.getrow(testCase[0]).toarray())[0]
@@ -38,7 +39,7 @@ def getTopK_nWays(teams_members, nway, k=10, threshold=1):
 
 # Plots Results of top-k into a Histogram
 # result: an array with top-K
-def plotTopK_nWays(result, names=None):
+def plotTopK_nWays(result, names=None, savefig=None):
     if len(result) < 1:
         print('no data to plot')
         return
@@ -49,9 +50,7 @@ def plotTopK_nWays(result, names=None):
         data.append(team[1])
 
     k = len(data)
-    fig = plt.figure()
-    ax = fig.add_axes([0.1, 0.1, 0.7, 0.7])
-
+    fig, ax = plt.subplots()
     # Form X-Axis Categories:
     xAxis = []
     for i in range(0, k): xAxis.append(f"({','.join([names[j] for j in indices[i]])})") if names else xAxis.append(
@@ -62,6 +61,8 @@ def plotTopK_nWays(result, names=None):
     ax.set_ylabel("Frequency")
     ax.set_xlabel("Collabs")
     plt.xticks(rotation=90)
+    if savefig: plt.savefig(savefig, bbox_inches='tight')
+    plt.tight_layout()
     plt.show()
 
 def main():
@@ -102,12 +103,17 @@ def main():
     # plotTopK_nWays(getTopK_nWays(A, nway=3, k=10, threshold=0), names=names)
     # plotTopK_nWays(getTopK_nWays(A, nway=4, k=10), names=names)
 
-    data = getTopK_nWays(A, nway=2, k=10, threshold=5)
-    with open('../../data/preprocessed/dblp/dblp.v12.json.filtered.mt75.ts3/collabs-2.pkl', 'wb') as f: pickle.dump(data,f)
-    data = getTopK_nWays(A, nway=3, k=10, threshold=5)
-    with open('../../data/preprocessed/dblp/dblp.v12.json.filtered.mt75.ts3/collabs-3.pkl', 'wb') as f: pickle.dump(data, f)
-    data = getTopK_nWays(A, nway=4, k=10, threshold=5)
-    with open('../../data/preprocessed/dblp/dblp.v12.json.filtered.mt75.ts3/collabs-4.pkl', 'wb') as f: pickle.dump(data, f)
+    # data = getTopK_nWays(A, nway=2, k=10, threshold=5)#100%|██████████| 101011791/101011791 [21:21:26<00:00, 1313.78it/s]
+    # with open('../../data/preprocessed/dblp/dblp.v12.json.filtered.mt75.ts3/collabs-2-top10.pkl', 'wb') as f: pickle.dump(data,f)
+
+    data = getTopK_nWays(A, nway=2, k=1000, threshold=5)
+    with open('../../data/preprocessed/dblp/dblp.v12.json.filtered.mt75.ts3/collabs-2-top1000.pkl', 'wb') as f: pickle.dump(data,f)
+
+    # #not doable! ((478526524564/3500)/3600)/24 = 1582 days
+    # data = getTopK_nWays(A, nway=3, k=10, threshold=5)#0%|          | 789041/478526524564 [03:19<36326:36:56, 3659.13it/s]
+    # with open('../../data/preprocessed/dblp/dblp.v12.json.filtered.mt75.ts3/collabs-3.pkl', 'wb') as f: pickle.dump(data, f)
+    # data = getTopK_nWays(A, nway=4, k=10, threshold=5)
+    # with open('../../data/preprocessed/dblp/dblp.v12.json.filtered.mt75.ts3/collabs-4.pkl', 'wb') as f: pickle.dump(data, f)
 
     # with multiprocessing.Pool() as p:
     #     func = partial(getTopK_nWays, A)
