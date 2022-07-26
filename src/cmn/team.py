@@ -8,7 +8,7 @@ from time import time
 import pickle
 import multiprocessing
 from functools import partial
-
+import pandas as pd
 class Team(object):
     def __init__(self, id, members, skills, datetime):
         self.id = id
@@ -86,7 +86,16 @@ class Team(object):
         # apply filtering
         if filter: teams = Team.remove_outliers(teams, settings)
 
-        teams = sorted(teams.values(), key=lambda x: x.datetime)
+        tteams = {}
+        count = 0
+        for key, team in teams.items():
+            if not pd.isna(team.datetime):
+                tteams[key] = team
+            else:
+                count += 1
+        print("Number of teams that had NA value for datetime", count)
+        print("Percentage of teams that had NA value for datetime", count/len(teams))
+        teams = sorted(tteams.values(), key=lambda x: x.datetime)
 
         year_idx = []
         start_year = None
