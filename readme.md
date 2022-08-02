@@ -10,6 +10,7 @@ We propose ``neural machine learning`` approaches to Team Formation. We train ne
 4. [Results](#4-results)
 5. [Acknowledgement](#5-acknowledgement)
 6. [License](#6-license)
+7. [Citation](#7-citation)
 
 ## 1. [Setup](https://colab.research.google.com/github/fani-lab/OpeNTF/blob/main/quickstart.ipynb)
 You need to have ``Python >= 3.8`` and install the following main packages, among others listed in [``requirements.txt``](requirements.txt):
@@ -145,3 +146,23 @@ We benefit from [``pytrec_eval``](https://github.com/cvangysel/pytrec_eval), [``
   
 ## 6. License:
 ©2021. This work is licensed under a [CC BY-NC-SA 4.0](license.txt) license.
+
+## 7. Citation:
+```
+@inproceedings{DBLP:conf/cikm/DashtiSH22,
+  author    = {Arman Dashti and Saeed Samet and Hossein Fani},
+  title     = {Effective Neural Team Formation via Negative Samples},
+  booktitle = {{CIKM} '22: The 31st {ACM} International Conference on Information and Knowledge Management, Hybrid Conference, Atlanta, Georgia, USA, October 17-21, 2022},
+  publisher = {{ACM}},
+  year      = {2022},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+@inproceedings{DBLP:conf/cikm/DashtiSH22,
+  author    = {Arman Dashti and Karan Saxena and Dhwani Patel and Hossein Fani},
+  title     = {A Benchmark Library for Neural Team Formation},
+  booktitle = {{CIKM} '22: The 31st {ACM} International Conference on Information and Knowledge Management, Hybrid Conference, Atlanta, Georgia, USA, October 17-21, 2022},
+  publisher = {{ACM}},
+  year      = {2022},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+```
