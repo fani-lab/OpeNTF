@@ -157,6 +157,8 @@ We benefit from [``pytrec_eval``](https://github.com/cvangysel/pytrec_eval), [``
   year      = {2022},
   bibsource = {dblp computer science bibliography, https://dblp.org}
 }
+  ```
+  ```
 @inproceedings{DBLP:conf/cikm/DashtiSH22,
   author    = {Arman Dashti and Karan Saxena and Dhwani Patel and Hossein Fani},
   title     = {A Benchmark Library for Neural Team Formation},
