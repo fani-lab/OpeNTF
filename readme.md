@@ -161,7 +161,7 @@ We benefit from [``pytrec_eval``](https://github.com/cvangysel/pytrec_eval), [``
   ```
 @inproceedings{DBLP:conf/cikm/DashtiSPF22,
   author    = {Arman Dashti and Karan Saxena and Dhwani Patel and Hossein Fani},
-  title     = {A Benchmark Library for Neural Team Formation},
+  title     = {OpeNTF: A Benchmark Library for Neural Team Formation},
   booktitle = {{CIKM} '22: The 31st {ACM} International Conference on Information and Knowledge Management, Hybrid Conference, Atlanta, Georgia, USA, October 17-21, 2022},
   publisher = {{ACM}},
   year      = {2022},
