@@ -11,6 +11,7 @@ We propose ``neural machine learning`` approaches to Team Formation. We train ne
 5. [Acknowledgement](#5-acknowledgement)
 6. [License](#6-license)
 7. [Citation](#7-citation)
+8. [Awards](#8-awards)
 
 ## 1. [Setup](https://colab.research.google.com/github/fani-lab/OpeNTF/blob/main/quickstart.ipynb)
 You need to have ``Python >= 3.8`` and install the following main packages, among others listed in [``requirements.txt``](requirements.txt):
@@ -168,3 +169,8 @@ We benefit from [``pytrec_eval``](https://github.com/cvangysel/pytrec_eval), [``
   bibsource = {dblp computer science bibliography, https://dblp.org}
 }
 ```
+## 8. Awards:
+
+> [Gold medalist at the 2022 UWill Discover conference](https://scholar.uwindsor.ca/uwilldiscover/2022/2022Day3/30/)
+
+> Best Research at the 2022 Demo Day, School of Computer Science, University of Windsor. 
