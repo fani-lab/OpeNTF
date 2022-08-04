@@ -171,6 +171,6 @@ We benefit from [``pytrec_eval``](https://github.com/cvangysel/pytrec_eval), [``
 ```
 ## 8. Awards:
 
-> [Gold medalist at the 2022 UWill Discover conference](https://scholar.uwindsor.ca/uwilldiscover/2022/2022Day3/30/)
+> [Gold medalist at the 2022 UWill Discover](https://scholar.uwindsor.ca/uwilldiscover/2022/2022Day3/30/)
 
 > Best Research at the 2022 Demo Day, School of Computer Science, University of Windsor. 
