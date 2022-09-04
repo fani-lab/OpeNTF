@@ -10,6 +10,7 @@ with open('./../../data/raw/gith/data.csv', 'w', newline='') as output_csv, open
     while repo != '':
         repo = repo.rstrip('\n')
         try:
+            # https://api.github.com/repos/fani-lab/OpeNTF/contributors
             collabs = requests.get(f'https://api.github.com/repos/{repo}/contributors', headers=headers).json()
             langs = requests.get(f'https://api.github.com/repos/{repo}/languages', headers=headers).json()
             rels = requests.get(f'https://api.github.com/repos/{repo}/releases', headers=headers).json()
