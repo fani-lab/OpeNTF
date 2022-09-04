@@ -1,6 +1,6 @@
 import csv, requests, traceback
 
-access_token = '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'  # Place auth code here
+access_token = ''  # Place auth code here
 headers = {'Authorization': "Token " + access_token}
 
 with open('./../../data/raw/gith/data.csv', 'w', newline='') as output_csv, open('./../../data/raw/gith/repos.txt', 'r') as reader:
