@@ -10,11 +10,13 @@ We propose ``neural machine learning`` approaches to Team Formation. We train ne
 4. [Results](#4-results)
 5. [Acknowledgement](#5-acknowledgement)
 6. [License](#6-license)
+7. [Citation](#7-citation)
+8. [Awards](#8-awards)
 
 ## 1. [Setup](https://colab.research.google.com/github/fani-lab/OpeNTF/blob/main/quickstart.ipynb)
 You need to have ``Python >= 3.8`` and install the following main packages, among others listed in [``requirements.txt``](requirements.txt):
 ```
-torch==1.6.0
+torch>=1.9.0
 pytrec-eval-terrier==0.5.2
 gensim==3.8.3
 ```
@@ -39,7 +41,7 @@ For installation of specific version of a python package due to, e.g., ``CUDA`` 
 # CUDA 10.1
 torch==1.6.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html
 ```
-## 2. [Quickstart](https://colab.research.google.com/github/fani-lab/OpeNTF/blob/main/quickstart.ipynb)
+## 2. Quickstart [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/fani-lab/OpeNTF/blob/main/quickstart.ipynb)
 
 ```sh
 cd src
@@ -145,3 +147,30 @@ We benefit from [``pytrec_eval``](https://github.com/cvangysel/pytrec_eval), [``
   
 ## 6. License:
 ©2021. This work is licensed under a [CC BY-NC-SA 4.0](license.txt) license.
+
+## 7. Citation:
+```
+@inproceedings{DBLP:conf/cikm/DashtiSF22,
+  author    = {Arman Dashti and Saeed Samet and Hossein Fani},
+  title     = {Effective Neural Team Formation via Negative Samples},
+  booktitle = {{CIKM} '22: The 31st {ACM} International Conference on Information and Knowledge Management, Hybrid Conference, Atlanta, Georgia, USA, October 17-21, 2022},
+  publisher = {{ACM}},
+  year      = {2022},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+  ```
+  ```
+@inproceedings{DBLP:conf/cikm/DashtiSPF22,
+  author    = {Arman Dashti and Karan Saxena and Dhwani Patel and Hossein Fani},
+  title     = {OpeNTF: A Benchmark Library for Neural Team Formation},
+  booktitle = {{CIKM} '22: The 31st {ACM} International Conference on Information and Knowledge Management, Hybrid Conference, Atlanta, Georgia, USA, October 17-21, 2022},
+  publisher = {{ACM}},
+  year      = {2022},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+```
+## 8. Awards:
+
+> [CAD$300, Gold medalist, UWill Discover, 2022](https://scholar.uwindsor.ca/uwilldiscover/2022/2022Day3/30/)
+
+> CAD$300, Best Research, Demo Day, School of Computer Science, University of Windsor, 2022. 
