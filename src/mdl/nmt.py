@@ -1,9 +1,10 @@
-from base64 import encode
-from calendar import EPOCH
 import yaml, pickle
 import subprocess, os, re
 import shlex
 import numpy as np
+import pandas as pd
+import torch
+
 from eval.metric import *
 from mdl.ntf import Ntf
 
@@ -42,6 +43,11 @@ class Nmt(Ntf):
             settings['save_data'] = f'{fold_path}/'
             settings['save_model'] = f'{fold_path}/model'
 
+            settings['world_size'] = 1
+            settings['gpu_ranks'] = [0] if torch.cuda.is_available() else []
+
+            settings['save_checkpoint_steps'] = 500 #overrides per_epoch evaluation and it becomes per_checkpoints
+
             with open(f'{fold_path}/config.yml', 'w') as outfile: yaml.safe_dump(settings, outfile)
 
             cli_cmd = 'onmt_build_vocab '
@@ -76,7 +82,7 @@ class Nmt(Ntf):
                 cli_cmd += f'-model {model} '
                 cli_cmd += f'-src {path}/src-test.txt '
                 cli_cmd += f'-output {path}/fold{foldidx}/test.fold{foldidx}.epoch{epoch}.pred.csv '
-                cli_cmd += '-gpu 0 '
+                cli_cmd += '-gpu 0 ' if torch.cuda.is_available() else ''
                 cli_cmd += '--min_length 2 '
                 cli_cmd += '-verbose '
                 print(f'{cli_cmd}')
@@ -89,7 +95,11 @@ class Nmt(Ntf):
             fold_path = f'{path}/fold{foldidx}'
             with open(f'{fold_path}/config.yml') as infile: cfg = yaml.safe_load(infile)
             modelfiles = [f"{fold_path}/model_step_{cfg['train_steps']}.pt"]
+
+            #per_epoch depends on "save_checkpoint_steps" param in nmt_config.yaml since it simply collect the checkpoint files
+            #so, per_epoch => per_checkpoints
             if per_epoch: modelfiles += [f'{fold_path}/{_}' for _ in os.listdir(fold_path) if re.match(f'model_step_\d+.pt', _)]
+
             for model in modelfiles:
                 epoch = model.split('.')[-2].split('/')[-1].split('_')[-1]
                 pred_path = f'{fold_path}/test.fold{foldidx}.epoch{epoch}.pred.csv'
@@ -99,7 +109,7 @@ class Nmt(Ntf):
                 Y_ = np.zeros((test_size, member_count))
                 # Y = np.zeros((test_size, member_count))
                 for i in range(test_size):
-                    yhat_list = (pred_csv.iloc[i])[0].replace('m', '').split(' ')
+                    yhat_list = (pred_csv.iloc[i])[0].replace('m', '').replace('<unk>', '').split()
                     yhat_count = len(yhat_list)
                     if yhat_count != 0:
                         for pred in yhat_list:
@@ -115,7 +125,6 @@ class Nmt(Ntf):
                     pickle.dump((fpr, tpr), outfile)
                 fold_mean = pd.concat([fold_mean, df_mean], axis=1)
         fold_mean.mean(axis=1).to_frame('mean').to_csv(f'{path}/test.epoch{epoch}.pred.eval.mean.csv')
-                
                       
     def run(self, splits, vecs, indexes, output, settings, cmd):
         with open(settings['base_config']) as infile: base_config = yaml.safe_load(infile)
