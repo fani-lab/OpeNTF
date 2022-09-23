@@ -15,7 +15,7 @@ from torch.distributions import Normal
 
 #We benefit from Josh Feldman's great blog at https://joshfeldman.net/WeightUncertainty/
 
-from mdl.custom_dataset import TFDataset
+from mdl.cds import TFDataset
 from mdl.fnn import Fnn
 from cmn.team import Team
 
@@ -25,22 +25,26 @@ class Bnn(Fnn):
 
     def init(self, input_size, output_size, param):
         self.h1 = BayesianLayer(input_size, param['l'][0])
-        self.h2 = BayesianLayer(param['l'][0], param['l'][0])
-        self.out = BayesianLayer(param['l'][0], output_size)
+        hl = []
+        for i in range(1, len(param['l'])):
+            hl.append(BayesianLayer(param['l'][i - 1], param['l'][i]))
+        self.hidden_layer = nn.ModuleList(hl)
+        self.out = BayesianLayer(param['l'][-1], output_size)
         self.output_size = output_size
         return self
 
     def forward(self, x):
         x = leaky_relu(self.h1(x))
-        x = leaky_relu(self.h2(x))
+        for i, l in enumerate(self.hidden_layer):
+            x = leaky_relu(l(x))
         x = torch.clamp(torch.sigmoid(self.out(x)), min=1.e-6, max=1. - 1.e-6)
         return x
 
     def log_prior(self):
-        return self.h1.log_prior + self.h2.log_prior + self.out.log_prior
+        return self.h1.log_prior + torch.sum(torch.as_tensor([hl.log_prior for hl in self.hidden_layer])) + self.out.log_prior
 
     def log_post(self):
-        return self.h1.log_post + self.h2.log_post + self.out.log_post
+        return self.h1.log_post + torch.sum(torch.as_tensor([hl.log_post for hl in self.hidden_layer])) + self.out.log_post
 
     def sample_elbo(self, input, target, samples):
         outputs = torch.zeros(target.shape[0], samples, self.output_size)
@@ -62,7 +66,7 @@ class Bnn(Fnn):
         return loss, outputs
 
     # TODO: there is huge code overlapp with bnn training and fnn training. Trying to generalize as we did in test and eval
-    def learn(self, splits, indexes, vecs, params, output):
+    def learn(self, splits, indexes, vecs, params, prev_model, output):
         layers = params['l'];
         learning_rate = params['lr'];
         batch_size = params['b'];
@@ -101,6 +105,7 @@ class Bnn(Fnn):
 
             # Initialize network
             self.init(input_size=input_size, output_size=output_size, param=params).to(self.device)
+            if prev_model: self.load_state_dict(torch.load(prev_model[foldidx]))
 
             optimizer = optim.Adam(self.parameters(), lr=learning_rate)
             scheduler = ReduceLROnPlateau(optimizer, factor=0.5, patience=10, verbose=True)

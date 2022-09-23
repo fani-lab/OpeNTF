@@ -4,7 +4,7 @@ import torch
 from torch.utils.data import DataLoader
 
 from mdl.ntf import Ntf
-from mdl.custom_dataset import TFDataset
+from mdl.cds import TFDataset
 
 class Rnd(Ntf):
     def __init__(self):

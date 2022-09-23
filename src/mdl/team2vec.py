@@ -15,12 +15,13 @@ logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=lo
 # label_list = ['t1','t2','t3']
 
 class Team2Vec:
-    def __init__(self, teamsvecs, embtype, output):
+    def __init__(self, teamsvecs, indexes, embtype, output):
         self.output = output
         self.embtype = embtype
         self.docs = []
         self.settings = ''
         self.teamsvecs = teamsvecs
+        self.indexes = indexes
 
     def init(self):
         try:
@@ -30,15 +31,19 @@ class Team2Vec:
                 return self.docs
         except FileNotFoundError:
             print(f"File not found! Generating {self.embtype} documents ...")
+            datetime_doc = []
             for i, id in enumerate(self.teamsvecs['id']):
                 skill_doc = [f's{str(skill_idx)}' for skill_idx in self.teamsvecs['skill'][i].nonzero()[1]]
                 member_doc = [f'm{str(member_idx)}' for member_idx in self.teamsvecs['member'][i].nonzero()[1]]
+                datetime_doc.append(f"dt{str(self.indexes['dt2i'][self.indexes['i2tdt'][id[0, 0]]])}")
                 if self.embtype == 'skill':
                     td = gensim.models.doc2vec.TaggedDocument(skill_doc, [str(int(id[0, 0]))])
                 elif self.embtype == 'member':
                     td = gensim.models.doc2vec.TaggedDocument(member_doc, [str(int(id[0, 0]))])
                 elif self.embtype == 'joint':
                     td = gensim.models.doc2vec.TaggedDocument(skill_doc + member_doc, [str(int(id[0, 0]))])
+                elif self.embtype == 'dt2v':
+                    td = gensim.models.doc2vec.TaggedDocument(skill_doc + datetime_doc, [str(int(id[0, 0]))])
                 self.docs.append(td)
             print(f'#Documents with word type of {self.embtype} have created: {len(self.docs)}')
             print(f'Saving the {self.embtype} documents ...')
