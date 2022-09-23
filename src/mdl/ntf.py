@@ -12,7 +12,7 @@ class Ntf(nn.Module):
         super(Ntf, self).__init__()
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    def learn(self, splits, indexes, vecs, params, output): pass
+    def learn(self, splits, indexes, vecs, params, prev_model, output): pass
     def test(self, model_path, splits, indexes, vecs, params, on_train_valid_set=False, per_epoch=False): pass
 
     def evaluate(self, model_path, splits, vecs, on_train_valid_set=False, per_instance=False, per_epoch=False):
@@ -65,7 +65,7 @@ class Ntf(nn.Module):
         per_instance = False
         per_epoch = False
 
-        if 'train' in cmd: self.learn(splits, indexes, vecs, settings, output)
+        if 'train' in cmd: self.learn(splits, indexes, vecs, settings, None, output)
         if 'test' in cmd: self.test(output, splits, indexes, vecs, settings, on_train_valid_set, per_epoch)
         if 'eval' in cmd: self.evaluate(output, splits, vecs, on_train_valid_set, per_instance, per_epoch)
         if 'plot' in cmd: self.plot_roc(output, splits, on_train_valid_set)

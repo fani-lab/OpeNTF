@@ -10,7 +10,7 @@ from torch.utils.data import DataLoader
 from torch.optim.lr_scheduler import StepLR, ReduceLROnPlateau
 
 from mdl.ntf import Ntf
-from mdl.custom_dataset import TFDataset
+from mdl.cds import TFDataset
 
 from cmn.team import Team
 
@@ -25,7 +25,6 @@ class Fnn(Ntf):
             hl.append(nn.Linear(param['l'][i - 1], param['l'][i]))
         self.hidden_layer = nn.ModuleList(hl)
         self.fc2 = nn.Linear(param['l'][-1], output_size)
-        self.dp = nn.Dropout(0.5)
         self.initialize_weights()
         return self
 
@@ -33,7 +32,6 @@ class Fnn(Ntf):
         x = leaky_relu(self.fc1(x))
         for i, l in enumerate(self.hidden_layer):
             x = leaky_relu(l(x))
-        x = self.dp(x)
         x = self.fc2(x)
         x = torch.clamp(torch.sigmoid(x), min=1.e-6, max=1. - 1.e-6)
         return x
@@ -99,7 +97,7 @@ class Fnn(Ntf):
                     random_samples[b][idx] = 1
         return (-targets * torch.log(logits) - random_samples * torch.log(1 - logits)).sum()
 
-    def learn(self, splits, indexes, vecs, params, output):
+    def learn(self, splits, indexes, vecs, params, prev_model, output):
 
         layers = params['l'];
         learning_rate = params['lr'];
@@ -138,6 +136,7 @@ class Fnn(Ntf):
 
             # Initialize network
             self.init(input_size=input_size, output_size=output_size, param=params).to(self.device)
+            if prev_model: self.load_state_dict(torch.load(prev_model[foldidx]))
 
             optimizer = optim.Adam(self.parameters(), lr=learning_rate)
             scheduler = ReduceLROnPlateau(optimizer, factor=0.5, patience=10, verbose=True)
