@@ -20,7 +20,7 @@ torch>=1.9.0
 pytrec-eval-terrier==0.5.2
 gensim==3.8.3
 ```
-By ``pip``, clone the codebase and install the required packages:
+By ``pip``, clone the codebase and install required packages:
 ```sh
 git clone https://github.com/Fani-Lab/opentf
 cd opentf
