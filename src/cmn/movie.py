@@ -1,34 +1,30 @@
 import pandas as pd
 from tqdm import tqdm
-import traceback
-import pickle
 from time import time
-import os
-from collections import Counter
-from os import listdir, write
-from csv import DictReader
-from csv import reader
+
 from cmn.team import Team
 from cmn.member import Member
 from cmn.castncrew import CastnCrew
 
-
 class Movie(Team):
 
-    def __init__(self, id, members, p_title, o_title, release, end, runtime, genres, members_details):
+    def __init__(self, id, members, p_title, o_title, release, end, runtime, genres, members_roles):
         super().__init__(id, members, set(genres.split(',')), release)
         self.p_title = p_title
         self.o_title = o_title
-        self.release = release
-        self.end = end
+        self.release = release #the release year of a title. In the case of TV Series, it is the series start year
+        self.end = end #endYear – TV Series end year. '\N' for all other title types
         self.runtime = runtime
         self.genres = genres
-        self.members_details = members_details
+        self.members_roles = members_roles
 
+        #this part won't have effect since the members are empty the way we create movie objects
         for i, member in enumerate(self.members):
             member.teams.append(self.id)
             member.skills.update(set(self.skills))
-            member.role.append(self.members_details[i])
+            member.role.append(self.members_roles[i])
+        self.members_locations = [(None, None, None)] * len(self.members)
+
 
     @staticmethod
     def read_data(datapath, output, index, filter, settings):
@@ -67,7 +63,7 @@ class Movie(Team):
                     if pd.isnull(new := movie_crew.tconst): break
                     if current != new:
                         team = Movie(movie_crew.tconst,
-                                     [],
+                                     [],#empty members!
                                      movie_crew.primaryTitle,
                                      movie_crew.originalTitle,
                                      movie_crew.startYear,
@@ -89,6 +85,7 @@ class Movie(Team):
                                                        movie_crew.knownForTitles)
                     team.members.append(candidates[idname])
                     team.members_details.append((movie_crew.category, movie_crew.job, movie_crew.characters))
+                    team.members_locations.append((None, None, None))
 
                     candidates[idname].skills.update(set(team.skills))
                     candidates[idname].teams.append(team.id)
