@@ -47,7 +47,7 @@ class Team(object):
 
     @staticmethod
     def build_index_location(teams, location_type):
-        print('Starting build index location')
+        print('Indexing locations ...')
         idx = 0; l2i = {}; i2l = {};
         for t in teams:
             for loc in t.members_locations:
@@ -63,6 +63,7 @@ class Team(object):
 
     @staticmethod
     def build_index_candidates(teams):
+        print('Indexing members ...')
         idx = 0; c2i = {}; i2c = {}
         for team in teams:
             for candidate in team.members:
@@ -75,6 +76,7 @@ class Team(object):
 
     @staticmethod
     def build_index_skills(teams):
+        print('Indexing skills ...')
         idx = 0; s2i = {}; i2s = {}
         for team in teams:
             for skill in team.skills:
@@ -86,6 +88,7 @@ class Team(object):
 
     @staticmethod
     def build_index_teams(teams):
+        print('Indexing teams ...')
         t2i = {}; i2t = {}
         for idx, t in enumerate(teams):
             i2t[idx] = t.id
@@ -94,6 +97,7 @@ class Team(object):
     
     @staticmethod
     def build_index_teamdatetimes(teams):
+        print('Indexing teams date (year) ...')
         i2tdt = {}
         for team in teams:
             i2tdt[team.id] = team.datetime
@@ -101,10 +105,11 @@ class Team(object):
     
     @staticmethod 
     def build_index_datetime(teams):
+        print('Indexing dates (year) ...')
         dt2i = {}; i2dt = {}
         for team in teams:
             if team.datetime not in dt2i:
-                dt2i[team.datetime] = team.id
+                dt2i[team.datetime] = team.id #shouldn't be a collection of team ids in that date?
                 i2dt[team.id] = team.datetime
         return i2dt, dt2i
 
@@ -209,6 +214,7 @@ class Team(object):
                     subteams = np.array_split(teams, n_core)
                     func = partial(Team.bucketing, settings['bucket_size'], indexes['s2i'], indexes['c2i'], indexes['l2i'], settings['location_type'])
                     data = p.map(func, subteams)
+                    #It took 12156.825613975525 seconds to generate and store the sparse matrices of size (1729691, 818915) at ./../data/preprocessed/uspt/patent.tsv.filtered.mt5.ts3/teamsvecs.pkl
             # serial
             else:
                 data = Team.bucketing(settings['bucket_size'], indexes['s2i'], indexes['c2i'], teams)
