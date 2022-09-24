@@ -83,6 +83,9 @@ def run(data_list, domain_list, filter, model_list, output, settings):
     if 'bnn' in model_list: models['bnn'] = Bnn()
     if 'fnn_emb' in model_list: models['fnn_emb'] = Fnn()
     if 'bnn_emb' in model_list: models['bnn_emb'] = Bnn()
+    if 'nmt' in model_list: models['nmt'] = Nmt()
+
+    #temporal baselines
     if 'tfnn' in model_list: models['tfnn'] = tNtf(Fnn(), settings['model']['nfolds'], step_ahead=settings['model']['step_ahead'])
     if 'tbnn' in model_list: models['tbnn'] = tNtf(Bnn(), settings['model']['nfolds'], step_ahead=settings['model']['step_ahead'])
     if 'tfnn_emb' in model_list: models['tfnn_emb'] = tNtf(Fnn(), settings['model']['nfolds'], step_ahead=settings['model']['step_ahead'])
@@ -93,7 +96,6 @@ def run(data_list, domain_list, filter, model_list, output, settings):
     if 'tbnn_emb_a1' in model_list: models['tbnn_emb_a1'] = tNtf(Bnn(), settings['model']['nfolds'], step_ahead=settings['model']['step_ahead'])
     if 'tfnn_dt2v_emb' in model_list: models['tfnn_dt2v_emb'] = tNtf(Fnn(), settings['model']['nfolds'], step_ahead=settings['model']['step_ahead'])
     if 'tbnn_dt2v_emb' in model_list: models['tbnn_dt2v_emb'] = tNtf(Bnn(), settings['model']['nfolds'], step_ahead=settings['model']['step_ahead'])
-    if 'nmt' in model_list: models['nmt'] = Nmt()
     if 'tnmt' in model_list: models['tnmt'] = tNmt(settings['model']['nfolds'], settings['model']['step_ahead'])
 
     assert len(datasets) > 0
@@ -114,16 +116,18 @@ def run(data_list, domain_list, filter, model_list, output, settings):
         splits = create_evaluation_splits(vecs['id'].shape[0], settings['model']['nfolds'], settings['model']['train_test_split'], indexes['i2y'] if temporal else None, output=f'{prep_output}{filter_str}', step_ahead=settings['model']['step_ahead'])
 
         for (m_name, m_obj) in models.items():
+            vecs_ = vecs.copy()
             if m_name.find('_emb') > 0:
                 t2v = Team2Vec(vecs, indexes, 'dt2v' if m_name.find('_dt2v') > 0 else 'skill', f'./../data/preprocessed/{d_name}/{os.path.split(datapath)[-1]}{filter_str}')
                 emb_setting = settings['model']['baseline']['emb']
                 t2v.train(emb_setting['d'], emb_setting['w'], emb_setting['dm'], emb_setting['e'])
-                vecs['skill'] = t2v.dv()
-            
-            if m_name.endswith('a1'):
-                vecs['skill'] = lil_matrix(scipy.sparse.hstack((vecs['skill'], lil_matrix(np.ones((vecs['skill'].shape[0], 1))))))
+                vecs_['skill'] = t2v.dv()
 
-            m_obj.run(splits, vecs, indexes, f'{output}{os.path.split(datapath)[-1]}{filter_str}/{m_name}', settings['model']['baseline'][m_name.lstrip('t').replace('_emb', '').replace('_dt2v', '')], settings['model']['cmd'])
+            if m_name.endswith('a1'): vecs_['skill'] = lil_matrix(scipy.sparse.hstack((vecs_['skill'], lil_matrix(np.ones((vecs_['skill'].shape[0], 1))))))
+
+            baseline_name = m_name.lstrip('t').replace('_emb', '').replace('_dt2v', '').replace('_a1', '')
+            print(f'Running for (dataset, model): ({d_name}, {m_name}) ... ')
+            m_obj.run(splits, vecs_, indexes, f'{output}{os.path.split(datapath)[-1]}{filter_str}/{m_name}', settings['model']['baseline'][baseline_name], settings['model']['cmd'])
     if 'agg' in settings['model']['cmd']: aggregate(output)
 
 def addargs(parser):
@@ -143,7 +147,9 @@ def addargs(parser):
 # 						  ../data/raw/imdb/toy.title.basics.tsv
 # 						  ../data/raw/uspt/toy.patent.tsv
 # 					-domain dblp imdb uspt
-# 					-model random fnn fnn_emb bnn bnn_emb tbnn tfnn
+# 					-model random
+# 					       fnn fnn_emb bnn bnn_emb nmt
+# 					       tfnn tbnn tnmt tfnn_emb tbnn_emb tfnn_a1 tbnn_a1 tfnn_emb_a1 tbnn_emb_a1 tfnn_dt2v_emb tbnn_dt2v_emb
 #                   -filter 1
 
 if __name__ == '__main__':

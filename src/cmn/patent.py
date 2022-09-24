@@ -6,21 +6,18 @@ import pickle
 from cmn.team import Team
 from cmn.inventor import Inventor
 
-import pickle
-
 class Patent(Team):
-    def __init__(self, id, members, date, title, country, subgroups, withdrawn, members_details):
-        super().__init__(id, members, set(subgroups.split(',')), date)
+    def __init__(self, id, members, date, title, country, subgroups, withdrawn, members_locations):
+        super().__init__(id, members, set(subgroups.split(',')), date, country)
         self.title = title
-        self.country = country
         self.subgroups = subgroups
         self.withdrawn = withdrawn
-        self.members_details = members_details
+        self.members_locations = members_locations
 
         for i, member in enumerate(self.members):
             member.teams.append(self.id)
             member.skills.update(set(self.skills))
-            member.locations.append(self.members_details[i])
+            #member.locations.append(self.members_details[i])
 
     @staticmethod
     def read_data(datapath, output, index, filter, settings):
@@ -61,37 +58,37 @@ class Patent(Team):
             patents_cpc_inventors_location.sort_values(by=['patent_id'], inplace=True)
             patents_cpc_inventors_location = patents_cpc_inventors_location.append(pd.Series(), ignore_index=True)
 
-            print("Reading data to objects..")
+            print("Reading data to objects ...")
             teams = {}; candidates = {}; n_row = 0
             current = None
 
             # 100 % |██████████████████████████████████████████████████████████████████████▉ | 210808 / 210809[00:02 < 00:00,75194.06 it / s]
-            for patent_team in tqdm(patents_cpc_inventors_location.itertuples(), total=patents_cpc_inventors_location.shape[0]):
+            for patent in tqdm(patents_cpc_inventors_location.itertuples(), total=patents_cpc_inventors_location.shape[0]):
                 try:
-                    if pd.isnull(new := patent_team.patent_id): break
+                    if pd.isnull(new := patent.patent_id): break
                     if current != new:
-                        team = Patent(patent_team.patent_id,#for "utility" patents is integer but for "design" has "Dxxxx", ...
+                        team = Patent(patent.patent_id,#for "utility" patents is integer but for "design" has "Dxxxx", ...
                                       [],
-                                      patent_team.date,
-                                      patent_team.title,
-                                      patent_team.patent_country,
-                                      patent_team.subgroup_id,
-                                      bool(patent_team.withdrawn),
+                                      patent.date,
+                                      patent.title,
+                                      patent.patent_country,
+                                      patent.subgroup_id,
+                                      bool(patent.withdrawn),
                                       [])
                         current = new
                         teams[team.id] = team
 
-                    inventor_id = patent_team.inventor_id
-                    inventor_name = f'{patent_team.name_first}_{patent_team.name_last}'
+                    inventor_id = patent.inventor_id
+                    inventor_name = f'{patent.name_first}_{patent.name_last}'
 
                     if (idname := f'{inventor_id}_{inventor_name}') not in candidates:
-                        candidates[idname] = Inventor(patent_team.inventor_id, inventor_name, patent_team.male_flag)
+                        candidates[idname] = Inventor(patent.inventor_id, inventor_name, patent.male_flag)
                     team.members.append(candidates[idname])
-                    team.members_details.append((patent_team.city, patent_team.state, patent_team.country))
+                    team.members_locations.append((patent.city, patent.state, patent.country))
 
                     candidates[idname].skills.update(team.skills)
                     candidates[idname].teams.append(team.id)
-                    candidates[idname].locations.append(team.members_details[-1])
+                    candidates[idname].locations.append(team.members_locations[-1])
 
                 except Exception as e:
                     raise e
@@ -125,7 +122,7 @@ class Patent(Team):
 
             for key in teams.keys():
                 t_city = set(); t_state = set(); t_country = set()
-                loc = teams[key].members_details[0:]
+                loc = teams[key].members_locations[0:]
                 for item in loc:
                     city_name, state_name, country_name = item
                     t_city.add(city_name); t_state.add(state_name); t_country.add(country_name)

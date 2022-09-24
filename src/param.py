@@ -42,9 +42,9 @@ settings = {
             }
         },
         'cmd': ['train', 'test', 'eval', 'plot', 'agg'],  # 'train', 'test', 'eval', 'plot', 'agg'
-        'nfolds': 3,
+        'nfolds': 2,
         'train_test_split': 0.85,
-        'step_ahead': 2,
+        'step_ahead': 1,#for now, it means that whatever are in the last [step_ahead] time interval will be the test set!
     },
     'data':{
         'domain': {
@@ -52,6 +52,7 @@ settings = {
             'uspt':{},
             'imdb':{},
         },
+        'location_type': 'country', #should be one of 'city', 'state', 'country' and represents the location of members in teams (not the location of teams)
         'filter': {
             'min_nteam': 75,
             'min_team_size': 3,

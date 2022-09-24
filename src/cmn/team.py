@@ -1,26 +1,28 @@
-import os
+import os, scipy.sparse, pickle, multiprocessing
 import matplotlib.pyplot as plt
 from collections import Counter
 from scipy.sparse import lil_matrix
-import scipy.sparse
 import numpy as np
 from time import time
-import pickle
-import multiprocessing
 from functools import partial
 import pandas as pd
+from dateutil import parser
+
 class Team(object):
-    def __init__(self, id, members, skills, datetime):
-        self.id = id
-        self.datetime = datetime
+    def __init__(self, id, members, skills, datetime, location=None):
+        self.id = int(id)
+        self.datetime = parser.parse(datetime).year
         self.members = members
         self.skills = skills
+        self.location = location
+        self.members_locations = [] #[(city, state, country)] the living addresses of the members. might not be the same as the address of the team (venue of a paper or country that a patent is issued)
+        self.members_details = []
 
-    def get_one_hot(self, s2i, c2i):
+    def get_one_hot(self, s2i, c2i, l2i, location_type):
         # Generating one hot encoded vector for skills of team
         skill_vec_dim = len(s2i)
-        X = np.zeros((1, skill_vec_dim))
-        for field in self.skills: X[0, s2i[field]] = 1
+        x = np.zeros((1, skill_vec_dim))
+        for field in self.skills: x[0, s2i[field]] = 1
 
         # Generating one hot encoded vector for members of team
         candidate_vec_dim = len(c2i)
@@ -28,9 +30,36 @@ class Team(object):
         idnames = [f'{m.id}_{m.name}' for m in self.members]
         for idname in idnames:
             y[0, c2i[idname]] = 1
-        id = np.zeros((1,1))
-        id[0,0] = self.id
-        return np.hstack([id, X, y])
+        id = np.zeros((1, 1))
+        id[0, 0] = self.id
+
+        # Generating one hot encoded vector for locations of team members
+        loc_vec_dim = len(l2i)
+        z = np.zeros((1, loc_vec_dim))
+        for loc in self.members_locations:
+            loc = loc[0] + loc[1] + loc[2] if location_type == 'city' else \
+                  loc[1] + loc[2] if location_type == 'state' else \
+                  loc[2]  # if location_type == 'country'
+            if loc in l2i.keys():
+                z[0, l2i[loc]] = 1
+
+        return np.hstack([id, x, z, y])
+
+    @staticmethod
+    def build_index_location(teams, location_type):
+        print('Starting build index location')
+        idx = 0; l2i = {}; i2l = {};
+        for t in teams:
+            for loc in t.members_locations:
+                loc = loc[0] + loc[1] + loc[2] if location_type == 'city' else \
+                      loc[1] + loc[2] if location_type == 'state' else \
+                      loc[2] #if location_type == 'country'
+                if loc not in l2i.keys():
+                    l2i[loc] = idx
+                    i2l[idx] = loc
+                    idx += 1
+
+        return i2l, l2i
 
     @staticmethod
     def build_index_candidates(teams):
@@ -86,18 +115,12 @@ class Team(object):
         # apply filtering
         if filter: teams = Team.remove_outliers(teams, settings)
 
-        tteams = {}
-        count = 0
-        for key, team in teams.items():
-            if not pd.isna(team.datetime):
-                tteams[key] = team
-            else:
-                count += 1
-        print("Number of teams that had NA value for datetime", count)
-        print("Percentage of teams that had NA value for datetime", count/len(teams))
-        teams = sorted(tteams.values(), key=lambda x: x.datetime)
+        for k, v in teams.items():
+            if pd.isna(teams[k].datetime): del teams[k]
 
-        year_idx = []
+        teams = sorted(teams.values(), key=lambda x: x.datetime)
+
+        year_idx = [] #e.g, [(0, 1900), (6, 1903), (14, 1906)] => the i shows the starting index for movies of the year
         start_year = None
         for i, v in enumerate(teams):
             if v.datetime != start_year:
@@ -110,6 +133,7 @@ class Team(object):
         indexes['i2s'], indexes['s2i'] = Team.build_index_skills(teams)
         indexes['i2t'], indexes['t2i'] = Team.build_index_teams(teams)
         indexes['i2dt'], indexes['dt2i'] = Team.build_index_datetime(teams)
+        indexes['i2l'], indexes['l2i'] = Team.build_index_location(teams, settings["location_type"])
         indexes['i2tdt'] = Team.build_index_teamdatetimes(teams)
         indexes['i2y'] = year_idx
         st = time()
@@ -138,23 +162,24 @@ class Team(object):
         return indexes, teams
 
     @staticmethod
-    def bucketing(bucket_size, s2i, c2i, teams):
+    def bucketing(bucket_size, s2i, c2i, l2i, location_type, teams):
         skill_vec_dim = len(s2i)
         candidate_vec_dim = len(c2i)
-        data = lil_matrix((len(teams), 1 + skill_vec_dim + candidate_vec_dim))
-        data_ = np.zeros((bucket_size, 1 + skill_vec_dim + candidate_vec_dim))
+        location_vec_dim = len(l2i)
+        data = lil_matrix((len(teams), 1 + skill_vec_dim + candidate_vec_dim + location_vec_dim))
+        data_ = np.zeros((bucket_size, 1 + skill_vec_dim + candidate_vec_dim + location_vec_dim))
         j = -1
         st = time()
         for i, team in enumerate(teams):
             try:
                 j += 1
-                data_[j] = team.get_one_hot(s2i, c2i)
+                data_[j] = team.get_one_hot(s2i, c2i, l2i, location_type)
             except IndexError as ex:
                 s = int(((i / bucket_size) - 1) * bucket_size)
                 e = int(s + bucket_size)
                 data[s: e] = data_
                 j = 0
-                data_[j] = team.get_one_hot(s2i, c2i)
+                data_[j] = team.get_one_hot(s2i, c2i, l2i, location_type)
             except Exception as ex:
                 raise ex
 
@@ -182,13 +207,13 @@ class Team(object):
                 with multiprocessing.Pool() as p:
                     n_core = multiprocessing.cpu_count() if settings['ncore'] <= 0 else settings['ncore']
                     subteams = np.array_split(teams, n_core)
-                    func = partial(Team.bucketing, settings['bucket_size'], indexes['s2i'], indexes['c2i'])
+                    func = partial(Team.bucketing, settings['bucket_size'], indexes['s2i'], indexes['c2i'], indexes['l2i'], settings['location_type'])
                     data = p.map(func, subteams)
             # serial
             else:
                 data = Team.bucketing(settings['bucket_size'], indexes['s2i'], indexes['c2i'], teams)
             data = scipy.sparse.vstack(data, 'lil')#{'bsr', 'coo', 'csc', 'csr', 'dia', 'dok', 'lil'}, By default an appropriate sparse matrix format is returned!!
-            vecs = {'id': data[:, 0], 'skill': data[:, 1:len(indexes['s2i']) + 1], 'member':data[:, - len(indexes['c2i']):]}
+            vecs = {'id': data[:, 0], 'skill': data[:, 1:len(indexes['s2i']) + 1], 'loc': data[:, len(indexes['s2i']) + 1: len(indexes['s2i']) + 1 + len(indexes['l2i'])], 'member': data[:, - len(indexes['c2i']):]}
 
             with open(pkl, 'wb') as outfile: pickle.dump(vecs, outfile)
             print(f"It took {time() - st} seconds to generate and store the sparse matrices of size {data.shape} at {pkl}")
