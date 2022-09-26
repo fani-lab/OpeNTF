@@ -11,7 +11,7 @@ from dateutil import parser
 class Team(object):
     def __init__(self, id, members, skills, datetime, location=None):
         self.id = int(id)
-        self.datetime = parser.parse(datetime).year
+        self.datetime = parser.parse(str(datetime)).year
         self.members = members
         self.skills = skills
         self.location = location
