@@ -148,6 +148,11 @@ We benefit from [``pytrec_eval``](https://github.com/cvangysel/pytrec_eval), [``
 ## 6. License:
 ©2021. This work is licensed under a [CC BY-NC-SA 4.0](license.txt) license.
 
+Arman Dashti<sup>1</sup>, [Hossein Fani](https://hosseinfani.github.io/)<sup>1,2</sup> 
+
+<sup><sup>1</sup>School of Computer Science, Faculty of Science, University of Windsor, ON, Canada.</sup>
+<sup><sup>2</sup>[hfani@uwindsor.ca](mailto:hfani@uwindsor.ca)</sup>
+
 ## 7. Citation:
 ```
 @inproceedings{DBLP:conf/cikm/DashtiSF22,
