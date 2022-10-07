@@ -11,7 +11,7 @@ from dateutil import parser
 class Team(object):
     def __init__(self, id, members, skills, datetime, location=None):
         self.id = int(id)
-        self.datetime = parser.parse(str(datetime)).year
+        self.datetime = parser.parse(str(datetime)).year if not pd.isna(datetime) else None
         self.members = members
         self.skills = skills
         self.location = location
@@ -120,7 +120,7 @@ class Team(object):
         # apply filtering
         if filter: teams = Team.remove_outliers(teams, settings)
 
-        for k, v in teams.items():
+        for k in list(teams.keys()):
             if pd.isna(teams[k].datetime): del teams[k]
 
         teams = sorted(teams.values(), key=lambda x: x.datetime)
