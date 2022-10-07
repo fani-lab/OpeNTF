@@ -19,7 +19,7 @@ class Publication(Team):
         for author in self.members:
             author.teams.add(self.id)
             author.skills.update(set(self.skills))
-        self.members_locations = [(venue, venue, venue)] * len(self.members)
+        self.members_locations = [(str(venue), str(venue), str(venue))] * len(self.members)
 
 
     # Fill the fields attribute with non-zero weight from FOS
