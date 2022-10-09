@@ -77,7 +77,12 @@ def run(data_list, domain_list, filter, model_list, output, settings):
     if 'dblp' in domain_list: datasets['dblp'] = Publication
     if 'imdb' in domain_list: datasets['imdb'] = Movie
     if 'uspt' in domain_list: datasets['uspt'] = Patent
+        
+    # model names starting with 't' means that they will follow the streaming scenario
+    # model names ending with _a1 means that they have one 1 added to their input for time as aspect learning
+    # model names having _dt2v means that they learn the input embedding with doc2vec where input is (skills + year)
 
+    # non-temporal (no streaming scenario, bag of teams)
     if 'random' in model_list: models['random'] = Rnd()
     if 'fnn' in model_list: models['fnn'] = Fnn()
     if 'bnn' in model_list: models['bnn'] = Bnn()
@@ -85,19 +90,25 @@ def run(data_list, domain_list, filter, model_list, output, settings):
     if 'bnn_emb' in model_list: models['bnn_emb'] = Bnn()
     if 'nmt' in model_list: models['nmt'] = Nmt()
 
-    #temporal baselines
+    # streaming scenario (no vector for time)
     if 'tfnn' in model_list: models['tfnn'] = tNtf(Fnn(), settings['model']['nfolds'], step_ahead=settings['model']['step_ahead'])
     if 'tbnn' in model_list: models['tbnn'] = tNtf(Bnn(), settings['model']['nfolds'], step_ahead=settings['model']['step_ahead'])
     if 'tfnn_emb' in model_list: models['tfnn_emb'] = tNtf(Fnn(), settings['model']['nfolds'], step_ahead=settings['model']['step_ahead'])
     if 'tbnn_emb' in model_list: models['tbnn_emb'] = tNtf(Bnn(), settings['model']['nfolds'], step_ahead=settings['model']['step_ahead'])
+    if 'tnmt' in model_list: models['tnmt'] = tNmt(settings['model']['nfolds'], settings['model']['step_ahead'])
+
+    # streaming scenario with adding one 1 to the input (time as aspect/vector for time)
     if 'tfnn_a1' in model_list: models['tfnn_a1'] = tNtf(Fnn(), settings['model']['nfolds'], step_ahead=settings['model']['step_ahead'])
     if 'tbnn_a1' in model_list: models['tbnn_a1'] = tNtf(Bnn(), settings['model']['nfolds'], step_ahead=settings['model']['step_ahead'])
     if 'tfnn_emb_a1' in model_list: models['tfnn_emb_a1'] = tNtf(Fnn(), settings['model']['nfolds'], step_ahead=settings['model']['step_ahead'])
     if 'tbnn_emb_a1' in model_list: models['tbnn_emb_a1'] = tNtf(Bnn(), settings['model']['nfolds'], step_ahead=settings['model']['step_ahead'])
+    
+    # streaming scenario with adding the year to the doc2vec training (temporal dense skill vecs in input)
     if 'tfnn_dt2v_emb' in model_list: models['tfnn_dt2v_emb'] = tNtf(Fnn(), settings['model']['nfolds'], step_ahead=settings['model']['step_ahead'])
     if 'tbnn_dt2v_emb' in model_list: models['tbnn_dt2v_emb'] = tNtf(Bnn(), settings['model']['nfolds'], step_ahead=settings['model']['step_ahead'])
-    if 'tnmt' in model_list: models['tnmt'] = tNmt(settings['model']['nfolds'], settings['model']['step_ahead'])
-
+        
+    # todo: temporal: time as an input feature
+    
     assert len(datasets) > 0
     assert len(datasets) == len(domain_list)
     assert len(models) > 0
