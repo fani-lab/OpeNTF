@@ -25,7 +25,7 @@ def get_data(w):
     repo = reader.readline()
 
 
-access_token = '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'  # Place auth code here
+access_token = ''  # Place auth code here
 headers = {'Authorization': "Token " + access_token}
 
 '''
