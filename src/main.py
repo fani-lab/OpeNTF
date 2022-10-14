@@ -1,16 +1,17 @@
-import sys,os, json
+import os, json
 import argparse
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import KFold, train_test_split
-from itertools import product
 from scipy.sparse import lil_matrix
 import scipy.sparse
+
 import param
 from cmn.tools import NumpyArrayEncoder
 from cmn.publication import Publication
 from cmn.movie import Movie
 from cmn.patent import Patent
+from cmn.github import Repo
 from mdl.fnn import Fnn
 from mdl.bnn import Bnn
 from mdl.rnd import Rnd
@@ -77,6 +78,7 @@ def run(data_list, domain_list, filter, model_list, output, settings):
     if 'dblp' in domain_list: datasets['dblp'] = Publication
     if 'imdb' in domain_list: datasets['imdb'] = Movie
     if 'uspt' in domain_list: datasets['uspt'] = Patent
+    if 'gith' in domain_list: datasets['gith'] = Repo
         
     # model names starting with 't' means that they will follow the streaming scenario
     # model names ending with _a1 means that they have one 1 added to their input for time as aspect learning
@@ -144,7 +146,7 @@ def run(data_list, domain_list, filter, model_list, output, settings):
 def addargs(parser):
     dataset = parser.add_argument_group('dataset')
     dataset.add_argument('-data', '--data-list', nargs='+', type=str, default=[], required=True, help='a list of dataset paths; required; (eg. -data ./../data/raw/toy.json)')
-    dataset.add_argument('-domain', '--domain-list', nargs='+', type=str.lower, default=[], required=True, help='a list of domains; required; (eg. -domain dblp imdb uspt)')
+    dataset.add_argument('-domain', '--domain-list', nargs='+', type=str.lower, default=[], required=True, help='a list of domains; required; (eg. -domain dblp imdb uspt gith)')
     dataset.add_argument('-filter', type=int, default=0, choices=[0, 1], help='remove outliers? (e.g., -filter 0 (default) or 1)')
 
     baseline = parser.add_argument_group('baseline')
@@ -157,7 +159,8 @@ def addargs(parser):
 # python -u main.py -data ../data/raw/dblp/toy.dblp.v12.json
 # 						  ../data/raw/imdb/toy.title.basics.tsv
 # 						  ../data/raw/uspt/toy.patent.tsv
-# 					-domain dblp imdb uspt
+#                         ../data/raw/gith/toy.data.csv
+# 					-domain dblp imdb uspt gith
 # 					-model random
 # 					       fnn fnn_emb bnn bnn_emb nmt
 # 					       tfnn tbnn tnmt tfnn_emb tbnn_emb tfnn_a1 tbnn_a1 tfnn_emb_a1 tbnn_emb_a1 tfnn_dt2v_emb tbnn_dt2v_emb
