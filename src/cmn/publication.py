@@ -27,17 +27,11 @@ class Publication(Team):
         skills = set()
         for skill in self.fos:
             #if skill["w"] != 0.0:
-            skills.add(skill["name"].replace(" ", "_"))
+            skills.add(skill["name"].replace(" ", "_").lower())
         # Extend the fields with keywords
         # if len(self.keywords):
         #     skills.union(set([keyword.replace(" ", "_") for keyword in self.keywords]))
         return skills
-
-    def get_skills(self):
-        return self.skills
-
-    def get_year(self):
-        return self.year
 
     @staticmethod
     def read_data(datapath, output, index, filter, settings):
@@ -85,8 +79,7 @@ class Publication(Team):
                     except Exception as e:
                         raise e
             return super(Publication, Publication).read_data(teams, output, filter, settings)
-        except Exception as e:
-            raise e
+        except Exception as e: raise e
 
     # @classmethod
     # def get_stats(cls, teamsvecs, output, plot=False):
