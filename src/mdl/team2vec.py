@@ -35,7 +35,7 @@ class Team2Vec:
             for i, id in enumerate(self.teamsvecs['id']):
                 skill_doc = [f's{str(skill_idx)}' for skill_idx in self.teamsvecs['skill'][i].nonzero()[1]]
                 member_doc = [f'm{str(member_idx)}' for member_idx in self.teamsvecs['member'][i].nonzero()[1]]
-                datetime_doc.append(f"dt{str(self.indexes['dt2i'][self.indexes['i2tdt'][str(int(id[0, 0]))]])}")
+                datetime_doc.append(f"dt{str(self.indexes['dt2i'][self.indexes['i2tdt'][id[0, 0]]])}")
                 if self.embtype == 'skill':
                     td = gensim.models.doc2vec.TaggedDocument(skill_doc, [str(int(id[0, 0]))])
                 elif self.embtype == 'member':
