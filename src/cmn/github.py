@@ -14,6 +14,7 @@ class Repo(Team):
         self.name = name
         self.nforks = nforks
         self.nstargazers = nstargazers
+        self.created_at = created_at
         self.pushed_at = pushed_at
         self.ncontributions = ncontributions
         self.releases = releases
