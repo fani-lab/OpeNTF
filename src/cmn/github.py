@@ -8,9 +8,9 @@ from cmn.developer import Developer
 class Repo(Team):
 
     def __init__(self, idx: int, contributors: list, name: str, languages_lines: list, nforks: int,
-                 nstargazers: int, created_at: str, pushed_at: str, ncontributions: list, releases: list):
+                 nstargazers: int, created_at: str, year: int, pushed_at: str, ncontributions: list, releases: list):
 
-        super().__init__(id=idx, members=contributors, skills=None, datetime=created_at)
+        super().__init__(id=idx, members=contributors, skills=None, datetime=year)
         self.name = name
         self.nforks = nforks
         self.nstargazers = nstargazers
@@ -59,7 +59,7 @@ class Repo(Team):
 
                     dict_of_teams[idx] = Repo(idx=idx, contributors=list_of_developers, name=repo_name, releases=releases,
                                               languages_lines=languages_lines, nstargazers=nstargazers,
-                                              nforks=nforks, created_at=year, pushed_at=pushed_at, ncontributions=ncontributions)
+                                              nforks=nforks, created_at=created_at, year=year, pushed_at=pushed_at, ncontributions=ncontributions)
             except Exception as e: raise e
 
             return super(Repo, Repo).read_data(dict_of_teams, output, filter, settings)
