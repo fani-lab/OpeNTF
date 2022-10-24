@@ -61,7 +61,8 @@ class Patent(Team):
             print("Reading data to objects ...")
             teams = {}; candidates = {}; n_row = 0
             current = None
-
+            patents_cpc_inventors_location['date'] = pd.to_datetime(patents_cpc_inventors_location['date'])
+            patents_cpc_inventors_location['year'] = patents_cpc_inventors_location['date'].dt.year
             # 100 % |██████████████████████████████████████████████████████████████████████▉ | 210808 / 210809[00:02 < 00:00,75194.06 it / s]
             for patent in tqdm(patents_cpc_inventors_location.itertuples(), total=patents_cpc_inventors_location.shape[0]):
                 try:
@@ -69,7 +70,7 @@ class Patent(Team):
                     if current != new:
                         team = Patent(patent.patent_id,#for "utility" patents is integer but for "design" has "Dxxxx", ...
                                       [],
-                                      patent.date,
+                                      int(patent.year),
                                       patent.title,
                                       patent.patent_country,
                                       patent.subgroup_id,
