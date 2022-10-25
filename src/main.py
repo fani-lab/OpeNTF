@@ -166,6 +166,9 @@ def addargs(parser):
 # 					       tfnn tbnn tnmt tfnn_emb tbnn_emb tfnn_a1 tbnn_a1 tfnn_emb_a1 tbnn_emb_a1 tfnn_dt2v_emb tbnn_dt2v_emb
 #                   -filter 1
 
+# To run on compute canada servers you can use the following command: (time is in minutes)
+#sbatch --account=def-hfani --mem=96000MB --time=2880 cc.sh
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Neural Team Formation')
     addargs(parser)
