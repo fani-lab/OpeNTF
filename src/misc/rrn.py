@@ -1,3 +1,5 @@
+import sys
+sys.path.extend(["./"])
 import pickle
 import matplotlib.pyplot as plt
 from scipy.sparse import lil_matrix
