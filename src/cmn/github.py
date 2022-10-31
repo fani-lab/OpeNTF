@@ -33,7 +33,7 @@ class Repo(Team):
         except (FileNotFoundError, EOFError) as e:
             print(f"Pickles not found! Reading raw data from {datapath} ...")
             raw_dataset = pd.read_csv(datapath, converters={'collabs': eval, 'langs': eval, 'rels': eval})
-            dict_of_teams = dict(); candidates = {}
+            dict_of_teams = dict(); repos = dict(); candidates = {}
             raw_dataset['created_at'] = pd.to_datetime(raw_dataset['created_at'])
             raw_dataset['year'] = raw_dataset['created_at'].dt.year
             try:
@@ -58,9 +58,14 @@ class Repo(Team):
                     ncontributions = row['collabs']
                     releases = row['rels']
 
-                    dict_of_teams[idx] = Repo(idx=idx, contributors=list_of_developers, name=repo_name, releases=releases,
-                                              languages_lines=languages_lines, nstargazers=nstargazers,
-                                              nforks=nforks, created_at=created_at, year=year, pushed_at=pushed_at, ncontributions=ncontributions)
+                    if repo_name not in repos:
+                        dict_of_teams[idx] = Repo(idx=idx, contributors=list_of_developers, name=repo_name, releases=releases,
+                                                  languages_lines=languages_lines, nstargazers=nstargazers,
+                                                  nforks=nforks, created_at=created_at, year=year, pushed_at=pushed_at, ncontributions=ncontributions)
+                        repos[repo_name] = dict_of_teams[idx]
+                    else:
+                        pass
+
             except Exception as e: raise e
 
             return super(Repo, Repo).read_data(dict_of_teams, output, filter, settings)
