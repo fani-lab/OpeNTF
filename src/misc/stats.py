@@ -9,7 +9,7 @@ import numpy as np
 sys.path.extend(["./"])
 
 import param
-from cmn.team import Team
+from src.cmn.team import Team
 
 datasets = []
 # datasets += ['../data/preprocessed/dblp/dblp.v12.json.filtered.mt75.ts3']
