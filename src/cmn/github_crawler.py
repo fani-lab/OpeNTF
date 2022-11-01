@@ -1,5 +1,6 @@
 import csv, requests, traceback, time
 import pandas as pd
+import os
 import schedule #conda install --channel=conda-forge schedule
 
 from team import Team
@@ -20,9 +21,14 @@ class Repo(Team):
             int: index of the last crawled repo or 1 in case the log file does not exist
         """
         try:
-            log = pd.read_csv(log_file)
-            if 0 < len(log):
-                return log['index'].iloc[-1]
+            with open(log_file, mode='rb') as file:
+                file.seek(-2, os.SEEK_END)
+                while file.read(1) != b'\n':
+                    file.seek(-2, os.SEEK_CUR)
+                last_index = file.readline().decode().split(sep=',')[0]
+
+            if 0 < int(last_index):
+                return int(last_index)
             else:
                 return 1
 
