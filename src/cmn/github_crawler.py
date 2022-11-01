@@ -1,14 +1,42 @@
 import csv, requests, traceback, time
+import pandas as pd
 import schedule #conda install --channel=conda-forge schedule
-
 
 from team import Team
 
 
 class Repo(Team):
 
+    last_index = 0
+
     @staticmethod
-    def crawl_repo(writer, reader, GET_header):
+    def check_previous_indexes(log_file):
+        """
+
+        Args:
+            log_file: log file as csv
+
+        Returns:
+            int: index of the last crawled repo or 1 in case the log file does not exist
+        """
+        try:
+            log = pd.read_csv(log_file)
+            if 0 < len(log):
+                return log['index'].iloc[-1]
+            else:
+                return 1
+
+        except FileNotFoundError:
+            print('Log file not found')
+            with open(log_file, mode='w', newline='') as log_indexes:
+
+                fieldnames = ['index', 'repo']
+                writer = csv.DictWriter(log_indexes, fieldnames=fieldnames)
+                writer.writeheader()
+            return 1
+
+    @staticmethod
+    def crawl_repo(writer, reader, log_file, GET_header):
         repo = reader.readline().rstrip('\n')
         if not repo: return schedule.CancelJob
         try:
@@ -23,9 +51,16 @@ class Repo(Team):
                 forks_count = general_repo_info['forks_count']
                 created_at = general_repo_info['created_at']
                 pushed_at = general_repo_info['pushed_at']
-                if len(collabs) > 1: writer.writerow(
-                    {'repo': repo, 'collabs': collabs, 'langs': langs, 'rels': rels, 'pushed_at': pushed_at,
+                if len(collabs) > 1:
+                    writer.writerow( {'repo': repo, 'collabs': collabs, 'langs': langs, 'rels': rels, 'pushed_at': pushed_at,
                      'stargazers_count': stargazers_count, 'forks_count': forks_count, 'created_at': created_at})
+
+                with open(log_file, 'a', newline='') as log_object:
+                    # Writing to the log file
+                    index_writer = csv.DictWriter(log_object, fieldnames=['index', 'repo'])
+                    index_writer.writerow( {'index': Repo.last_index, 'repo': repo} )
+                    Repo.last_index += 1
+
             except KeyError:
                 print('The following error has occurred: {}'.format(general_repo_info['message']))
 
@@ -34,7 +69,7 @@ class Repo(Team):
             traceback.print_exc()
 
     @staticmethod
-    def crawl_github(input, output, access_token, nseconds):
+    def crawl_github(input, output,log_file, access_token, nseconds):
         """"
         data.csv is where the output of the data is stored
 
@@ -55,15 +90,30 @@ class Repo(Team):
         # schedule_logger.setLevel(level=logging.DEBUG)
 
         header = {'Authorization': "Token " + access_token}
-        with open(input, 'r') as reader, open(output, 'w', newline='') as output_csv:
-            reader.readline() #bypass the header 'repo'
-            w = csv.DictWriter(output_csv, ['repo', 'collabs', 'langs', 'rels', 'stargazers_count', 'forks_count', 'created_at', 'pushed_at'])
-            w.writeheader()
-            job = schedule.every(nseconds).seconds.do(Repo.crawl_repo, writer=w, reader=reader, GET_header=header)  # NOT schedule.every(1).seconds.do(getData, w=w)
+        Repo.last_index = Repo.check_previous_indexes(log_file)
+
+        if Repo.last_index == 1:
+            file_open_mode = 'w'
+        else:
+            file_open_mode = 'a'
+
+
+        with open(input, 'r') as reader, open(output, file_open_mode, newline='') as output_csv:
+
+            for i in range(1, Repo.last_index):
+                reader.readline() #bypass the header 'repo' and crawled repos
+
+            if file_open_mode == 'w':
+                w = csv.DictWriter(output_csv, ['repo', 'collabs', 'langs', 'rels', 'stargazers_count', 'forks_count', 'created_at', 'pushed_at'])
+                w.writeheader()
+            else:
+                w = csv.DictWriter(output_csv, ['repo', 'collabs', 'langs', 'rels', 'stargazers_count', 'forks_count', 'created_at', 'pushed_at'])
+
+            job = schedule.every(nseconds).seconds.do(Repo.crawl_repo, writer=w, reader=reader, log_file=log_file, GET_header=header)  # NOT schedule.every(1).seconds.do(getData, w=w)
             while True:
                 schedule.run_pending()
                 if not schedule.jobs: return
                 time.sleep(1)
 
 
-Repo.crawl_github(input='./../../data/raw/gith/toy.repos.csv', output='./../../data/raw/gith/toy.data.csv', access_token='', nseconds=8)
+Repo.crawl_github(input='./../../data/raw/gith/repos.csv', output='./../../data/raw/gith/data.csv', log_file='./../../data/raw/gith/log_index.csv', access_token='', nseconds=8)
