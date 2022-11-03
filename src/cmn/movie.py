@@ -2,7 +2,7 @@ import pandas as pd
 from tqdm import tqdm
 from time import time
 
-from cmn.team import Team
+from .team import Team
 from cmn.member import Member
 from cmn.castncrew import CastnCrew
 
