@@ -9,7 +9,7 @@ import numpy as np
 sys.path.extend(["./"])
 
 import param
-from src.cmn.team import Team
+from cmn.team import Team
 
 datasets = []
 # datasets += ['../data/preprocessed/dblp/dblp.v12.json.filtered.mt75.ts3']
@@ -108,12 +108,10 @@ def get_dist_teams_over_years_with_ind(dataset):
         indexes = pickle.load(infile)
     year_idx = indexes['i2y']
     nteams = len(indexes['i2t'])
-    print(year_idx)
     year_nteams = {}
     for i in range(1, len(year_idx)):
         year_nteams[year_idx[i-1][1]] = year_idx[i][0] - year_idx[i-1][0]
     year_nteams[year_idx[-1][1]] = nteams - year_idx[-1][0]
-    print(year_nteams)
     yc = dict(sorted(year_nteams.items()))
     fig = plt.figure(figsize=(2, 2))
     ax = fig.add_subplot(1, 1, 1)
