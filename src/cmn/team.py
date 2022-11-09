@@ -238,7 +238,7 @@ class Team(object):
         return teams
 
     @classmethod
-    def get_stats(cls, teamsvecs, output, cache=True, plot=False, plot_title=None):
+    def get_stats(cls, teamsvecs, obj, output, cache=True, plot=False, plot_title=None):
         try:
             print("Loading the stats pickle ...")
             if not cache: raise FileNotFoundError
@@ -282,6 +282,24 @@ class Team(object):
             stats['*avg_nteams_member'] = col_sums.mean()
 
             #TODO: temporal stats!
+            #year to count
+            i2y,pointer,stats['nteams_year'],stats['nmembers_year'],stats['nskills_year'],stats['avg_nskills_nteams_year'],stats['avg_single_member_year'],stats['avg_nskills_nmembers_year'],stats['avg_nteams_nmembers_year'] = obj['i2y'],0,{},{},{},{},{},{},{}
+            for x in range(len(i2y)-1): stats['nteams_year'][i2y[x][1]] = i2y[1+x][0]-i2y[x][0]
+            stats['nteams_year'][i2y[-1][1]] = stats['*nteams']-i2y[-1][0]
+            for x in range(len(i2y)-1):
+                members,skills = 0,0
+                while pointer < i2y[x+1][0]:
+                    if pointer in obj['i2c'] : members += 1
+                    if pointer in obj['i2s']: skills += 1
+                    pointer+=1
+                stats['nmembers_year'][i2y[x][1]] = members
+                stats['nskills_year'][i2y[x][1]] = skills
+                stats['avg_nskills_nteams_year'][i2y[x][1]] = skills/stats['nteams_year'][i2y[x][1]]
+                stats['avg_single_member_year'][i2y[x][1]] = list(stats['nmembers_year'].values()).count(1)/stats['nteams_year'][i2y[x][1]]
+                stats['avg_nskills_nmembers_year'][i2y[x][1]] = skills/members if members != 0 else 0#list(stats['nmembers_year'].values()).count(1) if list(stats['nmembers_year'].values()).count(1) != 0 else 0
+                stats['avg_nteams_nmembers_year'][i2y[x][1]] = stats['nteams_year'][i2y[x][1]]/members if members != 0 else 0#list(stats['nmembers_year'].values()).count(1) if list(stats['nmembers_year'].values()).count(1) != 0 else 0
+
+            print(stats)
             #TODO: skills_years (2-D image)
             #TODO: candidate_years (2-D image)
             with open(f'{output}/stats.pkl', 'wb') as outfile: pickle.dump(stats, outfile)
