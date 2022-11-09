@@ -13,16 +13,17 @@ from cmn.team import Team
 
 datasets = []
 # datasets += ['../data/preprocessed/dblp/dblp.v12.json.filtered.mt75.ts3']
-datasets += ['../data/preprocessed/dblp/toy.dblp.v12.json']
+datasets += ['../../data/preprocessed/dblp/toy.dblp.v12.json']
 # datasets += ['../data/preprocessed/imdb/title.basics.tsv.filtered.mt75.ts3']
-datasets += ['../data/preprocessed/imdb/toy.title.basics.tsv']
+datasets += ['../../data/preprocessed/imdb/toy.title.basics.tsv']
 # datasets += ['../data/preprocessed/uspt/patent.tsv.filtered.mt75.ts3']
-datasets += ['../data/preprocessed/uspt/toy.patent.tsv']
+datasets += ['../../data/preprocessed/uspt/toy.patent.tsv']
 
 for dataset in datasets:
     start = time.time()
     with open(f'{dataset}/teamsvecs.pkl', 'rb') as infile:
-        stats = Team.get_stats(pickle.load(infile), dataset, cache=False, plot=True, plot_title='uspt')
+        obj = pd.read_pickle(dataset+'/indexes.pkl')
+        stats = Team.get_stats(pickle.load(infile),obj,dataset, cache=False, plot=True, plot_title='uspt')
     end = time.time()
     print(end - start)
 
@@ -108,10 +109,12 @@ def get_dist_teams_over_years_with_ind(dataset):
         indexes = pickle.load(infile)
     year_idx = indexes['i2y']
     nteams = len(indexes['i2t'])
+    print(year_idx)
     year_nteams = {}
     for i in range(1, len(year_idx)):
         year_nteams[year_idx[i-1][1]] = year_idx[i][0] - year_idx[i-1][0]
     year_nteams[year_idx[-1][1]] = nteams - year_idx[-1][0]
+    print(year_nteams)
     yc = dict(sorted(year_nteams.items()))
     fig = plt.figure(figsize=(2, 2))
     ax = fig.add_subplot(1, 1, 1)
