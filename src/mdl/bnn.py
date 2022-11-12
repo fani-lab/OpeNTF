@@ -60,6 +60,7 @@ class Bnn(Fnn):
         log_prior = log_priors.mean()
         log_post = log_posts.mean()
         loss = log_post - log_prior
+        outputs = outputs.mean(axis=1)
         #log_likes = F.nll_loss(outputs.mean(0), target, size_average=False)
         # log_likes = F.nll_loss(outputs.mean(0), target, reduction='sum')
         # loss = (log_post - log_prior)/num_batches + log_likes
@@ -67,11 +68,11 @@ class Bnn(Fnn):
 
     # TODO: there is huge code overlapp with bnn training and fnn training. Trying to generalize as we did in test and eval
     def learn(self, splits, indexes, vecs, params, prev_model, output):
-        layers = params['l'];
-        learning_rate = params['lr'];
-        batch_size = params['b'];
-        num_epochs = params['e'];
-        nns = params['nns'];
+        layers = params['l']
+        learning_rate = params['lr']
+        batch_size = params['b']
+        num_epochs = params['e']
+        nns = params['nns']
         ns = params['ns']
         s = params['s']
         # input_size = len(indexes['i2s'])
