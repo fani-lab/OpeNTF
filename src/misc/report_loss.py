@@ -7,7 +7,7 @@ datasets += ['../output/dblp.v12.json.filtered.mt75.ts3']
 datasets += ['../output/title.basics.tsv.filtered.mt75.ts3']
 datasets += ['../output/patent.tsv.filtered.mt75.ts3']
 models = ['bnn', 'bnn_emb']
-colors = ['orange', 'blue', 'deeppink', 'maroon', 'royalblue', 'darkviolet', 'aqua', 'darkorange', 'maroon', 'chocolate']
+colors = ['blue', 'orange', 'deeppink', 'maroon', 'royalblue', 'darkviolet', 'aqua', 'darkorange', 'chocolate', 'black', 'rosybrown', 'orange', 'blue', 'deeppink', 'maroon', 'royalblue', 'darkviolet', 'chocolate', 'darkorange', 'maroon', 'aqua', 'black']
 
 def plot_train_val_loss(datasets, models):
     for dataset in datasets:
@@ -30,8 +30,8 @@ def plot_train_val_loss(datasets, models):
                 train_l = [sum(sub_list) / len(sub_list) for sub_list in zip(*train_loss)]
                 valid_l = [sum(sub_list) / len(sub_list) for sub_list in zip(*valid_loss)]
                 i += 1
-                plt.plot(train_l, label=f"Train - b{file[4].split('.')[-1]}", color=colors[i], linewidth=2)
-                plt.plot(valid_l, label=f"Valid - b{file[4].split('.')[-1]}", color=colors[i], linestyle=':', linewidth=2)
+                plt.plot(train_l, label=f"Train - b{file[4].split('.')[-1]}", color=colors[int(file[4].split('.')[-1].replace('s',''))], linewidth=2)
+                plt.plot(valid_l, label=f"Valid - b{file[4].split('.')[-1]}", color=colors[int(file[4].split('.')[-1].replace('s',''))], linestyle=':', linewidth=2)
             plt.legend(loc='upper right')
             plt.title(f"Train/Val loss of {file[3]} on {str(str(dataset.split('.')[2]).split('/')[-1])}")
             plt.savefig(f'../output/{file[2]}/{file[3]}/l[128].lr0.1.b128.e20.nns3.nsunigram_b.train_valid_loss.pdf', dpi=100, bbox_inches='tight')
@@ -41,7 +41,7 @@ def plot_train_val_loss(datasets, models):
 
 def subplot_train_val_loss(datasets, models):
     p = 0
-    fig, axs = plt.subplots(len(datasets), len(models), figsize=(16,16))
+    fig, axs = plt.subplots(len(datasets), len(models), figsize=(12,12))
     axs = axs.flatten()
     for dataset in datasets:
         for model in models:
@@ -63,8 +63,8 @@ def subplot_train_val_loss(datasets, models):
                 train_l = [sum(sub_list) / len(sub_list) for sub_list in zip(*train_loss)]
                 valid_l = [sum(sub_list) / len(sub_list) for sub_list in zip(*valid_loss)]
                 
-                axs[p].plot(train_l, label=f"Train - b{file[4].split('.')[-1]}", color=colors[i], linewidth=2)
-                axs[p].plot(valid_l, label=f"Valid - b{file[4].split('.')[-1]}", color=colors[i], linestyle=':', linewidth=2)
+                axs[p].plot(train_l, label=f"Train - b{file[4].split('.')[-1]}", color=colors[int(file[4].split('.')[-1].replace('s',''))], linewidth=2)
+                axs[p].plot(valid_l, label=f"Valid - b{file[4].split('.')[-1]}", color=colors[int(file[4].split('.')[-1].replace('s',''))], linestyle=':', linewidth=2)
                 i += 1  
             axs[p].legend(loc='upper right')
             axs[p].title.set_text(f"Train/Val loss of {file[3]} on {str(str(dataset.split('.')[2]).split('/')[-1])}")
