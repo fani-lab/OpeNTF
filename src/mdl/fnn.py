@@ -99,13 +99,11 @@ class Fnn(Ntf):
 
     def learn(self, splits, indexes, vecs, params, prev_model, output):
 
-        layers = params['l'];
-        learning_rate = params['lr'];
-        batch_size = params['b'];
-        num_epochs = params['e'];
-        nns = params['nns'];
+        learning_rate = params['lr']
+        batch_size = params['b']
+        num_epochs = params['e']
+        nns = params['nns']
         ns = params['ns']
-        # input_size = len(indexes['i2s'])
         input_size = vecs['skill'].shape[1]
         output_size = len(indexes['i2c'])
 
@@ -120,9 +118,9 @@ class Fnn(Ntf):
         # Training K-fold
         for foldidx in splits['folds'].keys():
             # Retrieving the folds
-            X_train = vecs['skill'][splits['folds'][foldidx]['train'], :];
+            X_train = vecs['skill'][splits['folds'][foldidx]['train'], :]
             y_train = vecs['member'][splits['folds'][foldidx]['train']]
-            X_valid = vecs['skill'][splits['folds'][foldidx]['valid'], :];
+            X_valid = vecs['skill'][splits['folds'][foldidx]['valid'], :]
             y_valid = vecs['member'][splits['folds'][foldidx]['valid']]
 
             # Building custom dataset
