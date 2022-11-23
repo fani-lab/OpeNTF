@@ -256,6 +256,21 @@ class Team(object):
             stats['*nmembers'] = membervecs.shape[1] #unique members
             stats['*nskills'] = skillvecs.shape[1]
 
+            #declaring location
+            locationvecs = teamsvecs['location']
+            #number of locations
+            stats['*nlocation'] = locationvecs.shape[1]
+            
+            # how many teams have only 1 location, 2 locations, ...
+            row_sums = locationvecs.sum(axis=1)
+            col_sums = locationvecs.sum(axis=0)
+            nteams_nlocation  = Counter(col_sums.A1.astype(int))
+            stats['*nteams_nlocation1'] = {k: v for k, v in sorted(nteams_nlocation.items(), key=lambda item: item[1], reverse=True)}
+            
+            stats['*nmembers_nlocation1'] = {k: v for k, v in sorted(nteams_nlocation.items(), key=lambda item: item[1], reverse=True)}
+            stats['*nskills_nlocation1'] = {k: v for k, v in sorted(nteams_nlocation.items(), key=lambda item: item[1], reverse=True)}
+
+
             #distributions
             row_sums = skillvecs.sum(axis=1)
             col_sums = skillvecs.sum(axis=0)
@@ -284,10 +299,102 @@ class Team(object):
             #TODO: temporal stats!
             #TODO: skills_years (2-D image)
             #TODO: candidate_years (2-D image)
+            
+            #how many members are from a particular location, .... 
+            row_sums_ml = locationvecs.sum(axis=1)
+            col_sums_ml = locationvecs.sum(axis=0)
+            nmembers_nlocation  = Counter(row_sums_ml.A1.astype(int))
+            stats['*nmembers_nlocation'] = {k: v for k, v in sorted(nmembers_nlocation.items(), reverse=True)}
+            
+            
+            #how many skills are from a particular location, ....
+            row_sums_sl = locationvecs.sum(axis=1)
+            col_sums_sl = locationvecs.sum(axis=0)
+            nskills_nlocation  = Counter(row_sums_sl.A1.astype(int))
+            stats['*nskills_nlocation'] = {k: v for k, v in sorted(nskills_nlocation.items(), reverse=True)}
+            
+            
+            #average number of people from each location
+            stats['*avg_nmembers_location'] = row_sums_ml.mean()
+            stats['*avg_nskills_location'] = row_sums_sl.mean()
+
+
             with open(f'{output}/stats.pkl', 'wb') as outfile: pickle.dump(stats, outfile)
             if plot: Team.plot_stats(stats, output, plot_title)
         return stats
 
+    def loc_heatmap_skills(dataset):
+        dname = dataset.split('/')[-2]
+
+        #getting the data
+        open(f'{output}/stats.pkl', 'rb') as infile:
+                    stats = pickle.load(infile)
+        location = stats['location']
+        skills = stats['skills']
+        npatents = len(stats['patent'])
+
+        # creating 3d figures
+        fig = plt.figure(figsize=(10, 10))
+        ax = Axes3D(fig)
+        axM = Axes3D(fig)
+
+        # configuring colorbar
+        color_map = cm.ScalarMappable(cmap=cm.gray)
+        color_map.set_array(colo)
+
+        # creating the heatmap
+        img = ax.scatter(location, skills, npatents, marker='s',
+                        s=100, color='gray')
+        plt.colorbar(color_map)
+
+        # adding title and labels - skills
+        ax.set_title("3D Heatmap")
+        ax.set_xlabel('X-locations')
+        ax.set_ylabel('Y-skills')
+        ax.set_zlabel('Z-number-of-patents')
+
+        # displaying plot
+        fig.savefig(f"{dataset}/{dname}_location_skills_distribution.pdf", dpi=100, bbox_inches='tight')
+        plt.show()
+
+    def loc_heatmap_members(dataset):
+        dname = dataset.split('/')[-2]
+    
+        #getting the data
+        open(f'{output}/stats.pkl', 'rb') as infile:
+                    stats = pickle.load(infile)
+        location = stats['location']
+        members = stats['member']
+        npatents = len(stats['patent'])
+
+        # creating 3d figures
+        fig = plt.figure(figsize=(10, 10))
+        ax = Axes3D(fig)
+        axM = Axes3D(fig)
+
+        # configuring colorbar
+        color_map = cm.ScalarMappable(cmap=cm.gray)
+        color_map.set_array(colo)
+
+        # creating the heatmap
+        img = ax.scatter(location, members, npatents, marker='s',
+                        s=100, color='gray')
+        plt.colorbar(color_map)
+
+        # adding title and labels - members
+        ax.set_title("3D Heatmap")
+        ax.set_xlabel('X-locations')
+        ax.set_ylabel('Y-members')
+        ax.set_zlabel('Z-number-of-patents')
+
+        # displaying plot
+        fig.savefig(f"{dataset}/{dname}_location_members_distribution.pdf", dpi=100, bbox_inches='tight')
+        plt.show()
+
+
+
+
+    
     @staticmethod
     def plot_stats(stats, output, plot_title):
         plt.rcParams.update({'font.family': 'Consolas'})
