@@ -1,6 +1,6 @@
+from cmn.member import Member
 
-
-class Developer(object):
+class Developer(Member):
 
     def __init__(self, name: str, id: int, url: str, is_owner: bool = False):
         """
@@ -14,7 +14,6 @@ class Developer(object):
         Returns:
             None
         """
-        self.name = name
-        self.id = id
+        super().__init__(id, name)
         self.is_owner = is_owner
         self.url = url
