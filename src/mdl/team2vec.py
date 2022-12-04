@@ -30,22 +30,22 @@ class Team2Vec:
                 self.docs = pickle.load(infile)
                 return self.docs
         except FileNotFoundError:
-            print(f"File not found! Generating {self.embtype} documents ...")
-            datetime_doc = []
-
-            j = 0
-
+            print(f"File not found! Generating {self.embtype} documents ...") 
+            # j = 0
             for i, id in enumerate(self.teamsvecs['id']):
                 skill_doc = [f's{str(skill_idx)}' for skill_idx in self.teamsvecs['skill'][i].nonzero()[1]]
                 member_doc = [f'm{str(member_idx)}' for member_idx in self.teamsvecs['member'][i].nonzero()[1]]
-                datetime_doc.append(f"dt{str(self.indexes['dt2i'][self.indexes['i2tdt'][id[0, 0]]])}")
+                # datetime_doc = [f"dt{str(self.indexes['dt2i'][self.indexes['i2tdt'][id[0, 0]]])}"]
+
+                datetime_doc = [f"dt{str(self.indexes['i2tdt'][id[0, 0]])}"]
 
                 #Start Hossein: level up by a trigger
-                if j < len(self.indexes['i2y']) and self.indexes['i2y'][j][0] == i:
-                    year = self.indexes['i2y'][j][1]
-                    year_idx = j #zero-based
-                    j += 1
+                # if j < len(self.indexes['i2y']) and self.indexes['i2y'][j][0] == i:
+                #     year = self.indexes['i2y'][j][1]
+                #     year_idx = j #zero-based
+                #     j += 1
                 #End Hossein
+                # year_doc = [f"dt{str(year)}"]
 
                 if self.embtype == 'skill':
                     td = gensim.models.doc2vec.TaggedDocument(skill_doc, [str(int(id[0, 0]))])
