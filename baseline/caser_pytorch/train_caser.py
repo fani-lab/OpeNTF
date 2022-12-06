@@ -86,7 +86,7 @@ class Recommender(object):
                                      weight_decay=self._l2,
                                      lr=self._learning_rate)
 
-    def fit(self, train, test, indexes, verbose=False):
+    def fit(self, train, test, indexes, path, verbose=False):
         """
         The general training loop to fit the model
 
@@ -179,49 +179,15 @@ class Recommender(object):
             epoch_loss /= minibatch_num + 1
 
             t2 = time()
-            # if verbose and (epoch_num + 1) % 2 == 0:
-            #     torch.save(self._net.state_dict(), f"dblp_e{epoch_num + 1}_lr0.0001_dp0.0001_TL22_state_dict_model.pt", pickle_protocol=4)
             if verbose and (epoch_num + 1) % 20 == 0:
-                torch.save(self._net.state_dict(), f"imdb_e{epoch_num + 1}_lr0.0001_dp0.001_TL22_shuffled_state_dict_model.pt", pickle_protocol=4)
-                eval(self, test)
-                # precision, recall, mean_aps = evaluate_ranking(self, test, train, k=[2, 5, 10])
-                # output_str = "Epoch %d [%.1f s]\tloss=%.4f, map=%.6f, " \
-                #              "prec@2=%.6f, prec@5=%.6f, prec@10=%.6f, " \
-                #              "recall@2=%.6f, recall@5=%.6f, recall@10=%.6f, [%.1f s]" % (epoch_num + 1,
-                #                                                                          t2 - t1,
-                #                                                                          epoch_loss,
-                #                                                                          mean_aps,
-                #                                                                          np.mean(precision[0]),
-                #                                                                          np.mean(precision[1]),
-                #                                                                          np.mean(precision[2]),
-                #                                                                          np.mean(recall[0]),
-                #                                                                          np.mean(recall[1]),
-                #                                                                          np.mean(recall[2]),
-                #                                                                          time() - t2)
-                # print(output_str)
+                torch.save(self._net.state_dict(), f"{path}/state_dict_model.pt", pickle_protocol=4)
+                eval(self, test, path)
             else:
                 output_str = "Epoch %d [%.1f s]\tloss=%.4f [%.1f s]" % (epoch_num + 1,
                                                                         t2 - t1,
                                                                         epoch_loss,
                                                                         time() - t2)
                 print(output_str)
-    def test(self, train, test, indexes, verbose=False):
-        if not self._initialized:
-            self._initialize(train, indexes)
-        self._net.load_state_dict(torch.load('imdb_e20_lr0.0001_dp0.001_TL22_shuffled_state_dict_model.pt'))
-        eval(self, test)
-        # precision, recall, mean_aps = evaluate_ranking(self, test, train, k=[2, 5, 10])
-        # output_str = "Epoch %d \t, map=%.6f, " \
-        #              "prec@2=%.6f, prec@5=%.6f, prec@10=%.6f, " \
-        #              "recall@2=%.6f, recall@5=%.6f, recall@10=%.6f" % (20,
-        #                                                                 mean_aps,
-        #                                                                 np.mean(precision[0]),
-        #                                                                 np.mean(precision[1]),
-        #                                                                 np.mean(precision[2]),
-        #                                                                 np.mean(recall[0]),
-        #                                                                 np.mean(recall[1]),
-        #                                                                 np.mean(recall[2]))
-        # print(output_str)
 
     def _generate_negative_samples(self, users, interactions, n):
         """
@@ -304,8 +270,8 @@ class Recommender(object):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     # data arguments
-    parser.add_argument('--train_root', type=str, default='datasets/imdb/test/train_shuffled.txt')
-    parser.add_argument('--test_root', type=str, default='datasets/imdb/test/test_shuffled.txt')
+    parser.add_argument('--train_root', default='datasets/imdb/test/train_shuffled.txt')
+    parser.add_argument('--test_root', default='datasets/imdb/test/test_shuffled.txt')
     parser.add_argument('--L', type=int, default=2)
     parser.add_argument('--T', type=int, default=2)
     # train arguments
@@ -317,19 +283,15 @@ if __name__ == '__main__':
     parser.add_argument('--neg_samples', type=int, default=3)
     parser.add_argument('--use_cuda', type=str2bool, default=False)
 
+    parser.add_argument('--d', type=int, default=128)
+    parser.add_argument('--nv', type=int, default=1)
+    parser.add_argument('--nh', type=int, default=1)
+    parser.add_argument('--drop', type=float, default=0.001)
+    parser.add_argument('--ac_conv', type=str, default='relu')
+    parser.add_argument('--ac_fc', type=str, default='relu')
+
     config = parser.parse_args()
 
-    # model dependent arguments
-    model_parser = argparse.ArgumentParser()
-    model_parser.add_argument('--d', type=int, default=128)
-    model_parser.add_argument('--nv', type=int, default=1)
-    model_parser.add_argument('--nh', type=int, default=1)
-    model_parser.add_argument('--drop', type=float, default=0.001)
-    model_parser.add_argument('--ac_conv', type=str, default='relu')
-    model_parser.add_argument('--ac_fc', type=str, default='relu')
-
-    model_config = model_parser.parse_args()
-    model_config.L = config.L
     path = '/'.join(config.train_root.split('/')[:-1])
     with open(f"{path}/indexes.pkl", 'rb') as infile:
         indexes = pickle.load(infile)
@@ -354,15 +316,13 @@ if __name__ == '__main__':
                         item_map=train.item_map)
 
     print(config)
-    print(model_config)
     # fit model
     model = Recommender(n_iter=config.n_iter,
                         batch_size=config.batch_size,
                         learning_rate=config.learning_rate,
                         l2=config.l2,
                         neg_samples=config.neg_samples,
-                        model_args=model_config,
+                        model_args=config,
                         use_cuda=config.use_cuda)
 
-    model.fit(train, test, indexes, verbose=True)
-    # model.test(train, test, indexes, verbose=True)
+    model.fit(train, test, indexes, path, verbose=True)
