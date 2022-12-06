@@ -25,7 +25,7 @@ class Rrn(Ntf):
         with open(f"{model_path}/train.data", "w") as file1:
             file1.write(str(skill.shape[1])+"\n")
             file1.write(str(member.shape[1])+"\n")    
-            for i in range(1, len(ind['i2y'])-1):
+            for i in range(1, len(ind['i2y'])-2):
                 colab = skill[ind['i2y'][i-1][0]:ind['i2y'][i][0]].T @ member[ind['i2y'][i-1][0]:ind['i2y'][i][0]]
                 rows, cols = colab.nonzero()
                 for row, col in zip(rows, cols):
@@ -33,9 +33,10 @@ class Rrn(Ntf):
                     file1.write(instance)
             
             with open(f"{model_path}/test.data", "w") as file2:
+                colab = skill[ind['i2y'][-2][0]:].T @ member[ind['i2y'][-2][0]:]
                 rows, cols = colab.nonzero()
                 for row, col in zip(rows, cols):
-                    instance = f'{{"u_idx": {row}, "m_idx": {col}, "split": "test", "time_stamp": {len(ind["i2y"])-1}, "rating": 1}}\n'
+                    instance = f'{{"u_idx": {row}, "m_idx": {col}, "split": "test", "time_stamp": {len(ind["i2y"])-2}, "rating": 1}}\n'
                     file2.write(instance)
     
     def prepare_data_with_zeros(self, teamsvec, ind, model_path):
@@ -44,7 +45,7 @@ class Rrn(Ntf):
         with open(f"{model_path}/train_with_zero.data", "w") as file1:
             file1.write(str(skill.shape[1])+"\n")
             file1.write(str(member.shape[1])+"\n")    
-            for i in range(1, len(ind['i2y'])-1):
+            for i in range(1, len(ind['i2y'])-2):
                 n_teams_per_year = ind['i2y'][i][0] - ind['i2y'][i-1][0]
                 compl_skill = np.ones((n_teams_per_year, skill.shape[1]), int)
                 compl_member = np.ones((n_teams_per_year, member.shape[1]), int)
@@ -74,21 +75,21 @@ class Rrn(Ntf):
                 no_colab = lil_matrix(compl_skill.T @ compl_member)
                 rows, cols = colab.nonzero()
                 for row, col in zip(rows, cols):
-                    instance = f'{{"u_idx": {row}, "m_idx": {col}, "split": "test", "time_stamp": {len(ind["i2y"])-1}, "rating": 1}}\n'
+                    instance = f'{{"u_idx": {row}, "m_idx": {col}, "split": "test", "time_stamp": {len(ind["i2y"])-2}, "rating": 1}}\n'
                     file2.write(instance)
                 no_rows, no_cols = no_colab.nonzero()
                 for row, col in zip(no_rows, no_cols):
-                    instance = f'{{"u_idx": {row}, "m_idx": {col}, "split": "test", "time_stamp": {len(ind["i2y"])-1}, "rating": 0}}\n'
+                    instance = f'{{"u_idx": {row}, "m_idx": {col}, "split": "test", "time_stamp": {len(ind["i2y"])-2}, "rating": 0}}\n'
                     file2.write(instance)
 
-    def learn(self, model_path, with_zero=True):
-        if with_zero:
+    def learn(self, model_path, with_zeros=True):
+        if with_zeros:
             wz = '_with_zero'
         else:
             wz = ''
         cli_cmd = 'python ../baseline/rrn/src/rrn_main.py '
         cli_cmd += f'--train_file {model_path}/train{wz}.data '
-        cli_cmd += f'--test_val_file {model_path}/test{wz}.data'
+        cli_cmd += f'--test_val_file {model_path}/test{wz}.data '
         cli_cmd += '--mf_model_file ../baseline/rrn/model/imdb_15core_M.model40.npy'
         print(f'{cli_cmd}')
         subprocess.Popen(shlex.split(cli_cmd)).wait()
@@ -97,7 +98,8 @@ class Rrn(Ntf):
         pass # test already done in learn
 
     def eval(self, splits, teamsvec, path):
-        results = pd.read_csv(f'{path}/pred')
+        results = pd.read_csv(f'{path}/pred', sep='\t', header=None)
+        results.rename(columns={0:'skill', 1:'member', 2:'gt', 3:'pred'}, inplace=True)
         skill = lil_matrix(teamsvec['skill'])
         member = lil_matrix(teamsvec['member'])
                 
