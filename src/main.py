@@ -19,6 +19,7 @@ from mdl.nmt import Nmt
 from mdl.tnmt import tNmt
 from mdl.tntf import tNtf
 from mdl.team2vec import Team2Vec
+from mdl.caser import Caser
 
 def create_evaluation_splits(n_sample, n_folds, train_ratio=0.85, year_idx=None, output='./', step_ahead=1):   
     if year_idx:
@@ -111,6 +112,9 @@ def run(data_list, domain_list, filter, model_list, output, settings):
         
     # todo: temporal: time as an input feature
     
+    # temporal recommender systems
+    if 'caser' in model_list: models['caser'] = Caser()
+
     assert len(datasets) > 0
     assert len(datasets) == len(domain_list)
     assert len(models) > 0

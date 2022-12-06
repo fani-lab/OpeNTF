@@ -99,7 +99,7 @@ def evaluate_ranking(model, test, train=None, k=10):
 
     return precisions, recalls, mean_aps
 
-def eval(model, test):
+def eval(model, test, path):
     test = test.tocsr()
     df = []
     for user_id, row in enumerate(test):
@@ -112,5 +112,5 @@ def eval(model, test):
             d = {'skill': user_id, 'member': i, 'pred': pred[i]}
             df.append(d)
     df = pd.DataFrame(df)
-    df.to_csv('caser_imdb_lr0.0001_dp0.001_TL22_shuffled.csv')
+    df.to_csv(f'{path}/pred.csv')
     return None
