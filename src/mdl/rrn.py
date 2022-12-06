@@ -1,34 +1,28 @@
-import sys
-sys.path.extend(["./"])
 import pickle
+import subprocess, os
+import shlex
+import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 from scipy.sparse import lil_matrix
-import numpy as np 
-import pandas as pd
+
 from eval.metric import *
-import json
+from mdl.ntf import Ntf
 
-datasets = []
-# datasets += ['../data/preprocessed/dblp/toy.dblp.v12.json']
-# datasets += ['../data/preprocessed/imdb/toy.title.basics.tsv']
-# datasets += ['../data/preprocessed/uspt/toy.patent.tsv']
-# datasets += ['../data/preprocessed/dblp/dblp.v12.json.filtered.mt75.ts3']
-# datasets += ['../data/preprocessed/imdb/title.basics.tsv.filtered.mt75.ts3']
-# datasets += ['../data/preprocessed/uspt/patent.tsv.filtered.mt75.ts3']
+class Rrn(Ntf):
+    def __init__(self):
+        super(Ntf, self).__init__()
 
-
-def reformulate_input_to_rrn(datasets):
-    for dataset in datasets:
-        dname = dataset.split('/')[-2]
-        with open(f'{dataset}/indexes.pkl', 'rb') as infile:
-            ind = pickle.load(infile)
-        with open(f'{dataset}/teamsvecs.pkl', 'rb') as infile2:
-            teamsvec = pickle.load(infile2)
-        
-        id = lil_matrix(teamsvec['id'])
+    def prepare_data(self, teamsvec, ind, model_path, with_zeros=True):
+        if with_zeros:
+            self.prepare_data_with_zeros(teamsvec, ind, model_path)   
+        else:
+            self.prepare_data_without_zeros(teamsvec, ind, model_path)  
+    
+    def prepare_data_without_zeros(self, teamsvec, ind, model_path):
         skill = lil_matrix(teamsvec['skill'])
         member = lil_matrix(teamsvec['member'])
-        with open(f"{dname}_train.data", "w") as file1:
+        with open(f"{model_path}/train.data", "w") as file1:
             file1.write(str(skill.shape[1])+"\n")
             file1.write(str(member.shape[1])+"\n")    
             for i in range(1, len(ind['i2y'])-1):
@@ -38,24 +32,16 @@ def reformulate_input_to_rrn(datasets):
                     instance = f'{{"u_idx": {row}, "m_idx": {col}, "split": "train", "time_stamp": {i}, "rating": 1}}\n'
                     file1.write(instance)
             
-            with open(f"{dname}_test.data", "w") as file2:
+            with open(f"{model_path}/test.data", "w") as file2:
                 rows, cols = colab.nonzero()
                 for row, col in zip(rows, cols):
                     instance = f'{{"u_idx": {row}, "m_idx": {col}, "split": "test", "time_stamp": {len(ind["i2y"])-1}, "rating": 1}}\n'
                     file2.write(instance)
-
-def reformulate_input_to_rrn_with_zero(datasets):
-    for dataset in datasets:
-        dname = dataset.split('/')[-2]
-        with open(f'{dataset}/indexes.pkl', 'rb') as infile:
-            ind = pickle.load(infile)
-        with open(f'{dataset}/teamsvecs.pkl', 'rb') as infile2:
-            teamsvec = pickle.load(infile2)
-        
-        id = lil_matrix(teamsvec['id'])
+    
+    def prepare_data_with_zeros(self, teamsvec, ind, model_path):
         skill = lil_matrix(teamsvec['skill'])
         member = lil_matrix(teamsvec['member'])
-        with open(f"{dname}_train_with_zero.data", "w") as file1:
+        with open(f"{model_path}/train_with_zero.data", "w") as file1:
             file1.write(str(skill.shape[1])+"\n")
             file1.write(str(member.shape[1])+"\n")    
             for i in range(1, len(ind['i2y'])-1):
@@ -77,7 +63,7 @@ def reformulate_input_to_rrn_with_zero(datasets):
                     instance = f'{{"u_idx": {row}, "m_idx": {col}, "split": "train", "time_stamp": {i}, "rating": 0}}\n'
                     file1.write(instance)
             
-            with open(f"{dname}_test_with_zero.data", "w") as file2:
+            with open(f"{model_path}/test_with_zero.data", "w") as file2:
                 n_teams_test_set = skill.shape[0] - ind['i2y'][-2][0]
                 compl_skill = np.ones((n_teams_test_set, skill.shape[1]), int)
                 compl_member = np.ones((n_teams_test_set, member.shape[1]), int)
@@ -95,24 +81,26 @@ def reformulate_input_to_rrn_with_zero(datasets):
                     instance = f'{{"u_idx": {row}, "m_idx": {col}, "split": "test", "time_stamp": {len(ind["i2y"])-1}, "rating": 0}}\n'
                     file2.write(instance)
 
-# reformulate_input_to_rrn(datasets)
+    def learn(self, model_path, with_zero=True):
+        if with_zero:
+            wz = '_with_zero'
+        else:
+            wz = ''
+        cli_cmd = 'python ../baseline/rrn/src/rrn_main.py '
+        cli_cmd += f'--train_file {model_path}/train{wz}.data '
+        cli_cmd += f'--test_val_file {model_path}/test{wz}.data'
+        cli_cmd += '--mf_model_file ../baseline/rrn/model/imdb_15core_M.model40.npy'
+        print(f'{cli_cmd}')
+        subprocess.Popen(shlex.split(cli_cmd)).wait()
+    
+    def test(self):
+        pass # test already done in learn
 
-
-def transform_rrn_output(datasets):
-    for dataset in datasets:
-        dname = dataset.split('/')[-2]
-        results = pd.read_csv(f'{dataset}/{dname}_pred', sep='\t', header=None)
-        results.rename(columns={0:'skill', 1:'member', 2:'gt', 3:'pred'}, inplace=True)
-        with open(f'{dataset}/indexes.pkl', 'rb') as infile:
-            ind = pickle.load(infile)
-        with open(f'{dataset}/teamsvecs.pkl', 'rb') as infile2:   
-            teamsvec = pickle.load(infile2)
-        id = lil_matrix(teamsvec['id'])
+    def eval(self, splits, teamsvec, path):
+        results = pd.read_csv(f'{path}/pred')
         skill = lil_matrix(teamsvec['skill'])
         member = lil_matrix(teamsvec['member'])
                 
-        with open(f'{dataset}/splits.json') as infile3:
-            splits = json.load(infile3)
         Y = member[splits['test']]
         Y_ = np.zeros((len(splits['test']), member.shape[1]))
         for i in range(len(splits['test'])):
@@ -123,16 +111,36 @@ def transform_rrn_output(datasets):
                 Y_[i][int(row['member'])] = row['pred']
 
         _, df_mean, (fpr, tpr) = calculate_metrics(Y, Y_, False)
-        df_mean.to_csv(f'{dataset}/{dname}.pred.eval.mean.csv')
-        with open(f'{dataset}/{dname}.pred.eval.roc.pkl', 'wb') as outfile:
+        df_mean.to_csv(f'{path}/pred.eval.mean.csv')
+        with open(f'{path}/pred.eval.roc.pkl', 'wb') as outfile:
             pickle.dump((fpr, tpr), outfile)
+
+    def plot_roc(self, model_path):
+        with open(f'{model_path}/pred.eval.roc.pkl', 'rb') as infile: (fpr, tpr) = pickle.load(infile)
         plt.figure()
         plt.plot(fpr, tpr, label=f'micro-average on test set', linestyle=':', linewidth=4)
         plt.xlabel('false positive rate')
         plt.ylabel('true positive rate')
         plt.title(f'ROC curves for test set')
         plt.legend()
-        plt.savefig(f'{dataset}/{dname}.roc.png', dpi=100, bbox_inches='tight')
+        plt.savefig(f'{model_path}/roc.png', dpi=100, bbox_inches='tight')
         plt.show()
 
-# transform_rrn_output(datasets)
+    def run(self, splits, vecs, indexes, output, settings, cmd):
+        team_count = vecs['skill'].shape[0]
+        skill_count = vecs['skill'].shape[1]
+        member_count = vecs['member'].shape[1]
+
+        model_path = f"{output}/t{team_count}.s{skill_count}.m{member_count}"
+        if not os.path.isdir(output): os.makedirs(output)
+        if not os.path.isdir(model_path): os.makedirs(model_path)
+        with open(f'{model_path}/indexes.pkl', "wb") as outfile: pickle.dump(indexes, outfile) 
+
+        with_zero = True
+
+        if 'train' in cmd:
+            self.prepare_data(vecs, indexes, model_path, with_zeros=with_zero)
+            self.learn(model_path, with_zeros=with_zero)
+        if 'test' in cmd: self.test()
+        if 'eval' in cmd: self.eval(splits, vecs, model_path)
+        if 'plot' in cmd: self.plot_roc(model_path)
