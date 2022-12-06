@@ -94,7 +94,7 @@ We randomly take ``85%`` of the dataset for the train-validation set and ``15%``
 
 Previous works in team formation presumed that teams follow the i.i.d property and hence when training their models they followed the bag of teams approach, where they train and validate their models on a shuffled dataset of teams. Moreover, they were interpolative and did not try to predict _future_ successful teams. In this work, we aim at extrapolating and predicting _future_ teams of experts. We sort the teams by time intervals and train a neural model incrementally  through the ordered collection of teams in [C<sub>0</sub>, ..C<sub>t</sub>, ..C<sub>T</sub>]. As can be seen in Figure below, after random initialization of skills’ and experts’ embeddings at t=0, we start training the model on the teams in the first time interval C<sub>0</sub> for a number of epochs, then we continue with training  on the second time interval C<sub>1</sub> using the learned embeddings from the previous time interval and so forth until we finish the training on the last training time interval C<sub>t=T</sub>. We believe that using this approach, will help the model understand how experts’ skills and collaborative ties evolve through time and the final embeddings are their optimum representation in the latent space to predict _future_ successful teams at time interval C<sub>t=T+1</sub>.
 
-<p align="center"><img src='./data/streaming_plot.PNG'></p>
+<p align="center"><img src='./src/mdl/tntf.png' width="700"></p>
 
 **3.3. Model Architecture**
 
@@ -105,6 +105,8 @@ For example, for our feedforward baseline [``fnn``](./src/mdl/fnn.py), the model
   
 Currently, we support neural models:
 1) Bayesian [``bnn``](./src/mdl/bnn.py) where model's parameter (weights) is assumed to be drawn from Gaussian (Normal) distribution and the task is to not to learn the weight but the mean (μ) and standard deviation (σ) of the distribution at each parameter.
+
+<p align="center"><img src='./src/mdl/bnn.png' width="350" ></p>
 
 2) non-Bayesian feedforward [``fnn``](./src/mdl/fnn.py) where the model's parameter (weights) is to be learnt.
 
@@ -186,6 +188,11 @@ We benefit from [``pytrec_eval``](https://github.com/cvangysel/pytrec_eval), [``
   
 ## 6. License:
 ©2021. This work is licensed under a [CC BY-NC-SA 4.0](license.txt) license.
+
+Arman Dashti<sup>1</sup>, [Hossein Fani](https://hosseinfani.github.io/)<sup>1,2</sup> 
+
+<sup><sup>1</sup>School of Computer Science, Faculty of Science, University of Windsor, ON, Canada.</sup>
+<sup><sup>2</sup>[hfani@uwindsor.ca](mailto:hfani@uwindsor.ca)</sup>
 
 ## 7. Citation:
 ```
