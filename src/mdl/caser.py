@@ -1,9 +1,8 @@
-import yaml, pickle
-import subprocess, os, re
+import pickle
+import subprocess, os
 import shlex
 import numpy as np
 import pandas as pd
-import torch
 import matplotlib.pyplot as plt
 from scipy.sparse import lil_matrix
 
@@ -60,15 +59,7 @@ class Caser(Ntf):
         df_mean.to_csv(f'{path}/pred.eval.mean.csv')
         with open(f'{path}/pred.eval.roc.pkl', 'wb') as outfile:
             pickle.dump((fpr, tpr), outfile)
-        plt.figure()
-        plt.plot(fpr, tpr, label=f'micro-average on test set', linestyle=':', linewidth=4)
-        plt.xlabel('false positive rate')
-        plt.ylabel('true positive rate')
-        plt.title(f'ROC curves for test set')
-        plt.legend()
-        plt.savefig(f'{path}/roc.png', dpi=100, bbox_inches='tight')
-        plt.show()
-
+    
     def plot_roc(self, model_path):
         with open(f'{model_path}/pred.eval.roc.pkl', 'rb') as infile: (fpr, tpr) = pickle.load(infile)
         plt.figure()
