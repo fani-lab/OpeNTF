@@ -10,19 +10,17 @@ from eval.metric import *
 from mdl.ntf import Ntf
 
 class Rrn(Ntf):
-    def __init__(self):
+    def __init__(self, with_zero=True):
         super(Ntf, self).__init__()
+        self.with_zero = with_zero
 
-    def prepare_data(self, teamsvec, ind, model_path, with_zeros=True):
-        if with_zeros:
-            self.prepare_data_with_zeros(teamsvec, ind, model_path)   
-        else:
-            self.prepare_data_without_zeros(teamsvec, ind, model_path)  
-    
-    def prepare_data_without_zeros(self, teamsvec, ind, model_path):
+    def prepare_data(self, teamsvec, ind, model_path):
         skill = lil_matrix(teamsvec['skill'])
         member = lil_matrix(teamsvec['member'])
-        with open(f"{model_path}/train.data", "w") as file1:
+        wz = '_with_zero' if self.with_zero else ''
+        train_data_name = f'train{wz}.data'
+        test_data_name = f'test{wz}.data'
+        with open(f"{model_path}/{train_data_name}", "w") as file1:
             file1.write(str(skill.shape[1])+"\n")
             file1.write(str(member.shape[1])+"\n")    
             for i in range(1, len(ind['i2y'])-2):
@@ -31,59 +29,39 @@ class Rrn(Ntf):
                 for row, col in zip(rows, cols):
                     instance = f'{{"u_idx": {row}, "m_idx": {col}, "split": "train", "time_stamp": {i}, "rating": 1}}\n'
                     file1.write(instance)
-            
-            with open(f"{model_path}/test.data", "w") as file2:
-                colab = skill[ind['i2y'][-2][0]:].T @ member[ind['i2y'][-2][0]:]
-                rows, cols = colab.nonzero()
-                for row, col in zip(rows, cols):
-                    instance = f'{{"u_idx": {row}, "m_idx": {col}, "split": "test", "time_stamp": {len(ind["i2y"])-2}, "rating": 1}}\n'
-                    file2.write(instance)
-    
-    def prepare_data_with_zeros(self, teamsvec, ind, model_path):
-        skill = lil_matrix(teamsvec['skill'])
-        member = lil_matrix(teamsvec['member'])
-        with open(f"{model_path}/train_with_zero.data", "w") as file1:
-            file1.write(str(skill.shape[1])+"\n")
-            file1.write(str(member.shape[1])+"\n")    
-            for i in range(1, len(ind['i2y'])-2):
-                n_teams_per_year = ind['i2y'][i][0] - ind['i2y'][i-1][0]
-                compl_skill = np.ones((n_teams_per_year, skill.shape[1]), int)
-                compl_member = np.ones((n_teams_per_year, member.shape[1]), int)
-                compl_skill[skill[ind['i2y'][i-1][0]:ind['i2y'][i][0]].nonzero()] = 0
-                compl_member[member[ind['i2y'][i-1][0]:ind['i2y'][i][0]].nonzero()] = 0
 
-                colab = skill[ind['i2y'][i-1][0]:ind['i2y'][i][0]].T @ member[ind['i2y'][i-1][0]:ind['i2y'][i][0]]
-                no_colab = lil_matrix(compl_skill.T @ compl_member)
-
-                rows, cols = colab.nonzero()
-                for row, col in zip(rows, cols):
-                    instance = f'{{"u_idx": {row}, "m_idx": {col}, "split": "train", "time_stamp": {i}, "rating": 1}}\n'
-                    file1.write(instance)
-                no_rows, no_cols = no_colab.nonzero()
-                for row, col in zip(no_rows, no_cols):
-                    instance = f'{{"u_idx": {row}, "m_idx": {col}, "split": "train", "time_stamp": {i}, "rating": 0}}\n'
-                    file1.write(instance)
+                if self.with_zero:
+                    n_teams_per_year = ind['i2y'][i][0] - ind['i2y'][i-1][0]
+                    compl_skill = np.ones((n_teams_per_year, skill.shape[1]), int)
+                    compl_member = np.ones((n_teams_per_year, member.shape[1]), int)
+                    compl_skill[skill[ind['i2y'][i-1][0]:ind['i2y'][i][0]].nonzero()] = 0
+                    compl_member[member[ind['i2y'][i-1][0]:ind['i2y'][i][0]].nonzero()] = 0
+                    no_colab = lil_matrix(compl_skill.T @ compl_member)
+                    no_rows, no_cols = no_colab.nonzero()
+                    for row, col in zip(no_rows, no_cols):
+                        instance = f'{{"u_idx": {row}, "m_idx": {col}, "split": "train", "time_stamp": {i}, "rating": 0}}\n'
+                        file1.write(instance)
             
-            with open(f"{model_path}/test_with_zero.data", "w") as file2:
+        with open(f"{model_path}/{test_data_name}", "w") as file2:
+            colab = skill[ind['i2y'][-2][0]:].T @ member[ind['i2y'][-2][0]:]
+            rows, cols = colab.nonzero()
+            for row, col in zip(rows, cols):
+                instance = f'{{"u_idx": {row}, "m_idx": {col}, "split": "test", "time_stamp": {len(ind["i2y"])-2}, "rating": 1}}\n'
+                file2.write(instance)
+            if self.with_zero:
                 n_teams_test_set = skill.shape[0] - ind['i2y'][-2][0]
                 compl_skill = np.ones((n_teams_test_set, skill.shape[1]), int)
                 compl_member = np.ones((n_teams_test_set, member.shape[1]), int)
-                
                 compl_skill[skill[ind['i2y'][-2][0]:].nonzero()] = 0
                 compl_member[member[ind['i2y'][-2][0]:].nonzero()] = 0
-                colab = skill[ind['i2y'][-2][0]:].T @ member[ind['i2y'][-2][0]:]
                 no_colab = lil_matrix(compl_skill.T @ compl_member)
-                rows, cols = colab.nonzero()
-                for row, col in zip(rows, cols):
-                    instance = f'{{"u_idx": {row}, "m_idx": {col}, "split": "test", "time_stamp": {len(ind["i2y"])-2}, "rating": 1}}\n'
-                    file2.write(instance)
                 no_rows, no_cols = no_colab.nonzero()
                 for row, col in zip(no_rows, no_cols):
                     instance = f'{{"u_idx": {row}, "m_idx": {col}, "split": "test", "time_stamp": {len(ind["i2y"])-2}, "rating": 0}}\n'
                     file2.write(instance)
 
-    def learn(self, model_path, with_zeros=True):
-        if with_zeros:
+    def learn(self, model_path):
+        if self.with_zero:
             wz = '_with_zero'
         else:
             wz = ''
@@ -138,11 +116,9 @@ class Rrn(Ntf):
         if not os.path.isdir(model_path): os.makedirs(model_path)
         with open(f'{model_path}/indexes.pkl', "wb") as outfile: pickle.dump(indexes, outfile) 
 
-        with_zero = True
-
         if 'train' in cmd:
-            self.prepare_data(vecs, indexes, model_path, with_zeros=with_zero)
-            self.learn(model_path, with_zeros=with_zero)
+            self.prepare_data(vecs, indexes, model_path)
+            self.learn(model_path)
         if 'test' in cmd: self.test()
         if 'eval' in cmd: self.eval(splits, vecs, model_path)
         if 'plot' in cmd: self.plot_roc(model_path)
