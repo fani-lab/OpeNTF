@@ -35,7 +35,9 @@ settings = {
                 'base_config': './mdl/nmt_config.yaml'
             },
             'caser': {},
-            'rrn': {},
+            'rrn': {
+                'with_zero': True
+            },
             'emb':{
                 'd': 100,# embedding dimension
                 'e': 100,# epoch
@@ -46,7 +48,7 @@ settings = {
         'cmd': ['train', 'test', 'eval', 'plot', 'agg'],  # 'train', 'test', 'eval', 'plot', 'agg'
         'nfolds': 5,
         'train_test_split': 0.85,
-        'step_ahead': 1,#for now, it means that whatever are in the last [step_ahead] time interval will be the test set!
+        'step_ahead': 2,#for now, it means that whatever are in the last [step_ahead] time interval will be the test set!
     },
     'data':{
         'domain': {

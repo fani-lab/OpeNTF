@@ -115,7 +115,7 @@ def run(data_list, domain_list, filter, model_list, output, settings):
     
     # temporal recommender systems
     if 'caser' in model_list: models['caser'] = Caser()
-    if 'rrn' in model_list: models['rrn'] = Rrn()
+    if 'rrn' in model_list: models['rrn'] = Rrn(settings['model']['baseline']['rrn']['with_zero'])
 
     assert len(datasets) > 0
     assert len(datasets) == len(domain_list)
