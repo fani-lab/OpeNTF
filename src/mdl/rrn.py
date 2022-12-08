@@ -10,9 +10,10 @@ from eval.metric import *
 from mdl.ntf import Ntf
 
 class Rrn(Ntf):
-    def __init__(self, with_zero=True):
+    def __init__(self, with_zero=True, step_ahead=2):
         super(Ntf, self).__init__()
         self.with_zero = with_zero
+        self.step_ahead = step_ahead
 
     def prepare_data(self, teamsvec, ind, model_path):
         skill = lil_matrix(teamsvec['skill'])
@@ -23,7 +24,7 @@ class Rrn(Ntf):
         with open(f"{model_path}/{train_data_name}", "w") as file1:
             file1.write(str(skill.shape[1])+"\n")
             file1.write(str(member.shape[1])+"\n")    
-            for i in range(1, len(ind['i2y'])-2):
+            for i in range(1, len(ind['i2y'])-(self.step_ahead)):
                 colab = skill[ind['i2y'][i-1][0]:ind['i2y'][i][0]].T @ member[ind['i2y'][i-1][0]:ind['i2y'][i][0]]
                 rows, cols = colab.nonzero()
                 for row, col in zip(rows, cols):
@@ -43,21 +44,21 @@ class Rrn(Ntf):
                         file1.write(instance)
             
         with open(f"{model_path}/{test_data_name}", "w") as file2:
-            colab = skill[ind['i2y'][-2][0]:].T @ member[ind['i2y'][-2][0]:]
+            colab = skill[ind['i2y'][-(self.step_ahead)][0]:].T @ member[ind['i2y'][-(self.step_ahead)][0]:]
             rows, cols = colab.nonzero()
             for row, col in zip(rows, cols):
-                instance = f'{{"u_idx": {row}, "m_idx": {col}, "split": "test", "time_stamp": {len(ind["i2y"])-2}, "rating": 1}}\n'
+                instance = f'{{"u_idx": {row}, "m_idx": {col}, "split": "test", "time_stamp": {len(ind["i2y"])-(self.step_ahead)}, "rating": 1}}\n'
                 file2.write(instance)
             if self.with_zero:
-                n_teams_test_set = skill.shape[0] - ind['i2y'][-2][0]
+                n_teams_test_set = skill.shape[0] - ind['i2y'][-(self.step_ahead)][0]
                 compl_skill = np.ones((n_teams_test_set, skill.shape[1]), int)
                 compl_member = np.ones((n_teams_test_set, member.shape[1]), int)
-                compl_skill[skill[ind['i2y'][-2][0]:].nonzero()] = 0
-                compl_member[member[ind['i2y'][-2][0]:].nonzero()] = 0
+                compl_skill[skill[ind['i2y'][-(self.step_ahead)][0]:].nonzero()] = 0
+                compl_member[member[ind['i2y'][-(self.step_ahead)][0]:].nonzero()] = 0
                 no_colab = lil_matrix(compl_skill.T @ compl_member)
                 no_rows, no_cols = no_colab.nonzero()
                 for row, col in zip(no_rows, no_cols):
-                    instance = f'{{"u_idx": {row}, "m_idx": {col}, "split": "test", "time_stamp": {len(ind["i2y"])-2}, "rating": 0}}\n'
+                    instance = f'{{"u_idx": {row}, "m_idx": {col}, "split": "test", "time_stamp": {len(ind["i2y"])-(self.step_ahead)}, "rating": 0}}\n'
                     file2.write(instance)
 
     def learn(self, model_path):
