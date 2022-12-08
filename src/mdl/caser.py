@@ -10,21 +10,22 @@ from eval.metric import *
 from mdl.ntf import Ntf
 
 class Caser(Ntf):
-    def __init__(self):
+    def __init__(self, step_ahead=2):
         super(Ntf, self).__init__()
+        self.step_ahead = step_ahead
 
     def prepare_data(self, vecs, indexes, model_path):
         skill = lil_matrix(vecs['skill'])
         member = lil_matrix(vecs['member'])
         with open(f"{model_path}/train.txt", "w") as file1:
-            for i in range(1, len(indexes['i2y'])-2):
+            for i in range(1, len(indexes['i2y'])-(self.step_ahead)):
                 colab = skill[indexes['i2y'][i-1][0]:indexes['i2y'][i][0]].T @ member[indexes['i2y'][i-1][0]:indexes['i2y'][i][0]]
                 rows, cols = colab.nonzero()
                 for row, col in zip(rows, cols):
                     instance = f'{row} {col} 1\n'
                     file1.write(instance)
         with open(f"{model_path}/test.txt", "w") as file2:
-            colab = skill[indexes['i2y'][-2][0]:].T @ member[indexes['i2y'][-2][0]:]
+            colab = skill[indexes['i2y'][-(self.step_ahead)][0]:].T @ member[indexes['i2y'][-(self.step_ahead)][0]:]
             rows, cols = colab.nonzero()
             for row, col in zip(rows, cols):
                 instance = f'{row} {col} 1\n'

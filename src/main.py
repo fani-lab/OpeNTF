@@ -114,8 +114,8 @@ def run(data_list, domain_list, filter, model_list, output, settings):
     # todo: temporal: time as an input feature
     
     # temporal recommender systems
-    if 'caser' in model_list: models['caser'] = Caser()
-    if 'rrn' in model_list: models['rrn'] = Rrn(settings['model']['baseline']['rrn']['with_zero'])
+    if 'caser' in model_list: models['caser'] = Caser(settings['model']['step_ahead'])
+    if 'rrn' in model_list: models['rrn'] = Rrn(settings['model']['baseline']['rrn']['with_zero'], settings['model']['step_ahead'])
 
     assert len(datasets) > 0
     assert len(datasets) == len(domain_list)
