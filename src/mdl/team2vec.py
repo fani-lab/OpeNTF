@@ -32,6 +32,7 @@ class Team2Vec:
         except FileNotFoundError:
             print(f"File not found! Generating {self.embtype} documents ...") 
             j = 0
+            year = self.indexes['i2y'][0][1]
             for i, id in enumerate(self.teamsvecs['id']):
                 skill_doc = [f's{str(skill_idx)}' for skill_idx in self.teamsvecs['skill'][i].nonzero()[1]]
                 member_doc = [f'm{str(member_idx)}' for member_idx in self.teamsvecs['member'][i].nonzero()[1]]
