@@ -143,7 +143,7 @@ class Recommender(object):
                                                     negatives.to(self._device))
 
             epoch_loss = 0.0
-
+            minibatch_num = 0
             for (minibatch_num,
                  (batch_users,
                   batch_sequences,
