@@ -210,16 +210,31 @@ class Bnn(Fnn):
                     torch.cuda.empty_cache()
                     with torch.no_grad():
                         y_pred = torch.empty(0, dl.dataset.output.shape[1])
+                        # y_mins = torch.empty(0, dl.dataset.output.shape[1])
+                        # y_maxs = torch.empty(0, dl.dataset.output.shape[1])
                         for x, y in dl:
                             x = x.to(device=self.device)
                             outputs = np.zeros((params['s'], y.shape[0], y.shape[2]))
                             for i in range(params['s']):
                                 outputs[i] = self.forward(x).squeeze(1).cpu().numpy()
                             scores = outputs.mean(axis=0)
+                            # y_mins = np.vstack((y_mins, np.amin(outputs, axis=0)))
+                            # y_maxs = np.vstack((y_maxs, np.amax(outputs, axis=0)))
                             y_pred = np.vstack((y_pred, scores))
                     epoch = modelfile.split('.')[-2] + '.' if per_epoch else ''
                     epoch = epoch.replace(f'f{foldidx}.', '')
                     torch.save(y_pred, f'{model_path}/f{foldidx}.{pred_set}.{epoch}pred', pickle_protocol=4)
+                    # plt.figure(figsize=(8,4)) 
+                    # plt.plot(y_pred.mean(axis=0), label=f"avg", color='blue', linewidth=1)
+                    # plt.plot(y_maxs.mean(axis=0), label=f"max", color='green', linewidth=1)
+                    # plt.plot(y_mins.mean(axis=0), label=f"min", color='red', linewidth=1)
+                    # plt.fill_between(np.arange(len(y_pred[0])), y_pred.mean(axis=0), y_maxs.mean(axis=0), color='palegreen')
+                    # plt.fill_between(np.arange(len(y_pred[0])), y_mins.mean(axis=0), y_pred.mean(axis=0), color='palegreen')
+                    # plt.legend(loc='upper right')
+                    # plt.grid(linestyle=':')
+                    # plt.title(f"max-min-avg plot")
+                    # plt.savefig(f'{model_path}/f{foldidx}.{pred_set}.min-max-avg-plot.png', dpi=100, bbox_inches='tight')
+                    # plt.show()
 
 class BayesianLayer(nn.Module):
     def __init__(self, input_features, output_features, prior_var=1.):
