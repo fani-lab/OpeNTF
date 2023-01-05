@@ -18,11 +18,13 @@ datasets += ['../data/preprocessed/dblp/toy.dblp.v12.json']
 datasets += ['../data/preprocessed/imdb/toy.title.basics.tsv']
 # datasets += ['../data/preprocessed/uspt/patent.tsv.filtered.mt75.ts3']
 datasets += ['../data/preprocessed/uspt/toy.patent.tsv']
+# datasets += ['../data/preprocessed/gith/data.csv.filtered.mt10.ts3']
+datasets += ['../data/preprocessed/gith/toy.data.csv']
 
 for dataset in datasets:
     start = time.time()
     with open(f'{dataset}/teamsvecs.pkl', 'rb') as infile:
-        stats = Team.get_stats(pickle.load(infile), dataset, cache=False, plot=True, plot_title='uspt')
+        stats = Team.get_stats(pickle.load(infile), dataset, cache=False, plot=True, plot_title=None)
     end = time.time()
     print(end - start)
 
@@ -136,11 +138,11 @@ def get_dist_teams_over_years_with_ind(dataset):
 # for dataset in datasets:
     # get_dist_teams_over_years_with_ind(dataset)
 
-def hmap_after_year(dataset, year):
-    dname = dataset.split('/')[-2]
-    with open(f'{dataset}/teamsvecs.pkl', 'rb') as infile:
+def hmap_after_year(dataset_path, values, year):
+    dname = dataset_path.split('/')[-2]
+    with open(f'{dataset_path}/teamsvecs.pkl', 'rb') as infile:
         teamsvecs = pickle.load(infile)
-    with open(f'{dataset}/indexes.pkl', 'rb') as infile:
+    with open(f'{dataset_path}/indexes.pkl', 'rb') as infile:
         indexes = pickle.load(infile)
     year_idx = indexes['i2y']
     yid = []
@@ -148,49 +150,49 @@ def hmap_after_year(dataset, year):
         if year_idx[i][1] < year:
             continue
         yid.append(year_idx[i])
-    skill_year = np.empty((len(yid), teamsvecs['skill'].shape[1]))
+    value_year = np.empty((len(yid), teamsvecs[values].shape[1]))
     for i in range(1, len(yid)):
         if yid[i][1] < year:
             continue
-        row_sum = teamsvecs['skill'][yid[i-1][0]:yid[i][0]].sum(axis=0)
-        skill_year[i-1] = row_sum
-    skill_year[-1] = teamsvecs['skill'][yid[-1][0]:].sum(axis=0)
-    year_skill = skill_year.T
-    sum_skill_in_all_years = year_skill.sum(axis=1)
-    skills_bigger_than = sum_skill_in_all_years > 1000
-    year_skill_hm = year_skill[skills_bigger_than.nonzero()[0]]
+        row_sum = teamsvecs[values][yid[i-1][0]:yid[i][0]].sum(axis=0)
+        value_year[i-1] = row_sum
+    value_year[-1] = teamsvecs[values][yid[-1][0]:].sum(axis=0)
+    year_value = value_year.T
+    sum_value_in_all_years = year_value.sum(axis=1)
+    values_bigger_than = sum_value_in_all_years > 300
+    year_value_hm = year_value[values_bigger_than.nonzero()[0]]
     
     # plt.xticks(color='w')
     # plt.yticks(color='w')
-    plt.pcolormesh(year_skill_hm, cmap='gray_r')
+    plt.pcolormesh(year_value_hm, cmap='gray_r')
     plt.colorbar()
-    plt.savefig(f'{dataset}/{dname}_heatmap_after_{year}_gray_r.pdf', dpi=100, bbox_inches='tight')
+    plt.savefig(f'{dataset_path}/{dname}_{values}_heatmap_after_{year}_gray_r.pdf', dpi=100, bbox_inches='tight')
     plt.show()
 
-def hmap(dataset):
-    dname = dataset.split('/')[-2]
-    with open(f'{dataset}/teamsvecs.pkl', 'rb') as infile:
+def hmap(dataset_path, values):
+    dname = dataset_path.split('/')[-2]
+    with open(f'{dataset_path}/teamsvecs.pkl', 'rb') as infile:
         teamsvecs = pickle.load(infile)
-    with open(f'{dataset}/indexes.pkl', 'rb') as infile:
+    with open(f'{dataset_path}/indexes.pkl', 'rb') as infile:
         indexes = pickle.load(infile)
     year_idx = indexes['i2y']
-    skill_year = np.empty((len(year_idx), teamsvecs['skill'].shape[1]))
+    value_year = np.empty((len(year_idx), teamsvecs[values].shape[1]))
     for i in range(1, len(year_idx)):
-        row_sum = teamsvecs['skill'][year_idx[i-1][0]:year_idx[i][0]].sum(axis=0)
-        skill_year[i-1] = row_sum
-    skill_year[-1] = teamsvecs['skill'][year_idx[-1][0]:].sum(axis=0)
-    year_skill = skill_year.T
-    sum_skill_in_all_years = year_skill.sum(axis=1)
-    skills_bigger_than = sum_skill_in_all_years > 1000
-    year_skill_hm = year_skill[skills_bigger_than.nonzero()[0]]
+        row_sum = teamsvecs[values][year_idx[i-1][0]:year_idx[i][0]].sum(axis=0)
+        value_year[i-1] = row_sum
+    value_year[-1] = teamsvecs[values][year_idx[-1][0]:].sum(axis=0)
+    year_value = value_year.T
+    sum_value_in_all_years = year_value.sum(axis=1)
+    values_bigger_than = sum_value_in_all_years > 1000
+    year_value_hm = year_value[values_bigger_than.nonzero()[0]]
     
     # plt.xticks(color='w')
     # plt.yticks(color='w')
-    plt.pcolormesh(year_skill_hm, cmap='gray_r')
+    plt.pcolormesh(year_value_hm, cmap='gray_r')
     plt.colorbar()
-    plt.savefig(f'{dataset}/{dname}_heatmap_gray_r.pdf', dpi=100, bbox_inches='tight')
+    plt.savefig(f'{dataset_path}/{dname}_{values}_heatmap_gray_r.pdf', dpi=100, bbox_inches='tight')
     plt.show()
 
-# for dataset in datasets:
-    # hmap_after_year(dataset, 2005)
-    # hmap(dataset)
+for dataset in datasets:
+    hmap_after_year(dataset, 'member', 2000)
+    hmap(dataset, 'skill')
