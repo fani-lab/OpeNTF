@@ -20,6 +20,8 @@ class Ntf(nn.Module):
         y_test = vecs['member'][splits['test']]
         for pred_set in (['test', 'train', 'valid'] if on_train_valid_set else ['test']):
             fold_mean = pd.DataFrame()
+            if per_instance: fold_mean_per_instance = pd.DataFrame()
+            
             #there is not such files for random model!!
             predfiles = [f'{model_path}/{_}' for _ in os.listdir(model_path) if re.match('state_dict_model.f\d+.pt', _)]
             if per_epoch: predfiles += [f'{model_path}/{_}' for _ in os.listdir(model_path) if re.match('state_dict_model.f\d+.e\d+', _)]
@@ -34,13 +36,15 @@ class Ntf(nn.Module):
                         Y = y_test
                     Y_ = torch.load(f'{model_path}/f{foldidx}.{pred_set}.{epoch}pred')
                     df, df_mean, (fpr, tpr) = calculate_metrics(Y, Y_, per_instance)
-                    if per_instance: df.to_csv(f'{model_path}/f{foldidx}.{pred_set}.{epoch}pred.eval.csv', float_format='%.15f')
+                    if per_instance: df.to_csv(f'{model_path}/f{foldidx}.{pred_set}.{epoch}pred.eval.per_instance.csv', float_format='%.15f')
                     df_mean.to_csv(f'{model_path}/f{foldidx}.{pred_set}.{epoch}pred.eval.mean.csv')
                     with open(f'{model_path}/f{foldidx}.{pred_set}.{epoch}pred.eval.roc.pkl', 'wb') as outfile:
                         pickle.dump((fpr, tpr), outfile)
                     fold_mean = pd.concat([fold_mean, df_mean], axis=1)
+                    if per_instance: fold_mean_per_instance = fold_mean_per_instance.add(df, fill_value=0)
                 # the last row is a list of roc values
                 fold_mean.mean(axis=1).to_frame('mean').to_csv(f'{model_path}/{pred_set}.{epoch}pred.eval.mean.csv')
+                if per_instance: fold_mean_per_instance.truediv(len(splits['folds'].keys())).to_csv(f'{model_path}/{pred_set}.{epoch}pred.eval.per_instance_mean.csv')
 
     def plot_roc(self, model_path, splits, on_train_valid_set=False):
         for pred_set in (['test', 'train', 'valid'] if on_train_valid_set else ['test']):
@@ -58,11 +62,8 @@ class Ntf(nn.Module):
             plt.show()
 
     def run(self, splits, vecs, indexes, output, settings, cmd):
-        output = f"{output}/t{vecs['skill'].shape[0]}.s{vecs['skill'].shape[1]}.m{vecs['member'].shape[1]}.{'.'.join([k + str(v).replace(' ', '') for k, v in settings.items() if v])}"
-        if not os.path.isdir(output): os.makedirs(output)
-
         on_train_valid_set = False #random baseline cannot join this.
-        per_instance = False
+        per_instance = True
         per_epoch = False
 
         if 'train' in cmd: self.learn(splits, indexes, vecs, settings, None, output)
