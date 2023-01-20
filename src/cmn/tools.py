@@ -9,7 +9,7 @@ class NumpyArrayEncoder(JSONEncoder):
             return obj.tolist()
         return JSONEncoder.default(self, obj)
 
-def merge_teams_by_skills(teamsvecs, inplace=False, distinct=True):
+def merge_teams_by_skills(teamsvecs, inplace=False, distinct=False):
     vecs = teamsvecs if inplace else copy.deepcopy(teamsvecs)
     merge_list = {}
 
@@ -39,7 +39,7 @@ def merge_teams_by_skills(teamsvecs, inplace=False, distinct=True):
             result = np.add(vec1, vec2)
             result[result != 0] = 1
             vecs['member'][int(key_), :] = scipy.sparse.lil_matrix(result)
-    if not distinct:
+    if distinct:
         vecs['id'] = scipy.sparse.lil_matrix(np.delete(vecs['id'].toarray(), del_list, axis=0))
         vecs['skill'] = scipy.sparse.lil_matrix(np.delete(vecs['skill'].toarray(), del_list, axis=0))
         vecs['member'] = scipy.sparse.lil_matrix(np.delete(vecs['member'].toarray(), del_list, axis=0))
