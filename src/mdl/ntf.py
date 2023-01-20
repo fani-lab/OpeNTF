@@ -13,7 +13,7 @@ class Ntf(nn.Module):
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     def learn(self, splits, indexes, vecs, params, prev_model, output): pass
-    def test(self, model_path, splits, indexes, vecs, params, on_train_valid_set=False, per_epoch=False): pass
+    def test(self, model_path, splits, indexes, vecs, params, on_train_valid_set=False, per_epoch=False, merge_skills=False): pass
 
     def evaluate(self, model_path, splits, vecs, on_train_valid_set=False, per_instance=False, per_epoch=False):
         if not os.path.isdir(model_path): raise Exception("The predictions do not exist!")
@@ -57,7 +57,7 @@ class Ntf(nn.Module):
             plt.savefig(f'{model_path}/{pred_set}.roc.png', dpi=100, bbox_inches='tight')
             plt.show()
 
-    def run(self, splits, vecs, indexes, output, settings, cmd):
+    def run(self, splits, vecs, indexes, output, settings, cmd, merge_skills):
         output = f"{output}/t{vecs['skill'].shape[0]}.s{vecs['skill'].shape[1]}.m{vecs['member'].shape[1]}.{'.'.join([k + str(v).replace(' ', '') for k, v in settings.items() if v])}"
         if not os.path.isdir(output): os.makedirs(output)
 
@@ -66,7 +66,7 @@ class Ntf(nn.Module):
         per_epoch = False
 
         if 'train' in cmd: self.learn(splits, indexes, vecs, settings, None, output)
-        if 'test' in cmd: self.test(output, splits, indexes, vecs, settings, on_train_valid_set, per_epoch)
+        if 'test' in cmd: self.test(output, splits, indexes, vecs, settings, on_train_valid_set, per_epoch, merge_skills)
         if 'eval' in cmd: self.evaluate(output, splits, vecs, on_train_valid_set, per_instance, per_epoch)
         if 'plot' in cmd: self.plot_roc(output, splits, on_train_valid_set)
 

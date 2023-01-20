@@ -156,7 +156,7 @@ if __name__ == '__main__':
         filter=args.filter,
         model_list=args.model_list,
         output=args.output,
-        settings=param.settings)
+        settings=param.settings,)
 
     # aggregate(args.output)
 
