@@ -1,4 +1,4 @@
-import os, time, json, re
+import os, time, json, re, random
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -46,6 +46,8 @@ class Fnn(Ntf):
         if ns == "uniform": return self.ns_uniform(y_, y, nns)
         if ns == "unigram": return self.ns_unigram(y_, y, unigram, nns)
         if ns == "unigram_b": return self.ns_unigram_mini_batch(y_, y, nns)
+        if ns == "inverse_unigram": return self.ns_inverse_unigram(y_, y, unigram, nns)
+        if ns == "inverse_unigram_b": return self.ns_inverse_unigram_mini_batch(y_, y, nns)
         return self.weighted(y_, y)
 
     def weighted(self, logits, targets, pos_weight=2.5):
@@ -69,6 +71,35 @@ class Fnn(Ntf):
         targets = targets.squeeze(1)
         logits = logits.squeeze(1)
         random_samples = torch.zeros_like(targets)
+
+        for b in range(targets.shape[0]):
+            k_neg_idx = list(set(random.choices(range(targets.shape[1]), weights=np.array(unigram)[0], k=neg_samples)))
+            cor_idx = torch.nonzero(targets[b], as_tuple=True)[0]
+            for idx in k_neg_idx:
+                if idx not in cor_idx:
+                    random_samples[b][idx] = 1
+        return (-targets * torch.log(logits) - random_samples * torch.log(1 - logits)).sum()
+
+    def ns_unigram_mini_batch(self, logits, targets, neg_samples=5):
+        targets = targets.squeeze(1)
+        logits = logits.squeeze(1)
+        random_samples = torch.zeros_like(targets)
+        n_paper_per_author = torch.sum(targets, dim=0) + 1
+        unigram = (n_paper_per_author / (targets.shape[0] + targets.shape[1])).cpu()
+
+        for b in range(targets.shape[0]):
+            k_neg_idx = list(set(random.choices(range(targets.shape[1]), weights=unigram, k=neg_samples)))
+            cor_idx = torch.nonzero(targets[b], as_tuple=True)[0]
+            for idx in k_neg_idx:
+                if idx not in cor_idx:
+                    random_samples[b][idx] = 1
+        return (-targets * torch.log(logits) - random_samples * torch.log(1 - logits)).sum()
+
+    
+    def ns_inverse_unigram(self, logits, targets, unigram, neg_samples=5):
+        targets = targets.squeeze(1)
+        logits = logits.squeeze(1)
+        random_samples = torch.zeros_like(targets)
         for b in range(targets.shape[0]):
             rand = np.random.rand(targets.shape[1])
             neg_rands = (rand > unigram) * 1
@@ -80,7 +111,7 @@ class Fnn(Ntf):
                     random_samples[b][idx] = 1
         return (-targets * torch.log(logits) - random_samples * torch.log(1 - logits)).sum()
 
-    def ns_unigram_mini_batch(self, logits, targets, neg_samples=5):
+    def ns_inverse_unigram_mini_batch(self, logits, targets, neg_samples=5):
         targets = targets.squeeze(1)
         logits = logits.squeeze(1)
         random_samples = torch.zeros_like(targets)
@@ -100,13 +131,11 @@ class Fnn(Ntf):
 
     def learn(self, splits, indexes, vecs, params, prev_model, output):
 
-        layers = params['l'];
-        learning_rate = params['lr'];
-        batch_size = params['b'];
-        num_epochs = params['e'];
-        nns = params['nns'];
+        learning_rate = params['lr']
+        batch_size = params['b']
+        num_epochs = params['e']
+        nns = params['nns']
         ns = params['ns']
-        # input_size = len(indexes['i2s'])
         input_size = vecs['skill'].shape[1]
         output_size = len(indexes['i2c'])
 
@@ -121,9 +150,9 @@ class Fnn(Ntf):
         # Training K-fold
         for foldidx in splits['folds'].keys():
             # Retrieving the folds
-            X_train = vecs['skill'][splits['folds'][foldidx]['train'], :];
+            X_train = vecs['skill'][splits['folds'][foldidx]['train'], :]
             y_train = vecs['member'][splits['folds'][foldidx]['train']]
-            X_valid = vecs['skill'][splits['folds'][foldidx]['valid'], :];
+            X_valid = vecs['skill'][splits['folds'][foldidx]['valid'], :]
             y_valid = vecs['member'][splits['folds'][foldidx]['valid']]
 
             # Building custom dataset
