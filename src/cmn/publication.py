@@ -1,46 +1,37 @@
-import json
-from tqdm import  tqdm
-import traceback
-import pickle
+import json, os
+from tqdm import tqdm
 from time import time
-import os
 
-
-import numpy as np
 from cmn.author import Author
 from cmn.team import Team
 
 class Publication(Team):
     def __init__(self, id, authors, title, datetime, doc_type, venue, references, fos, keywords):
-        super().__init__(id, authors, None, datetime)
+        super().__init__(id, authors, None, datetime, venue)
         self.title = title
         self.doc_type = doc_type
-        self.venue = venue
+        self.location = venue #e.g., {'raw': 'international conference on human-computer interaction', 'id': 1127419992, 'type': 'c'}
         self.references = references
-        self.fos = fos
+        self.fos = fos #field of study
         self.keywords = keywords
         self.skills = self.set_skills()
 
         for author in self.members:
             author.teams.add(self.id)
             author.skills.update(set(self.skills))
+        self.members_locations = [(str(venue), str(venue), str(venue))] * len(self.members)
+
 
     # Fill the fields attribute with non-zero weight from FOS
     def set_skills(self):
         skills = set()
         for skill in self.fos:
             #if skill["w"] != 0.0:
-            skills.add(skill["name"].replace(" ", "_"))
+            skills.add(skill["name"].replace(" ", "_").lower())
         # Extend the fields with keywords
         # if len(self.keywords):
         #     skills.union(set([keyword.replace(" ", "_") for keyword in self.keywords]))
         return skills
-
-    def get_skills(self):
-        return self.skills
-
-    def get_year(self):
-        return self.year
 
     @staticmethod
     def read_data(datapath, output, index, filter, settings):
@@ -88,8 +79,7 @@ class Publication(Team):
                     except Exception as e:
                         raise e
             return super(Publication, Publication).read_data(teams, output, filter, settings)
-        except Exception as e:
-            raise e
+        except Exception as e: raise e
 
     # @classmethod
     # def get_stats(cls, teamsvecs, output, plot=False):
