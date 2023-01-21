@@ -20,6 +20,7 @@ from torch.distributions import Normal
 from mdl.cds import TFDataset
 from mdl.fnn import Fnn
 from cmn.team import Team
+from cmn.tools import merge_teams_by_skills
 
 class Bnn(Fnn):
     def __init__(self):

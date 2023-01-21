@@ -13,6 +13,7 @@ from mdl.ntf import Ntf
 from mdl.cds import TFDataset
 
 from cmn.team import Team
+from cmn.tools import merge_teams_by_skills
 
 class Fnn(Ntf):
     def __init__(self):
@@ -235,11 +236,15 @@ class Fnn(Ntf):
                 plt.savefig(f'{output}/f{foldidx}.train_valid_loss.png', dpi=100, bbox_inches='tight')
                 plt.show()
 
-    def test(self, model_path, splits, indexes, vecs, params, on_train_valid_set=False, per_epoch=False):
+    def test(self, model_path, splits, indexes, vecs, params, on_train_valid_set=False, per_epoch=False, merge_skills=False):
         if not os.path.isdir(model_path): raise Exception("The model does not exist!")
         # input_size = len(indexes['i2s'])
         input_size = vecs['skill'].shape[1]
         output_size = len(indexes['i2c'])
+
+        if merge_skills:
+            vecs = merge_teams_by_skills(vecs)
+            print('running with merged teams by skill')
 
         X_test = vecs['skill'][splits['test'], :]
         y_test = vecs['member'][splits['test']]
