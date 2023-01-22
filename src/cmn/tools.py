@@ -66,5 +66,5 @@ print(new_teamsvecs['member'].todense())# <= [[1, 1, 1, 0], [0, 1, 1, 1], [1, 1,
 new_teamsvecs = merge_teams_by_skills(teamsvecs, inplace=False, distinct=False)
 print(new_teamsvecs['id'].todense())# <= [[1],[2],[3],[4],[5]]
 print(new_teamsvecs['skill'].todense())# <= [[1,1,0],[1,1,0],[0,1,1],[0,1,1],[1,1,1]]
-print(new_teamsvecs['member'].todense())# <= [[1,1,1,0],[1,1,1,0],[0,1,1,1],[0,1,1,*0=>1*],[1,1,1,0]]
+print(new_teamsvecs['member'].todense())# <= [[1,1,1,0],[1,1,1,0],[0,1,1,1],[0,1,1,1],[1,1,1,0]]
 
