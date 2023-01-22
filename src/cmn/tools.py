@@ -39,6 +39,7 @@ def merge_teams_by_skills(teamsvecs, inplace=False, distinct=False):
             result = np.add(vec1, vec2)
             result[result != 0] = 1
             vecs['member'][int(key_), :] = scipy.sparse.lil_matrix(result)
+            vecs['member'][int(value_), :] = scipy.sparse.lil_matrix(result)
     if distinct:
         vecs['id'] = scipy.sparse.lil_matrix(np.delete(vecs['id'].toarray(), del_list, axis=0))
         vecs['skill'] = scipy.sparse.lil_matrix(np.delete(vecs['skill'].toarray(), del_list, axis=0))
