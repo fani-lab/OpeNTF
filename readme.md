@@ -199,22 +199,30 @@ Arman Dashti<sup>1</sup>, [Hossein Fani](https://hosseinfani.github.io/)<sup>1,2
 @inproceedings{DBLP:conf/cikm/DashtiSF22,
   author    = {Arman Dashti and Saeed Samet and Hossein Fani},
   title     = {Effective Neural Team Formation via Negative Samples},
-  booktitle = {{CIKM} '22: The 31st {ACM} International Conference on Information and Knowledge Management, Hybrid Conference, Atlanta, Georgia, USA, October 17-21, 2022},
+  booktitle = {Proceedings of the 31st {ACM} International Conference on Information {\&} Knowledge Management, Atlanta, GA, USA, October 17-21, 2022},
+  pages     = {3908--3912},
   publisher = {{ACM}},
   year      = {2022},
+  url       = {https://doi.org/10.1145/3511808.3557590},
+  doi       = {10.1145/3511808.3557590},
+  biburl    = {https://dblp.org/rec/conf/cikm/DashtiSF22.bib},
   bibsource = {dblp computer science bibliography, https://dblp.org}
 }
   ```
   ```
 @inproceedings{DBLP:conf/cikm/DashtiSPF22,
   author    = {Arman Dashti and Karan Saxena and Dhwani Patel and Hossein Fani},
-  title     = {OpeNTF: A Benchmark Library for Neural Team Formation},
-  booktitle = {{CIKM} '22: The 31st {ACM} International Conference on Information and Knowledge Management, Hybrid Conference, Atlanta, Georgia, USA, October 17-21, 2022},
+  title     = {OpeNTF: {A} Benchmark Library for Neural Team Formation},
+  booktitle = {Proceedings of the 31st {ACM} International Conference on Information {\&} Knowledge Management, Atlanta, GA, USA, October 17-21, 2022},
+  pages     = {3913--3917},
   publisher = {{ACM}},
   year      = {2022},
+  url       = {https://doi.org/10.1145/3511808.3557526},
+  doi       = {10.1145/3511808.3557526},
+  biburl    = {https://dblp.org/rec/conf/cikm/DashtiSPF22.bib},
   bibsource = {dblp computer science bibliography, https://dblp.org}
-}
-```
+}```
+
 ## 8. Awards:
 
 > [CAD$300, Gold medalist, UWill Discover, 2022](https://scholar.uwindsor.ca/uwilldiscover/2022/2022Day3/30/)
