@@ -7,7 +7,7 @@ from torch import nn
 from torch.nn.functional import leaky_relu
 from torch import optim
 from torch.utils.data import DataLoader
-from torch.optim.lr_scheduler import StepLR, ReduceLROnPlateau
+from torch.optim.lr_scheduler import StepLR, ReduceLROnPlateau, MultiStepLR
 
 from mdl.ntf import Ntf
 from mdl.cds import TFDataset
@@ -25,15 +25,18 @@ class Fnn(Ntf):
             hl.append(nn.Linear(param['l'][i - 1], param['l'][i]))
         self.hidden_layer = nn.ModuleList(hl)
         self.fc2 = nn.Linear(param['l'][-1], output_size)
+        self.dp = nn.Dropout(0.5)
         self.initialize_weights()
         return self
 
     def forward(self, x):
         x = leaky_relu(self.fc1(x))
         for i, l in enumerate(self.hidden_layer):
+            x = self.dp(x)
             x = leaky_relu(l(x))
+        x = self.dp(x)
         x = self.fc2(x)
-        x = torch.clamp(torch.sigmoid(x), min=1.e-6, max=1. - 1.e-6)
+        x = torch.clamp(torch.sigmoid(x), min=1.e-7, max=1. - 1.e-7)
         return x
 
     def initialize_weights(self):
@@ -45,7 +48,7 @@ class Fnn(Ntf):
         if ns == "uniform": return self.ns_uniform(y_, y, nns)
         if ns == "unigram": return self.ns_unigram(y_, y, unigram, nns)
         if ns == "unigram_b": return self.ns_unigram_mini_batch(y_, y, nns)
-        return self.weighted(y_, y)
+        return self.normalized_weighted(y_, y, pos_weight=50)
 
     def weighted(self, logits, targets, pos_weight=2.5):
         targets = targets.squeeze(1)
@@ -139,8 +142,13 @@ class Fnn(Ntf):
             if prev_model: self.load_state_dict(torch.load(prev_model[foldidx]))
 
             optimizer = optim.Adam(self.parameters(), lr=learning_rate)
-            scheduler = ReduceLROnPlateau(optimizer, factor=0.5, patience=10, verbose=True)
-            # scheduler = StepLR(optimizer, step_size=3, gamma=0.9)
+            # scheduler = ReduceLROnPlateau(optimizer, factor=0.5, patience=10, verbose=True)
+            # scheduler = ReduceLROnPlateau(optimizer, factor=0.25, patience=5, verbose=True, min_lr=0.000005, threshold=0.01)# threshold=1000, min_lr=0.00005)
+
+            scheduler = ReduceLROnPlateau(optimizer, factor=0.5, patience=5, verbose=True, min_lr=0.0005, threshold=1e-1)# threshold=1000, min_lr=0.00005)
+            
+            # scheduler = StepLR(optimizer, step_size=3, gamma=0.5, verbose=True)
+            # scheduler = MultiStepLR(optimizer, milestones=[5, 10, 15], gamma=0.9, verbose=True)
 
             train_loss_values = []
             valid_loss_values = []
@@ -172,7 +180,7 @@ class Fnn(Ntf):
                             valid_running_loss += loss.item()
                         print(
                             f'Fold {foldidx}/{len(splits["folds"]) - 1}, Epoch {epoch}/{num_epochs - 1}, Minibatch {batch_idx}/{int(X_train.shape[0] / batch_size)}, Phase {phase}'
-                            f', Running Loss {phase} {loss.item()}'
+                            f', Running Loss {phase} {loss.item() / X.shape[0]}'
                             f", Time {time.time() - fold_time}, Overall {time.time() - start_time} "
                         )
                     # Appending the loss of each epoch to plot later
@@ -204,7 +212,7 @@ class Fnn(Ntf):
                 plt.legend(loc='upper right')
                 plt.title(f'Training and Validation Loss for fold #{foldidx}')
                 plt.savefig(f'{output}/f{foldidx}.train_valid_loss.png', dpi=100, bbox_inches='tight')
-                plt.show()
+                # plt.show()
 
     def test(self, model_path, splits, indexes, vecs, params, on_train_valid_set=False, per_epoch=False):
         if not os.path.isdir(model_path): raise Exception("The model does not exist!")
@@ -247,4 +255,5 @@ class Fnn(Ntf):
                     epoch = modelfile.split('.')[-2] + '.' if per_epoch else ''
                     epoch = epoch.replace(f'f{foldidx}.', '')
                     torch.save(y_pred, f'{model_path}/f{foldidx}.{pred_set}.{epoch}pred', pickle_protocol=4)
+                    # torch.save(y_pred, f'{model_path}/f{foldidx}.{pred_set}.{epoch}test.pred', pickle_protocol=4)
 
