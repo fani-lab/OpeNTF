@@ -25,3 +25,18 @@ fani-lab/OpeNTF, [
                 ...
                 ]
 ```
+
+Stats: 
+
+|Stat| Value|
+|-----|------|
+|#Repos (teams)| ?|
+|#Unique Contributors (members) |?|
+|#Unique Programming Language (skills)|?|
+|Avg #Contributors per Repo| ?|
+|Avg #Programmng Language per Repo|?|
+|Avg #Repo per Contributor|?|
+|Avg #Programming Language per Contributor|?|
+|#Repo w/o Programming Language |?|
+|#Repo w/ Single Contributor|?|
+|#Repo w/ Single Programming Language |?|
