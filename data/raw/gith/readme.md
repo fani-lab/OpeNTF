@@ -30,13 +30,13 @@ Stats:
 
 |Stat| Value|
 |-----|------|
-|#Repos (teams)| ?|
-|#Unique Contributors (members) |?|
-|#Unique Programming Language (skills)|?|
-|Avg #Contributors per Repo| ?|
-|Avg #Programmng Language per Repo|?|
-|Avg #Repo per Contributor|?|
-|Avg #Programming Language per Contributor|?|
+|#Repos (teams)| 661,335|
+|#Unique Contributors (members) |1,444,480|
+|#Unique Programming Language (skills)|20|
+|Avg #Contributors per Repo|5.5345278867744785|
+|Avg #Programmng Language per Repo|1.3723967429517567|
+|Avg #Repo per Contributor|2.533906319229065|
+|Avg #Programming Language per Contributor|2.1095840717766947|
 |#Repo w/o Programming Language |?|
-|#Repo w/ Single Contributor|?|
-|#Repo w/ Single Programming Language |?|
+|#Repo w/ Single Contributor|0|
+|#Repo w/ Single Programming Language |342,950|
