@@ -25,7 +25,8 @@ datasets += ['../data/preprocessed/gith/data.csv']
 for dataset in datasets:
     start = time.time()
     with open(f'{dataset}/teamsvecs.pkl', 'rb') as infile:
-        stats = Team.get_stats(pickle.load(infile), dataset, cache=False, plot=True, plot_title=None)
+        obj = pd.read_pickle(dataset+'/indexes.pkl')
+        stats = Team.get_stats(pickle.load(infile), obj, dataset, cache=False, plot=True, plot_title='uspt')
     end = time.time()
     print(end - start)
 
@@ -111,10 +112,12 @@ def get_dist_teams_over_years_with_ind(dataset):
         indexes = pickle.load(infile)
     year_idx = indexes['i2y']
     nteams = len(indexes['i2t'])
+    print(year_idx)
     year_nteams = {}
     for i in range(1, len(year_idx)):
         year_nteams[year_idx[i-1][1]] = year_idx[i][0] - year_idx[i-1][0]
     year_nteams[year_idx[-1][1]] = nteams - year_idx[-1][0]
+    print(year_nteams)
     yc = dict(sorted(year_nteams.items()))
     fig = plt.figure(figsize=(2, 2))
     ax = fig.add_subplot(1, 1, 1)
@@ -195,5 +198,5 @@ def hmap(dataset_path, values):
     plt.show()
 
 # for dataset in datasets:
-#     hmap_after_year(dataset, 'member', 2000)
-#     hmap(dataset, 'skill')
+    # hmap_after_year(dataset, 2005)
+    # hmap(dataset)
