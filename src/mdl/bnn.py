@@ -3,6 +3,8 @@ import time
 import matplotlib as plt
 import json
 import matplotlib.pyplot as plt
+import numpy as np
+import re
 
 import torch
 from torch import optim
@@ -18,6 +20,7 @@ from torch.distributions import Normal
 from mdl.cds import TFDataset
 from mdl.fnn import Fnn
 from cmn.team import Team
+from cmn.tools import merge_teams_by_skills
 
 class Bnn(Fnn):
     def __init__(self):
@@ -60,6 +63,7 @@ class Bnn(Fnn):
         log_prior = log_priors.mean()
         log_post = log_posts.mean()
         loss = log_post - log_prior
+        outputs = outputs.mean(axis=1)
         #log_likes = F.nll_loss(outputs.mean(0), target, size_average=False)
         # log_likes = F.nll_loss(outputs.mean(0), target, reduction='sum')
         # loss = (log_post - log_prior)/num_batches + log_likes
@@ -67,14 +71,13 @@ class Bnn(Fnn):
 
     # TODO: there is huge code overlapp with bnn training and fnn training. Trying to generalize as we did in test and eval
     def learn(self, splits, indexes, vecs, params, prev_model, output):
-        layers = params['l'];
-        learning_rate = params['lr'];
-        batch_size = params['b'];
-        num_epochs = params['e'];
-        nns = params['nns'];
+
+        learning_rate = params['lr']
+        batch_size = params['b']
+        num_epochs = params['e']
+        nns = params['nns']
         ns = params['ns']
         s = params['s']
-        # input_size = len(indexes['i2s'])
         input_size = vecs['skill'].shape[1]
         output_size = len(indexes['i2c'])
 
@@ -89,9 +92,9 @@ class Bnn(Fnn):
         # Training K-fold
         for foldidx in splits['folds'].keys():
             # Retrieving the folds
-            X_train = vecs['skill'][splits['folds'][foldidx]['train'], :];
+            X_train = vecs['skill'][splits['folds'][foldidx]['train'], :]
             y_train = vecs['member'][splits['folds'][foldidx]['train']]
-            X_valid = vecs['skill'][splits['folds'][foldidx]['valid'], :];
+            X_valid = vecs['skill'][splits['folds'][foldidx]['valid'], :]
             y_valid = vecs['member'][splits['folds'][foldidx]['valid']]
 
             # Building custom dataset
@@ -136,7 +139,7 @@ class Bnn(Fnn):
                             train_running_loss += loss.item()
                         else:  # valid
                             self.train(False)  # Set model to valid mode
-                            layer_loss, y_ = self.sample_elbo(X.squeeze(1), y, 1)
+                            layer_loss, y_ = self.sample_elbo(X.squeeze(1), y, s)
                             loss = self.cross_entropy(y_.to(self.device), y, ns, nns, unigram) + layer_loss / batch_size
                             valid_running_loss += loss.item()
                         print(
@@ -174,6 +177,65 @@ class Bnn(Fnn):
                 plt.title(f'Training and Validation Loss for fold #{foldidx}')
                 plt.savefig(f'{output}/f{foldidx}.train_valid_loss.png', dpi=100, bbox_inches='tight')
                 plt.show()
+
+    def test(self, model_path, splits, indexes, vecs, params, on_train_valid_set=False, per_epoch=False):
+        if not os.path.isdir(model_path): raise Exception("The model does not exist!")
+        # input_size = len(indexes['i2s'])
+        input_size = vecs['skill'].shape[1]
+        output_size = len(indexes['i2c'])
+
+        X_test = vecs['skill'][splits['test'], :]
+        y_test = vecs['member'][splits['test']]
+        test_matrix = TFDataset(X_test, y_test)
+        test_dl = DataLoader(test_matrix, batch_size=params['b'], shuffle=True, num_workers=0)
+
+        for foldidx in splits['folds'].keys():
+            modelfiles = [f'{model_path}/state_dict_model.f{foldidx}.pt']
+            if per_epoch: modelfiles += [f'{model_path}/{_}' for _ in os.listdir(model_path) if re.match(f'state_dict_model.f{foldidx}.e\d+.pt', _)]
+
+            for modelfile in modelfiles:
+                self.init(input_size=input_size, output_size=output_size, param=params).to(self.device)
+                self.load_state_dict(torch.load(modelfile))
+                self.eval()
+
+                for pred_set in (['test', 'train', 'valid'] if on_train_valid_set else ['test']):
+                    if pred_set != 'test':
+                        X = vecs['skill'][splits['folds'][foldidx][pred_set], :]
+                        y = vecs['member'][splits['folds'][foldidx][pred_set]]
+                        matrix = TFDataset(X, y)
+                        dl = DataLoader(matrix, batch_size=params['b'], shuffle=True, num_workers=0)
+                    else:
+                        X = X_test; y = y_test; matrix = test_matrix
+                        dl = test_dl
+
+                    torch.cuda.empty_cache()
+                    with torch.no_grad():
+                        y_pred = torch.empty(0, dl.dataset.output.shape[1])
+                        # y_mins = torch.empty(0, dl.dataset.output.shape[1])
+                        # y_maxs = torch.empty(0, dl.dataset.output.shape[1])
+                        for x, y in dl:
+                            x = x.to(device=self.device)
+                            outputs = np.zeros((params['s'], y.shape[0], y.shape[2]))
+                            for i in range(params['s']):
+                                outputs[i] = self.forward(x).squeeze(1).cpu().numpy()
+                            scores = outputs.mean(axis=0)
+                            # y_mins = np.vstack((y_mins, np.amin(outputs, axis=0)))
+                            # y_maxs = np.vstack((y_maxs, np.amax(outputs, axis=0)))
+                            y_pred = np.vstack((y_pred, scores))
+                    epoch = modelfile.split('.')[-2] + '.' if per_epoch else ''
+                    epoch = epoch.replace(f'f{foldidx}.', '')
+                    torch.save(y_pred, f'{model_path}/f{foldidx}.{pred_set}.{epoch}pred', pickle_protocol=4)
+                    # plt.figure(figsize=(8,4)) 
+                    # plt.plot(y_pred.mean(axis=0), label=f"avg", color='blue', linewidth=1)
+                    # plt.plot(y_maxs.mean(axis=0), label=f"max", color='green', linewidth=1)
+                    # plt.plot(y_mins.mean(axis=0), label=f"min", color='red', linewidth=1)
+                    # plt.fill_between(np.arange(len(y_pred[0])), y_pred.mean(axis=0), y_maxs.mean(axis=0), color='palegreen')
+                    # plt.fill_between(np.arange(len(y_pred[0])), y_mins.mean(axis=0), y_pred.mean(axis=0), color='palegreen')
+                    # plt.legend(loc='upper right')
+                    # plt.grid(linestyle=':')
+                    # plt.title(f"max-min-avg plot")
+                    # plt.savefig(f'{model_path}/f{foldidx}.{pred_set}.min-max-avg-plot.png', dpi=100, bbox_inches='tight')
+                    # plt.show()
 
 class BayesianLayer(nn.Module):
     def __init__(self, input_features, output_features, prior_var=1.):

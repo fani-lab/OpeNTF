@@ -215,6 +215,7 @@ class Team(object):
                     func = partial(Team.bucketing, settings['bucket_size'], indexes['s2i'], indexes['c2i'], indexes['l2i'], settings['location_type'])
                     data = p.map(func, subteams)
                     #It took 12156.825613975525 seconds to generate and store the sparse matrices of size (1729691, 818915) at ./../data/preprocessed/uspt/patent.tsv.filtered.mt5.ts3/teamsvecs.pkl
+                    #It took 11935.809179782867 seconds to generate and store the sparse matrices of size (661335, 1444501) at ./../data/preprocessed/gith/data.csv/teamsvecs.pkl
             # serial
             else:
                 data = Team.bucketing(settings['bucket_size'], indexes['s2i'], indexes['c2i'], teams)

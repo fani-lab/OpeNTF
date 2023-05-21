@@ -1,7 +1,7 @@
 # ``OpeNTF``: An Open-Source Neural Team Formation Benchmark Library 
 Collaborative teams are the primary vehicle for coordinating experts with diverse skills needed for a particular collaborative project, and Team Formation (TF) has firsthand effects on creating organizational performance. Social network analysis has been employed for TF by incorporating social ties and interpersonal collaboration features using measures such as degree and closeness centrality. Socially driven methods, however, face two significant challenges, esp., when currency (timeliness) is of the prime concern: ``i) temporality``: the expert's skills and her social attributes constantly change over time. A successful collaboration of experts in a team years ago does not tailor a successful team now, ``ii) complexity``: optimum teams are found by computationally expensive search over all the subgraphs of a large-scale collaboration graph (search-based.) 
 
-## :movie_camera: [`Demo`](https://youtu.be/nFLow5Oy9nw)
+## [![license](https://img.shields.io/badge/Demo-youtu.be/nFLow5Oy9nw-critical?style=&logo=youtube)](https://www.youtube.com/watch?v=nFLow5Oy9nw)
 We propose ``neural machine learning`` approaches to Team Formation. We train neural models that would learn relationships among experts and their social attributes in vector space. Wherein, we consider all past (un)successful team compositions as training samples to predict future teams and the team's level of success. Therefore, we bring efficiency while enhancing efficacy due to the inherently iterative and online learning procedure in neural architectures. More importantly, we will address temporality by incorporating sequences on the neural architecture via recurrence, which yields a richer representation and more accurate team composition within time. We are the first who consider temporal graph neural networks for team formation and will provide major advances via ``1) time-sensitive`` and ``2) scalable`` incorporation of experts' attributes and skills. 
 
 1. [Setup](#1-setup)
@@ -94,7 +94,7 @@ We randomly take ``85%`` of the dataset for the train-validation set and ``15%``
 
 Previous works in team formation presumed that teams follow the i.i.d property and hence when training their models they followed the bag of teams approach, where they train and validate their models on a shuffled dataset of teams. Moreover, they were interpolative and did not try to predict _future_ successful teams. In this work, we aim at extrapolating and predicting _future_ teams of experts. We sort the teams by time intervals and train a neural model incrementally  through the ordered collection of teams in [C<sub>0</sub>, ..C<sub>t</sub>, ..C<sub>T</sub>]. As can be seen in Figure below, after random initialization of skills’ and experts’ embeddings at t=0, we start training the model on the teams in the first time interval C<sub>0</sub> for a number of epochs, then we continue with training  on the second time interval C<sub>1</sub> using the learned embeddings from the previous time interval and so forth until we finish the training on the last training time interval C<sub>t=T</sub>. We believe that using this approach, will help the model understand how experts’ skills and collaborative ties evolve through time and the final embeddings are their optimum representation in the latent space to predict _future_ successful teams at time interval C<sub>t=T+1</sub>.
 
-<p align="center"><img src='./data/streaming_plot.PNG'></p>
+<p align="center"><img src='./src/mdl/tntf.png' width="700"></p>
 
 **3.3. Model Architecture**
 
@@ -105,6 +105,8 @@ For example, for our feedforward baseline [``fnn``](./src/mdl/fnn.py), the model
   
 Currently, we support neural models:
 1) Bayesian [``bnn``](./src/mdl/bnn.py) where model's parameter (weights) is assumed to be drawn from Gaussian (Normal) distribution and the task is to not to learn the weight but the mean (μ) and standard deviation (σ) of the distribution at each parameter.
+
+<p align="center"><img src='./src/mdl/bnn.png' width="350" ></p>
 
 2) non-Bayesian feedforward [``fnn``](./src/mdl/fnn.py) where the model's parameter (weights) is to be learnt.
 
@@ -187,27 +189,40 @@ We benefit from [``pytrec_eval``](https://github.com/cvangysel/pytrec_eval), [``
 ## 6. License:
 ©2021. This work is licensed under a [CC BY-NC-SA 4.0](license.txt) license.
 
+Arman Dashti<sup>1</sup>, [Hossein Fani](https://hosseinfani.github.io/)<sup>1,2</sup> 
+
+<sup><sup>1</sup>School of Computer Science, Faculty of Science, University of Windsor, ON, Canada.</sup>
+<sup><sup>2</sup>[hfani@uwindsor.ca](mailto:hfani@uwindsor.ca)</sup>
+
 ## 7. Citation:
 ```
 @inproceedings{DBLP:conf/cikm/DashtiSF22,
   author    = {Arman Dashti and Saeed Samet and Hossein Fani},
   title     = {Effective Neural Team Formation via Negative Samples},
-  booktitle = {{CIKM} '22: The 31st {ACM} International Conference on Information and Knowledge Management, Hybrid Conference, Atlanta, Georgia, USA, October 17-21, 2022},
+  booktitle = {Proceedings of the 31st {ACM} International Conference on Information {\&} Knowledge Management, Atlanta, GA, USA, October 17-21, 2022},
+  pages     = {3908--3912},
   publisher = {{ACM}},
   year      = {2022},
+  url       = {https://doi.org/10.1145/3511808.3557590},
+  doi       = {10.1145/3511808.3557590},
+  biburl    = {https://dblp.org/rec/conf/cikm/DashtiSF22.bib},
   bibsource = {dblp computer science bibliography, https://dblp.org}
 }
   ```
   ```
 @inproceedings{DBLP:conf/cikm/DashtiSPF22,
   author    = {Arman Dashti and Karan Saxena and Dhwani Patel and Hossein Fani},
-  title     = {OpeNTF: A Benchmark Library for Neural Team Formation},
-  booktitle = {{CIKM} '22: The 31st {ACM} International Conference on Information and Knowledge Management, Hybrid Conference, Atlanta, Georgia, USA, October 17-21, 2022},
+  title     = {OpeNTF: {A} Benchmark Library for Neural Team Formation},
+  booktitle = {Proceedings of the 31st {ACM} International Conference on Information {\&} Knowledge Management, Atlanta, GA, USA, October 17-21, 2022},
+  pages     = {3913--3917},
   publisher = {{ACM}},
   year      = {2022},
+  url       = {https://doi.org/10.1145/3511808.3557526},
+  doi       = {10.1145/3511808.3557526},
+  biburl    = {https://dblp.org/rec/conf/cikm/DashtiSPF22.bib},
   bibsource = {dblp computer science bibliography, https://dblp.org}
-}
-```
+}```
+
 ## 8. Awards:
 
 > [CAD$300, Gold medalist, UWill Discover, 2022](https://scholar.uwindsor.ca/uwilldiscover/2022/2022Day3/30/)
