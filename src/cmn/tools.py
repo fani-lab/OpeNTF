@@ -46,7 +46,7 @@ def merge_teams_by_skills(teamsvecs, inplace=False, distinct=False):
         vecs['member'] = scipy.sparse.lil_matrix(np.delete(vecs['member'].toarray(), del_list, axis=0))
     return vecs
 
-teamsvecs = {}
+# teamsvecs = {}
 # 1 110 0110
 # 2 110 1110
 # ------------
@@ -54,17 +54,17 @@ teamsvecs = {}
 # 4 011 0110
 # ------------
 # 5 111 1110
-teamsvecs['id'] = scipy.sparse.lil_matrix([[1],[2],[3],[4],[5]])
-teamsvecs['skill'] = scipy.sparse.lil_matrix([[1,1,0],[1,1,0],[0,1,1],[0,1,1],[1,1,1]])
-teamsvecs['member'] = scipy.sparse.lil_matrix([[0,1,1,0],[1,1,1,0],[0,1,1,1],[0,1,1,0],[1,1,1,0]])
-
-new_teamsvecs = merge_teams_by_skills(teamsvecs, inplace=False, distinct=True)
-print(new_teamsvecs['id'].todense())# <= [[1], [3], [5]]
-print(new_teamsvecs['skill'].todense())# <= [[1, 1, 0], [0, 1, 1], [1, 1, 1]]
-print(new_teamsvecs['member'].todense())# <= [[1, 1, 1, 0], [0, 1, 1, 1], [1, 1, 1, 0]]
-
-new_teamsvecs = merge_teams_by_skills(teamsvecs, inplace=False, distinct=False)
-print(new_teamsvecs['id'].todense())# <= [[1],[2],[3],[4],[5]]
-print(new_teamsvecs['skill'].todense())# <= [[1,1,0],[1,1,0],[0,1,1],[0,1,1],[1,1,1]]
-print(new_teamsvecs['member'].todense())# <= [[1,1,1,0],[1,1,1,0],[0,1,1,1],[0,1,1,1],[1,1,1,0]]
+# teamsvecs['id'] = scipy.sparse.lil_matrix([[1],[2],[3],[4],[5]])
+# teamsvecs['skill'] = scipy.sparse.lil_matrix([[1,1,0],[1,1,0],[0,1,1],[0,1,1],[1,1,1]])
+# teamsvecs['member'] = scipy.sparse.lil_matrix([[0,1,1,0],[1,1,1,0],[0,1,1,1],[0,1,1,0],[1,1,1,0]])
+#
+# new_teamsvecs = merge_teams_by_skills(teamsvecs, inplace=False, distinct=True)
+# print(new_teamsvecs['id'].todense())# <= [[1], [3], [5]]
+# print(new_teamsvecs['skill'].todense())# <= [[1, 1, 0], [0, 1, 1], [1, 1, 1]]
+# print(new_teamsvecs['member'].todense())# <= [[1, 1, 1, 0], [0, 1, 1, 1], [1, 1, 1, 0]]
+#
+# new_teamsvecs = merge_teams_by_skills(teamsvecs, inplace=False, distinct=False)
+# print(new_teamsvecs['id'].todense())# <= [[1],[2],[3],[4],[5]]
+# print(new_teamsvecs['skill'].todense())# <= [[1,1,0],[1,1,0],[0,1,1],[0,1,1],[1,1,1]]
+# print(new_teamsvecs['member'].todense())# <= [[1,1,1,0],[1,1,1,0],[0,1,1,1],[0,1,1,1],[1,1,1,0]]
 
