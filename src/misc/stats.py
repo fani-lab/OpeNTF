@@ -13,13 +13,14 @@ from cmn.team import Team
 
 datasets = []
 # datasets += ['../data/preprocessed/dblp/dblp.v12.json.filtered.mt75.ts3']
-datasets += ['../data/preprocessed/dblp/toy.dblp.v12.json']
+# datasets += ['../data/preprocessed/dblp/toy.dblp.v12.json']
 # datasets += ['../data/preprocessed/imdb/title.basics.tsv.filtered.mt75.ts3']
-datasets += ['../data/preprocessed/imdb/toy.title.basics.tsv']
+# datasets += ['../data/preprocessed/imdb/toy.title.basics.tsv']
 # datasets += ['../data/preprocessed/uspt/patent.tsv.filtered.mt75.ts3']
-datasets += ['../data/preprocessed/uspt/toy.patent.tsv']
+# datasets += ['../data/preprocessed/uspt/toy.patent.tsv']
+datasets += ['../data/preprocessed/gith/data.csv']
 # datasets += ['../data/preprocessed/gith/data.csv.filtered.mt10.ts3']
-datasets += ['../data/preprocessed/gith/toy.data.csv']
+# datasets += ['../data/preprocessed/gith/toy.data.csv']
 
 for dataset in datasets:
     start = time.time()
@@ -193,6 +194,6 @@ def hmap(dataset_path, values):
     plt.savefig(f'{dataset_path}/{dname}_{values}_heatmap_gray_r.pdf', dpi=100, bbox_inches='tight')
     plt.show()
 
-for dataset in datasets:
-    hmap_after_year(dataset, 'member', 2000)
-    hmap(dataset, 'skill')
+# for dataset in datasets:
+#     hmap_after_year(dataset, 'member', 2000)
+#     hmap(dataset, 'skill')
