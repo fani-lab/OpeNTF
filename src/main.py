@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 from sklearn.model_selection import KFold, train_test_split
 from scipy.sparse import lil_matrix
+from shutil import copyfile
 import scipy.sparse
 
 import param
@@ -19,6 +20,8 @@ from mdl.nmt import Nmt
 from mdl.tnmt import tNmt
 from mdl.tntf import tNtf
 from mdl.team2vec import Team2Vec
+from mdl.caser import Caser
+from mdl.rrn import Rrn
 
 def create_evaluation_splits(n_sample, n_folds, train_ratio=0.85, year_idx=None, output='./', step_ahead=1):   
     if year_idx:
@@ -69,8 +72,11 @@ def aggregate(output):
             dff.set_axis(names, axis=1, inplace=True)
             dff.to_csv(f"{output}{rd}/{rf.replace('.csv', '.agg.csv')}", index=False)
 
-def run(data_list, domain_list, filter, model_list, output, settings):
+def run(data_list, domain_list, filter, future, model_list, output, exp_id, settings):
     filter_str = f".filtered.mt{settings['data']['filter']['min_nteam']}.ts{settings['data']['filter']['min_team_size']}" if filter else ""
+
+    if exp_id: output = f'{output}exp_{exp_id}/'
+    if not os.path.isdir(output): os.makedirs(output)
 
     datasets = {}
     models = {}
@@ -111,11 +117,14 @@ def run(data_list, domain_list, filter, model_list, output, settings):
         
     # todo: temporal: time as an input feature
     
+    # temporal recommender systems
+    if 'caser' in model_list: models['caser'] = Caser(settings['model']['step_ahead'])
+    if 'rrn' in model_list: models['rrn'] = Rrn(settings['model']['baseline']['rrn']['with_zero'], settings['model']['step_ahead'])
+
     assert len(datasets) > 0
     assert len(datasets) == len(domain_list)
     assert len(models) > 0
 
-    temporal = any(m_name.startswith('t') for (m_name, m_obj) in models.items())
     for (d_name, d_cls) in datasets.items():
         datapath = data_list[domain_list.index(d_name)]
         prep_output = f'./../data/preprocessed/{d_name}/{os.path.split(datapath)[-1]}'
@@ -126,7 +135,7 @@ def run(data_list, domain_list, filter, model_list, output, settings):
                 year_idx.append(indexes['i2y'][i-1])
         year_idx.append(indexes['i2y'][-1])
         indexes['i2y'] = year_idx
-        splits = create_evaluation_splits(vecs['id'].shape[0], settings['model']['nfolds'], settings['model']['train_test_split'], indexes['i2y'] if temporal else None, output=f'{prep_output}{filter_str}', step_ahead=settings['model']['step_ahead'])
+        splits = create_evaluation_splits(vecs['id'].shape[0], settings['model']['nfolds'], settings['model']['train_test_split'], indexes['i2y'] if future else None, output=f'{prep_output}{filter_str}', step_ahead=settings['model']['step_ahead'])
 
         for (m_name, m_obj) in models.items():
             vecs_ = vecs.copy()
@@ -140,7 +149,12 @@ def run(data_list, domain_list, filter, model_list, output, settings):
 
             baseline_name = m_name.lstrip('t').replace('_emb', '').replace('_dt2v', '').replace('_a1', '')
             print(f'Running for (dataset, model): ({d_name}, {m_name}) ... ')
-            m_obj.run(splits, vecs_, indexes, f'{output}{os.path.split(datapath)[-1]}{filter_str}/{m_name}', settings['model']['baseline'][baseline_name], settings['model']['cmd'])
+            
+            output_path = f"{output}{os.path.split(datapath)[-1]}{filter_str}/{m_name}/t{vecs_['skill'].shape[0]}.s{vecs_['skill'].shape[1]}.m{vecs_['member'].shape[1]}.{'.'.join([k + str(v).replace(' ', '') for k, v in settings['model']['baseline'][baseline_name].items() if v])}"
+            if not os.path.isdir(output_path): os.makedirs(output_path)
+            copyfile('./param.py', f'{output_path}/param.py')
+            
+            m_obj.run(splits, vecs_, indexes, f'{output_path}', settings['model']['baseline'][baseline_name], settings['model']['cmd'])
     if 'agg' in settings['model']['cmd']: aggregate(output)
 
 def addargs(parser):
@@ -148,12 +162,14 @@ def addargs(parser):
     dataset.add_argument('-data', '--data-list', nargs='+', type=str, default=[], required=True, help='a list of dataset paths; required; (eg. -data ./../data/raw/toy.json)')
     dataset.add_argument('-domain', '--domain-list', nargs='+', type=str.lower, default=[], required=True, help='a list of domains; required; (eg. -domain dblp imdb uspt gith)')
     dataset.add_argument('-filter', type=int, default=0, choices=[0, 1], help='remove outliers? (e.g., -filter 0 (default) or 1)')
+    dataset.add_argument('-future', type=int, default=0, choices=[0, 1], help='predict future? (e.g., -future 0 (default) or 1)')
 
     baseline = parser.add_argument_group('baseline')
     baseline.add_argument('-model', '--model-list', nargs='+', type=str.lower, default=[], required=True, help='a list of neural models (eg. -model random fnn bnn fnn_emb bnn_emb nmt)')
 
     output = parser.add_argument_group('output')
     output.add_argument('-output', type=str, default='./../output/', help='The output path (default: -output ./../output/)')
+    output.add_argument('-exp_id', type=str, default=None, help='ID of the experiment')
 
 
 # python -u main.py -data ../data/raw/dblp/toy.dblp.v12.json
@@ -177,8 +193,10 @@ if __name__ == '__main__':
     run(data_list=args.data_list,
         domain_list=args.domain_list,
         filter=args.filter,
+        future=args.future,
         model_list=args.model_list,
         output=args.output,
+        exp_id=args.exp_id,
         settings=param.settings)
 
     # aggregate(args.output)
