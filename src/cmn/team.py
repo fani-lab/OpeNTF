@@ -137,7 +137,6 @@ class Team(object):
         indexes['i2c'], indexes['c2i'] = Team.build_index_candidates(teams)
         indexes['i2s'], indexes['s2i'] = Team.build_index_skills(teams)
         indexes['i2t'], indexes['t2i'] = Team.build_index_teams(teams)
-        indexes['i2dt'], indexes['dt2i'] = Team.build_index_datetime(teams)
         indexes['i2l'], indexes['l2i'] = Team.build_index_location(teams, settings["location_type"])
         indexes['i2tdt'] = Team.build_index_teamdatetimes(teams)
         indexes['i2y'] = year_idx
@@ -342,78 +341,6 @@ class Team(object):
             if plot: Team.plot_stats(stats, output, plot_title)
         return stats
 
-    def loc_heatmap_skills(dataset):
-        dname = dataset.split('/')[-2]
-
-        #getting the data
-        open(f'{output}/stats.pkl', 'rb') as infile:
-                    stats = pickle.load(infile)
-        location = stats['location']
-        skills = stats['skills']
-        npatents = len(stats['patent'])
-
-        # creating 3d figures
-        fig = plt.figure(figsize=(10, 10))
-        ax = Axes3D(fig)
-        axM = Axes3D(fig)
-
-        # configuring colorbar
-        color_map = cm.ScalarMappable(cmap=cm.gray)
-        color_map.set_array(colo)
-
-        # creating the heatmap
-        img = ax.scatter(location, skills, npatents, marker='s',
-                        s=100, color='gray')
-        plt.colorbar(color_map)
-
-        # adding title and labels - skills
-        ax.set_title("3D Heatmap")
-        ax.set_xlabel('X-locations')
-        ax.set_ylabel('Y-skills')
-        ax.set_zlabel('Z-number-of-patents')
-
-        # displaying plot
-        fig.savefig(f"{dataset}/{dname}_location_skills_distribution.pdf", dpi=100, bbox_inches='tight')
-        plt.show()
-
-    def loc_heatmap_members(dataset):
-        dname = dataset.split('/')[-2]
-    
-        #getting the data
-        open(f'{output}/stats.pkl', 'rb') as infile:
-                    stats = pickle.load(infile)
-        location = stats['location']
-        members = stats['member']
-        npatents = len(stats['patent'])
-
-        # creating 3d figures
-        fig = plt.figure(figsize=(10, 10))
-        ax = Axes3D(fig)
-        axM = Axes3D(fig)
-
-        # configuring colorbar
-        color_map = cm.ScalarMappable(cmap=cm.gray)
-        color_map.set_array(colo)
-
-        # creating the heatmap
-        img = ax.scatter(location, members, npatents, marker='s',
-                        s=100, color='gray')
-        plt.colorbar(color_map)
-
-        # adding title and labels - members
-        ax.set_title("3D Heatmap")
-        ax.set_xlabel('X-locations')
-        ax.set_ylabel('Y-members')
-        ax.set_zlabel('Z-number-of-patents')
-
-        # displaying plot
-        fig.savefig(f"{dataset}/{dname}_location_members_distribution.pdf", dpi=100, bbox_inches='tight')
-        plt.show()
-
-
-
-
-    
     @staticmethod
     def plot_stats(stats, output, plot_title):
         plt.rcParams.update({'font.family': 'Consolas'})
@@ -440,5 +367,70 @@ class Team(object):
             plt.show()
 
     @staticmethod
-    def get_unigram(membervecs):
-        return membervecs.sum(axis=0)/membervecs.shape[0]
+    def get_unigram(membervecs): return membervecs.sum(axis=0)/membervecs.shape[0]
+
+    # needs code review
+    # def loc_heatmap_skills(dataset, output):
+    #     from mpl_toolkits.mplot3d import Axes3D
+    #     dname = dataset.split('/')[-2]
+    #
+    #     # getting the data
+    #     with open(f'{output}/stats.pkl', 'rb') as infile: stats = pickle.load(infile)
+    #     location = stats['location']
+    #     skills = stats['skills']
+    #     npatents = len(stats['patent'])
+    #
+    #     # creating 3d figures
+    #     fig = plt.figure(figsize=(10, 10))
+    #     ax = Axes3D(fig)
+    #     axM = Axes3D(fig)
+    #
+    #     # configuring colorbar
+    #     color_map = cm.ScalarMappable(cmap=cm.gray)
+    #     color_map.set_array(colo)
+    #
+    #     # creating the heatmap
+    #     img = ax.scatter(location, skills, npatents, marker='s', s=100, color='gray')
+    #     plt.colorbar(color_map)
+    #
+    #     # adding title and labels - skills
+    #     ax.set_title("3D Heatmap")
+    #     ax.set_xlabel('X-locations')
+    #     ax.set_ylabel('Y-skills')
+    #     ax.set_zlabel('Z-number-of-patents')
+    #
+    #     # displaying plot
+    #     fig.savefig(f"{dataset}/{dname}_location_skills_distribution.pdf", dpi=100, bbox_inches='tight')
+    #     plt.show()
+    #
+    # def loc_heatmap_members(dataset, output):
+    #     from mpl_toolkits.mplot3d import Axes3D
+    #     dname = dataset.split('/')[-2]
+    #     # getting the data
+    #     with open(f'{output}/stats.pkl', 'rb') as infile: stats = pickle.load(infile)
+    #     location = stats['location']
+    #     members = stats['member']
+    #     npatents = len(stats['patent'])
+    #
+    #     # creating 3d figures
+    #     fig = plt.figure(figsize=(10, 10))
+    #     ax = Axes3D(fig)
+    #     axM = Axes3D(fig)
+    #
+    #     # configuring colorbar
+    #     color_map = cm.ScalarMappable(cmap=cm.gray)
+    #     color_map.set_array(colo)
+    #
+    #     # creating the heatmap
+    #     img = ax.scatter(location, members, npatents, marker='s', s=100, color='gray')
+    #     plt.colorbar(color_map)
+    #
+    #     # adding title and labels - members
+    #     ax.set_title("3D Heatmap")
+    #     ax.set_xlabel('X-locations')
+    #     ax.set_ylabel('Y-members')
+    #     ax.set_zlabel('Z-number-of-patents')
+    #
+    #     # displaying plot
+    #     fig.savefig(f"{dataset}/{dname}_location_members_distribution.pdf", dpi=100, bbox_inches='tight')
+    #     plt.show()
