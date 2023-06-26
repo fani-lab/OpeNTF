@@ -1,11 +1,14 @@
+import multiprocessing
 import os, pickle, re
+from functools import partial
+
 import matplotlib.pyplot as plt
 import pandas as pd
-
 import torch
 from torch import nn
 
-from eval.metric import *
+from src.Adila.src import main
+from src.eval.metric import *
 
 class Ntf(nn.Module):
     def __init__(self):
@@ -49,6 +52,60 @@ class Ntf(nn.Module):
                 mean_std.to_csv(f'{model_path}/{pred_set}.{epoch}pred.eval.mean.csv')
                 if per_instance: fold_mean_per_instance.truediv(len(splits['folds'].keys())).to_csv(f'{model_path}/{pred_set}.{epoch}pred.eval.per_instance_mean.csv')
 
+    def adila(self, model_path, teamsvecs, splits, settings):
+
+        if os.path.isfile(model_path):
+            main.Reranking.run(fpred=model_path,
+                          output=model_path,
+                          teamsvecs=teamsvecs,
+                          splits=splits,
+                          np_ratio=settings['np_ratio'],
+                          algorithm=settings['algorithm'],
+                          k_max=settings['k_max'],
+                          fairness_metrics=settings['fairness_metrics'],
+                          eq_op=settings['eq_op'],
+                          utility_metrics=settings['utility_metrics'])
+            exit(0)
+
+        if os.path.isdir(model_path):
+            # given a root folder, we can crawl the folder to find *.pred files and run the pipeline for all
+            files = list()
+            for dirpath, dirnames, filenames in os.walk(model_path): files += [
+                os.path.join(os.path.normpath(dirpath), file).split(os.sep) for file in filenames if
+                file.endswith("pred") and 'rerank' not in file]
+
+            files = pd.DataFrame(files, columns=['.', '..', 'domain', 'baseline', 'setting', 'setting_',  'rfile'])
+            address_list = list()
+
+            pairs = []
+            for i, row in files.iterrows():
+                output = f"{row['.']}/{row['..']}/{row['domain']}/{row['baseline']}/{row['setting']}/{row['setting_']}/"
+                pairs.append((f'{output}{row["rfile"]}', f'{output}rerank/'))
+
+            if settings['mode'] == 0:  # sequential run
+                for fpred, output in pairs: main.Reranking.run(fpred=fpred,
+                                                          output=output,
+                                                          teamsvecs=teamsvecs,
+                                                          splits=splits,
+                                                          np_ratio=settings['np_ratio'],
+                                                          algorithm=settings['algorithm'],
+                                                          k_max=settings['k_max'],
+                                                          fairness_metrics=settings['fairness_metrics'],
+                                                          eq_op=settings['eq_op'],
+                                                          utility_metrics=settings['utility_metrics'])
+            elif settings['mode'] == 1:  # parallel run
+                print(f'Parallel run started ...')
+                with multiprocessing.Pool(multiprocessing.cpu_count() if settings['core'] < 0 else settings['core']) as executor:
+                    executor.starmap(partial(main.Reranking.run,
+                                             teamsvecs=teamsvecs,
+                                             splits=splits,
+                                             np_ratio=settings['np_ratio'],
+                                             algorithm=settings['algorithm'],
+                                             k_max=settings['k_max'],
+                                             fairness_metrics=settings['fairness_metrics'],
+                                             utility_metrics=settings['utility_metrics'],
+                                             eq_op=settings['eq_op']
+                                             ), pairs)
     def plot_roc(self, model_path, splits, on_train_valid_set=False):
         for pred_set in (['test', 'train', 'valid'] if on_train_valid_set else ['test']):
             plt.figure()
@@ -64,7 +121,7 @@ class Ntf(nn.Module):
             plt.savefig(f'{model_path}/{pred_set}.roc.png', dpi=100, bbox_inches='tight')
             plt.show()
 
-    def run(self, splits, vecs, indexes, output, settings, cmd, merge_skills):
+    def run(self, splits, vecs, indexes, output, settings, cmd, adila_settings, merge_skills):
         output = f"{output}/t{vecs['skill'].shape[0]}.s{vecs['skill'].shape[1]}.m{vecs['member'].shape[1]}.{'.'.join([k + str(v).replace(' ', '') for k, v in settings.items() if v])}"
         if not os.path.isdir(output): os.makedirs(output)
 
@@ -76,6 +133,4 @@ class Ntf(nn.Module):
         if 'test' in cmd: self.test(output, splits, indexes, vecs, settings, on_train_valid_set, per_epoch, merge_skills)
         if 'eval' in cmd: self.evaluate(output, splits, vecs, on_train_valid_set, per_instance, per_epoch)
         if 'plot' in cmd: self.plot_roc(output, splits, on_train_valid_set)
-
-
-
+        if 'adila' in cmd: self.adila(output, vecs, splits, adila_settings)
