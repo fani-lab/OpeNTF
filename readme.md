@@ -96,6 +96,12 @@ Previous works in team formation presumed that teams follow the i.i.d property a
 
 <p align="center"><img src='./src/mdl/tntf.png' width="700"></p>
 
+**3.2.3. Fairness aware Team Formation**
+
+While state-of-the-art neural team formation methods are able to efficiently analyze massive collections of experts to form effective collaborative teams, they largely ignore the fairness in recommended teams of experts. In `Adila`, we study the application of `fairness-aware` team formation algorithms to mitigate the potential popularity bias in the neural team formation models.
+For further details and demo, please visit [Adila's repository](https://github.com/fani-lab/Adila).
+
+
 **3.3. Model Architecture**
 
 Each model has been defined in [``./src/mdl/``](./src/mdl/) under an inheritance hierarchy. They override abstract functions for ``train``, ``test``, ``eval``, and ``plot`` steps. 
