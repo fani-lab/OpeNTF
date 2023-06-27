@@ -66,11 +66,12 @@ settings = {
         'bucket_size': 500
     },
     'fair': {'np_ratio': None,
-              'algorithm': 'det_greedy',
+              'fairness': ['det_greedy',],
               'k_max': None,
               'fairness_metrics': {'ndkl'},
               'utility_metrics': {'map_cut_2,5,10'},
               'eq_op': False,
               'mode': 0,
-              'core': -1},
+              'core': -1,
+              'attribute': ['gender', 'popularity']},
 }

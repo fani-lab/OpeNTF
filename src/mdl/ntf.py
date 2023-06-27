@@ -64,7 +64,8 @@ class Ntf(nn.Module):
                           k_max=settings['k_max'],
                           fairness_metrics=settings['fairness_metrics'],
                           eq_op=settings['eq_op'],
-                          utility_metrics=settings['utility_metrics'])
+                          utility_metrics=settings['utility_metrics'],
+                          )
             exit(0)
 
         if os.path.isdir(model_path):
@@ -83,29 +84,34 @@ class Ntf(nn.Module):
                 pairs.append((f'{output}{row["rfile"]}', f'{output}rerank/'))
 
             if settings['mode'] == 0:  # sequential run
-                for fpred, output in pairs: main.Reranking.run(fpred=fpred,
-                                                          output=output,
-                                                          teamsvecs=teamsvecs,
-                                                          splits=splits,
-                                                          np_ratio=settings['np_ratio'],
-                                                          algorithm=settings['algorithm'],
-                                                          k_max=settings['k_max'],
-                                                          fairness_metrics=settings['fairness_metrics'],
-                                                          eq_op=settings['eq_op'],
-                                                          utility_metrics=settings['utility_metrics'])
+                for algorithm in settings['fairness']:
+                    for att in settings['attribute']:
+                        for fpred, output in pairs: main.Reranking.run(fpred=fpred,
+                                                                  output=output,
+                                                                  teamsvecs=teamsvecs,
+                                                                  splits=splits,
+                                                                  np_ratio=settings['np_ratio'],
+                                                                  algorithm=algorithm,
+                                                                  k_max=settings['k_max'],
+                                                                  fairness_metrics=settings['fairness_metrics'],
+                                                                  eq_op=settings['eq_op'],
+                                                                  utility_metrics=settings['utility_metrics'],
+                                                                  att=att)
             elif settings['mode'] == 1:  # parallel run
                 print(f'Parallel run started ...')
-                with multiprocessing.Pool(multiprocessing.cpu_count() if settings['core'] < 0 else settings['core']) as executor:
-                    executor.starmap(partial(main.Reranking.run,
-                                             teamsvecs=teamsvecs,
-                                             splits=splits,
-                                             np_ratio=settings['np_ratio'],
-                                             algorithm=settings['algorithm'],
-                                             k_max=settings['k_max'],
-                                             fairness_metrics=settings['fairness_metrics'],
-                                             utility_metrics=settings['utility_metrics'],
-                                             eq_op=settings['eq_op']
-                                             ), pairs)
+                for algorithm in settings['fairness']:
+                    for att in settings['attribute']:
+                        with multiprocessing.Pool(multiprocessing.cpu_count() if settings['core'] < 0 else settings['core']) as executor:
+                            executor.starmap(partial(main.Reranking.run,
+                                                     teamsvecs=teamsvecs,
+                                                     splits=splits,
+                                                     np_ratio=settings['np_ratio'],
+                                                     algorithm=algorithm,
+                                                     k_max=settings['k_max'],
+                                                     fairness_metrics=settings['fairness_metrics'],
+                                                     utility_metrics=settings['utility_metrics'],
+                                                     eq_op=settings['eq_op'],
+                                                     att=att), pairs)
     def plot_roc(self, model_path, splits, on_train_valid_set=False):
         for pred_set in (['test', 'train', 'valid'] if on_train_valid_set else ['test']):
             plt.figure()
