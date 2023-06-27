@@ -45,7 +45,7 @@ settings = {
                 'w': 1 #cooccurrence window
             }
         },
-        'cmd': ['train', 'test', 'eval', 'adila'],  # 'train', 'test', 'eval', 'plot', 'agg', 'adila'
+        'cmd': ['train', 'test', 'eval', 'fair'],  # 'train', 'test', 'eval', 'plot', 'agg', 'adila'
         'nfolds': 5,
         'train_test_split': 0.85,
         'step_ahead': 2,#for now, it means that whatever are in the last [step_ahead] time interval will be the test set!
@@ -65,7 +65,7 @@ settings = {
         'ncore': 0,# <= 0 for all
         'bucket_size': 500
     },
-    'adila': {'np_ratio': None,
+    'fair': {'np_ratio': None,
               'algorithm': 'det_greedy',
               'k_max': None,
               'fairness_metrics': {'ndkl'},
