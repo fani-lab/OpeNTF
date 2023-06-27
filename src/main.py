@@ -72,7 +72,7 @@ def aggregate(output):
             dff.set_axis(names, axis=1, inplace=True)
             dff.to_csv(f"{output}{rd}/{rf.replace('.csv', '.agg.csv')}", index=False)
 
-def run(data_list, domain_list, adila, filter, future, model_list, output, exp_id, settings):
+def run(data_list, domain_list, fair, filter, future, model_list, output, exp_id, settings):
     filter_str = f".filtered.mt{settings['data']['filter']['min_nteam']}.ts{settings['data']['filter']['min_team_size']}" if filter else ""
 
     if exp_id: output = f'{output}exp_{exp_id}/'
@@ -122,9 +122,9 @@ def run(data_list, domain_list, adila, filter, future, model_list, output, exp_i
     if 'rrn' in model_list: models['rrn'] = Rrn(settings['model']['baseline']['rrn']['with_zero'], settings['model']['step_ahead'])
 
 
-    if 'np_ratio' in adila: settings['adila']['np_ratio'] = adila['np_ratio']
-    if 'algorithm' in adila: settings['adila']['algorithm'] = adila['algorithm']
-    if 'k_max' in adila: settings['adila']['k_max'] = adila['k_max']
+    if 'np_ratio' in fair: settings['fair']['np_ratio'] = fair['np_ratio']
+    if 'algorithm' in fair: settings['fair']['algorithm'] = fair['algorithm']
+    if 'k_max' in fair: settings['fair']['k_max'] = fair['k_max']
 
     assert len(datasets) > 0
     assert len(datasets) == len(domain_list)
@@ -159,7 +159,7 @@ def run(data_list, domain_list, adila, filter, future, model_list, output, exp_i
             if not os.path.isdir(output_path): os.makedirs(output_path)
             copyfile('./param.py', f'{output_path}/param.py')
             
-            m_obj.run(splits, vecs_, indexes, f'{output_path}', settings['model']['baseline'][baseline_name], settings['model']['cmd'], settings['adila'], merge_skills=False)
+            m_obj.run(splits, vecs_, indexes, f'{output_path}', settings['model']['baseline'][baseline_name], settings['model']['cmd'], settings['fair'], merge_skills=False)
     if 'agg' in settings['model']['cmd']: aggregate(output)
 
 
@@ -177,10 +177,10 @@ def addargs(parser):
     output.add_argument('-output', type=str, default='./../output/', help='The output path (default: -output ./../output/)')
     output.add_argument('-exp_id', type=str, default=None, help='ID of the experiment')
 
-    adila = parser.add_argument_group('adila')
-    adila.add_argument('-np_ratio', '--np_ratio', type=float, default=None, required=False, help='desired ratio of non-popular experts after reranking; if None, based on distribution in dataset; default: None; Eg. 0.5')
-    adila.add_argument('-algorithm', '--algorithm', type=str, default='det_greedy', required=False, help='reranking algorithm from {det_greedy, det_cons, det_relaxed}; required; Eg. det_cons')
-    adila.add_argument('-k_max', '--k_max', type=int, default=None, required=False, help='cutoff for the reranking algorithms; default: None')
+    fair = parser.add_argument_group('fair')
+    fair.add_argument('-np_ratio', '--np_ratio', type=float, default=None, required=False, help='desired ratio of non-popular experts after reranking; if None, based on distribution in dataset; default: None; Eg. 0.5')
+    fair.add_argument('-algorithm', '--algorithm', type=str, default='det_greedy', required=False, help='reranking algorithm from {det_greedy, det_cons, det_relaxed}; required; Eg. det_cons')
+    fair.add_argument('-k_max', '--k_max', type=int, default=None, required=False, help='cutoff for the reranking algorithms; default: None')
 
 # python -u main.py -data ../data/raw/dblp/toy.dblp.v12.json
 # 						  ../data/raw/imdb/toy.title.basics.tsv
@@ -200,10 +200,10 @@ if __name__ == '__main__':
     addargs(parser)
     args = parser.parse_args()
 
-    adila = { 'algorithm': args.algorithm, 'k_max': args.k_max, 'np_ratio': args.np_ratio }
+    fair = { 'algorithm': args.algorithm, 'k_max': args.k_max, 'np_ratio': args.np_ratio }
     run(data_list=args.data_list,
         domain_list=args.domain_list,
-        adila = adila,
+        fair = fair,
         filter=args.filter,
         future=args.future,
         model_list=args.model_list,
