@@ -123,8 +123,9 @@ def run(data_list, domain_list, fair, filter, future, model_list, output, exp_id
 
 
     if 'np_ratio' in fair: settings['fair']['np_ratio'] = fair['np_ratio']
-    if 'algorithm' in fair: settings['fair']['algorithm'] = fair['algorithm']
+    if 'fairness' in fair: settings['fair']['fairness'] = fair['fairness']
     if 'k_max' in fair: settings['fair']['k_max'] = fair['k_max']
+    if 'attribute' in fair: settings['fair']['attribute'] = fair['attribute']
 
     assert len(datasets) > 0
     assert len(datasets) == len(domain_list)
@@ -179,8 +180,9 @@ def addargs(parser):
 
     fair = parser.add_argument_group('fair')
     fair.add_argument('-np_ratio', '--np_ratio', type=float, default=None, required=False, help='desired ratio of non-popular experts after reranking; if None, based on distribution in dataset; default: None; Eg. 0.5')
-    fair.add_argument('-algorithm', '--algorithm', type=str, default='det_greedy', required=False, help='reranking algorithm from {det_greedy, det_cons, det_relaxed}; required; Eg. det_cons')
+    fair.add_argument('-fairness', '--fairness', nargs='+', type=str, default='det_greedy', required=False, help='reranking algorithm from {det_greedy, det_cons, det_relaxed}; required; Eg. det_cons')
     fair.add_argument('-k_max', '--k_max', type=int, default=None, required=False, help='cutoff for the reranking algorithms; default: None')
+    fair.add_argument('-attribute', '--attribute', nargs='+' ,type=str, default='popularity', required=False, help='the set of our sensitive attributes')
 
 # python -u main.py -data ../data/raw/dblp/toy.dblp.v12.json
 # 						  ../data/raw/imdb/toy.title.basics.tsv
@@ -200,7 +202,7 @@ if __name__ == '__main__':
     addargs(parser)
     args = parser.parse_args()
 
-    fair = { 'algorithm': args.algorithm, 'k_max': args.k_max, 'np_ratio': args.np_ratio }
+    fair = { 'fairness': args.fairness, 'k_max': args.k_max, 'np_ratio': args.np_ratio, 'attribute': args.attribute }
     run(data_list=args.data_list,
         domain_list=args.domain_list,
         fair = fair,
