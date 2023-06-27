@@ -83,8 +83,8 @@ Please note that the preprocessing step will be executed once. Subsequent runs l
 
 **3.2. Fairness aware Team Formation**
 
-While state-of-the-art neural team formation methods are able to efficiently analyze massive collections of experts to form effective collaborative teams, they largely ignore the fairness in recommended teams of experts. In `Adila`, we study the application of `fairness-aware` team formation algorithms to mitigate the potential popularity bias in the neural team formation models.
-For further details and demo, please visit [Adila's repository](https://github.com/fani-lab/Adila).
+While state-of-the-art neural team formation methods are able to efficiently analyze massive collections of experts to form effective collaborative teams, they largely ignore the fairness in recommended teams of experts. In `Adila`, we study the application of `fairness-aware` team formation algorithms to mitigate the potential popularity bias in the neural team formation models. We support two fairness notions namely, `equality of opportunity` and `demographic parity`. To achieve fairness, we utilize three deterministic greedy reranking algorithms (`det_greedy`, `det_cons`, `det_relaxed`). 
+For further details and demo, please visit [Adila's submodule](https://github.com/fani-lab/Adila).
 
 **3.3.1. Non-Temporal Neural Team Formation**
 
