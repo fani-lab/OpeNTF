@@ -200,6 +200,8 @@ Full predictions of all models on test and training sets and the values of evalu
 |Baselines|{bnn, random}×{sparse, emb}×{unigram_b}|
 |Results|for further details and results, please visit [Adila's submodule](https://github.com/fani-lab/Adila)|
 
+The following table is a sample result of Adila module's reranking on imdb dataset and bnn embedding baseline:
+<p align="center"><img src='./misc/bnn_emb.PNG'></p>
 
 ## 5. Acknowledgement:
 We benefit from [``pytrec_eval``](https://github.com/cvangysel/pytrec_eval), [``gensim``](https://radimrehurek.com/gensim/), [Josh Feldman's blog](https://joshfeldman.net/WeightUncertainty/), and other libraries. We would like to thank the authors of these libraries and helpful resources.
