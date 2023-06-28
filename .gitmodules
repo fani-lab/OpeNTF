@@ -1,0 +1,4 @@
+[submodule "src/Adila"]
+	path = src/Adila
+	url = https://github.com/fani-lab/Adila.git
+	branch = module
