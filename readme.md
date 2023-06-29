@@ -1,15 +1,23 @@
 # ``OpeNTF``: An Open-Source Neural Team Formation Benchmark Library 
 Team formation involves selecting a team of skillful experts who will, more likely than not, accomplish a task. Researchers have proposed a rich body of computational methods to automate the traditionally tedious and error-prone manual process. We previously released OpeNTF, an open-source framework hosting canonical neural models as the cutting-edge class of approaches, along with large-scale training datasets from varying domains. In this paper, we contribute OpeNTF2 that extends the initial release in two prime directions. (1) The first of its kind in neural team formation, we integrated `debiasing reranking algorithms` to mitigate the `popularity` and `gender` disparities in the neural models’ team recommendations based on two alternative notions of fairness: equality of opportunity and demographic parity. (2) We further contribute a `temporal` training strategy for neural models’ training to capture the evolution of experts’ skills and collaboration ties over time, as opposed to randomly shuffled training datasets. OpeNTF2 is a forward-looking effort to automate team formation via fairness-aware and time-sensitive methods. AI-ML-based solutions are increasingly impacting how resources are allocated to various groups in society, and ensuring fairness and time are systematically considered is key.
 
+<table align="center" border=0>
+<tr>
+<td>
+- [1. Setup](#1-setup)
+- [2. Quickstart](#2-quickstart)
+- [3. Features](#3-features)
+- [4. Results](#4-results)
+- [5. Acknowledgement](#5-acknowledgement)
+- [6. License](#6-license)
+- [7. Citation](#7-citation)
+- [8. Awards](#8-awards)
+</td>
+<td><img src='./misc/adila_flow.png' width="100%" /></td>
+<td><img src='./src/mdl/team_inheritance_hierarchy.png' width="100%" /></td>
+</tr>
+</table>
 
-1. [Setup](#1-setup)
-2. [Quickstart](#2-quickstart)
-3. [Features](#3-features)
-4. [Results](#4-results)
-5. [Acknowledgement](#5-acknowledgement)
-6. [License](#6-license)
-7. [Citation](#7-citation)
-8. [Awards](#8-awards)
 
 ## 1. [Setup](https://colab.research.google.com/github/fani-lab/OpeNTF/blob/main/quickstart.ipynb)
 You need to have ``Python >= 3.8`` and install the following main packages, among others listed in [``requirements.txt``](requirements.txt):
