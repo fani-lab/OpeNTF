@@ -3,7 +3,9 @@ Team formation involves selecting a team of skillful experts who will, more like
 
 <table align="center" border=0>
 <tr>
-<td>
+<td >
+
+  
 - [1. Setup](#1-setup)
 - [2. Quickstart](#2-quickstart)
 - [3. Features](#3-features)
@@ -12,6 +14,9 @@ Team formation involves selecting a team of skillful experts who will, more like
 - [6. License](#6-license)
 - [7. Citation](#7-citation)
 - [8. Awards](#8-awards)
+
+
+
 </td>
 <td><img src='./misc/adila_flow.png' width="100%" /></td>
 <td><img src='./src/mdl/team_inheritance_hierarchy.png' width="100%" /></td>
