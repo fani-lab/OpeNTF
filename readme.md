@@ -19,7 +19,7 @@ Team formation involves selecting a team of skillful experts who will, more like
 
 </td>
 <td><img src='./misc/adila_flow.png' width="100%" /></td>
-<td><img src='./src/mdl/team_inheritance_hierarchy.png' width="100%" /></td>
+<td><img src='./src/mdl/team_inheritance_hierarchy.png' width="90%%" /></td>
 </tr>
 </table>
 
