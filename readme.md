@@ -9,6 +9,13 @@ Team formation involves selecting a team of skillful experts who will, more like
 - [1. Setup](#1-setup)
 - [2. Quickstart](#2-quickstart)
 - [3. Features](#3-features)
+  * [`Fairness aware Team Formation`](#31-fairness-aware-team-formation)
+  * [`Datasets and Parallel Preprocessing`](#32-datasets-and-parallel-preprocessing)
+  * [`Non-Temporal Neural Team Formation`](#33-non-temporal-neural-team-formation)
+  * [`Temporal Neural Team Prediction`](#34-temporal-neural-team-prediction)
+  * [`Model Architecture`](#35-model-architecture)
+  * [`Negative Sampling Strategies`](#36-negative-sampling-strategies)
+  * [`Run`](#37-run)
 - [4. Results](#4-results)
 - [5. Acknowledgement](#5-acknowledgement)
 - [6. License](#6-license)
@@ -18,7 +25,7 @@ Team formation involves selecting a team of skillful experts who will, more like
 
 
 </td>
-<td style="align: right"><img src='./misc/adila_flow_.png' width="80%" /></td>
+<td><img src='./misc/adila_flow_.png' width="600" align="right"" /></td>
 <!-- <td><img src='./src/mdl/team_inheritance_hierarchy.png' width="90%%" /></td> -->
 </tr>
 </table>
@@ -68,7 +75,7 @@ python -u main.py -data ../data/raw/dblp/toy.dblp.v12.json -domain dblp -model t
 This script loads and preprocesses the same dataset [``toy.dblp.v12.json``](data/raw/dblp/toy.dblp.v12.json) from [``dblp``](https://originalstatic.aminer.cn/misc/dblp.v12.7z), takes the teams from the the last year as the test set and trains the ``Bayesian`` neural model following our proposed streaming training strategy as explained in ``3.2.2. Temporal Neural Team Formation`` with two different input representations _i_) sparse vector represntation and _ii_) temporal skill vector represntation using default hyperparameters from [``./src/param.py``](./src/param.py).
 
 ## 3. Features
-**3.1. Fairness aware Team Formation**
+#### **3.1. Fairness aware Team Formation**
 
 While state-of-the-art neural team formation methods are able to efficiently analyze massive collections of experts to form effective collaborative teams, they largely ignore the fairness in recommended teams of experts. In `Adila`, we study the application of `fairness-aware` team formation algorithms to mitigate the potential popularity bias in the neural team formation models. We support two fairness notions namely, `equality of opportunity` and `demographic parity`. To achieve fairness, we utilize three deterministic greedy reranking algorithms (`det_greedy`, `det_cons`, `det_relaxed`). 
 
@@ -78,7 +85,7 @@ While state-of-the-art neural team formation methods are able to efficiently ana
 
 For further details and demo, please visit [Adila's submodule](https://github.com/fani-lab/Adila).
 
-**3.2. Datasets and Parallel Preprocessing**
+#### **3.2. Datasets and Parallel Preprocessing**
 
 Raw dataset, e.g., scholarly papers from AMiner's citation network dataset of [``dblp``](https://originalstatic.aminer.cn/misc/dblp.v12.7z), movies from [``imdb``](https://datasets.imdbws.com/), or US patents from [``uspt``](https://patentsview.org/download/data-download-tables) were assumed to be populated in [``data/raw``](data/raw). For the sake of integration test, tiny-size toy example datasets [``toy.dblp.v12.json``](data/raw/dblp/toy.dblp.v12.json) from [``dblp``](https://originalstatic.aminer.cn/misc/dblp.v12.7z), [[``toy.title.basics.tsv``](data/raw/imdb/toy.title.basics.tsv), [``toy.title.principals.tsv``](data/raw/imdb/toy.title.principals.tsv), [``toy.name.basics.tsv``](data/raw/imdb/toy.name.basics.tsv)] from [``imdb``](https://datasets.imdbws.com/) and [``toy.patent.tsv``](data/preprocessed/uspt/toy.patent.tsv) have been already provided.
 
@@ -102,11 +109,11 @@ The sparse matrices and the indices will be persisted in [``data/preprocessed/{d
 Please note that the preprocessing step will be executed once. Subsequent runs load the persisted pickle files. In order to regenerate them, one should simply delete them. 
 
 
-**3.3. Non-Temporal Neural Team Formation**
+#### **3.3. Non-Temporal Neural Team Formation**
 
 We randomly take ``85%`` of the dataset for the train-validation set and ``15%`` as the test set, i.e., the model never sees these instances during training or model tuning. You can change ``train_test_split`` parameter in [``./src/param.py``](./src/param.py).
 
-**3.4. Temporal Neural Team Prediction**
+#### **3.4. Temporal Neural Team Prediction**
 
 Previous works in team formation presumed that teams follow the i.i.d property and hence when training their models they followed the bag of teams approach, where they train and validate their models on a shuffled dataset of teams. Moreover, they were interpolative and did not try to predict _future_ successful teams. In this work, we aim at extrapolating and predicting _future_ teams of experts. We sort the teams by time intervals and train a neural model incrementally  through the ordered collection of teams in [C<sub>0</sub>, ..C<sub>t</sub>, ..C<sub>T</sub>]. As can be seen in Figure below, after random initialization of skills’ and experts’ embeddings at t=0, we start training the model on the teams in the first time interval C<sub>0</sub> for a number of epochs, then we continue with training  on the second time interval C<sub>1</sub> using the learned embeddings from the previous time interval and so forth until we finish the training on the last training time interval C<sub>t=T</sub>. We believe that using this approach, will help the model understand how experts’ skills and collaborative ties evolve through time and the final embeddings are their optimum representation in the latent space to predict _future_ successful teams at time interval C<sub>t=T+1</sub>.
 
@@ -114,7 +121,7 @@ Previous works in team formation presumed that teams follow the i.i.d property a
 
 
 
-**3.3. Model Architecture**
+#### **3.5. Model Architecture**
 
 Each model has been defined in [``./src/mdl/``](./src/mdl/) under an inheritance hierarchy. They override abstract functions for ``train``, ``test``, ``eval``, and ``plot`` steps. 
 For example, for our feedforward baseline [``fnn``](./src/mdl/fnn.py), the model has been implemented in [``./src/mdl/fnn.py``](src/mdl/fnn.py). Model's hyperparameters such as the learning rate (``lr``) or the number of epochs (``e``) can be set in [``./src/param.py``](src/param.py).
@@ -134,7 +141,7 @@ The input to the models is the vector representations for (_temporal_) skills an
 2) Dense vector representation ([``team2vec``](./src/mdl/team2vec.py)): Inspired by paragraph vectors by [Le and Mikolov](https://cs.stanford.edu/~quocle/paragraph_vector.pdf), we consider a team as a document and skills as the document words (``embtype == 'skill'``). Using distributed memory model, we map skills into a real-valued embedding space. Likewise and separately, we consider members as the document words and map members into real-valued vectors (``embtype == 'member'``). We also consider mapping skills and members into the same embedding space (``embtype == 'joint'``). Our embedding method benefits from [``gensim``](https://radimrehurek.com/gensim/) library.
 3) Temporal skill vector represntation ([``team2vec``](./src/mdl/team2vec.py)): Inspired by [Hamilton et al.](https://aclanthology.org/P16-1141/), we also incorporate time information into the underlying neural model besides utilizing our proposed streaming training strategy. We used the distributed memory model of Doc2Vec to generate the real-valued joint embeddings of the subset of skills and time intervals, where the skills and time intervals are the words of the document (``embtype == 'dt2v'``).
 
-**3.5. Negative Sampling Strategies**
+#### **3.6. Negative Sampling Strategies**
 
 As known, employing ``unsuccessful`` teams convey complementary negative signals to the model to alleviate the long-tail problem. Most real-world training datasets in the team formation domain, however, do not have explicit unsuccessful teams (e.g., collections of rejected papers.) In the absence of unsuccessful training instances, we proposed negative sampling strategies based on the ``closed-world`` assumption where no currently known successful group of experts for the required skills is assumed to be unsuccessful.  We study the effect of ``three`` different negative sampling strategies: two based on static distributions, and one based on adaptive noise distribution:
 
@@ -148,7 +155,7 @@ To include a negative sampling strategy, there are two parameters for a model to
 - ``ns``: the negative sampling strategy which can be ``uniform``, ``unigram``, ``unigram_b`` or ``None``(no negative sampling).
 - ``nns``: number of negative samples
 
-**3.6. Run**
+#### **3.7. Run**
 
 The pipeline accepts three required list of values:
 1) ``-data``: list of path to the raw datafiles, e.g., ``-data ./../data/raw/dblp/dblp.v12.json``, or the main file of a dataset, e.g., ``-data ./../data/raw/imdb/title.basics.tsv``
