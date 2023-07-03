@@ -9,5 +9,6 @@ gensim==3.8.3
 pytrec-eval-terrier==0.5.2
 matplotlib==3.4.2
 OpenNMT-py==2.2.0
+reranking==0.3.6 # required by Adila submodule
 #schedule
 python-dateutil==2.8.2
