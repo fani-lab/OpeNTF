@@ -40,14 +40,14 @@ gensim==3.8.3
 ```
 By ``pip``, clone the codebase and install required packages:
 ```sh
-git clone https://github.com/Fani-Lab/opentf
+git clone --recursive https://github.com/Fani-Lab/opentf
 cd opentf
 pip install -r requirements.txt
 ```
 By [``conda``](https://www.anaconda.com/products/individual):
 
 ```sh
-git clone https://github.com/Fani-Lab/opentf
+git clone --recursive https://github.com/Fani-Lab/opentf
 cd opentf
 conda env create -f environment.yml
 conda activate opentf
