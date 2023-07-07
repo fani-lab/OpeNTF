@@ -31,7 +31,7 @@ Team formation involves selecting a team of skillful experts who will, more like
 </table>
 
 
-## 1. [Setup](https://colab.research.google.com/github/fani-lab/OpeNTF/blob/main/quickstart.ipynb)
+## 1. [Setup](https://colab.research.google.com/github/fani-lab/Adila/blob/main/quickstart.ipynb)
 You need to have ``Python >= 3.8`` and install the following main packages, among others listed in [``requirements.txt``](requirements.txt):
 ```
 torch>=1.9.0
