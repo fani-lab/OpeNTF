@@ -7,8 +7,8 @@ import pandas as pd
 import torch
 from torch import nn
 
-from src.Adila.src import main
-from src.eval.metric import *
+from Adila.src import main
+from eval.metric import *
 
 class Ntf(nn.Module):
     def __init__(self):
