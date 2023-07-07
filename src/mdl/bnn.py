@@ -178,7 +178,7 @@ class Bnn(Fnn):
                 plt.savefig(f'{output}/f{foldidx}.train_valid_loss.png', dpi=100, bbox_inches='tight')
                 plt.show()
 
-    def test(self, model_path, splits, indexes, vecs, params, on_train_valid_set=False, per_epoch=False):
+    def test(self, model_path, splits, indexes, vecs, params, on_train_valid_set=False, per_epoch=False, merge_skills=False):
         if not os.path.isdir(model_path): raise Exception("The model does not exist!")
         # input_size = len(indexes['i2s'])
         input_size = vecs['skill'].shape[1]
