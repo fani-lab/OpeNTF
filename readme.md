@@ -9,7 +9,7 @@ Team formation involves selecting a team of skillful experts who will, more like
 - [1. Setup](#1-setup)
 - [2. Quickstart](#2-quickstart)
 - [3. Features](#3-features)
-  * [`Fairness aware Team Formation`](#31-fairness-aware-team-formation)
+  * [`Fairness aware Team Formation`](#31-adila-fairness-aware-team-formation)
   * [`Datasets and Parallel Preprocessing`](#32-datasets-and-parallel-preprocessing)
   * [`Non-Temporal Neural Team Formation`](#33-non-temporal-neural-team-formation)
   * [`Temporal Neural Team Prediction`](#34-temporal-neural-team-prediction)
@@ -75,7 +75,7 @@ python -u main.py -data ../data/raw/dblp/toy.dblp.v12.json -domain dblp -model t
 This script loads and preprocesses the same dataset [``toy.dblp.v12.json``](data/raw/dblp/toy.dblp.v12.json) from [``dblp``](https://originalstatic.aminer.cn/misc/dblp.v12.7z), takes the teams from the the last year as the test set and trains the ``Bayesian`` neural model following our proposed streaming training strategy as explained in ``3.2.2. Temporal Neural Team Formation`` with two different input representations _i_) sparse vector represntation and _ii_) temporal skill vector represntation using default hyperparameters from [``./src/param.py``](./src/param.py).
 
 ## 3. Features
-#### **3.1. Fairness aware Team Formation**
+#### **3.1. [`Adila`](https://github.com/fani-lab/Adila): Fairness aware Team Formation**
 
 While state-of-the-art neural team formation methods are able to efficiently analyze massive collections of experts to form effective collaborative teams, they largely ignore the fairness in recommended teams of experts. In `Adila`, we study the application of `fairness-aware` team formation algorithms to mitigate the potential popularity bias in the neural team formation models. We support two fairness notions namely, `equality of opportunity` and `demographic parity`. To achieve fairness, we utilize three deterministic greedy reranking algorithms (`det_greedy`, `det_cons`, `det_relaxed`). 
 
