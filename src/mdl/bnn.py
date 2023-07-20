@@ -83,6 +83,18 @@ class Bnn(Fnn):
 
         unigram = Team.get_unigram(vecs['member'])
 
+        # Get the range of indices of previous year's data
+        if ns.startswith('temporal'):
+            cur_year = int(output.split('/')[-1])
+            index_cur_year = next((i for i, (idx, yr) in enumerate(indexes['i2y']) if yr == cur_year), None)
+            window_size = int(ns.split('_')[-1])
+            if index_cur_year - window_size >= 0:
+                start = indexes['i2y'][index_cur_year-window_size][0]
+                end = indexes['i2y'][index_cur_year][0]
+                unigram = Team.get_unigram(vecs['member'][start:end])
+            else:
+                unigram = np.zeros(unigram.shape)
+
         # Prime a dict for train and valid loss
         train_valid_loss = dict()
         for i in range(len(splits['folds'].keys())):
