@@ -130,7 +130,6 @@ def run(data_list, domain_list, fair, filter, future, model_list, output, exp_id
     assert len(datasets) > 0
     assert len(datasets) == len(domain_list)
     assert len(models) > 0
-
     for (d_name, d_cls) in datasets.items():
         datapath = data_list[domain_list.index(d_name)]
         prep_output = f'./../data/preprocessed/{d_name}/{os.path.split(datapath)[-1]}'

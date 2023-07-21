@@ -1,0 +1,5 @@
+0.055703900000480644 ../output/toy.dblp.v12.json/fnn/t31.s10.m13.l[128].lr0.1.b128.e20.nns3.nsunigram_b/t31.s10.m13.l[128].lr0.1.b128.e20.nns3.nsunigram_b/rerank//f0.test.pred det_greedy None
+0.05118229999970936 ../output/toy.dblp.v12.json/fnn/t31.s10.m13.l[128].lr0.1.b128.e20.nns3.nsunigram_b/t31.s10.m13.l[128].lr0.1.b128.e20.nns3.nsunigram_b/rerank//f1.test.pred det_greedy None
+0.06401639999967301 ../output/toy.dblp.v12.json/fnn/t31.s10.m13.l[128].lr0.1.b128.e20.nns3.nsunigram_b/t31.s10.m13.l[128].lr0.1.b128.e20.nns3.nsunigram_b/rerank//f2.test.pred det_greedy None
+0.05207180000070366 ../output/toy.dblp.v12.json/fnn/t31.s10.m13.l[128].lr0.1.b128.e20.nns3.nsunigram_b/t31.s10.m13.l[128].lr0.1.b128.e20.nns3.nsunigram_b/rerank//f3.test.pred det_greedy None
+0.05503509999925882 ../output/toy.dblp.v12.json/fnn/t31.s10.m13.l[128].lr0.1.b128.e20.nns3.nsunigram_b/t31.s10.m13.l[128].lr0.1.b128.e20.nns3.nsunigram_b/rerank//f4.test.pred det_greedy None

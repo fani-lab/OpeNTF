@@ -7,6 +7,9 @@ from time import time
 from functools import partial
 import pandas as pd
 from dateutil import parser
+from office365.runtime.auth.authentication_context import AuthenticationContext
+from office365.sharepoint.client_context import ClientContext
+import json
 
 class Team(object):
     def __init__(self, id, members, skills, datetime, location=None):
@@ -194,6 +197,11 @@ class Team(object):
 
     @classmethod
     def generate_sparse_vectors(cls, datapath, output, filter, settings):
+
+        with open('cmn/sharepoint_client.json') as json_file:
+            sharepoint_client = json.load(json_file)
+        client_id = sharepoint_client['client_id']
+        client_secret = sharepoint_client['client_secret']
         pkl = f'{output}/teamsvecs.pkl'
         try:
             st = time()
@@ -202,8 +210,53 @@ class Team(object):
             indexes, _ = cls.read_data(datapath, output, index=True, filter=filter, settings=settings)
             print(f"It took {time() - st} seconds to load the sparse matrices.")
             return vecs, indexes
-        except FileNotFoundError as e:
-            print("File not found! Generating the sparse matrices ...")
+        except FileNotFoundError:
+            print("File not found! Proceeding to download the datasets ...")
+        except Exception as e:
+            raise e
+        
+        try:
+            # Download datasets from the API
+            site_url = "https://uwin365.sharepoint.com/:f:/s/cshfrg-TeamFormation/Eo_dbQ5f4mJLqYSVn3YCPu4BD4m4k26E6dtN3nu-Uv2_Ww?e=N9EcsU"
+            local_download_path = "./../../data/preprocessed/"
+
+            folder_path = "Shared Documents/Team Formation/OpeNTF0.2.0.0/data/preprocessed"
+
+            auth_context = AuthenticationContext(site_url)  # Connect to the SharePoint site
+            client_context = ClientContext(site_url, auth_context)
+            auth_context.acquire_token_for_app(client_id="", client_secret="")
+            client_context.execute_query()
+
+            target_folder = client_context.web.get_folder_by_server_relative_url(folder_path)
+            client_context.load(target_folder)
+            client_context.execute_query()
+
+            files = target_folder.files
+            client_context.load(files)
+            client_context.execute_query()
+
+            for file in files:  # Iterate over the files in the folder and download them
+                local_file_path = "{}/{}".format(local_download_path, file.properties["Name"])
+                try:
+                    with open(local_file_path, "wb") as local_file:
+                        file.download(local_file)
+                    print("Downloaded file: {}".format(file.properties["Name"]))
+                except Exception as e:
+                    print("Error downloading file: {}. {}".format(file.properties["Name"], str(e)))
+
+            print("All files have been downloaded successfully.")
+
+            #Read downloaded datasets
+            with open(pkl, 'rb') as infile:
+                vecs = pickle.load(infile)
+            indexes, _ = cls.read_data(datapath, output, index=True, filter=filter, settings=settings)
+            print(f"It took {time() - st} seconds to load the sparse matrices.")
+            return vecs, indexes
+        except Exception as e:
+            print("Failed to download the datasets! Generating the sparse matrices ...")
+        
+        try:
+            # Generate the preprocessed datasets
             indexes, teams = cls.read_data(datapath, output, index=False, filter=filter, settings=settings)
             st = time()
             # parallel
@@ -213,20 +266,71 @@ class Team(object):
                     subteams = np.array_split(teams, n_core)
                     func = partial(Team.bucketing, settings['bucket_size'], indexes['s2i'], indexes['c2i'], indexes['l2i'], settings['location_type'])
                     data = p.map(func, subteams)
-                    #It took 12156.825613975525 seconds to generate and store the sparse matrices of size (1729691, 818915) at ./../data/preprocessed/uspt/patent.tsv.filtered.mt5.ts3/teamsvecs.pkl
-                    #It took 11935.809179782867 seconds to generate and store the sparse matrices of size (661335, 1444501) at ./../data/preprocessed/gith/data.csv/teamsvecs.pkl
             # serial
             else:
                 data = Team.bucketing(settings['bucket_size'], indexes['s2i'], indexes['c2i'], teams)
-            data = scipy.sparse.vstack(data, 'lil')#{'bsr', 'coo', 'csc', 'csr', 'dia', 'dok', 'lil'}, By default an appropriate sparse matrix format is returned!!
+            data = scipy.sparse.vstack(data, 'lil')
             vecs = {'id': data[:, 0], 'skill': data[:, 1:len(indexes['s2i']) + 1], 'loc': data[:, len(indexes['s2i']) + 1: len(indexes['s2i']) + 1 + len(indexes['l2i'])], 'member': data[:, - len(indexes['c2i']):]}
 
-            with open(pkl, 'wb') as outfile: pickle.dump(vecs, outfile)
+            with open(pkl, 'wb') as outfile:
+                pickle.dump(vecs, outfile)
             print(f"It took {time() - st} seconds to generate and store the sparse matrices of size {data.shape} at {pkl}")
             return vecs, indexes
-
+        except FileNotFoundError:
+            print("File not found! Proceeding to download the raw data ...")
         except Exception as e:
             raise e
+
+        # Download the raw dataset from the API
+        site_url = "https://uwin365.sharepoint.com/:f:/s/cshfrg-TeamFormation/Eo_dbQ5f4mJLqYSVn3YCPu4BD4m4k26E6dtN3nu-Uv2_Ww?e=N9EcsU"
+        local_download_path = "./../../data/raw/"
+
+        folder_path = "Shared Documents/Team Formation/OpeNTF0.2.0.0/data/raw"
+
+        auth_context = AuthenticationContext(site_url)  # Connect to the SharePoint site
+        client_context = ClientContext(site_url, auth_context)
+        auth_context.acquire_token_for_app(client_id, client_secret) #Will need to add client_id and client_secret to gitignore on merge
+        client_context.execute_query()
+
+        target_folder = client_context.web.get_folder_by_server_relative_url(folder_path)
+        client_context.load(target_folder)
+        client_context.execute_query()
+
+        files = target_folder.files
+        client_context.load(files)
+        client_context.execute_query()
+
+        for file in files:  # Iterate over the files in the folder and download them
+            local_file_path = "{}/{}".format(local_download_path, file.properties["Name"])
+            try:
+                with open(local_file_path, "wb") as local_file:
+                    file.download(local_file)
+                print("Downloaded file: {}".format(file.properties["Name"]))
+            except Exception as e:
+                print("Error downloading file: {}. {}".format(file.properties["Name"], str(e)))
+
+        print("All files have been downloaded successfully.")
+
+        # Generate the preprocessed datasets
+        indexes, teams = cls.read_data(datapath, output, index=False, filter=filter, settings=settings)
+        st = time()
+        # parallel
+        if settings['parallel']:
+            with multiprocessing.Pool() as p:
+                n_core = multiprocessing.cpu_count() if settings['ncore'] <= 0 else settings['ncore']
+                subteams = np.array_split(teams, n_core)
+                func = partial(Team.bucketing, settings['bucket_size'], indexes['s2i'], indexes['c2i'], indexes['l2i'], settings['location_type'])
+                data = p.map(func, subteams)
+        # serial
+        else:
+            data = Team.bucketing(settings['bucket_size'], indexes['s2i'], indexes['c2i'], teams)
+        data = scipy.sparse.vstack(data, 'lil')
+        vecs = {'id': data[:, 0], 'skill': data[:, 1:len(indexes['s2i']) + 1], 'loc': data[:, len(indexes['s2i']) + 1: len(indexes['s2i']) + 1 + len(indexes['l2i'])], 'member': data[:, - len(indexes['c2i']):]}
+
+        with open(pkl, 'wb') as outfile:
+            pickle.dump(vecs, outfile)
+        print(f"It took {time() - st} seconds to generate and store the sparse matrices of size {data.shape} at {pkl}")
+        return vecs, indexes
 
     @staticmethod
     def remove_outliers(teams, settings):
