@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpeNTF Benchmark Leaderboard</title>
+  <link rel="stylesheet" href="./style.css">
+
+</head>
+<body>
+
+<div id="container">
+  <div id="sideMenu">
+    <h1><b><a class="opentf" href="https://github.com/fani-lab/OpeNTF">OpeNTF</a></b></h1>
+
+
+    <ul class="menu">
+      <li>Evaluation Metrics</li>
+      <li class = "selected" onclick="selectMetric(this, 'P')">P<span class="count">3</span></li>
+      <li onclick="selectMetric(this, 'Recall')">Recall<span class="count">3</span></li>
+      <li onclick="selectMetric(this, 'nDCG')">nDCG<span class="count">3</span></li>
+      <li onclick="selectMetric(this, 'mAP')">mAP<span class="count">3</span></li>
+      <li onclick="selectMetric(this, 'AUC-ROC')">AUC-ROC</li>
+    </ul>
+    <ul class="menustatic">
+      <li>Legend</li>
+      <li>P<sub>2</sub> <span class="colorIcon red"></span></li>
+      <li>P<sub>5</sub> <span class="colorIcon green"></span></li>
+      <li>P<sub>10</sub> <span class="colorIcon yellow"></span></li>
+      
+    </ul>
+    <ul id="model-list" class="menu">
+      <li>Models</li>
+      <!-- Items will be populated dynamically -->
+    </ul>
+  </div>
+  <div id="content">
+    <div id="titleBar">
+      <h2><b>Benchmark Dashboard</b></h2>
+      <div id="logo">
+        <img id="logo" src="logo.png" style="max-width: 100%;max-height:100%"/>
+      </div>
+    </div>
+
+    <div class="mainChart">
+      <canvas id="graph"></canvas>
+
+      <table id="data-table">
+        <tr>
+          <th>No</th>
+          <th>Model</th>
+          <th>P<sub>2</sub></th>
+          <th>P<sub>5</sub></th>
+          <th>P<sub>10</sub></th>
+          <th>Recall<sub>2</sub></th>
+          <th>Recall<sub>5</sub></th>
+          <th>Recall<sub>10</sub></th>
+          <th>nDCG<sub>2</sub></th>
+          <th>nDCG<sub>5</sub></th>
+          <th>nDCG<sub>10</sub></th>
+          <th>mAP<sub>2</sub></th>
+          <th>mAP<sub>5</sub></th>
+          <th>mAP<sub>10</sub></th>
+          <th>AUC-ROC</th>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
+  <script src='//cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.1/Chart.min.js'></script>
+  <script  src="./script.js"></script>
+
+</body>
+</html>
