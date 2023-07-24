@@ -255,7 +255,7 @@ class Fnn(Ntf):
                           )
                 torch.save(self.state_dict(), f"{output}/state_dict_model.f{foldidx}.e{epoch}.pt", pickle_protocol=4)
                 scheduler.step(valid_running_loss / X_valid.shape[0])
-
+                earlystopping(valid_loss_values[-1], self)
                 if earlystopping.early_stop:
                     print("Early stopping")
                     break

@@ -74,6 +74,9 @@ def adjust_learning_rate(model_initial_lr, optimizer, gamma, step):
         param_group['lr'] = lr
 
 
+def make_popular_and_nonpopular_matrix(vecs, output_path):
+    pass
+
 def apply_weight_decay_data_parameters(loss, class_parameter_minibatch, weight_decay):
     loss = loss + 0.5 * weight_decay * (class_parameter_minibatch ** 2).sum()
 
