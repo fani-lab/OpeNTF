@@ -15,6 +15,12 @@ from mdl.cds import TFDataset
 from cmn.team import Team
 from cmn.tools import merge_teams_by_skills
 
+from src.cmn.earlystopping import EarlyStopping
+from src.cmn.tools import get_class_data_params_n_optimizer, adjust_learning_rate, apply_weight_decay_data_parameters
+from src.mdl.cds import SuperlossDataset
+from src.mdl.superloss import SuperLoss
+
+
 class Fnn(Ntf):
     def __init__(self):
         super(Fnn, self).__init__()
@@ -48,7 +54,9 @@ class Fnn(Ntf):
         if ns == "unigram_b": return self.ns_unigram_mini_batch(y_, y, nns)
         if ns == "inverse_unigram": return self.ns_inverse_unigram(y_, y, unigram, nns)
         if ns == "inverse_unigram_b": return self.ns_inverse_unigram_mini_batch(y_, y, nns)
-        return self.weighted(y_, y)
+        # return self.weighted(y_, y)
+        cri = nn.BCELoss()
+        return cri(y_.squeeze(1), y.squeeze(1))
 
     def weighted(self, logits, targets, pos_weight=2.5):
         targets = targets.squeeze(1)
@@ -130,6 +138,7 @@ class Fnn(Ntf):
         return (-targets * torch.log(logits) - random_samples * torch.log(1 - logits)).sum()
 
     def learn(self, splits, indexes, vecs, params, prev_model, output):
+        loss_type = params['loss_type']
 
         learning_rate = params['lr']
         batch_size = params['b']
@@ -155,9 +164,8 @@ class Fnn(Ntf):
             X_valid = vecs['skill'][splits['folds'][foldidx]['valid'], :]
             y_valid = vecs['member'][splits['folds'][foldidx]['valid']]
 
-            # Building custom dataset
-            training_matrix = TFDataset(X_train, y_train)
-            validation_matrix = TFDataset(X_valid, y_valid)
+            training_matrix = SuperlossDataset(X_train, y_train)
+            validation_matrix = SuperlossDataset(X_valid, y_valid)
 
             # Generating data loaders
             training_dataloader = DataLoader(training_matrix, batch_size=batch_size, shuffle=True, num_workers=0)
@@ -176,11 +184,23 @@ class Fnn(Ntf):
             valid_loss_values = []
             fold_time = time.time()
             # Train Network
+            # Start data params
+            learning_rate_schedule = np.array([80, 100, 160])
+            if loss_type == 'data_parameters':
+                class_parameters, optimizer_class_param = get_class_data_params_n_optimizer(nr_classes=y_train.shape[1], lr=learning_rate, device=self.device)
+            # End data params
+            if loss_type == 'superloss':
+                criterion = SuperLoss(nsamples=X_train.shape[0], ncls=y_train.shape[1], wd_cls=0.9, loss_func=nn.BCELoss())
+            earlystopping = EarlyStopping(patience=7, verbose=False, delta=0, path=f"{output}/state_dict_model.f{foldidx}.pt", trace_func=print)
             for epoch in range(num_epochs):
+                if loss_type == 'data_parameters':
+                    if epoch in learning_rate_schedule:
+                        adjust_learning_rate(model_initial_lr=learning_rate, optimizer=optimizer, gamma=0.1, step=np.sum(epoch >= learning_rate_schedule))
+
                 train_running_loss = valid_running_loss = 0.0
                 # Each epoch has a training and validation phase
                 for phase in ['train', 'valid']:
-                    for batch_idx, (X, y) in enumerate(data_loaders[phase]):
+                    for batch_idx, (X, y, index) in enumerate(data_loaders[phase]):
                         torch.cuda.empty_cache()
                         X = X.float().to(device=self.device)  # Get data to cuda if possible
                         y = y.float().to(device=self.device)
@@ -188,17 +208,36 @@ class Fnn(Ntf):
                             self.train(True)  # scheduler.step()
                             # forward
                             optimizer.zero_grad()
+                            if loss_type == 'data_parameters':
+                                optimizer_class_param.zero_grad()
+
                             y_ = self.forward(X)
-                            loss = self.cross_entropy(y_, y, ns, nns, unigram)
+
+                            if loss_type == 'normal':
+                                loss = self.cross_entropy(y_, y, ns, nns, unigram)
+                            elif loss_type == 'superloss':
+                                loss = criterion(y_.squeeze(1), y.squeeze(1), index)
+                            elif loss_type == 'data_parameters':
+                                # hits = (y.squeeze() == 1.).nonzero()[:,1].tolist()
+                                # class_parameter_minibatch = class_parameters[hits]
+                                data_parameter_minibatch = torch.exp(class_parameters).view(1, -1)
+                                y_ = y_ / data_parameter_minibatch
+                                loss = self.cross_entropy(y_, y, ns, nns, unigram)
+                                loss = apply_weight_decay_data_parameters(loss, class_parameter_minibatch=class_parameters, weight_decay= 0.9)
                             # backward
                             loss.backward()
                             # clip_grad_value_(model.parameters(), 1)
                             optimizer.step()
+                            if loss_type == 'data_parameters':
+                                optimizer_class_param.step()
                             train_running_loss += loss.item()
                         else:  # valid
                             self.train(False)  # Set model to valid mode
                             y_ = self.forward(X)
-                            loss = self.cross_entropy(y_, y, ns, nns, unigram)
+                            if loss_type == 'normal' or loss_type == 'data_parameters':
+                                loss = self.cross_entropy(y_, y, ns, nns, unigram)
+                            else:
+                                loss = criterion(y_.squeeze(), y.squeeze(), index)
                             valid_running_loss += loss.item()
                         print(
                             f'Fold {foldidx}/{len(splits["folds"]) - 1}, Epoch {epoch}/{num_epochs - 1}, Minibatch {batch_idx}/{int(X_train.shape[0] / batch_size)}, Phase {phase}'
@@ -216,6 +255,10 @@ class Fnn(Ntf):
                           )
                 torch.save(self.state_dict(), f"{output}/state_dict_model.f{foldidx}.e{epoch}.pt", pickle_protocol=4)
                 scheduler.step(valid_running_loss / X_valid.shape[0])
+
+                if earlystopping.early_stop:
+                    print("Early stopping")
+                    break
 
             model_path = f"{output}/state_dict_model.f{foldidx}.pt"
 

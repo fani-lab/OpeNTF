@@ -1,13 +1,18 @@
 import numpy as np
 import scipy.sparse
 import copy
+import torch
 from json import JSONEncoder
+
+from src.cmn.sparse_sgd import SparseSGD
+
 
 class NumpyArrayEncoder(JSONEncoder):
     def default(self, obj):
         if isinstance(obj, np.ndarray):
             return obj.tolist()
         return JSONEncoder.default(self, obj)
+
 
 def merge_teams_by_skills(teamsvecs, inplace=False, distinct=False):
     vecs = teamsvecs if inplace else copy.deepcopy(teamsvecs)
@@ -46,6 +51,33 @@ def merge_teams_by_skills(teamsvecs, inplace=False, distinct=False):
         vecs['member'] = scipy.sparse.lil_matrix(np.delete(vecs['member'].toarray(), del_list, axis=0))
     return vecs
 
+
+def get_class_data_params_n_optimizer(nr_classes, lr, device):
+    class_parameters = torch.tensor(np.ones(nr_classes) * np.log(1.0),
+                                    dtype=torch.float32,
+                                    requires_grad=True,
+                                    device=device)
+    optimizer_class_param = SparseSGD([class_parameters],
+                                      lr=lr,
+                                      momentum=0.9,
+                                      skip_update_zero_grad=True)
+    print('Initialized class_parameters with: {}'.format(1.0))
+    print('optimizer_class_param:')
+    print(optimizer_class_param)
+
+    return class_parameters, optimizer_class_param
+
+
+def adjust_learning_rate(model_initial_lr, optimizer, gamma, step):
+    lr = model_initial_lr * (gamma ** step)
+    for param_group in optimizer.param_groups:
+        param_group['lr'] = lr
+
+
+def apply_weight_decay_data_parameters(loss, class_parameter_minibatch, weight_decay):
+    loss = loss + 0.5 * weight_decay * (class_parameter_minibatch ** 2).sum()
+
+    return loss
 # teamsvecs = {}
 # 1 110 0110
 # 2 110 1110
