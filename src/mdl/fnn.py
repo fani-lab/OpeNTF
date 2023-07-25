@@ -15,7 +15,7 @@ from mdl.cds import TFDataset
 from cmn.team import Team
 from cmn.tools import merge_teams_by_skills
 
-from src.cmn.earlystopping import EarlyStopping
+from src.mdl.earlystopping import EarlyStopping
 from src.cmn.tools import get_class_data_params_n_optimizer, adjust_learning_rate, apply_weight_decay_data_parameters
 from src.mdl.cds import SuperlossDataset
 from src.mdl.superloss import SuperLoss
@@ -138,7 +138,7 @@ class Fnn(Ntf):
         return (-targets * torch.log(logits) - random_samples * torch.log(1 - logits)).sum()
 
     def learn(self, splits, indexes, vecs, params, prev_model, output):
-        loss_type = params['loss_type']
+        loss_type = params['loss']
 
         learning_rate = params['lr']
         batch_size = params['b']
@@ -186,14 +186,14 @@ class Fnn(Ntf):
             # Train Network
             # Start data params
             learning_rate_schedule = np.array([80, 100, 160])
-            if loss_type == 'data_parameters':
+            if loss_type == 'DP':
                 class_parameters, optimizer_class_param = get_class_data_params_n_optimizer(nr_classes=y_train.shape[1], lr=learning_rate, device=self.device)
             # End data params
-            if loss_type == 'superloss':
+            if loss_type == 'SL':
                 criterion = SuperLoss(nsamples=X_train.shape[0], ncls=y_train.shape[1], wd_cls=0.9, loss_func=nn.BCELoss())
-            earlystopping = EarlyStopping(patience=7, verbose=False, delta=0, path=f"{output}/state_dict_model.f{foldidx}.pt", trace_func=print)
+            earlystopping = EarlyStopping(patience=4, verbose=False, delta=0.1, path=f"{output}/state_dict_model.f{foldidx}.pt", trace_func=print)
             for epoch in range(num_epochs):
-                if loss_type == 'data_parameters':
+                if loss_type == 'DP':
                     if epoch in learning_rate_schedule:
                         adjust_learning_rate(model_initial_lr=learning_rate, optimizer=optimizer, gamma=0.1, step=np.sum(epoch >= learning_rate_schedule))
 
@@ -208,16 +208,16 @@ class Fnn(Ntf):
                             self.train(True)  # scheduler.step()
                             # forward
                             optimizer.zero_grad()
-                            if loss_type == 'data_parameters':
+                            if loss_type == 'DP':
                                 optimizer_class_param.zero_grad()
 
                             y_ = self.forward(X)
 
                             if loss_type == 'normal':
                                 loss = self.cross_entropy(y_, y, ns, nns, unigram)
-                            elif loss_type == 'superloss':
+                            elif loss_type == 'SL':
                                 loss = criterion(y_.squeeze(1), y.squeeze(1), index)
-                            elif loss_type == 'data_parameters':
+                            elif loss_type == 'DP':
                                 # hits = (y.squeeze() == 1.).nonzero()[:,1].tolist()
                                 # class_parameter_minibatch = class_parameters[hits]
                                 data_parameter_minibatch = torch.exp(class_parameters).view(1, -1)
@@ -228,13 +228,13 @@ class Fnn(Ntf):
                             loss.backward()
                             # clip_grad_value_(model.parameters(), 1)
                             optimizer.step()
-                            if loss_type == 'data_parameters':
+                            if loss_type == 'DP':
                                 optimizer_class_param.step()
                             train_running_loss += loss.item()
                         else:  # valid
                             self.train(False)  # Set model to valid mode
                             y_ = self.forward(X)
-                            if loss_type == 'normal' or loss_type == 'data_parameters':
+                            if loss_type == 'normal' or loss_type == 'DP':
                                 loss = self.cross_entropy(y_, y, ns, nns, unigram)
                             else:
                                 loss = criterion(y_.squeeze(), y.squeeze(), index)
@@ -257,7 +257,7 @@ class Fnn(Ntf):
                 scheduler.step(valid_running_loss / X_valid.shape[0])
                 earlystopping(valid_loss_values[-1], self)
                 if earlystopping.early_stop:
-                    print("Early stopping")
+                    print(f"Early Stopping Triggered at epoch: {epoch}")
                     break
 
             model_path = f"{output}/state_dict_model.f{foldidx}.pt"

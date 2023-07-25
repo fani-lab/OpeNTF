@@ -1,6 +1,12 @@
 import numpy as np
 import torch
 
+
+"""
+Code snippet copied from: https://github.com/Bjarten/early-stopping-pytorch
+Original author: Bjarte Mehus Sunde
+Description: This is an implementation of early stopping in pytorch
+"""
 class EarlyStopping:
     """Early stops the training if validation loss doesn't improve after a given patience."""
     def __init__(self, patience=7, verbose=False, delta=0, path='checkpoint.pt', trace_func=print):
