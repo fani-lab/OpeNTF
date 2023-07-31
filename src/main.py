@@ -1,5 +1,7 @@
 import os, json
 import argparse
+import pickle
+
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import KFold, train_test_split
@@ -8,7 +10,7 @@ from shutil import copyfile
 import scipy.sparse
 
 import param
-from cmn.tools import NumpyArrayEncoder
+from cmn.tools import NumpyArrayEncoder, popular_nonpopular_ratio
 from cmn.publication import Publication
 from cmn.movie import Movie
 from cmn.patent import Patent
@@ -22,14 +24,15 @@ from mdl.tntf import tNtf
 from mdl.team2vec import Team2Vec
 from mdl.caser import Caser
 from mdl.rrn import Rrn
+from cmn.tools import generate_popular_and_nonpopular
 
-def create_evaluation_splits(n_sample, n_folds, train_ratio=0.85, year_idx=None, output='./', step_ahead=1):   
+def create_evaluation_splits(n_sample, n_folds, train_ratio=0.85, year_idx=None, output='./', step_ahead=1):
     if year_idx:
         train = np.arange(year_idx[0][0], year_idx[-step_ahead][0])  # for teamporal folding, we do on each time interval ==> look at tntf.py
         test = np.arange(year_idx[-step_ahead][0], n_sample)
     else:
         train, test = train_test_split(np.arange(n_sample), train_size=train_ratio, random_state=0, shuffle=True)
-        
+
     splits = dict()
     splits['test'] = test
     splits['folds'] = dict()
@@ -85,7 +88,7 @@ def run(data_list, domain_list, fair, filter, future, model_list, output, exp_id
     if 'imdb' in domain_list: datasets['imdb'] = Movie
     if 'uspt' in domain_list: datasets['uspt'] = Patent
     if 'gith' in domain_list: datasets['gith'] = Repo
-        
+
     # model names starting with 't' means that they will follow the streaming scenario
     # model names ending with _a1 means that they have one 1 added to their input for time as aspect learning
     # model names having _dt2v means that they learn the input embedding with doc2vec where input is (skills + year)
@@ -110,13 +113,13 @@ def run(data_list, domain_list, fair, filter, future, model_list, output, exp_id
     if 'tbnn_a1' in model_list: models['tbnn_a1'] = tNtf(Bnn(), settings['model']['nfolds'], step_ahead=settings['model']['step_ahead'])
     if 'tfnn_emb_a1' in model_list: models['tfnn_emb_a1'] = tNtf(Fnn(), settings['model']['nfolds'], step_ahead=settings['model']['step_ahead'])
     if 'tbnn_emb_a1' in model_list: models['tbnn_emb_a1'] = tNtf(Bnn(), settings['model']['nfolds'], step_ahead=settings['model']['step_ahead'])
-    
+
     # streaming scenario with adding the year to the doc2vec training (temporal dense skill vecs in input)
     if 'tfnn_dt2v_emb' in model_list: models['tfnn_dt2v_emb'] = tNtf(Fnn(), settings['model']['nfolds'], step_ahead=settings['model']['step_ahead'])
     if 'tbnn_dt2v_emb' in model_list: models['tbnn_dt2v_emb'] = tNtf(Bnn(), settings['model']['nfolds'], step_ahead=settings['model']['step_ahead'])
-        
+
     # todo: temporal: time as an input feature
-    
+
     # temporal recommender systems
     if 'caser' in model_list: models['caser'] = Caser(settings['model']['step_ahead'])
     if 'rrn' in model_list: models['rrn'] = Rrn(settings['model']['baseline']['rrn']['with_zero'], settings['model']['step_ahead'])
@@ -155,11 +158,12 @@ def run(data_list, domain_list, fair, filter, future, model_list, output, exp_id
 
             baseline_name = m_name.lstrip('t').replace('_emb', '').replace('_dt2v', '').replace('_a1', '')
             print(f'Running for (dataset, model): ({d_name}, {m_name}) ... ')
-            
+
             output_path = f"{output}{os.path.split(datapath)[-1]}{filter_str}/{m_name}/t{vecs_['skill'].shape[0]}.s{vecs_['skill'].shape[1]}.m{vecs_['member'].shape[1]}.{'.'.join([k + str(v).replace(' ', '') for k, v in settings['model']['baseline'][baseline_name].items() if v])}"
             if not os.path.isdir(output_path): os.makedirs(output_path)
             copyfile('./param.py', f'{output_path}/param.py')
-            
+            # make_popular_and_nonpopular_matrix(vecs_, data_list[0])
+
             m_obj.run(splits, vecs_, indexes, f'{output_path}', settings['model']['baseline'][baseline_name], settings['model']['cmd'], settings['fair'], merge_skills=False)
     if 'agg' in settings['model']['cmd']: aggregate(output)
 
