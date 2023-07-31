@@ -1,5 +1,7 @@
 import os, json
 import argparse
+import pickle
+
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import KFold, train_test_split
@@ -8,7 +10,7 @@ from shutil import copyfile
 import scipy.sparse
 
 import param
-from cmn.tools import NumpyArrayEncoder
+from cmn.tools import NumpyArrayEncoder, popular_nonpopular_ratio
 from cmn.publication import Publication
 from cmn.movie import Movie
 from cmn.patent import Patent
@@ -22,6 +24,7 @@ from mdl.tntf import tNtf
 from mdl.team2vec import Team2Vec
 from mdl.caser import Caser
 from mdl.rrn import Rrn
+from cmn.tools import generate_popular_and_nonpopular
 
 def create_evaluation_splits(n_sample, n_folds, train_ratio=0.85, year_idx=None, output='./', step_ahead=1):
     if year_idx:
@@ -159,6 +162,7 @@ def run(data_list, domain_list, fair, filter, future, model_list, output, exp_id
             output_path = f"{output}{os.path.split(datapath)[-1]}{filter_str}/{m_name}/t{vecs_['skill'].shape[0]}.s{vecs_['skill'].shape[1]}.m{vecs_['member'].shape[1]}.{'.'.join([k + str(v).replace(' ', '') for k, v in settings['model']['baseline'][baseline_name].items() if v])}"
             if not os.path.isdir(output_path): os.makedirs(output_path)
             copyfile('./param.py', f'{output_path}/param.py')
+            # make_popular_and_nonpopular_matrix(vecs_, data_list[0])
 
             m_obj.run(splits, vecs_, indexes, f'{output_path}', settings['model']['baseline'][baseline_name], settings['model']['cmd'], settings['fair'], merge_skills=False)
     if 'agg' in settings['model']['cmd']: aggregate(output)
