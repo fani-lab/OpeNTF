@@ -15,21 +15,23 @@ settings = {
                 'b': 128
             },
             'fnn':{
-                'l': [128],  # list of number of nodes in each layer
-                'lr': 0.1,  # learning rate
+                'l': [100],  # list of number of nodes in each layer
+                'lr': 0.001,  # learning rate
                 'b': 128,  # batch size
-                'e': 20,  # epoch
+                'e': 10,  # epoch
                 'nns': 3,  # number of negative samples
-                'ns': 'unigram_b',  # 'uniform', 'unigram', 'unigram_b'
+                'ns': 'none',  # 'none', 'uniform', 'unigram', 'unigram_b'
+                'loss': 'SL',  # 'SL'-> superloss, 'DP' -> Data Parameters, 'normal' -> Binary Cross Entropy
             },
             'bnn':{
                 'l': [128],  # list of number of nodes in each layer
                 'lr': 0.1,  # learning rate
                 'b': 128,  # batch size
-                'e': 20,  # epoch
+                'e': 5,  # epoch
                 'nns': 3,  # number of negative samples
                 'ns': 'unigram_b',  # 'uniform', 'unigram', 'unigram_b'
-                's': 1  # # sample_elbo for bnn
+                's': 1,  # # sample_elbo for bnn
+                'loss': 'SL',  # 'SL'-> superloss, 'DP' -> Data Parameters, 'normal' -> Binary Cross Entropy
             },
             'nmt': {
                 'base_config': './mdl/nmt_config.yaml'
@@ -45,8 +47,8 @@ settings = {
                 'w': 1 #cooccurrence window
             }
         },
-        'cmd': ['train', 'test', 'eval', 'fair'],  # 'train', 'test', 'eval', 'plot', 'agg', 'adila'
-        'nfolds': 5,
+        'cmd': ['train', 'test', 'eval'],  # 'train', 'test', 'eval', 'plot', 'agg', 'fair'
+        'nfolds': 3,
         'train_test_split': 0.85,
         'step_ahead': 2,#for now, it means that whatever are in the last [step_ahead] time interval will be the test set!
     },
