@@ -89,7 +89,7 @@ class Bnn(Fnn):
             index_cur_year = next((i for i, (idx, yr) in enumerate(indexes['i2y']) if yr == cur_year), None)
             window_size = int(ns.split('_')[-1])
             if index_cur_year - window_size >= 0:
-                start = indexes['i2y'][index_cur_year-window_size][0]
+                start = indexes['i2y'][index_cur_year-window_size][0] if 'until' not in ns else 0
                 end = indexes['i2y'][index_cur_year][0]
                 unigram = Team.get_unigram(vecs['member'][start:end])
             else:
