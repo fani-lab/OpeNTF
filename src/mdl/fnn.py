@@ -146,8 +146,8 @@ class Fnn(Ntf):
         nns = params['nns']
         ns = params['ns']
         input_size = vecs['skill'].shape[1]
-        # output_size = len(indexes['i2c'])
-        output_size = vecs['member'].shape[1]
+        output_size = len(indexes['i2c'])
+        # output_size = vecs['member'].shape[1]
 
         unigram = Team.get_unigram(vecs['member'])
 
@@ -219,8 +219,6 @@ class Fnn(Ntf):
                             elif loss_type == 'SL':
                                 loss = criterion(y_.squeeze(1), y.squeeze(1), index)
                             elif loss_type == 'DP':
-                                # hits = (y.squeeze() == 1.).nonzero()[:,1].tolist()
-                                # class_parameter_minibatch = class_parameters[hits]
                                 data_parameter_minibatch = torch.exp(class_parameters).view(1, -1)
                                 y_ = y_ / data_parameter_minibatch
                                 loss = self.cross_entropy(y_, y, ns, nns, unigram)

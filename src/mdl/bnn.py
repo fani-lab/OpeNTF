@@ -22,6 +22,12 @@ from mdl.fnn import Fnn
 from cmn.team import Team
 from cmn.tools import merge_teams_by_skills
 
+from src.cmn.tools import get_class_data_params_n_optimizer, adjust_learning_rate, apply_weight_decay_data_parameters
+from src.mdl.cds import SuperlossDataset
+from src.mdl.earlystopping import EarlyStopping
+from src.mdl.superloss import SuperLoss
+
+
 class Bnn(Fnn):
     def __init__(self):
         super().__init__()
@@ -67,10 +73,11 @@ class Bnn(Fnn):
         #log_likes = F.nll_loss(outputs.mean(0), target, size_average=False)
         # log_likes = F.nll_loss(outputs.mean(0), target, reduction='sum')
         # loss = (log_post - log_prior)/num_batches + log_likes
-        return loss, outputs
+        return loss.to(self.device), outputs.to(self.device)
 
     # TODO: there is huge code overlapp with bnn training and fnn training. Trying to generalize as we did in test and eval
     def learn(self, splits, indexes, vecs, params, prev_model, output):
+        loss_type = params['loss']
 
         learning_rate = params['lr']
         batch_size = params['b']
@@ -98,8 +105,8 @@ class Bnn(Fnn):
             y_valid = vecs['member'][splits['folds'][foldidx]['valid']]
 
             # Building custom dataset
-            training_matrix = TFDataset(X_train, y_train)
-            validation_matrix = TFDataset(X_valid, y_valid)
+            training_matrix = SuperlossDataset(X_train, y_train)
+            validation_matrix = SuperlossDataset(X_valid, y_valid)
 
             # Generating data loaders
             training_dataloader = DataLoader(training_matrix, batch_size=batch_size, shuffle=True, num_workers=0)
@@ -118,11 +125,24 @@ class Bnn(Fnn):
             valid_loss_values = []
             fold_time = time.time()
             # Train Network
+            # Start data params
+            learning_rate_schedule = np.array([2, 4, 10])
+            if loss_type == 'DP':
+                class_parameters, optimizer_class_param = get_class_data_params_n_optimizer(nr_classes=y_train.shape[1], lr=learning_rate, device=self.device)
+            # End data params
+            if loss_type == 'SL':
+                criterion = SuperLoss(nsamples=X_train.shape[0], ncls=y_train.shape[1], wd_cls=0.9, loss_func=nn.BCELoss())
+            earlystopping = EarlyStopping(patience=5, verbose=False, delta=0.01, path=f"{output}/state_dict_model.f{foldidx}.pt", trace_func=print)
             for epoch in range(num_epochs):
+                if loss_type == 'DP':
+                    if epoch in learning_rate_schedule:
+                        adjust_learning_rate(model_initial_lr=learning_rate, optimizer=optimizer, gamma=0.1,
+                                             step=np.sum(epoch >= learning_rate_schedule))
+
                 train_running_loss = valid_running_loss = 0.0
                 # Each epoch has a training and validation phase
                 for phase in ['train', 'valid']:
-                    for batch_idx, (X, y) in enumerate(data_loaders[phase]):
+                    for batch_idx, (X, y, index) in enumerate(data_loaders[phase]):
                         torch.cuda.empty_cache()
                         X = X.float().to(device=self.device)  # Get data to cuda if possible
                         y = y.float().to(device=self.device)
@@ -130,17 +150,32 @@ class Bnn(Fnn):
                             self.train(True)  # scheduler.step()
                             # forward
                             optimizer.zero_grad()
+                            if loss_type == 'DP':
+                                optimizer_class_param.zero_grad()
                             layer_loss, y_ = self.sample_elbo(X.squeeze(1), y, s)
-                            loss = self.cross_entropy(y_.to(self.device), y, ns, nns, unigram) + layer_loss / batch_size
+                            if loss_type == 'normal':
+                                loss = self.cross_entropy(y_.to(self.device), y, ns, nns, unigram) + layer_loss / batch_size
+                            elif loss_type == 'SL':
+                                loss = criterion(y_.squeeze(1), y.squeeze(1), index) + layer_loss / batch_size
+                            elif loss_type == 'DP':
+                                data_parameter_minibatch = torch.exp(class_parameters).view(1, -1)
+                                y_ = y_ / data_parameter_minibatch
+                                loss = self.cross_entropy(y_, y, ns, nns, unigram)
+                                loss = apply_weight_decay_data_parameters(loss, class_parameter_minibatch=class_parameters, weight_decay= 0.9) + layer_loss / batch_size
                             # backward
                             loss.backward()
                             # clip_grad_value_(model.parameters(), 1)
                             optimizer.step()
+                            if loss_type == 'DP':
+                                optimizer_class_param.step()
                             train_running_loss += loss.item()
                         else:  # valid
                             self.train(False)  # Set model to valid mode
                             layer_loss, y_ = self.sample_elbo(X.squeeze(1), y, s)
-                            loss = self.cross_entropy(y_.to(self.device), y, ns, nns, unigram) + layer_loss / batch_size
+                            if loss_type == 'normal' or loss_type == 'DP':
+                                loss = self.cross_entropy(y_.to(self.device), y, ns, nns, unigram) + layer_loss / batch_size
+                            else:
+                                loss = criterion(y_.squeeze(), y.squeeze(), index)
                             valid_running_loss += loss.item()
                         print(
                             f'Fold {foldidx}/{len(splits["folds"]) - 1}, Epoch {epoch}/{num_epochs - 1}, Minibatch {batch_idx}/{int(X_train.shape[0] / batch_size)}, Phase {phase}'
@@ -158,6 +193,10 @@ class Bnn(Fnn):
                           )
                 torch.save(self.state_dict(), f"{output}/state_dict_model.f{foldidx}.e{epoch}.pt", pickle_protocol=4)
                 scheduler.step(valid_running_loss / X_valid.shape[0])
+                earlystopping(valid_loss_values[-1], self)
+                if earlystopping.early_stop:
+                    print(f"Early Stopping Triggered at epoch: {epoch}")
+                    break
 
             model_path = f"{output}/state_dict_model.f{foldidx}.pt"
 
