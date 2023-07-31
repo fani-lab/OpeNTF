@@ -30,7 +30,8 @@ settings = {
                 'e': 5,  # epoch
                 'nns': 3,  # number of negative samples
                 'ns': 'unigram_b',  # 'uniform', 'unigram', 'unigram_b'
-                's': 1  # # sample_elbo for bnn
+                's': 1,  # # sample_elbo for bnn
+                'loss': 'SL',  # 'SL'-> superloss, 'DP' -> Data Parameters, 'normal' -> Binary Cross Entropy
             },
             'nmt': {
                 'base_config': './mdl/nmt_config.yaml'
