@@ -146,7 +146,8 @@ class Fnn(Ntf):
         nns = params['nns']
         ns = params['ns']
         input_size = vecs['skill'].shape[1]
-        output_size = len(indexes['i2c'])
+        # output_size = len(indexes['i2c'])
+        output_size = vecs['member'].shape[1]
 
         unigram = Team.get_unigram(vecs['member'])
 
@@ -185,13 +186,13 @@ class Fnn(Ntf):
             fold_time = time.time()
             # Train Network
             # Start data params
-            learning_rate_schedule = np.array([80, 100, 160])
+            learning_rate_schedule = np.array([2, 4, 10])
             if loss_type == 'DP':
                 class_parameters, optimizer_class_param = get_class_data_params_n_optimizer(nr_classes=y_train.shape[1], lr=learning_rate, device=self.device)
             # End data params
             if loss_type == 'SL':
                 criterion = SuperLoss(nsamples=X_train.shape[0], ncls=y_train.shape[1], wd_cls=0.9, loss_func=nn.BCELoss())
-            earlystopping = EarlyStopping(patience=4, verbose=False, delta=0.1, path=f"{output}/state_dict_model.f{foldidx}.pt", trace_func=print)
+            earlystopping = EarlyStopping(patience=5, verbose=False, delta=0.01, path=f"{output}/state_dict_model.f{foldidx}.pt", trace_func=print)
             for epoch in range(num_epochs):
                 if loss_type == 'DP':
                     if epoch in learning_rate_schedule:
@@ -283,7 +284,8 @@ class Fnn(Ntf):
         if not os.path.isdir(model_path): raise Exception("The model does not exist!")
         # input_size = len(indexes['i2s'])
         input_size = vecs['skill'].shape[1]
-        output_size = len(indexes['i2c'])
+        output_size = vecs['member'].shape[1]
+        # output_size = len(indexes['i2c'])
 
         if merge_skills:
             vecs = merge_teams_by_skills(vecs)

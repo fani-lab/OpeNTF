@@ -17,11 +17,11 @@ settings = {
             'fnn':{
                 'l': [100],  # list of number of nodes in each layer
                 'lr': 0.001,  # learning rate
-                'b': 1,  # batch size
+                'b': 128,  # batch size
                 'e': 10,  # epoch
                 'nns': 3,  # number of negative samples
                 'ns': 'none',  # 'none', 'uniform', 'unigram', 'unigram_b'
-                'loss_type': 'data_parameters', # 'superloss', 'data_parameters', 'none' -> binary Cross Entropy
+                'loss': 'SL',  # 'SL'-> superloss, 'DP' -> Data Parameters, 'normal' -> Binary Cross Entropy
             },
             'bnn':{
                 'l': [128],  # list of number of nodes in each layer

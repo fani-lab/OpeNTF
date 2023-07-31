@@ -83,7 +83,7 @@ def apply_weight_decay_data_parameters(loss, class_parameter_minibatch, weight_d
     return loss
 
 
-def make_popular_and_nonpopular_matrix(vecs, input_path):
+def generate_popular_and_nonpopular(vecs, input_path):
     """
 
     Parameters
@@ -98,7 +98,8 @@ def make_popular_and_nonpopular_matrix(vecs, input_path):
                                     non_popular_inst: teams that do not have any popular experts
                                 }
     -------
-    This function needs a **popularity matrix** that can be generated from Adila submodule
+    This function needs a **popularity matrix** that can be generated from Adila submodule.
+    The objective of this function is to divide teams into popular and non-popular subsets.
     """
     try:
         popularity = pd.read_csv(input_path + '/popularity.csv', index_col='memberidx')
@@ -143,6 +144,46 @@ def make_popular_and_nonpopular_matrix(vecs, input_path):
     with open(input_path + '/non_popular_inst.pkl', 'wb') as file:
         pickle.dump(non_popular_vecs, file)
         print("nonpopular vecs are saved!")
+
+
+def popular_nonpopular_ratio(vecs, input_path, ratio=0):
+    """
+
+    Parameters
+    ----------
+    vecs: the lil matrix representation of the dataset
+    input_path: the path of the dataset
+    ratio: {
+        0 -> Only popular experts will remain in vecs['member']
+        1 -> the proportion of popular and non-popular experts are the same
+        >1 -> currently returns only the input
+    }
+
+    Returns: an edited version of vecs
+    -------
+    place these 3 lines before sreate_evaluation_splits():
+    # with open(data_list[0] + '/popular_inst.pkl', 'rb') as file:
+        #     vecs = pickle.load(file)
+    # vecs = popular_nonpopular_ratio(vecs, data_list[0], ratio=0)
+
+    """
+    if ratio > 1:
+        return vecs
+    try:
+        popularity = pd.read_csv(input_path + '/popularity.csv', index_col='memberidx')
+    except FileNotFoundError:
+        print(f"To start, copy and paste popularity file in {input_path}.")
+        return FileNotFoundError
+    popularity = popularity.to_numpy().squeeze()
+    popular_count = popularity[popularity == True].shape[0]
+    nonpopular_count = popularity[popularity == False].shape[0]
+    print(f"number of popular experts: {popular_count} -> {popular_count / popularity.shape[0] * 100} % \nNumber of non-popular experts {nonpopular_count} -> {nonpopular_count / popularity.shape[0] * 100} % ")
+    if ratio == 0:
+        return {
+            'id': vecs['id'],
+            'skill': vecs['skill'],
+            'member': vecs['member'][:, popularity],
+        }
 
 # teamsvecs = {}
 # 1 110 0110
