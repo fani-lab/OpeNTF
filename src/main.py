@@ -159,7 +159,7 @@ def run(data_list, domain_list, fair, filter, future, model_list, output, exp_id
             baseline_name = m_name.lstrip('t').replace('_emb', '').replace('_dt2v', '').replace('_a1', '')
             print(f'Running for (dataset, model): ({d_name}, {m_name}) ... ')
 
-            output_path = f"{output}{os.path.split(datapath)[-1]}{filter_str}/{m_name}/t{vecs_['skill'].shape[0]}.s{vecs_['skill'].shape[1]}.m{vecs_['member'].shape[1]}.{'.'.join([k + str(v).replace(' ', '') for k, v in settings['model']['baseline'][baseline_name].items() if v])}"
+            output_path = f"{output}\{d_name}\{os.path.split(datapath)[-1]}{filter_str}/{m_name}/t{vecs_['skill'].shape[0]}.s{vecs_['skill'].shape[1]}.m{vecs_['member'].shape[1]}.{'.'.join([k + str(v).replace(' ', '') for k, v in settings['model']['baseline'][baseline_name].items() if v])}"
             if not os.path.isdir(output_path): os.makedirs(output_path)
             copyfile('./param.py', f'{output_path}/param.py')
             # make_popular_and_nonpopular_matrix(vecs_, data_list[0])
