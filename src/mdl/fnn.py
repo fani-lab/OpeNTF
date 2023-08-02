@@ -15,10 +15,10 @@ from mdl.cds import TFDataset
 from cmn.team import Team
 from cmn.tools import merge_teams_by_skills
 
-from src.mdl.earlystopping import EarlyStopping
-from src.cmn.tools import get_class_data_params_n_optimizer, adjust_learning_rate, apply_weight_decay_data_parameters
-from src.mdl.cds import SuperlossDataset
-from src.mdl.superloss import SuperLoss
+from mdl.earlystopping import EarlyStopping
+from cmn.tools import get_class_data_params_n_optimizer, adjust_learning_rate, apply_weight_decay_data_parameters
+from mdl.cds import SuperlossDataset
+from mdl.superloss import SuperLoss
 
 
 class Fnn(Ntf):
