@@ -22,10 +22,10 @@ from mdl.fnn import Fnn
 from cmn.team import Team
 from cmn.tools import merge_teams_by_skills
 
-from src.cmn.tools import get_class_data_params_n_optimizer, adjust_learning_rate, apply_weight_decay_data_parameters
-from src.mdl.cds import SuperlossDataset
-from src.mdl.earlystopping import EarlyStopping
-from src.mdl.superloss import SuperLoss
+from cmn.tools import get_class_data_params_n_optimizer, adjust_learning_rate, apply_weight_decay_data_parameters
+from mdl.cds import SuperlossDataset
+from mdl.earlystopping import EarlyStopping
+from mdl.superloss import SuperLoss
 
 
 class Bnn(Fnn):
@@ -191,7 +191,7 @@ class Bnn(Fnn):
                           f', Running Loss {phase} {train_loss_values[-1] if phase == "train" else valid_loss_values[-1]}'
                           f", Time {time.time() - fold_time}, Overall {time.time() - start_time} "
                           )
-                torch.save(self.state_dict(), f"{output}/state_dict_model.f{foldidx}.e{epoch}.pt", pickle_protocol=4)
+                # torch.save(self.state_dict(), f"{output}/state_dict_model.f{foldidx}.e{epoch}.pt", pickle_protocol=4)
                 scheduler.step(valid_running_loss / X_valid.shape[0])
                 earlystopping(valid_loss_values[-1], self)
                 if earlystopping.early_stop:
