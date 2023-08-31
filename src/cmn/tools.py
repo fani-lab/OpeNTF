@@ -7,7 +7,7 @@ import copy
 import torch
 from json import JSONEncoder
 from scipy.sparse import lil_matrix
-from src.cmn.sparse_sgd import SparseSGD
+from cmn.sparse_sgd import SparseSGD
 
 
 class NumpyArrayEncoder(JSONEncoder):
