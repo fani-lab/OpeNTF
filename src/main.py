@@ -128,5 +128,5 @@ if __name__ == '__main__':
         output=args.output,
         settings=param.settings)
 
-    # aggregate(args.output)
+    aggregate(args.output)
 
