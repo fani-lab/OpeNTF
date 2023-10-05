@@ -127,6 +127,6 @@ if __name__ == '__main__':
         model_list=args.model_list,
         output=args.output,
         settings=param.settings)
-
+    print(f'\n\n\n\nThis is the paramter for next function call : {args.output}')
     aggregate(args.output)
 
