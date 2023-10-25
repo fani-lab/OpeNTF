@@ -2,6 +2,17 @@ import torch
 import torch.nn.functional as F
 from torch_geometric.datasets import Planetoid
 from torch_geometric.nn import GCNConv
+from torch_geometric.data import Data
+from tqdm import tqdm
+
+
+# a method to create a custom dataset
+def create_data(data):
+    x = torch.tensor([-1, 0, 1])
+    edge_index = torch.tensor([[0, 1, 1, 2], [1, 0, 2, 1]])
+    y = torch.tensor([2, 4, 1])
+    data = Data(x = x, y = y, edge_index = edge_index)
+    return data
 
 def load_dataset():
     # Load a graph dataset
@@ -17,6 +28,9 @@ def explore_dataset(dataset):
     print('======================')
 
     print(f'dimension of the data : {len(data)}')
+
+    # print(f'data.x = {data.x}')
+    # print(f'data.edge_index = {data.edge_index}')
 
     print(f'Number of graphs: {len(dataset)}')
     print(f'Number of features: {dataset.num_features}')
@@ -34,6 +48,38 @@ def explore_dataset(dataset):
     print(f'Contains self-loops: {data.has_self_loops()}')
     print(f'Is undirected: {data.is_undirected()}')
 
+# explore the particular data points in the dataset
+def explore_dataset_specific(dataset):
+    data = dataset[0]
+
+    print(f'###############################################')
+    print(f'explore_dataset_specific')
+    print(f'###############################################')
+    print()
+
+    # size of a tensor object
+    torch.set_printoptions(threshold=10_000)
+    print(f'type of data object : {type(data)}')
+    print(f'Size of data : {data.size()}')
+    print(f'Type of the data.x : {type(data.x)}')
+    print(f'Size of x = {data.x.size()}')
+    print(f'Size of y = {data.y.size()}')
+    print(f'Size of edge_index : {data.edge_index.size()}')
+    print(f'Number of nodes in x and y = {data.x.size()[0]}')
+    print(f'Number of features in each node = {data.x.size()[1]}')
+    print()
+    print(f'x :')
+    print('-------------------')
+    print(data.x)
+    print(f'y : ')
+    print(f'------------------')
+    print(data.y)
+    print(f'edge_index : ')
+    print(f'------------------')
+    print(data.edge_index)
+    print(f'###############################################')
+    print()
+
 # visualize the data
 def visualize_dataset(data):
     # G = to_networkx(data, to_undirected=True)
@@ -42,6 +88,7 @@ def visualize_dataset(data):
 
 def create_model(dataset):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    print(f'device = {device}')
     model = GCN(dataset).to(device)
     data = dataset[0].to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr = 0.01, weight_decay = 5e4)
@@ -50,13 +97,17 @@ def create_model(dataset):
 
 def train_model(model, data, optimizer):
     model.train()
-    for epoch in range(200):
+    for epoch in tqdm(range(200)):
+        print(f'Epoch : {epoch}')
         optimizer.zero_grad()
         out = model(data)
+        # print(f'output after each pass : {out}')
         loss = F.nll_loss(out[data.train_mask], data.y[data.train_mask])
+        print(f'Loss before optimization : {loss}')
         loss.backward()
         optimizer.step()
-    return model
+        print(f'loss after backprop {epoch} : {loss}')
+    return model, data
 
 
 def evaluate_model(model, data):
@@ -87,11 +138,13 @@ class GCN(torch.nn.Module):
 
 def main():
     dataset = load_dataset()
-    data = dataset[0]
-    explore_dataset(dataset)
+    # data = create_data()
+    # data = dataset[0]
+    # explore_dataset(dataset)
+    explore_dataset_specific(dataset)
     # visualize_dataset(data)
     model, data, optimizer = create_model(dataset)
-    train_model(model, data, optimizer)
+    # model = train_model(model, data, optimizer)
     evaluate_model(model, data)
 
 if __name__ == "__main__":
