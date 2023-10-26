@@ -40,20 +40,50 @@ def create_evaluation_splits(n_sample, n_folds, train_ratio=0.85, output='./'):
 
 def aggregate(output):
     files = list()
+    # output = desired directory for the generated output
+
+    # os.walk(output) goes inside the output directory
+    # dirpath = pwd of the current directory
+    # dirnames = list of all the directories in dirpath
+    # filenames = list of all files in dirpath
     for dirpath, dirnames, filenames in os.walk(output):
+        # if it reaches the end of the subfolders, add the filenames to the file list
         if not dirnames: files += [os.path.join(os.path.normpath(dirpath), file).split(os.sep) for file in filenames if file.endswith("pred.eval.mean.csv")]
+    #files = the list of files inside the entire output directory
+    # now this files dataframe will store the file and path info based on the breakdown of the attributes
+    # that has been given for running various models
+    # rfile = result csv files in all the directories
     files = pd.DataFrame(files, columns=['', '', 'domain', 'baseline', 'setting', 'rfile'])
+    # rfiles now contains a grouped df where each group contains the items under one rfile
+    # f0.test.pred.eval.mean.csv
+    # f1.test.pred.eval.mean.csv
+    # f2.test.pred.eval.mean.csv
+    # f3.test.pred.eval.mean.csv
+    # f4.test.pred.eval.mean.csv
+    # test.pred.eval.mean.csv
+    # each of these files have individual groups. together they are forming rfiles
     rfiles = files.groupby('rfile')
+
+    # rf = one of the 'rfile's listed above
+    # r = each row under the grouped dataframe where the rfile is rf
     for rf, r in rfiles:
         dfff = pd.DataFrame()
+        # rdomains = each rf group will be divided according to its domain like :
+        # dblp.v12.json.filtered.mt75.ts3
+        # patent.tsv.filtered.mt75.ts3
+        # title.basics.tsv.filtered.mt75.ts3
+        # toy.dblp.v12.json
         rdomains = r.groupby('domain')
         for rd, rr in rdomains:
+            #
             names = ['metrics']
             dff = pd.DataFrame()
             df = rdomains.get_group(rd)
             hr = False
             for i, row in df.iterrows():
                 if not hr:
+                    # This is one row in df
+                    # .. | output | dblp.v12.json.filtered.mt75.ts3 | bnn | t99375.s29661.m14214.l[100].lr0.1.b4096.e20 | f0.test.pred.eval.mean.csv
                     dff = pd.concat([dff, pd.read_csv(f"{output}{rd}/{row['baseline']}/{row['setting']}/{rf}", usecols=[0])], axis=1, ignore_index=True)
                     hr = True
                 dff = pd.concat([dff, pd.read_csv(f"{output}{rd}/{row['baseline']}/{row['setting']}/{rf}", usecols=[1])], axis=1, ignore_index=True)
