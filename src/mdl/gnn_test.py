@@ -137,15 +137,7 @@ class GCN(torch.nn.Module):
 
 
 def main():
-    dataset = load_dataset()
-    # data = create_data()
-    # data = dataset[0]
-    # explore_dataset(dataset)
-    explore_dataset_specific(dataset)
-    # visualize_dataset(data)
-    model, data, optimizer = create_model(dataset)
-    # model = train_model(model, data, optimizer)
-    evaluate_model(model, data)
+
 
 if __name__ == "__main__":
     main()
