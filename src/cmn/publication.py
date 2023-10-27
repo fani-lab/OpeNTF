@@ -46,8 +46,10 @@ class Publication(Team):
     def read_data(datapath, output, index, filter, settings):
         st = time()
         try:
+            # at first try to load the existing data (if any) with the default super.load_data() method
             return super(Publication, Publication).load_data(output, index)
         except (FileNotFoundError, EOFError) as e:
+            # otherwise we read it using the custom function for each domain
             print(f"Pickles not found! Reading raw data from {datapath} (progress in bytes) ...")
             teams = {}; candidates = {}
 
