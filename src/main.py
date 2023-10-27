@@ -113,7 +113,9 @@ def run(data_list, domain_list, filter, model_list, output, settings):
     assert len(models) > 0
 
     for (d_name, d_cls), (m_name, m_obj) in product(datasets.items(), models.items()):
+        # e.g : 'data/raw/dblp/toy.dblp.v12.json'
         datapath = data_list[domain_list.index(d_name)]
+        # e.g : './../data/preprocessed/dblp/toy.dblp.v12.json'
         prep_output = f'./../data/preprocessed/{d_name}/{os.path.split(datapath)[-1]}'
         vecs, indexes = d_cls.generate_sparse_vectors(datapath, f'{prep_output}{filter_str}', filter, settings['data'])
         splits = create_evaluation_splits(vecs['id'].shape[0], settings['model']['nfolds'], settings['model']['train_test_split'], output=f'{prep_output}{filter_str}')

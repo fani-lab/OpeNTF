@@ -63,11 +63,12 @@ class Team(object):
             t2i[t.id] = idx
         return i2t, t2i
 
+    # should be overridden by the children classes, customize their loading data
+    # read data from file
     @staticmethod
     def read_data(teams, output, filter, settings):
-        # should be overridden by the children classes, customize their loading data
-        # read data from file
         # apply filtering
+        # drop the teams based on min_nteam
         if filter: teams = Team.remove_outliers(teams, settings)
         # build indexes
         indexes = {}
@@ -76,9 +77,12 @@ class Team(object):
         indexes['i2t'], indexes['t2i'] = Team.build_index_teams(teams.values())
         st = time()
 
+        # This will raise FileExistsError, if the output directory already exists
+        # os.makedirs() raises such error with a default flag
         try: os.makedirs(output)
         except FileExistsError as ex: pass
 
+        # write the teams and indexes info as pkl file
         with open(f'{output}/teams.pkl', "wb") as outfile: pickle.dump(teams, outfile)
         with open(f'{output}/indexes.pkl', "wb") as outfile: pickle.dump(indexes, outfile)
         print(f"It took {time() - st} seconds to pickle the data into {output}")
@@ -144,6 +148,7 @@ class Team(object):
                 with multiprocessing.Pool() as p:
                     n_core = multiprocessing.cpu_count() if settings['ncore'] <= 0 else settings['ncore']
                     subteams = np.array_split(list(teams.values()), n_core)
+                    # need to understand why we need partial here
                     func = partial(Team.bucketing, settings['bucket_size'], indexes['s2i'], indexes['c2i'])
                     data = p.map(func, subteams)
             # serial

@@ -49,7 +49,7 @@ class Publication(Team):
             # at first try to load the existing data (if any) with the default super.load_data() method
             return super(Publication, Publication).load_data(output, index)
         except (FileNotFoundError, EOFError) as e:
-            # otherwise we read it using the custom function for each domain
+            # otherwise we read it using the custom read_data() function for each domain class
             print(f"Pickles not found! Reading raw data from {datapath} (progress in bytes) ...")
             teams = {}; candidates = {}
 
@@ -81,6 +81,7 @@ class Publication(Team):
                             if (idname := f'{member_id}_{member_name}') not in candidates:
                                 candidates[idname] = Author(member_id, member_name, member_org)
                             members.append(candidates[idname])
+                        # declare the team based on the data collected for a publication
                         team = Publication(id, members, title, year, type, venue, references, fos, keywords)
                         teams[team.id] = team
                         if 'nrow' in settings['domain']['dblp'].keys() and len(teams) > settings['domain']['dblp']['nrow']: break
@@ -89,6 +90,12 @@ class Publication(Team):
                         continue
                     except Exception as e:
                         raise e
+            # if there is no previous data to load, after this step in the child class called publication,
+            # the read_data() of the super class (Team) will be called to create the indexes and the teams
+            # and finally store them in the pickle format
+            # as the pickle and index formation is the same for every team child class
+            # the read_data() should be called by every child class of Team after performing necessary data fetching and preps
+            # from the raw files
             return super(Publication, Publication).read_data(teams, output, filter, settings)
         except Exception as e:
             raise e
