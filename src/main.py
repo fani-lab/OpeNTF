@@ -118,6 +118,11 @@ def run(data_list, domain_list, filter, model_list, output, settings):
         # e.g : './../data/preprocessed/dblp/toy.dblp.v12.json'
         prep_output = f'./../data/preprocessed/{d_name}/{os.path.split(datapath)[-1]}'
         vecs, indexes = d_cls.generate_sparse_vectors(datapath, f'{prep_output}{filter_str}', filter, settings['data'])
+        # e.g :
+        # vecs['id'].shape = 31 * 1, vecs['id'].shape[0] = 31
+        # settings['model']['nfolds'] = 5
+        # settings['model']['train_test_split'] = 0.85
+        # {prep_output}, {filter_str} = './../data/preprocessed/dblp/toy.dblp.v12.json' , ''
         splits = create_evaluation_splits(vecs['id'].shape[0], settings['model']['nfolds'], settings['model']['train_test_split'], output=f'{prep_output}{filter_str}')
         if m_name.find('_emb') > 0:
             t2v = Team2Vec(vecs, 'skill', f'./../data/preprocessed/{d_name}/{os.path.split(datapath)[-1]}{filter_str}')
