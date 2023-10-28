@@ -117,25 +117,9 @@ def evaluate_model(model, data):
     acc = int(correct) / int(data.test_mask.sum())
     print(f'Accuracy: {acc:.4f}')
 
-
-
-class GCN(torch.nn.Module):
-    def __init__(self):
-        super().__init__()
-        self.conv1 = GCNConv(dataset.num_node_features, 16)
-        self.conv2 = GCNConv(16, dataset.num_classes)
-
-    def forward(self, data):
-        x, edge_index = data.x, data.edge_index
-
-        x = self.conv1(x, edge_index)
-        x = F.relu(x)
-        x = F.dropout(x, training=self.training)
-        x = self.conv2(x, edge_index)
-
-        return F.log_softmax(x, dim=1)
-
-def raw_main():
+# the raw steps for sample gnn on planetoid data
+# need to rearrange these parts into separate functions
+def planetoid():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = GCN().to(device)
     data = dataset[0].to(device)
@@ -155,10 +139,40 @@ def raw_main():
     print(f'Accuracy: {acc:.4f}')
 
 
+# download the dataset
+
+def movie_interactions():
+    print('####################################')
+    print('Movie Interactions Model')
+    print('####################################')
+
+
 def main():
     dataset = Planetoid(root='/tmp/Cora', name='Cora')
 
 if __name__ == "__main__":
     dataset = Planetoid(root='/tmp/Cora', name='Cora')
     # main()
-    raw_main()
+    # planetoid()
+    movie_interactions()
+
+
+'''
+Class Definitions here
+'''
+# GCN class to form a GCN model
+class GCN(torch.nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.conv1 = GCNConv(dataset.num_node_features, 16)
+        self.conv2 = GCNConv(16, dataset.num_classes)
+
+    def forward(self, data):
+        x, edge_index = data.x, data.edge_index
+
+        x = self.conv1(x, edge_index)
+        x = F.relu(x)
+        x = F.dropout(x, training=self.training)
+        x = self.conv2(x, edge_index)
+
+        return F.log_softmax(x, dim=1)
