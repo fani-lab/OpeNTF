@@ -5,6 +5,11 @@ from torch_geometric.nn import GCNConv
 from torch_geometric.data import Data
 from tqdm import tqdm
 
+# import classes from opentf
+import param
+from cmn.team import Team
+from cmn.author import Author
+from cmn.publication import Publication
 
 # a method to create a custom dataset
 def create_data(data):
@@ -135,6 +140,13 @@ class GCN(torch.nn.Module):
 
         return F.log_softmax(x, dim=1)
 
+
+
+# preprocess dblp data into graph data
+def preprocess(dataset):
+    print(dataset)
+
+
 def raw_main():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = GCN().to(device)
@@ -159,6 +171,12 @@ def main():
     dataset = Planetoid(root='/tmp/Cora', name='Cora')
 
 if __name__ == "__main__":
-    dataset = Planetoid(root='/tmp/Cora', name='Cora')
+    # dataset = Planetoid(root='/tmp/Cora', name='Cora')
+
+    cls = Publication
+    datapath = 'data/raw/dblp/toy.dblp.v12.json'
+    # read the data based on the domain
+    indexes, teams = cls.read_data(datapath, output)
+    dataset = ""
     # main()
     raw_main()
