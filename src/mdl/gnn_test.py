@@ -5,6 +5,11 @@ from torch_geometric.nn import GCNConv
 from torch_geometric.data import Data
 from tqdm import tqdm
 
+# import classes from opentf
+import param
+from cmn.team import Team
+from cmn.author import Author
+from cmn.publication import Publication
 
 # a method to create a custom dataset
 def create_data(data):
@@ -117,9 +122,31 @@ def evaluate_model(model, data):
     acc = int(correct) / int(data.test_mask.sum())
     print(f'Accuracy: {acc:.4f}')
 
-# the raw steps for sample gnn on planetoid data
-# need to rearrange these parts into separate functions
-def planetoid():
+
+class GCN(torch.nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.conv1 = GCNConv(dataset.num_node_features, 16)
+        self.conv2 = GCNConv(16, dataset.num_classes)
+
+    def forward(self, data):
+        x, edge_index = data.x, data.edge_index
+
+        x = self.conv1(x, edge_index)
+        x = F.relu(x)
+        x = F.dropout(x, training=self.training)
+        x = self.conv2(x, edge_index)
+
+        return F.log_softmax(x, dim=1)
+
+
+
+# preprocess dblp data into graph data
+def preprocess(dataset):
+    print(dataset)
+
+
+def raw_main():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = GCN().to(device)
     data = dataset[0].to(device)
@@ -151,10 +178,19 @@ def main():
     dataset = Planetoid(root='/tmp/Cora', name='Cora')
 
 if __name__ == "__main__":
-    dataset = Planetoid(root='/tmp/Cora', name='Cora')
+    # dataset = Planetoid(root='/tmp/Cora', name='Cora')
+
+    cls = Publication
+    domain = 'dblp'
+    filename = 'toy.dblp.v12.json'
+    datapath = 'data/raw/dblp/toy.dblp.v12.json'
+    output = 'data/preprocessed/' + domain + filename + 'gnn'
+    # read the data based on the domain
+    indexes, teams = cls.read_data(datapath, output, True, False, param.settings)
+    dataset = ""
     # main()
     # planetoid()
-    movie_interactions()
+    # movie_interactions()
 
 
 '''
