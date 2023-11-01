@@ -7,6 +7,8 @@ from tqdm import tqdm
 
 # import classes from opentf
 import param
+import sys,os, json
+from json import JSONEncoder
 from cmn.team import Team
 from cmn.author import Author
 from cmn.publication import Publication
@@ -184,10 +186,11 @@ if __name__ == "__main__":
     domain = 'dblp'
     filename = 'toy.dblp.v12.json'
     datapath = 'data/raw/dblp/toy.dblp.v12.json'
-    output = 'data/preprocessed/' + domain + filename + 'gnn'
+    output = 'data/preprocessed/' + domain + '/' + filename + '/gnn'
     # read the data based on the domain
     indexes, teams = cls.read_data(datapath, output, True, False, param.settings)
-    dataset = ""
+    dataset = {'index': indexes, 'data' : teams}
+    preprocess(dataset)
     # main()
     # planetoid()
     # movie_interactions()

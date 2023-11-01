@@ -84,7 +84,9 @@ class Publication(Team):
                         # declare the team based on the data collected for a publication
                         team = Publication(id, members, title, year, type, venue, references, fos, keywords)
                         teams[team.id] = team
-                        if 'nrow' in settings['domain']['dblp'].keys() and len(teams) > settings['domain']['dblp']['nrow']: break
+                        # this line somehow miss the heirarchy of settings' keys : data > domain > dblp > nrow
+                        # if 'nrow' in settings['domain']['dblp'].keys() and len(teams) > settings['domain']['dblp']['nrow']: break
+                        if 'nrow' in settings['data']['domain']['dblp'].keys() and len(teams) > settings['data']['domain']['dblp']['nrow']: break
                     except json.JSONDecodeError as e:  # ideally should happen only for the last line ']'
                         print(f'JSONDecodeError: There has been error in loading json line `{line}`!\n{e}')
                         continue
