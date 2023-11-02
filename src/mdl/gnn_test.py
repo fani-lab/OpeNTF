@@ -3,6 +3,7 @@ import torch.nn.functional as F
 from torch_geometric.datasets import Planetoid
 from torch_geometric.nn import GCNConv
 from torch_geometric.data import Data
+from torch_geometric.data import HeteroData
 from tqdm import tqdm
 
 # import classes from opentf
@@ -145,7 +146,21 @@ class GCN(torch.nn.Module):
 
 # preprocess a data into graph data
 def preprocess(dataset):
-    print(dataset)
+    print()
+    print(f'dataset = {dataset}')
+
+    assert len(indexes['i2s']) == len(indexes['s2i'])
+    assert len(indexes['i2t']) == len(indexes['t2i'])
+    assert len(indexes['i2c']) == len(indexes['c2i'])
+    assert len(teams) == len(indexes['i2t'])
+
+    num_teams = len(indexes['i2t'])
+    num_skills = len(indexes['i2s'])
+    num_experts = len(indexes['i2c'])
+    num_edges_t2s = 0
+    num_edges_t2e = 0
+
+
     # dataset now contains indexes and teams
     # indexes is the index containing all the distinct candidates, skills and teams info
     # teams is a dict containing a Team object against each key (1,2,3.....nteams)
@@ -155,13 +170,43 @@ def preprocess(dataset):
     # num_nodes = num of distinct candidate + skill + team
     # edge exists between each team node to its relevant candidate and skill node
 
-    print('\nTeams : \n')
+    # the graph team_graph is basically a heterodata with node types team t, skill s and experts e.
+    # only the team t type nodes will contain the success or failure as y, all other properties like
+    # x, edge_index and edge_features will be the same
+
+    ### Nodes
+    # x = [num_teams, num_features_teams], here,
+    # num_features_teams = the number of features each team might contain
+    team_graph['team'].x = torch.tensor((num_teams, 1))
+    # x = [num_skills, num_features_skills]
+    team_graph['skill'].x = torch.tensor(list(indexes['i2s'].keys()))
+    # x = [num_experts, num_features_experts]
+    team_graph['expert'].x = torch.tensor(list(indexes['i2c'].keys()))
+
+    ### Edges
+    # so here the edges are mentioned as source_node "does_something_to" target_node
+    # which means, in our case, each team contains a skill or expert
+    # "team has skills" / t2s and "team contains experts" / t2e
+    # specifically, "publication has fos" or "publication contains authors"
+    # so we have 2 types of edges t->s and t->e
+
+    # edge_index = [2, num_edge_t2s], the edge_index for the type "has"
+    team_graph['team', 'has', 'skill'].edge_index = ...
+    # edge_index = [2, num_edge_t2e], the edge_index for the type "contains"
+    team_graph['team', 'contains', 'expert'].edge_index = ...
+
+
+
     # create nodes
+    print('\nTeams : ')
     for i, team_index in indexes['i2t'].items():
-        print(f'i = {i}, team = {team_index}, team_rpr = {teams[team_index].id}, {teams[team_index].title}, {teams[team_index].members.name}')
+        print(f'i = {i}, team = {team_index} \n\tteam_id : {teams[team_index].id} \n\tteam_title : {teams[team_index].title} \n\tmember[0].name : {teams[team_index].members[0].name}')
+        # for each team, we connect each t with each t.fos
 
 
-def raw_main():
+
+
+def raw_gcn():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = GCN().to(device)
     data = dataset[0].to(device)
@@ -200,6 +245,10 @@ if __name__ == "__main__":
     filename = 'toy.dblp.v12.json'
     datapath = 'data/raw/dblp/toy.dblp.v12.json'
     output = 'data/preprocessed/' + domain + '/' + filename + '/gnn'
+    # create the empty graph for all the teams
+    team_graph = HeteroData()
+
+
     # read the data based on the domain
     # 'indexes' contains the list of all the distinct
     # candidates, skills and teams
@@ -208,7 +257,10 @@ if __name__ == "__main__":
     indexes, teams = cls.read_data(datapath, output, False, False, param.settings)
     dataset = {'index': indexes, 'data' : teams}
     preprocess(dataset)
+
+
     # main()
+    # raw_gcn()
     # planetoid()
     # movie_interactions()
 
