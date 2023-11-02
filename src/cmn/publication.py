@@ -53,6 +53,7 @@ class Publication(Team):
             print(f"Pickles not found! Reading raw data from {datapath} (progress in bytes) ...")
             teams = {}; candidates = {}
 
+            # if there is no file, load it from scratch
             with tqdm(total=os.path.getsize(datapath)) as pbar, open(datapath, "r", encoding='utf-8') as jf:
                 for line in jf:
                     try:
@@ -63,11 +64,16 @@ class Publication(Team):
                         title = jsonline['title']
                         year = jsonline['year']
                         type = jsonline['doc_type']
+                        # venue itself is a dict with keys 'raw', 'id' and 'type'
+                        # e.g : {'raw': 'international conference on human-computer interaction', 'id': 1127419992, 'type': 'c'}
                         venue = jsonline['venue'] if 'venue' in jsonline.keys() else None
+                        # references = [2005687710, 2018037215]
                         references = jsonline['references'] if 'references' in jsonline.keys() else []
                         keywords = jsonline['keywords'] if 'keywords' in jsonline.keys() else []
 
-                        # a team must have skills and members
+                        # a team must have skills and members, otherwise skip this paper and continue to the next iteration
+                        # fos = a list of dictionaries with keys 'name', 'w'
+                        # fos = [{'name': 'deep learning', 'w': 0.45139}, {'name': 'image captioning', 'w': 0.3241}]
                         try: fos = jsonline['fos']# an array of (name, w), w shows a weight. Not sorted! Can be used later!
                         except: continue  #publication must have fos (skills)
                         try: authors = jsonline['authors']
@@ -79,9 +85,11 @@ class Publication(Team):
                             member_name = author['name'].replace(" ", "_")
                             member_org = author['org'].replace(" ", "_") if 'org' in author else ""
                             if (idname := f'{member_id}_{member_name}') not in candidates:
+                                # each Author object is stored in the candidates dict against a distinct idname
                                 candidates[idname] = Author(member_id, member_name, member_org)
                             members.append(candidates[idname])
                         # declare the team based on the data collected for a publication
+                        # in the json file, one line represents the whole team
                         team = Publication(id, members, title, year, type, venue, references, fos, keywords)
                         teams[team.id] = team
                         # this line somehow miss the heirarchy of settings' keys : data > domain > dblp > nrow

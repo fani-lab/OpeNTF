@@ -143,9 +143,22 @@ class GCN(torch.nn.Module):
 
 
 
-# preprocess dblp data into graph data
+# preprocess a data into graph data
 def preprocess(dataset):
     print(dataset)
+    # dataset now contains indexes and teams
+    # indexes is the index containing all the distinct candidates, skills and teams info
+    # teams is a dict containing a Team object against each key (1,2,3.....nteams)
+    # each Team object holds the info of distinct teams (e.g : distinct publications)
+
+    # we build a graph where
+    # num_nodes = num of distinct candidate + skill + team
+    # edge exists between each team node to its relevant candidate and skill node
+
+    print('\nTeams : \n')
+    # create nodes
+    for i, team_index in indexes['i2t'].items():
+        print(f'i = {i}, team = {team_index}, team_rpr = {teams[team_index].id}, {teams[team_index].title}, {teams[team_index].members.name}')
 
 
 def raw_main():
@@ -188,7 +201,11 @@ if __name__ == "__main__":
     datapath = 'data/raw/dblp/toy.dblp.v12.json'
     output = 'data/preprocessed/' + domain + '/' + filename + '/gnn'
     # read the data based on the domain
-    indexes, teams = cls.read_data(datapath, output, True, False, param.settings)
+    # 'indexes' contains the list of all the distinct
+    # candidates, skills and teams
+    # teams is a dict with keys 1,2,3, ..... nteams. against each key there is a Team object holding a team
+    # so info of each team can be accessed with teams[3].title, teams[3].fos etc. (here 3 is the key of the team)
+    indexes, teams = cls.read_data(datapath, output, False, False, param.settings)
     dataset = {'index': indexes, 'data' : teams}
     preprocess(dataset)
     # main()
