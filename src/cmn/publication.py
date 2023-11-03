@@ -92,7 +92,8 @@ class Publication(Team):
                         # in the json file, one line represents the whole team
                         team = Publication(id, members, title, year, type, venue, references, fos, keywords)
                         teams[team.id] = team
-                        # this line somehow miss the heirarchy of settings' keys : data > domain > dblp > nrow
+                        # to find the keys in the hierarchy 'data' > 'domain' > 'dblp', we have to previously pass
+                        # settings as settings['data']
                         if 'nrow' in settings['domain']['dblp'].keys() and len(teams) > settings['domain']['dblp']['nrow']: break
                     except json.JSONDecodeError as e:  # ideally should happen only for the last line ']'
                         print(f'JSONDecodeError: There has been error in loading json line `{line}`!\n{e}')

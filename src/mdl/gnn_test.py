@@ -177,7 +177,7 @@ def preprocess(dataset):
     ### Nodes
     # x = [num_teams, num_features_teams], here,
     # num_features_teams = the number of features each team might contain
-    team_graph['team'].x = torch.tensor((num_teams, 1))
+    team_graph['team'].x = torch.tensor((num_teams, 1), dtype = None)
     # x = [num_skills, num_features_skills]
     team_graph['skill'].x = torch.tensor(list(indexes['i2s'].keys()))
     # x = [num_experts, num_features_experts]
@@ -254,7 +254,7 @@ if __name__ == "__main__":
     # candidates, skills and teams
     # teams is a dict with keys 1,2,3, ..... nteams. against each key there is a Team object holding a team
     # so info of each team can be accessed with teams[3].title, teams[3].fos etc. (here 3 is the key of the team)
-    indexes, teams = cls.read_data(datapath, output, False, False, param.settings)
+    indexes, teams = cls.read_data(datapath, output, False, False, param.settings['data'])
     dataset = {'index': indexes, 'data' : teams}
     preprocess(dataset)
 
