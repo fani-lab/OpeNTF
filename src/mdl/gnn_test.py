@@ -14,6 +14,28 @@ from cmn.team import Team
 from cmn.author import Author
 from cmn.publication import Publication
 
+'''
+Class Definitions here
+'''
+# GCN class to form a GCN model
+class GCN(torch.nn.Module):
+    def __init__(self, input_dim, hidden_dim, output_dim):
+        super().__init__()
+        self.conv1 = GCNConv(input_dim, hidden_dim)
+        self.conv2 = GCNConv(hidden_dim, output_dim)
+
+    def forward(self, data):
+        x, edge_index = data.x, data.edge_index
+
+        x = self.conv1(x, edge_index)
+        x = F.relu(x)
+        x = F.dropout(x, training=self.training)
+        x = self.conv2(x, edge_index)
+
+        return F.log_softmax(x, dim=1)
+
+'''class definition ends here'''
+
 # a method to create a custom dataset
 def create_data(x, edge_index, y = None):
     # x = torch.tensor([-1, 0, 1])
@@ -131,23 +153,6 @@ def evaluate_model(model, data):
     print(f'Accuracy: {acc:.4f}')
 
 
-class GCN(torch.nn.Module):
-    def __init__(self):
-        super().__init__()
-        self.conv1 = GCNConv(dataset.num_node_features, 16)
-        self.conv2 = GCNConv(16, dataset.num_classes)
-
-    def forward(self, data):
-        x, edge_index = data.x, data.edge_index
-
-        x = self.conv1(x, edge_index)
-        x = F.relu(x)
-        x = F.dropout(x, training=self.training)
-        x = self.conv2(x, edge_index)
-
-        return F.log_softmax(x, dim=1)
-
-
 
 # preprocess a data into graph data
 def preprocess(dataset):
@@ -213,11 +218,11 @@ def preprocess(dataset):
 
 def raw_gcn():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model = GCN().to(device)
     # create a sample data to test
     # this data will have 3 nodes 0, 1 and 2 with 0-1, 1-2 but no 0-2 edge
     # the similarity should be between 0-1, 1-2 but 0-2 should be different from one another
-    data = create_data(torch.tensor([0, 1, 2], torch.tensor([[0, 1, 1, 2],[1, 0, 2, 1]]))).to(device)
+    data = create_data(torch.tensor([[0], [1], [2]], dtype=torch.float), torch.tensor([[0, 1, 1, 2],[1, 0, 2, 1]], dtype=torch.long)).to(device)
+    model = GCN(input_dim = data.num_node_features, hidden_dim = 16, output_dim = 3).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=0.01, weight_decay=5e-4)
 
     model.train()
@@ -248,23 +253,22 @@ def main():
 if __name__ == "__main__":
     # dataset = Planetoid(root='/tmp/Cora', name='Cora')
 
-    cls = Publication
-    domain = 'dblp'
-    filename = 'toy.dblp.v12.json'
-    datapath = 'data/raw/dblp/toy.dblp.v12.json'
-    output = 'data/preprocessed/' + domain + '/' + filename + '/gnn'
-    # create the empty graph for all the teams
-    team_graph = HeteroData()
-
-
-    # read the data based on the domain
-    # 'indexes' contains the list of all the distinct
-    # candidates, skills and teams
-    # teams is a dict with keys 1,2,3, ..... nteams. against each key there is a Team object holding a team
-    # so info of each team can be accessed with teams[3].title, teams[3].fos etc. (here 3 is the key of the team)
-    indexes, teams = cls.read_data(datapath, output, False, False, param.settings['data'])
-    dataset = {'index': indexes, 'data' : teams}
-    preprocess(dataset)
+    # cls = Publication
+    # domain = 'dblp'
+    # filename = 'toy.dblp.v12.json'
+    # datapath = 'data/raw/dblp/toy.dblp.v12.json'
+    # output = 'data/preprocessed/' + domain + '/' + filename + '/gnn'
+    # # create the empty graph for all the teams
+    # team_graph = HeteroData()
+    #
+    # # read the data based on the domain
+    # # 'indexes' contains the list of all the distinct
+    # # candidates, skills and teams
+    # # teams is a dict with keys 1,2,3, ..... nteams. against each key there is a Team object holding a team
+    # # so info of each team can be accessed with teams[3].title, teams[3].fos etc. (here 3 is the key of the team)
+    # indexes, teams = cls.read_data(datapath, output, False, False, param.settings['data'])
+    # dataset = {'index': indexes, 'data' : teams}
+    # preprocess(dataset)
 
 
     # main()
@@ -273,22 +277,3 @@ if __name__ == "__main__":
     # movie_interactions()
 
 
-'''
-Class Definitions here
-'''
-# GCN class to form a GCN model
-class GCN(torch.nn.Module):
-    def __init__(self):
-        super().__init__()
-        self.conv1 = GCNConv(dataset.num_node_features, 16)
-        self.conv2 = GCNConv(16, dataset.num_classes)
-
-    def forward(self, data):
-        x, edge_index = data.x, data.edge_index
-
-        x = self.conv1(x, edge_index)
-        x = F.relu(x)
-        x = F.dropout(x, training=self.training)
-        x = self.conv2(x, edge_index)
-
-        return F.log_softmax(x, dim=1)
