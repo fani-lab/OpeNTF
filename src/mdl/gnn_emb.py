@@ -50,10 +50,10 @@ if __name__ == "__main__":
 
     model = Node2Vec(
         data.edge_index,
-        embedding_dim = 128,
+        embedding_dim = 5,
         walks_per_node = 10,
-        walk_length = 20,
-        context_size = 10,
+        walk_length = 4,
+        context_size = 3,
         p = 1.0,
         q = 1.0,
         num_negative_samples = 1
@@ -65,7 +65,8 @@ if __name__ == "__main__":
     optimizer = torch.optim.Adam(model.parameters(), lr = 0.01)
     # the "TypeError: cannot pickle 'PyCapsule' object" error resolved after removing num_workers from the
     # set of arguments in the following model.loader() call
-    loader = model.loader(batch_size=128, shuffle=True)
+    num_workers = 4 if sys.platform == 'linux' else 0
+    loader = model.loader(batch_size=128, shuffle=True, num_workers = num_workers)
     try :
         # on Cora dataset having x=[2708, 1433], edge_index=[2, 10556], y=[2708], train_mask=[2708], val_mask=[2708], test_mask=[2708],
         # the next(iter(loader)) produces a tuple of two tensors pos_rw and neg_rw
@@ -74,12 +75,14 @@ if __name__ == "__main__":
     except EOFError:
         print('EOFError')
 
-    for epoch in range(1, 20):
+    for epoch in range(1, 11):
         loss = train()
         if(epoch % 5 == 0):
             print(f'epoch = {epoch : 02d}, loss = {loss : .4f}')
             print(f'node embeddings : ')
             print(f'embeddings : {model.embedding.weight}')
+            # embeddings of first 3 nodes
+            print(f'embeddings from model variable : {model(torch.tensor([0, 1, 2]))}')
 
 
 
