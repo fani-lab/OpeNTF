@@ -11,6 +11,8 @@ from torch_geometric.data import Data
 import torch
 from tqdm import tqdm
 from torch_geometric.datasets import Planetoid
+# import torch.utils.data.dataloader
+from torch_geometric.loader import NeighborSampler
 
 def create_data(x, edge_index, y = None):
     # x = torch.tensor([-1, 0, 1])
@@ -27,7 +29,7 @@ def create_data(x, edge_index, y = None):
 def train():
     model.train()
     total_loss = 0
-    for pos_rw, neg_rw in tqdm(loader):
+    for pos_rw, neg_rw in loader:
         optimizer.zero_grad()
         loss = model.loss(pos_rw.to(device), neg_rw.to(device))
         loss.backward()
@@ -61,15 +63,23 @@ if __name__ == "__main__":
     print(model)
     print(model.parameters())
     optimizer = torch.optim.Adam(model.parameters(), lr = 0.01)
-    loader = model.loader(batch_size=128, shuffle=True, num_workers=4)
+    # the "TypeError: cannot pickle 'PyCapsule' object" error resolved after removing num_workers from the
+    # set of arguments in the following model.loader() call
+    loader = model.loader(batch_size=128, shuffle=True)
     try :
+        # on Cora dataset having x=[2708, 1433], edge_index=[2, 10556], y=[2708], train_mask=[2708], val_mask=[2708], test_mask=[2708],
+        # the next(iter(loader)) produces a tuple of two tensors pos_rw and neg_rw
+        # each has a dimension of (14080, 10)
         pos_rw, neg_rw = next(iter(loader))
     except EOFError:
         print('EOFError')
 
-    for epoch in range(1, 100):
+    for epoch in range(1, 20):
         loss = train()
-        print(f'epoch = {epoch : 02d}, loss = {loss : .4f}')
+        if(epoch % 5 == 0):
+            print(f'epoch = {epoch : 02d}, loss = {loss : .4f}')
+            print(f'node embeddings : ')
+            print(f'embeddings : {model.embedding.weight}')
 
 
 
