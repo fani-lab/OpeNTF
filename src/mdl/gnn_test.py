@@ -15,11 +15,16 @@ from cmn.author import Author
 from cmn.publication import Publication
 
 # a method to create a custom dataset
-def create_data(data):
-    x = torch.tensor([-1, 0, 1])
-    edge_index = torch.tensor([[0, 1, 1, 2], [1, 0, 2, 1]])
-    y = torch.tensor([2, 4, 1])
-    data = Data(x = x, y = y, edge_index = edge_index)
+def create_data(x, edge_index, y = None):
+    # x = torch.tensor([-1, 0, 1])
+    # edge_index = torch.tensor([[0, 1, 1, 2], [1, 0, 2, 1]])
+    # y = torch.tensor([2, 4, 1])
+
+    # the data is only for generating the embedding without any target labels
+    if not y :
+        data = Data(x = x, edge_index = edge_index)
+    else:
+        data = Data(x = x, edge_index = edge_index, y = y)
     return data
 
 def load_dataset():
@@ -209,7 +214,10 @@ def preprocess(dataset):
 def raw_gcn():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = GCN().to(device)
-    data = dataset[0].to(device)
+    # create a sample data to test
+    # this data will have 3 nodes 0, 1 and 2 with 0-1, 1-2 but no 0-2 edge
+    # the similarity should be between 0-1, 1-2 but 0-2 should be different from one another
+    data = create_data(torch.tensor([0, 1, 2], torch.tensor([[0, 1, 1, 2],[1, 0, 2, 1]]))).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=0.01, weight_decay=5e-4)
 
     model.train()
@@ -260,7 +268,7 @@ if __name__ == "__main__":
 
 
     # main()
-    # raw_gcn()
+    raw_gcn()
     # planetoid()
     # movie_interactions()
 
