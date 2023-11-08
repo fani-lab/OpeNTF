@@ -9,10 +9,10 @@ from cmn.publication import Publication
 from torch_geometric.nn import Node2Vec, MetaPath2Vec
 from torch_geometric.data import Data
 import torch
+import matplotlib.pyplot as plt
 from tqdm import tqdm
 from torch_geometric.datasets import Planetoid
 # import torch.utils.data.dataloader
-from torch_geometric.loader import NeighborSampler
 
 def create_data(x, edge_index, y = None):
     # x = torch.tensor([-1, 0, 1])
@@ -37,6 +37,20 @@ def train():
         total_loss += loss.item()
     return total_loss / len(loader)
 
+def plot(x, y):
+    mx = max(y)
+    mn = min(y)
+    threshold = (mx - mn) // 10
+
+    plt.figure()
+    plt.ylabel('Loss')
+    plt.ylim(mn - threshold, mx + threshold)
+    plt.xlabel('Epochs')
+    plt.xlim(0, 100)
+    plt.plot(x, y)
+    plt.legend()
+    plt.show()
+
 ## main ##
 if __name__ == "__main__":
 
@@ -44,13 +58,13 @@ if __name__ == "__main__":
     # create a sample data to test
     # this data will have 3 nodes 0, 1 and 2 with 0-1, 1-2 but no 0-2 edge
     # the similarity should be between 0-1, 1-2 but 0-2 should be different from one another
-    # data = create_data(torch.tensor([[0], [1], [2]], dtype=torch.float), torch.tensor([[0, 1, 1, 2],[1, 0, 2, 1]], dtype=torch.long)).to(device)
+    data = create_data(torch.tensor([[0], [1], [2]], dtype=torch.float), torch.tensor([[0, 1, 1, 2],[1, 0, 2, 1]], dtype=torch.long)).to(device)
 
-    data = Planetoid('./data/Planetoid', name='Cora')[0]
+    # data = Planetoid('./data/Planetoid', name='Cora')[0]
 
     model = Node2Vec(
         data.edge_index,
-        embedding_dim = 5,
+        embedding_dim = 3,
         walks_per_node = 10,
         walk_length = 4,
         context_size = 3,
@@ -66,7 +80,7 @@ if __name__ == "__main__":
     # the "TypeError: cannot pickle 'PyCapsule' object" error resolved after removing num_workers from the
     # set of arguments in the following model.loader() call
     num_workers = 4 if sys.platform == 'linux' else 0
-    loader = model.loader(batch_size=128, shuffle=True, num_workers = num_workers)
+    loader = model.loader(batch_size=1, shuffle=True, num_workers = num_workers)
     try :
         # on Cora dataset having x=[2708, 1433], edge_index=[2, 10556], y=[2708], train_mask=[2708], val_mask=[2708], test_mask=[2708],
         # the next(iter(loader)) produces a tuple of two tensors pos_rw and neg_rw
@@ -75,15 +89,16 @@ if __name__ == "__main__":
     except EOFError:
         print('EOFError')
 
-    for epoch in range(1, 11):
+    losses = []
+    for epoch in range(1, 200):
         loss = train()
+        losses.append(loss)
         if(epoch % 5 == 0):
             print(f'epoch = {epoch : 02d}, loss = {loss : .4f}')
             print(f'node embeddings : ')
-            print(f'embeddings : {model.embedding.weight}')
+            # print(f'model.embedding.weight : \n{model.embedding.weight}')
             # embeddings of first 3 nodes
-            print(f'embeddings from model variable : {model(torch.tensor([0, 1, 2]))}')
+            print(f'embeddings from model object (first 3 nodes) : \n{model(torch.tensor([0, 1, 2]))}')
 
-
-
-
+    # plotting losses vs epochs
+    plot(list(range(1,200)), losses)
