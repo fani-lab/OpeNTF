@@ -56,6 +56,36 @@ def create_data_naive(x, edge_index, y = None):
         data = Data(x = x, edge_index = edge_index, y = y)
     return data
 
+# initialize the model for training
+def init():
+    model = Node2Vec(
+        data.edge_index,
+        embedding_dim = 3,
+        walks_per_node = 10,
+        walk_length = 4,
+        context_size = 2,
+        p = 1.0,
+        q = 1.0,
+        num_negative_samples = 1
+    ).to(device)
+
+    print(type(model))
+    print(model)
+    print(model.parameters())
+    optimizer = torch.optim.Adam(model.parameters(), lr = 0.01)
+    # the "TypeError: cannot pickle 'PyCapsule' object" error resolved after removing num_workers from the
+    # set of arguments in the following model.loader() call
+    num_workers = 4 if sys.platform == 'linux' else 0
+    loader = model.loader(batch_size=50, shuffle=True, num_workers = num_workers)
+    try :
+        # on Cora dataset having x=[2708, 1433], edge_index=[2, 10556], y=[2708], train_mask=[2708], val_mask=[2708], test_mask=[2708],
+        # the next(iter(loader)) produces a tuple of two tensors pos_rw and neg_rw
+        # each has a dimension of (14080, 10)
+        pos_rw, neg_rw = next(iter(loader))
+    except EOFError:
+        print('EOFError')
+    return model, loader, optimizer
+
 def train():
     model.train()
     total_loss = 0
@@ -122,36 +152,12 @@ if __name__ == "__main__":
     # teams['members'] = scipy.sparse.lil([[1,1,0],[0, 1, 1]])
     ###
 
-    model = Node2Vec(
-        data.edge_index,
-        embedding_dim = 3,
-        walks_per_node = 10,
-        walk_length = 2,
-        context_size = 2,
-        p = 1.0,
-        q = 1.0,
-        num_negative_samples = 1
-    ).to(device)
-
-    print(type(model))
-    print(model)
-    print(model.parameters())
-    optimizer = torch.optim.Adam(model.parameters(), lr = 0.01)
-    # the "TypeError: cannot pickle 'PyCapsule' object" error resolved after removing num_workers from the
-    # set of arguments in the following model.loader() call
-    num_workers = 4 if sys.platform == 'linux' else 0
-    loader = model.loader(batch_size=1, shuffle=True, num_workers = num_workers)
-    try :
-        # on Cora dataset having x=[2708, 1433], edge_index=[2, 10556], y=[2708], train_mask=[2708], val_mask=[2708], test_mask=[2708],
-        # the next(iter(loader)) produces a tuple of two tensors pos_rw and neg_rw
-        # each has a dimension of (14080, 10)
-        pos_rw, neg_rw = next(iter(loader))
-    except EOFError:
-        print('EOFError')
-
     # we test for some set of epochs and generate output files based on them
     num_epochs = [100, 200, 500, 1000, 1500, 2000]
     for max_epochs in num_epochs:
+        # initialize the model everytime
+        model, loader, optimizer = init()
+
         # we keep track of losses in a set of epochs
         losses = []
 
@@ -173,13 +179,13 @@ if __name__ == "__main__":
                 if(epoch % 10 == 0):
                     print(f'epoch = {epoch : 02d}, loss = {loss : .4f}')
                     # embeddings of first 3 nodes
-                    print(f'embeddings from model object (first 3 nodes) : \n{np.round(model(torch.tensor([0, 1, 2])).numpy(), 2)}')
+                    print(f'embeddings from model object (first 3 nodes) : \n{model(torch.tensor([0, 1, 2], dtype = torch.long))}')
                     # lines to write to file
                     line += f'Epoch : {epoch}\n\n'
-                    line += f'Node Index__________ Embeddings___________\n'
+                    line += f'-----Node Index----------------Embeddings----------------\n'
                     for i in range(data.x.shape[0]):
-                        line += f'{i} : {np.round(model(i).numpy(), 2)}\n'
-                    line += '\n'
+                        line += f'{i} : {model(torch.tensor(i , dtype = torch.long))}\n'
+                    line += '----------------------------------------------------------\n'
             # write to file
             outfile.write(line)
 
