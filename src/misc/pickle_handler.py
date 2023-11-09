@@ -1,6 +1,7 @@
 import pickle
 import os
 import numpy as np
+import torch
 from scipy.sparse import lil_matrix
 
 # reads the pickle data from the filepath
@@ -21,7 +22,8 @@ def read_data(filepath):
 def write_data(data, filepath):
     pass
 
-def create_graph_data():
+# create sample graph data in teamsvecs.pkl file format (sparse matrix)
+def create_graph_data(x, edge_index):
     data = None
     return data
 
@@ -32,6 +34,8 @@ if __name__ == "__main__":
     # to make sure the path to output exists or gets created
     os.makedirs(output_filepath, exist_ok=True)
 
-    x = np.rand()
-    custom_graph = create_graph_data()
+    tmp = np.arrange(start = 1, stop = 11, step = 1)
+    x = torch.from_numpy([[1],[1],[1],[1],[2],[3],[3],[3],[4],[4],])
+    edge_index = torch.from_numpy()
+    custom_teamsvecs = create_graph_data(x, edge_index)
     read_data(input_filepath)
