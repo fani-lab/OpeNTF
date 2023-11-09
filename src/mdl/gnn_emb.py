@@ -118,6 +118,23 @@ def plot(x, y):
     plt.legend()
     plt.show()
 
+# normalizr an np_array into a range of 0-1
+def normalize(np_array):
+    mx = np.max(np_array)
+    mn = np.min(np_array)
+
+    print(f'\nNormalize()\n')
+    print(f'Before :')
+    print(f'{np_array}')
+
+    np_array = (np_array - mn) / (mx - mn)
+
+    print(f'After :')
+    print(f'{np_array}')
+    print('')
+
+    return np_array
+
 ## main ##
 if __name__ == "__main__":
 
@@ -177,15 +194,26 @@ if __name__ == "__main__":
                 loss = train()
                 losses.append(loss)
                 if(epoch % 10 == 0):
-                    print(f'epoch = {epoch : 02d}, loss = {loss : .4f}')
-                    # embeddings of first 3 nodes
-                    print(f'embeddings from model object (first 3 nodes) : \n{model(torch.tensor([0, 1, 2], dtype = torch.long))}')
+                    print(f'Epoch = {epoch : 02d}, loss = {loss : .4f}')
+
+                    # the model() gives all the weights and biases of the model currently
+                    # the detach() enables this result to require no gradient
+                    # and then we convert the tensor to numpy array
+                    weights = model().detach().numpy()
+                    weights = normalize(weights)
+                    weights = np.around(weights, 2)
+
+                    print('\nembedding : \n')
+                    print(weights)
+
                     # lines to write to file
-                    line += f'Epoch : {epoch}\n\n'
-                    line += f'-----Node Index----------------Embeddings----------------\n'
-                    for i in range(data.x.shape[0]):
-                        line += f'{i} : {model(torch.tensor(i , dtype = torch.long))}\n'
-                    line += '----------------------------------------------------------\n'
+                    line += f'Epoch : {epoch}\n'
+                    line += f'--------------------------\n'
+                    line += f'Node ----- Embedding -----\n\n'
+                    for i, weights_per_node in enumerate(weights):
+                        print(weights_per_node)
+                        line += f'{i:2} : {weights_per_node}\n'
+                    line += f'--------------------------\n\n'
             # write to file
             outfile.write(line)
 
