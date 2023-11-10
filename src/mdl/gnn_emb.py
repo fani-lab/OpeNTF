@@ -98,11 +98,11 @@ def train():
         total_loss += loss.item()
     return total_loss / len(loader)
 
-def plot_graph(team_graph):
+def plot_graph(teams_graph):
     # make sure that the data given is a Data type object
-    assert type(team_graph) == torch_geometric.data.Data
+    assert type(teams_graph) == torch_geometric.data.Data
 
-    G = torch_geometric.utils.to_networkx(team_graph, to_undirected = True)
+    G = torch_geometric.utils.to_networkx(teams_graph, to_undirected = True)
     nx.draw(G, with_labels = True)
 
 def plot(x, y):
@@ -146,10 +146,14 @@ if __name__ == "__main__":
     dataset_name = 'custom'
     dataset_version = 'toy.dblp.v12.json'
     filename = 'teamsvecs.pkl'
+    graph_filename = 'teams_graph.pkl'
     # domains = param.settings['data']['domain']
     domain = 'dblp'
+
+    # the path to teams_graph.pkl file
+    teams_graph_input_filepath = f'../../data/graph/{domain}/{dataset_version}/{graph_filename}'
     preprocessed_datapath = f'../../data/preprocessed/{domain}/{dataset_version}/{filename}'
-    # the output_path for the testing logs
+    # the output_path for the testing preprocess steps logs
     output_path = f'../../output/{dataset_name}/{parent_name}/{model_name}/'
     os.makedirs(output_path, exist_ok = True)
 
@@ -161,12 +165,16 @@ if __name__ == "__main__":
     # create a sample data to test
     # this data will have 3 nodes 0, 1 and 2 with 0-1, 1-2 but no 0-2 edge
     # the similarity should be between 0-1, 1-2 but 0-2 should be different from one another
-    data = create_data_naive(torch.tensor([[0], [1], [2]], dtype=torch.float), torch.tensor([[0, 1, 1, 2],[1, 0, 2, 1]], dtype=torch.long)).to(device)
+    # data = create_data_naive(torch.tensor([[0], [1], [2]], dtype=torch.float), torch.tensor([[0, 1, 1, 2],[1, 0, 2, 1]], dtype=torch.long)).to(device)
     # data = Planetoid('./data/Planetoid', name='Cora')[0]
 
-    # this will generate graph data based on the teamsvecs.pkl file
-    # teamsvecs = data_handler.read_data(preprocessed_datapath)
-    # data = data_handler.create_graph_data(teamsvecs = teamsvecs,node_type = 'member')
+    # lazy load the data
+    if(os.path.exists(teams_graph_input_filepath)):
+        data = data_handler.load_graph(teams_graph_input_filepath)
+    else:
+        # this will generate graph data based on the teamsvecs.pkl file
+        teamsvecs = data_handler.read_data(preprocessed_datapath)
+        data = data_handler.create_graph(teamsvecs,['member'])
 
     # plot the graph data
     plot_graph(data)
@@ -181,6 +189,7 @@ if __name__ == "__main__":
 
     # we test for some set of epochs and generate output files based on them
     num_epochs = [100, 200, 500, 1000, 1500, 2000]
+    # num_epochs = [100]
     for max_epochs in num_epochs:
         # initialize the model everytime
         model, loader, optimizer = init()
