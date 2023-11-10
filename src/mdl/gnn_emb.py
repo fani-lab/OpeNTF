@@ -7,6 +7,7 @@ from json import JSONEncoder
 from cmn.team import Team
 from cmn.author import Author
 from cmn.publication import Publication
+from misc import data_handler
 
 from torch_geometric.nn import Node2Vec, MetaPath2Vec
 from torch_geometric.data import Data
@@ -143,6 +144,11 @@ if __name__ == "__main__":
     model_name = 'node2vec'
     parent_name = 'gnn_emb'
     dataset_name = 'custom'
+    dataset_version = 'toy.dblp.v12.json'
+    filename = 'teamsvecs.pkl'
+    # domains = param.settings['data']['domain']
+    domain = 'dblp'
+    preprocessed_datapath = f'../../data/preprocessed/{domain}/{dataset_version}/{filename}'
     # the output_path for the testing logs
     output_path = f'../../output/{dataset_name}/{parent_name}/{model_name}/'
     os.makedirs(output_path, exist_ok = True)
@@ -157,6 +163,10 @@ if __name__ == "__main__":
     # the similarity should be between 0-1, 1-2 but 0-2 should be different from one another
     data = create_data_naive(torch.tensor([[0], [1], [2]], dtype=torch.float), torch.tensor([[0, 1, 1, 2],[1, 0, 2, 1]], dtype=torch.long)).to(device)
     # data = Planetoid('./data/Planetoid', name='Cora')[0]
+
+    # this will generate graph data based on the teamsvecs.pkl file
+    # teamsvecs = data_handler.read_data(preprocessed_datapath)
+    # data = data_handler.create_graph_data(teamsvecs = teamsvecs,node_type = 'member')
 
     # plot the graph data
     plot_graph(data)
