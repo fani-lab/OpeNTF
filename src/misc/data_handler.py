@@ -137,6 +137,11 @@ def load_graph(filepath):
 
 # write the graph data into specified pickle file
 def write_graph(teams_graph, output_filepath):
+
+    output_folder = os.path.split(output_filepath)[0]
+
+    # at first make sure the desired folder or empty file is created
+    os.makedirs(output_folder, exist_ok=True)
     with open(output_filepath, 'wb') as outputfile:
         pickle.dump(teams_graph, outputfile)
     return
@@ -158,10 +163,10 @@ if __name__ == "__main__":
     teams_graph_output_filepath = f'../../data/graph/dblp/toy.dblp.v12.json/teams_graph.pkl'
     teams_graph_input_filepath = f'../../data/graph/dblp/toy.dblp.v12.json/teams_graph.pkl'
     # this is the output folder for preprocessed embeddings and performance data
-    preprocessed_output_filepath = '../../data/preprocessed/custom/gnn_emb/'
+    preprocessed_output_folder = '../../data/preprocessed/custom/gnn_emb/'
     
     # to make sure the path to output exists or gets created
-    os.makedirs(preprocessed_output_filepath, exist_ok=True)
+    os.makedirs(preprocessed_output_folder, exist_ok=True)
     os.makedirs(teams_graph_output_folder, exist_ok=True)
 
     # comment this if you dont want to test on your own data

@@ -152,6 +152,7 @@ if __name__ == "__main__":
 
     # the path to teams_graph.pkl file
     teams_graph_input_filepath = f'../../data/graph/{domain}/{dataset_version}/{graph_filename}'
+    teams_graph_output_filepath = f'../../data/graph/{domain}/{dataset_version}/{graph_filename}'
     preprocessed_datapath = f'../../data/preprocessed/{domain}/{dataset_version}/{filename}'
     # the output_path for the testing preprocess steps logs
     output_path = f'../../output/{dataset_name}/{parent_name}/{model_name}/'
@@ -174,7 +175,7 @@ if __name__ == "__main__":
     else:
         # this will generate graph data based on the teamsvecs.pkl file
         teamsvecs = data_handler.read_data(preprocessed_datapath)
-        data = data_handler.create_graph(teamsvecs,['member'])
+        data = data_handler.create_graph(teamsvecs, ['member'], teams_graph_output_filepath)
 
     # plot the graph data
     plot_graph(data)
@@ -188,9 +189,10 @@ if __name__ == "__main__":
     ###
 
     # we test for some set of epochs and generate output files based on them
-    num_epochs = [100, 200, 500, 1000, 1500, 2000]
+    num_epochs = [100, 200, 500, 1000, 1500]
     # num_epochs = [100]
     for max_epochs in num_epochs:
+
         # initialize the model everytime
         model, loader, optimizer = init()
 
