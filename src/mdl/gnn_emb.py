@@ -10,7 +10,7 @@ from cmn.publication import Publication
 from misc import data_handler
 
 from torch_geometric.nn import Node2Vec, MetaPath2Vec
-from torch_geometric.data import Data
+from torch_geometric.data import Data, HeteroData
 import torch
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -45,17 +45,29 @@ from torch_geometric.datasets import Planetoid
 #         data = Data(x = x, edge_index = edge_index, y = y)
 #     return data
 
-def create_data_naive(x, edge_index, y = None):
-    # x = torch.tensor([-1, 0, 1])
-    # edge_index = torch.tensor([[0, 1, 1, 2], [1, 0, 2, 1]])
-    # y = torch.tensor([2, 4, 1])
+# create any custom data here and delete the example when not needed
+def create_custom_data():
+    teamsvecs = data_handler.read_data(preprocessed_datapath)
+    teams_graph = create_hetero_data(teamsvecs, ['team', 'skill', 'member'], \
+                                     [['team', 'has', 'skill'], ['team', 'has', 'experts']])
 
-    # the data is only for generating the embedding without any target labels
-    if not y :
-        data = Data(x = x, edge_index = edge_index)
-    else:
-        data = Data(x = x, edge_index = edge_index, y = y)
-    return data
+# create heterogeneous graph from
+# teamsvecs = the information about the teams from which we have to infer the edges
+# node_type = the types of nodes provided
+# edge_type = the types of edges provided
+def create_hetero_data(teamsvecs, node_type, edge_type, output_filepath):
+    print('--------------------------------')
+    print('create_hetero_data()')
+    print('--------------------------------')
+    print()
+
+    teams_graph = HeteroData()
+
+    print(f'Node types are : {node_type}')
+    print(f'Edge types are : {edge_type}')
+
+    # can this return type be generalized for both homo and hetero graphs?
+    return teams_graph
 
 # initialize the model for training
 def init():
@@ -163,7 +175,11 @@ if __name__ == "__main__":
     print(f'The current device is {device}')
     print()
 
-    # create a sample data to test
+    ### Custom Section ###
+    # create a sample data to test, change the name to data once testing is done
+    # node_type, edge_types
+    create_custom_data()
+
     # this data will have 3 nodes 0, 1 and 2 with 0-1, 1-2 but no 0-2 edge
     # the similarity should be between 0-1, 1-2 but 0-2 should be different from one another
     # data = create_data_naive(torch.tensor([[0], [1], [2]], dtype=torch.float), torch.tensor([[0, 1, 1, 2],[1, 0, 2, 1]], dtype=torch.long)).to(device)
