@@ -151,8 +151,8 @@ if __name__ == "__main__":
     domain = 'dblp'
 
     # the path to teams_graph.pkl file
-    teams_graph_input_filepath = f'../../data/graph/{domain}/{dataset_version}/{graph_filename}'
-    teams_graph_output_filepath = f'../../data/graph/{domain}/{dataset_version}/{graph_filename}'
+    teams_graph_input_filepath = f'../../data/graph/{domain}/{dataset_version}/{model_name}/{graph_filename}'
+    teams_graph_output_filepath = f'../../data/graph/{domain}/{dataset_version}/{model_name}/{graph_filename}'
     preprocessed_datapath = f'../../data/preprocessed/{domain}/{dataset_version}/{filename}'
     # the output_path for the testing preprocess steps logs
     output_path = f'../../output/{dataset_name}/{parent_name}/{model_name}/'
