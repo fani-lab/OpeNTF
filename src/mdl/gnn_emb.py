@@ -73,17 +73,25 @@ def create_hetero_data(teamsvecs, node_types, edge_types, output_filepath):
     set_x = {}
     set_edge_index = {}
     for node_type in node_types:
-        set_x[node_type] = set()
+        # the node numbers are indexed from 0 - the number of columns in each type
+        # but for the id (teams) type, it is from 0 - the number of rows in this type
+        start = 0
+        end = teamsvecs['id'].shape[0] if node_type == 'id' else teamsvecs[node_type].shape[1]
+        set_x[node_type] = np.arange(start, end)
     for edge_type in edge_types:
         key1, key2 = edge_type[0], edge_type[1]
         set_edge_index[key1, key2] = [[],[]]
 
+    visited_index = {}
     # now for each type of edge_indices, populate the edge_index
     for edge_type in edge_types:
         # e.g : edge_types = [['skill', 'member'], ['id','member']]
         # these keys are for convenience in usage afterwards
         key1, key2 = edge_type[0], edge_type[1]
         reverse_edge_type = [key2, key1]
+        # this dict_key adds one more key for the edge_type in the visited_index dict
+        dict_key = str(key1 + key2)
+        reverse_dict_key = str(key2 + key1)
         print(f'edge_type = {edge_type}, reverse_edge_type = {reverse_edge_type}')
 
         # let node_type N1 = 'skill', node_type N2 = 'member'
@@ -92,42 +100,60 @@ def create_hetero_data(teamsvecs, node_types, edge_types, output_filepath):
         # if not visited[node_in_N1, node_in_N2], then visit them and create an edge_pair
         # repeat for every single row that contains the nonzero elements
 
-        # node_type n1, n2
-        n1 = teamsvecs[edge_type[0]]
-        n2 = teamsvecs[edge_type[1]]
-        node_type1 = edge_type[0]
-        node_type2 = edge_type[1]
-        visited_index = {}
+        # lil_matrix for two node_type : n1, n2
+        n1 = teamsvecs[key1]
+        n2 = teamsvecs[key2]
 
-        for row_id in range(n1.shape[0]):
-            # the col_ids of the node type n1
-            cols1 = n1.getrow(row_id).nonzero()[1]
-            for col1 in cols1:
-                # for each col_id in n1, now we have to create pairs with the same row elements in n2
-                cols2 = n1.getrow(row_id).nonzero()[1]
-                for col2 in cols2:
-                    if((not visited_index.get((col1, col2), None)) and (not visited_index.get((col2, col1), None))):
+        if(key1 != 'id' and key2 != 'id'):
+            # for the node type 'id', we need to handle the edge_index population differently
+
+            for row_id in range(n1.shape[0]):
+                # the col_ids of the node_type1
+                cols1 = n1.getrow(row_id).nonzero()[1]
+                for col1 in cols1:
+                    # for each col_id in n1, now we have to create pairs with the same row elements in n2
+                    cols2 = n2.getrow(row_id).nonzero()[1]
+                    for col2 in cols2:
+                        if((not visited_index.get((col1, col2, dict_key), None)) and (not visited_index.get((col2, col1, reverse_dict_key), None))):
+                            # mark the pair visited
+                            visited_index[col1, col2, dict_key] = 1
+                            visited_index[col2, col1, reverse_dict_key] = 1
+
+                            # create 2 sets of edges between col1 and col2
+                            # from col1 to col2, it should be edge_type 1,
+                            # from col2 to col1, it should be reverse_edge_type
+                            print(f'edge_index appended with edge pairs between n1 node {col1} and n2 node {col2}')
+                            set_edge_index[key1, key2][0].append(col1)
+                            set_edge_index[key1, key2][1].append(col2)
+                            set_edge_index[key2, key1][0].append(col2)
+                            set_edge_index[key2, key1][1].append(col1)
+                            print(f'updated edge_index = {set_edge_index[key1, key2]}')
+                            print(f'updated reverse_edge_index = {set_edge_index[key2, key1]}')
+        elif(key2 == 'id'):
+            # we traverse only one set of node pairs where
+            # the second one is 'id'
+            # to cover the edge type for both team-to-X and X-to-team
+            for row_id in range(n1.shape[0]):
+                # the col_ids of the node_type1
+                cols1 = n1.getrow(row_id).nonzero()[1]
+                # for each col_id in n1, now we have to create pairs with just the
+                # row number which is the 'team' of that node_type1
+                for col1 in cols1:
+                    if((not visited_index.get((col1, row_id, dict_key), None)) and (not visited_index.get((row_id, col1, reverse_dict_key), None))):
                         # mark the pair visited
-                        visited_index[col1, col2] = 1
-                        visited_index[col2, col1] = 1
+                        visited_index[col1, row_id, dict_key] = 1
+                        visited_index[row_id, col1, reverse_dict_key] = 1
 
-                        # create 2 sets of edges between col1 and col2
-                        # from col1 to col2, it should be edge_type 1,
-                        # from col2 to col1, it should be reverse_edge_type
-                        print(f'edge_index appended with edge pairs between n1 node {col1} and n2 node {col2}')
                         set_edge_index[key1, key2][0].append(col1)
-                        set_edge_index[key1, key2][1].append(col2)
+                        set_edge_index[key1, key2][1].append(row_id)
                         set_edge_index[key2, key1][0].append(col2)
-                        set_edge_index[key2, key1][1].append(col1)
+                        set_edge_index[key2, key1][1].append(row_id)
                         print(f'updated edge_index = {set_edge_index[key1, key2]}')
                         print(f'updated reverse_edge_index = {set_edge_index[key2, key1]}')
 
-                    # add the nodes in respective node_type.x
-                    set_x[node_type1].add(col1)
-                    set_x[node_type2].add(col2)
     # convert the collected data into torch for HeteroData
     for node_type in node_types:
-        teams_graph[node_type].x = torch.tensor(list(set_x[node_type]), dtype = torch.float64)
+        teams_graph[node_type].x = torch.tensor(set_x[node_type], dtype = torch.float64)
     for edge_type in edge_types:
         key1, key2 = edge_type[0], edge_type[1]
         teams_graph[key1, key2].edge_index = torch.tensor(np.array(set_edge_index[key1, key2]), dtype = torch.long)
