@@ -166,6 +166,23 @@ def create_hetero_data(teamsvecs, node_types, edge_types, output_filepath):
     # can this return type be generalized for both homo and hetero graphs?
     return teams_graph
 
+# the method to add edges of a particular edge_type to the edge_index
+def add_edges(is_hetero):
+    # mark the pair visited
+    visited_index[col1, col2, dict_key] = 1
+    visited_index[col2, col1, reverse_dict_key] = 1
+
+    # create 2 sets of edges between col1 and col2
+    # from col1 to col2, it should be edge_type 1,
+    # from col2 to col1, it should be reverse_edge_type
+    print(f'edge_index appended with edge pairs between n1 node {col1} and n2 node {col2}')
+    set_edge_index[key1, key2][0].append(col1)
+    set_edge_index[key1, key2][1].append(col2)
+    set_edge_index[key2, key1][0].append(col2)
+    set_edge_index[key2, key1][1].append(col1)
+    print(f'updated edge_index = {set_edge_index[key1, key2]}')
+    print(f'updated reverse_edge_index = {set_edge_index[key2, key1]}')
+
 # initialize the model for training
 def init():
     model = Node2Vec(
