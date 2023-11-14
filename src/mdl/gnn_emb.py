@@ -50,7 +50,8 @@ def create_custom_data():
     teamsvecs = data_handler.read_data(preprocessed_datapath)
     # here 'id' refers to the sparse_matrix of team
     teams_graph = create_hetero_data(teamsvecs, ['id', 'skill', 'member'], \
-                                     [['skill', 'member'], ['id', 'member']], preprocessed_datapath)
+                                     [['skill', 'member'], ['member', 'skill'],['id', 'member'], ['member', 'id']], \
+                                     preprocessed_datapath)
 
 # create heterogeneous graph from
 # teamsvecs = the information about the teams from which we have to infer the edges
@@ -69,19 +70,72 @@ def create_hetero_data(teamsvecs, node_types, edge_types, output_filepath):
 
     # add the node types and create edge_indices for each edge_types
     # each node_types should have an x
+    set_x = {}
+    set_edge_index = {}
     for node_type in node_types:
-        teams_graph[node_type].x = set()
+        set_x[node_type] = set()
     for edge_type in edge_types:
-        teams_graph[edge_type].edge_index = [[],[]]
+        key1, key2 = edge_type[0], edge_type[1]
+        set_edge_index[key1, key2] = [[],[]]
 
-    # to collect the various nonzero rows from teamsvecs
-    # for each type of nodes
-    vecs_rows = {}
     # now for each type of edge_indices, populate the edge_index
     for edge_type in edge_types:
-        print(f'edge_type = {edge_type}')
-        # take nonzero rows from each type of teamsvecs matrices
-        # here each edge_type will represent a pair of node types
+        # e.g : edge_types = [['skill', 'member'], ['id','member']]
+        # these keys are for convenience in usage afterwards
+        key1, key2 = edge_type[0], edge_type[1]
+        reverse_edge_type = [key2, key1]
+        print(f'edge_type = {edge_type}, reverse_edge_type = {reverse_edge_type}')
+
+        # let node_type N1 = 'skill', node_type N2 = 'member'
+        # traverse N1 nodes row by row (each row represents the nodes in a single team)
+        # for each node in N1, search for the nodes in N2 in the same row
+        # if not visited[node_in_N1, node_in_N2], then visit them and create an edge_pair
+        # repeat for every single row that contains the nonzero elements
+
+        # node_type n1, n2
+        n1 = teamsvecs[edge_type[0]]
+        n2 = teamsvecs[edge_type[1]]
+        node_type1 = edge_type[0]
+        node_type2 = edge_type[1]
+        visited_index = {}
+
+        for row_id in range(n1.shape[0]):
+            # the col_ids of the node type n1
+            cols1 = n1.getrow(row_id).nonzero()[1]
+            for col1 in cols1:
+                # for each col_id in n1, now we have to create pairs with the same row elements in n2
+                cols2 = n1.getrow(row_id).nonzero()[1]
+                for col2 in cols2:
+                    if((not visited_index.get((col1, col2), None)) and (not visited_index.get((col2, col1), None))):
+                        # mark the pair visited
+                        visited_index[col1, col2] = 1
+                        visited_index[col2, col1] = 1
+
+                        # create 2 sets of edges between col1 and col2
+                        # from col1 to col2, it should be edge_type 1,
+                        # from col2 to col1, it should be reverse_edge_type
+                        print(f'edge_index appended with edge pairs between n1 node {col1} and n2 node {col2}')
+                        set_edge_index[key1, key2][0].append(col1)
+                        set_edge_index[key1, key2][1].append(col2)
+                        set_edge_index[key2, key1][0].append(col2)
+                        set_edge_index[key2, key1][1].append(col1)
+                        print(f'updated edge_index = {set_edge_index[key1, key2]}')
+                        print(f'updated reverse_edge_index = {set_edge_index[key2, key1]}')
+
+                    # add the nodes in respective node_type.x
+                    set_x[node_type1].add(col1)
+                    set_x[node_type2].add(col2)
+    # convert the collected data into torch for HeteroData
+    for node_type in node_types:
+        teams_graph[node_type].x = torch.tensor(list(set_x[node_type]), dtype = torch.float64)
+    for edge_type in edge_types:
+        key1, key2 = edge_type[0], edge_type[1]
+        teams_graph[key1, key2].edge_index = torch.tensor(np.array(set_edge_index[key1, key2]), dtype = torch.long)
+
+    print()
+    print('----------------------------------------------------')
+    print(f'teams_graph = {teams_graph}')
+    print()
 
     # can this return type be generalized for both homo and hetero graphs?
     return teams_graph
