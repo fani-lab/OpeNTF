@@ -48,14 +48,15 @@ from torch_geometric.datasets import Planetoid
 # create any custom data here and delete the example when not needed
 def create_custom_data():
     teamsvecs = data_handler.read_data(preprocessed_datapath)
-    teams_graph = create_hetero_data(teamsvecs, ['team', 'skill', 'member'], \
-                                     [['team', 'has', 'skill'], ['team', 'has', 'experts']])
+    # here 'id' refers to the sparse_matrix of team
+    teams_graph = create_hetero_data(teamsvecs, ['id', 'skill', 'member'], \
+                                     [['skill', 'member'], ['id', 'member']], preprocessed_datapath)
 
 # create heterogeneous graph from
 # teamsvecs = the information about the teams from which we have to infer the edges
-# node_type = the types of nodes provided
-# edge_type = the types of edges provided
-def create_hetero_data(teamsvecs, node_type, edge_type, output_filepath):
+# node_types = the types of nodes provided
+# edge_types = the types of edges provided
+def create_hetero_data(teamsvecs, node_types, edge_types, output_filepath):
     print('--------------------------------')
     print('create_hetero_data()')
     print('--------------------------------')
@@ -63,8 +64,24 @@ def create_hetero_data(teamsvecs, node_type, edge_type, output_filepath):
 
     teams_graph = HeteroData()
 
-    print(f'Node types are : {node_type}')
-    print(f'Edge types are : {edge_type}')
+    print(f'Node types are : {node_types}')
+    print(f'Edge types are : {edge_types}')
+
+    # add the node types and create edge_indices for each edge_types
+    # each node_types should have an x
+    for node_type in node_types:
+        teams_graph[node_type].x = set()
+    for edge_type in edge_types:
+        teams_graph[edge_type].edge_index = [[],[]]
+
+    # to collect the various nonzero rows from teamsvecs
+    # for each type of nodes
+    vecs_rows = {}
+    # now for each type of edge_indices, populate the edge_index
+    for edge_type in edge_types:
+        print(f'edge_type = {edge_type}')
+        # take nonzero rows from each type of teamsvecs matrices
+        # here each edge_type will represent a pair of node types
 
     # can this return type be generalized for both homo and hetero graphs?
     return teams_graph
@@ -177,7 +194,7 @@ if __name__ == "__main__":
 
     ### Custom Section ###
     # create a sample data to test, change the name to data once testing is done
-    # node_type, edge_types
+    # node_types, edge_types
     create_custom_data()
 
     # this data will have 3 nodes 0, 1 and 2 with 0-1, 1-2 but no 0-2 edge
