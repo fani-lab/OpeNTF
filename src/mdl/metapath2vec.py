@@ -1,9 +1,13 @@
+import torch_geometric.data
+
 import graph_params
 from src.misc import data_handler
 
 import os
 import torch
+from src.mdl import gnn_emb
 from torch_geometric.nn import MetaPath2Vec
+import numpy as np
 
 class Metapath2Vec():
 
@@ -26,21 +30,25 @@ class Metapath2Vec():
 
     # this will load the desired graph data for running with the model
     def load(self, graph_datapath):
+        print(f'graph data to load from : {graph_datapath}')
         self.data = data_handler.load_graph(graph_datapath)
+
+        print(f'loaded graph data : {self.data}')
 
     # initialize the model
     def init(self):
+        assert type(self.data) == torch_geometric.data.hetero_data.HeteroData
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
-        self.model = MetaPath2Vec(self.data.edge_index_dict, embedding_dim=128,
-                             metapath=self.metapath, walk_length=50, context_size=7,
+        self.model = MetaPath2Vec(self.data.edge_index_dict, embedding_dim=5,
+                             metapath=self.metapath, walk_length=5, context_size=4,
                              walks_per_node=5, num_negative_samples=5,
                              sparse=True).to(self.device)
 
-        self.loader = self.model.loader(batch_size=128, shuffle=True, num_workers=1)
+        self.loader = self.model.loader(batch_size=30, shuffle=True, num_workers=1)
         self.optimizer = torch.optim.SparseAdam(list(self.model.parameters()), lr=0.01)
 
     # train the model to generate embeddings
-    def learn(self, model, optimizer, loader, device, epoch, log_steps = 100, eval_steps = 2000):
+    def learn(self, model, optimizer, loader, device, epoch, log_steps = 2, eval_steps = 2000):
         model.train()
 
         total_loss = 0
@@ -58,7 +66,23 @@ class Metapath2Vec():
 
     def run(self, num_epochs):
         self.init()
+
+        losses = []
+
         for epoch in range(num_epochs):
             self.learn(self.model, self.optimizer, self.loader, self.device, epoch)
 
 
+def main(max_epochs = [10]):
+    params = graph_params.settings
+    m2v = Metapath2Vec()
+    output_path = params['misc']['preprocessed_embedding_output_path']
+    print(f'preprocessed embedding output path = {output_path}')
+
+    for num_epochs in max_epochs:
+        m2v.run(num_epochs)
+
+
+
+if __name__ == '__main__':
+    main()

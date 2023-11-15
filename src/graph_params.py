@@ -49,7 +49,8 @@ settings = {
         ],
     },
     'misc':{
-        'graph_datapath' : '../../data/graph/raw/dblp/toy.dblp.json/metapath2vec/STE/teams_graph.pkl',
+        'graph_datapath' : '../../data/graph/raw/dblp/toy.dblp.v12.json/metapath2vec/STE/teams_graph.pkl',
+        'preprocessed_embedding_output_path' : '../../data/graph/preprocessed/dblp/toy.dblp.v12.json/metapath2vec/STE/teamsvecs_emb.pkl',
         'domain' : 'dblp',
         'dataset_version' : 'toy.dblp.v12.json',
         'model' : 'metapath2vec',
