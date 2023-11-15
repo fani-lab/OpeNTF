@@ -5,7 +5,7 @@ import torch
 
 import graph_params
 import src.graph_params
-from torch_geometric.data import Data
+from torch_geometric.data import Data, HeteroData
 from scipy.sparse import lil_matrix
 
 '''
@@ -125,6 +125,123 @@ def create_graph(teamsvecs, node_type, output_filepath):
 
     return teams_graph
 
+
+# create heterogeneous graph from
+# teamsvecs = the information about the teams from which we have to infer the edges
+# node_types = the types of nodes provided
+# edge_types = the types of edges provided
+def create_heterogeneous_graph(teamsvecs, node_types, edge_types, output_filepath):
+    print('--------------------------------')
+    print('create_hetero_data()')
+    print('--------------------------------')
+    print()
+
+    teams_graph = HeteroData()
+
+    print(f'Node types are : {node_types}')
+    print(f'Edge types are : {edge_types}')
+
+    # add the node types and create edge_indices for each edge_types
+    # each node_types should have an x
+    set_x = {}
+    set_edge_index = {}
+    for node_type in node_types:
+        # the node numbers are indexed from 0 - the number of columns in each type
+        # but for the id (teams) type, it is from 0 - the number of rows in this type
+        start = 0
+        end = teamsvecs['id'].shape[0] if node_type == 'id' else teamsvecs[node_type].shape[1]
+        set_x[node_type] = np.arange(start, end)
+    for edge_type in edge_types:
+        key1, key2 = edge_type[0], edge_type[1]
+        set_edge_index[key1, key2] = [[],[]]
+
+    visited_index = {}
+    # now for each type of edge_indices, populate the edge_index
+    for edge_type in edge_types:
+        # e.g : edge_types = [['skill', 'member'], ['id','member']]
+        # these keys are for convenience in usage afterwards
+        key1, key2 = edge_type[0], edge_type[1]
+        reverse_edge_type = [key2, key1]
+        # this dict_key adds one more key for the edge_type in the visited_index dict
+        dict_key = str(key1 + key2)
+        reverse_dict_key = str(key2 + key1)
+        print(f'edge_type = {edge_type}, reverse_edge_type = {reverse_edge_type}')
+
+        # let node_type N1 = 'skill', node_type N2 = 'member'
+        # traverse N1 nodes row by row (each row represents the nodes in a single team)
+        # for each node in N1, search for the nodes in N2 in the same row
+        # if not visited[node_in_N1, node_in_N2], then visit them and create an edge_pair
+        # repeat for every single row that contains the nonzero elements
+
+        # lil_matrix for two node_type : n1, n2
+        n1 = teamsvecs[key1]
+        n2 = teamsvecs[key2]
+
+        if(key1 != 'id' and key2 != 'id'):
+            # for the node type 'id', we need to handle the edge_index population differently
+
+            for row_id in range(n1.shape[0]):
+                # the col_ids of the node_type1
+                cols1 = n1.getrow(row_id).nonzero()[1]
+                for col1 in cols1:
+                    # for each col_id in n1, now we have to create pairs with the same row elements in n2
+                    cols2 = n2.getrow(row_id).nonzero()[1]
+                    for col2 in cols2:
+                        if((not visited_index.get((col1, col2, dict_key), None)) and (not visited_index.get((col2, col1, reverse_dict_key), None))):
+                            # mark the pair visited
+                            visited_index[col1, col2, dict_key] = 1
+                            visited_index[col2, col1, reverse_dict_key] = 1
+
+                            # create 2 sets of edges between col1 and col2
+                            # from col1 to col2, it should be edge_type 1,
+                            # from col2 to col1, it should be reverse_edge_type
+                            print(f'edge_index appended with edge pairs between n1 node {col1} and n2 node {col2}')
+                            set_edge_index[key1, key2][0].append(col1)
+                            set_edge_index[key1, key2][1].append(col2)
+                            set_edge_index[key2, key1][0].append(col2)
+                            set_edge_index[key2, key1][1].append(col1)
+                            print(f'updated edge_index = {set_edge_index[key1, key2]}')
+                            print(f'updated reverse_edge_index = {set_edge_index[key2, key1]}')
+        elif(key2 == 'id'):
+            # we traverse only one set of node pairs where
+            # the second one is 'id'
+            # to cover the edge type for both team-to-X and X-to-team
+            for row_id in range(n1.shape[0]):
+                # the col_ids of the node_type1
+                cols1 = n1.getrow(row_id).nonzero()[1]
+                # for each col_id in n1, now we have to create pairs with just the
+                # row number which is the 'team' of that node_type1
+                for col1 in cols1:
+                    if((not visited_index.get((col1, row_id, dict_key), None)) and (not visited_index.get((row_id, col1, reverse_dict_key), None))):
+                        # mark the pair visited
+                        visited_index[col1, row_id, dict_key] = 1
+                        visited_index[row_id, col1, reverse_dict_key] = 1
+
+                        set_edge_index[key1, key2][0].append(col1)
+                        set_edge_index[key1, key2][1].append(row_id)
+                        set_edge_index[key2, key1][0].append(row_id)
+                        set_edge_index[key2, key1][1].append(col1)
+                        print(f'updated edge_index = {set_edge_index[key1, key2]}')
+                        print(f'updated reverse_edge_index = {set_edge_index[key2, key1]}')
+
+    # convert the collected data into torch for HeteroData
+    for node_type in node_types:
+        teams_graph[node_type].x = torch.tensor(set_x[node_type], dtype = torch.float64)
+    for edge_type in edge_types:
+        key1, key2 = edge_type[0], edge_type[1]
+        teams_graph[key1, key2].edge_index = torch.tensor(np.array(set_edge_index[key1, key2]), dtype = torch.long)
+
+    print()
+    print('----------------------------------------------------')
+    print(f'teams_graph = {teams_graph}')
+    print()
+
+    # write the graph into a file for future use
+    write_graph(teams_graph, output_filepath)
+
+    # can this return type be generalized for both homo and hetero graphs?
+    return teams_graph
+
 # this particularly loads graph data from pickle file and returns the variable
 def load_graph(filepath):
     teams_graph = None
@@ -156,17 +273,36 @@ if __name__ == "__main__":
     print(f'This file handles all the pickle read and write for gnn tests')
     print('---------------------------------------------------------------')
 
-    input_filepath = '../../data/preprocessed/dblp/toy.dblp.v12.json/teamsvecs.pkl'
+    # files and folder section
+    # when used with graph_params.py
+    # ----------------------------------------------------------------------
+    # base_folder = graph_params.settings['storage']['base_folder']
+    # output_type = graph_params.settings['storage']['output_type']
+    # domain = graph_params.settings['data']['domain']
+    # data_version = graph_params.settings['data']['domain']['dblp']
+    # model_name = graph_params.settings['model']
+    # graph_edge_type = graph_params.settings['model']
+    # ----------------------------------------------------------------------
+
+    # params when hardcoded
+    base_folder = '../../data/graph/'
+    output_type = 'raw'
+    domain = 'dblp'
+    data_version = 'toy.dblp.v12.json'
+    model_name = 'metapath2vec'
+    graph_edge_type = 'STE'
+
+    teamsvecs_input_filepath = f'../../data/preprocessed/dblp/toy.dblp.v12.json/teamsvecs.pkl'
     # input_filepath = '../../data/preprocessed/uspt/toy.patent.tsv/teamsvecs.pkl'
     # input_filepath = '../../data/preprocessed/imdb/toy.title.basics.tsv/teamsvecs.pkl'
-    teams_graph_output_folder = f'../../data/graph/dblp/toy.dblp.v12.json/'
-    teams_graph_output_filepath = f'../../data/graph/dblp/toy.dblp.v12.json/teams_graph.pkl'
-    teams_graph_input_filepath = f'../../data/graph/dblp/toy.dblp.v12.json/teams_graph.pkl'
+    teams_graph_output_folder = f'{base_folder}/{output_type}/{domain}/{data_version}/{model_name}/{graph_edge_type}/'
+    teams_graph_output_filepath = f'{teams_graph_output_folder}/teams_graph.pkl'
+    teams_graph_input_filepath = teams_graph_output_filepath
     # this is the output folder for preprocessed embeddings and performance data
-    preprocessed_output_folder = '../../data/preprocessed/custom/gnn_emb/'
+    graph_preprocessed_output_folder = f'{base_folder}/preprocessed/{domain}/{data_version}/{model_name}/{graph_edge_type}/'
     
     # to make sure the path to output exists or gets created
-    os.makedirs(preprocessed_output_folder, exist_ok=True)
+    os.makedirs(graph_preprocessed_output_folder, exist_ok=True)
     os.makedirs(teams_graph_output_folder, exist_ok=True)
 
     # comment this if you dont want to test on your own data
@@ -174,10 +310,13 @@ if __name__ == "__main__":
     # custom_teamsvecs = create_graph(x, edge_index, teams_graph_output_filepath)
 
     # read from a teamsvecs pickle file if you want to create graph data with that file
-    teamsvecs = read_data(input_filepath)
+    teamsvecs = read_data(teamsvecs_input_filepath)
 
     # the graph will be made based on the mentioned node_types
-    create_graph(teamsvecs, ['member'], teams_graph_output_filepath)
+    # create_graph(teamsvecs, ['member'], teams_graph_output_filepath)
+    create_heterogeneous_graph(teamsvecs, ['id', 'skill', 'member'], \
+                               [['skill', 'id'], ['id', 'skill'], ['id', 'member'], ['member', 'id']], \
+                               teams_graph_output_filepath)
     teams_graph = load_graph(teams_graph_input_filepath)
 
     print(teams_graph.__dict__)

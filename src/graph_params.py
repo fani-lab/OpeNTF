@@ -15,7 +15,12 @@ settings = {
             'gan':{},
             'gin':{},
             'node2vec':{},
-            'metapath2vec':{}
+            'metapath2vec':{
+                'STE' : {},
+                'SE' : {},
+                'STE_TL' : {},
+                'STEL' : {}
+            }
         },
     'data':{
         'domain': {
@@ -30,4 +35,14 @@ settings = {
             },
         },
     },
+    'storage':{
+        'base_folder' : {
+            '../../data/graph/' : {},
+        },
+        'output_type': {
+            'raw' : {},
+            'preprocessed' : {}
+        },
+    },
+
 }
