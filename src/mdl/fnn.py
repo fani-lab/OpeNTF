@@ -50,9 +50,9 @@ class Fnn(Ntf):
 
     def cross_entropy(self, y_, y, ns, nns, unigram):
         if ns == "uniform": return self.ns_uniform(y_, y, nns)
-        if ns == "unigram": return self.ns_unigram(y_, y, unigram, nns)
+        if ns == "unigram" or ns.startswith("temporal_unigram"): return self.ns_unigram(y_, y, unigram, nns)
         if ns == "unigram_b": return self.ns_unigram_mini_batch(y_, y, nns)
-        if ns == "inverse_unigram": return self.ns_inverse_unigram(y_, y, unigram, nns)
+        if ns == "inverse_unigram" or ns.startswith("temporal_inverse_unigram"): return self.ns_inverse_unigram(y_, y, unigram, nns)
         if ns == "inverse_unigram_b": return self.ns_inverse_unigram_mini_batch(y_, y, nns)
         # return self.weighted(y_, y)
         cri = nn.BCELoss()
@@ -150,6 +150,17 @@ class Fnn(Ntf):
         # output_size = vecs['member'].shape[1]
 
         unigram = Team.get_unigram(vecs['member'])
+        
+        if ns.startswith('temporal'):
+            cur_year = int(output.split('/')[-1])
+            index_cur_year = next((i for i, (idx, yr) in enumerate(indexes['i2y']) if yr == cur_year), None)
+            window_size = int(ns.split('_')[-1])
+            if index_cur_year - window_size >= 0:
+                start = indexes['i2y'][index_cur_year-window_size][0] if 'until' not in ns else 0
+                end = indexes['i2y'][index_cur_year][0] if 'until' in ns else indexes['i2y'][index_cur_year-window_size+1][0]
+                unigram = Team.get_unigram(vecs['member'][start:end])
+            else:
+                unigram = np.zeros(unigram.shape)
 
         # Prime a dict for train and valid loss
         train_valid_loss = dict()
