@@ -2,6 +2,7 @@ import os, pickle, re, time, json
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
+import os
 
 from sklearn.model_selection import KFold
 
@@ -17,7 +18,15 @@ class tNtf(Ntf):
 
     def learn(self, splits, indexes, vecs, params, prev_model, output):
         year_idx = indexes['i2y']
+        items_in_directory = os.listdir(output)
+        if 'param.py' in items_in_directory: items_in_directory.remove('param.py')
+        items_in_directory = [int(item) for item in items_in_directory]
         for i, v in enumerate(year_idx[:-self.step_ahead]):#the last years are for test.
+            n_years_trained = len(items_in_directory)
+            if n_years_trained > 1:
+                print(f'The model has already been trained on year {min(items_in_directory)}')
+                items_in_directory.remove(min(items_in_directory))        
+                continue
             skf = KFold(n_splits=self.tfold, random_state=0, shuffle=True)
             train = np.arange(year_idx[i][0], year_idx[i + 1][0])
             for k, (trainIdx, validIdx) in enumerate(skf.split(train)):
