@@ -103,6 +103,9 @@ def train():
         total_loss += loss.item()
     return total_loss / len(loader)
 
+def learn():
+    pass
+
 def plot_graph(teams_graph):
     # make sure that the data given is a Data type object
     assert type(teams_graph) == torch_geometric.data.Data
