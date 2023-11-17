@@ -14,6 +14,7 @@ class Graph():
 
     def __init__(self):
         self.init_variables()
+        self.init_child_variables()
 
     def init_variables(self):
 
@@ -90,6 +91,9 @@ class Graph():
         self.base_graph_plot_filename = params['storage']['base_graph_plot_filename']
         self.graph_plot_filename = f'{self.graph_preprocessed_output_folder}/{self.base_graph_plot_filename}.{self.model_name}.{self.graph_edge_type}.'
         # -------------------------------------------
+
+    def init_child_variables(self):
+        pass
 
     def init_model(self):
         pass
