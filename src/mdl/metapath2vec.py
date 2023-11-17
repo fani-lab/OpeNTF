@@ -119,6 +119,9 @@ class M2V(src.mdl.graph.Graph):
                 # write to file
                 outfile.write(line)
 
+            # store the final embeddings to a pickle file
+            data_handler.write_graph(weights, f'{self.graph_preprocessed_output_filename}.e{num_epochs}.pkl')
+
             # draw and save the loss vs epoch plot
             self.plot(list_epochs, losses, f'{self.graph_plot_filename}.e{num_epochs}.png')
 

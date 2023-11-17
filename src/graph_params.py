@@ -10,7 +10,6 @@ this file contains the parameters to do all the graph based tasks
 
 settings = {
     'model': {
-            'gnn':{},
             'gcn':{
                 'edge_types' : {
                     'EE' : {
@@ -32,6 +31,7 @@ settings = {
                     'embedding_dim' : 5,
                     'hidden_dim' : 16,
                     'dropout' : 0.5,
+                    'training' : True,
                     'p' : 1.0,
                     'q' : 1.0,
                     'lr' : 0.01,
@@ -105,8 +105,8 @@ settings = {
                 'toy.title.basics.tsv':{},
             },
         },
-        # 'node_types': ['member'],
-        'node_types': ['id', 'skill', 'member'],
+        'node_types': ['member'],
+        # 'node_types': ['id', 'skill', 'member'],
         'edge_types':[['skill', 'id'], ['id', 'skill'], ['id', 'member'], ['member', 'id']],
     },
     'storage' : {
@@ -129,7 +129,7 @@ settings = {
         'model' : 'm2v',
         'edge_type' : 'STE',
         'file_name' : 'teams_graph.pkl',
-        'model_index' : 5,
+        'model_index' : 3,
     },
     'data_handler' : {
     },
