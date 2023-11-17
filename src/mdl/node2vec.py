@@ -97,15 +97,16 @@ class N2V(src.mdl.graph.Graph):
                     if(loss < min_loss):
                         min_loss = loss
                         print('.')
-                    if (epoch % 20 == 0):
+
+                    if (epoch % 10 == 0):
                         print(f'Epoch = {epoch : 02d}, loss = {loss : .4f}')
 
                         # the model() gives all the weights and biases of the model currently
                         # the detach() enables this result to require no gradient
                         # and then we convert the tensor to numpy array
                         weights = self.model.embedding.weight.detach().numpy()
-                        weights = self.normalize(weights)
-                        weights = np.around(weights, 2)
+                        # weights = self.normalize(weights)
+                        # weights = np.around(weights, 2)
 
                         print(f'\nepoch : {epoch}\n')
                         print(weights)
@@ -122,6 +123,9 @@ class N2V(src.mdl.graph.Graph):
                     list_epochs.append(epoch)
                 # write to file
                 outfile.write(line)
+
+            # store the final embeddings to a pickle file
+            data_handler.write_graph(weights, f'{self.graph_preprocessed_output_filename}.e{num_epochs}.pkl')
 
             # draw and save the loss vs epoch plot
             self.plot(list_epochs, losses, f'{self.graph_plot_filename}.e{num_epochs}.png')

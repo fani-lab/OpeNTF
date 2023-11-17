@@ -19,10 +19,7 @@ class Graph():
     def init_variables(self):
 
         # detect the model name, then access the parameters specific to that model
-        if('GNN' in str(self.__class__)):
-            print(f'Model name is gnn')
-            self.model_name = 'gnn'
-        elif('GCN' in str(self.__class__)):
+        if('GCN' in str(self.__class__)):
             print(f'Model name is gcn')
             self.model_name = 'gcn'
         elif ('GAT' in str(self.__class__)):

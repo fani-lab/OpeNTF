@@ -18,20 +18,14 @@ class GCN(src.mdl.graph.Graph):
         self.optimizer = torch.optim.Adam(self.parameters(), lr=0.01)
         self.criterion = nn.MSELoss()
 
-    def forward(self, data):
-        x, edge_index = data.x, data.edge_index
 
-        x = F.relu(self.conv1(x, edge_index))
-        x = F.dropout(x, p=self.dropout, training=True)  # Assuming training is always True
-        x = self.conv2(x, edge_index)
-
-        return x
 
     def init_child_variables(self):
         model_params = self.params['model'][self.model_name]['model_params']
         self.num_features = model_params['num_features']
         self.hidden_dim = model_params['hidden_dim']
         self.dropout = model_params['dropout']
+        self.training = model_params['training']
 
 
     def run(self):
@@ -39,18 +33,32 @@ class GCN(src.mdl.graph.Graph):
         # create custom graph data
         teams_graph = data_handler.create_custom_data(is_homogeneous = True)
 
+        gcn_model = GCN_Model(self)
         # Create an instance of the GCN model
-        gcn_model = self.init_model(self.num_features, self.hidden_dim, self.embedding_dim)
+        self.init_model(self.num_features, self.hidden_dim, self.embedding_dim)
 
         # Forward pass to get the graph embeddings
         graph_embeddings = gcn_model.forward(teams_graph)
         print("Graph Embeddings:\n", graph_embeddings)
 
+# this class will only contain the model definitions
 class GCN_Model(torch.nn.Module):
-    def __init__(self):
+    def __init__(self, gcn):
         super(GCN_Model, self).__init__()
-        self.conv1 = GCNConv(self.num_features, self.hidden_dim)
-        self.conv2 = GCNConv(self.hidden_dim, self.embedding_dim)
+        # to access the fetaures of graph > gcn heirarchy
+        self.gcn = gcn
+        self.conv1 = GCNConv(self.gcn.num_features, self.gcn.hidden_dim)
+        self.conv2 = GCNConv(self.gcn.hidden_dim, self.gcn.embedding_dim)
+
+    def forward(self, data):
+        x, edge_index = data.x, data.edge_index
+
+        x = F.relu(self.conv1(x, edge_index))
+        x = F.dropout(x, p=self.gcn.dropout, training = self.gcn.training)  # Assuming training is always True
+        x = self.conv2(x, edge_index)
+
+        return x
+
 
 def main():
     gcn = GCN()
