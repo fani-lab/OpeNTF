@@ -96,24 +96,6 @@ class Team(object):
         return i2t, t2i
     
     @staticmethod
-    def build_index_teamdatetimes(teams):
-        print('Indexing teams date (year) ...')
-        i2tdt = {}
-        for team in teams:
-            i2tdt[team.id] = team.datetime
-        return i2tdt
-    
-    @staticmethod 
-    def build_index_datetime(teams):
-        print('Indexing dates (year) ...')
-        dt2i = {}; i2dt = {}
-        for team in teams:
-            if team.datetime not in dt2i:
-                dt2i[team.datetime] = team.id #shouldn't be a collection of team ids in that date?
-                i2dt[team.id] = team.datetime
-        return i2dt, dt2i
-
-    @staticmethod
     def read_data(teams, output, filter, settings):
         # should be overridden by the children classes, customize their loading data
         # read data from file
@@ -138,7 +120,6 @@ class Team(object):
         indexes['i2s'], indexes['s2i'] = Team.build_index_skills(teams)
         indexes['i2t'], indexes['t2i'] = Team.build_index_teams(teams)
         indexes['i2l'], indexes['l2i'] = Team.build_index_location(teams, settings["location_type"])
-        indexes['i2tdt'] = Team.build_index_teamdatetimes(teams)
         indexes['i2y'] = year_idx
         st = time()
 
