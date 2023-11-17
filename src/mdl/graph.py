@@ -10,7 +10,7 @@ import networkx as nx
 import math
 import os
 
-class Graph:
+class Graph():
 
     def __init__(self):
         self.init_variables()
