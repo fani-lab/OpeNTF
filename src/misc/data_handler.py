@@ -2,6 +2,7 @@ import pickle
 import os
 import numpy as np
 import torch
+import torch_geometric.data
 
 import graph_params
 import src.graph_params
@@ -32,12 +33,26 @@ def read_data(filepath):
     return teamsvecs
 
 # create your custom data here and send as x and edge_index
-def create_custom_data():
-    tmp = np.arange(start=1, stop=11, step=1)
-    x = torch.from_numpy(tmp)
-    edge_index = torch.from_numpy(np.array([[1], [1], [1], [1], [2], [3], [3], [3], [4], [4]]))
+def create_custom_data(is_homogeneous = True):
+    if(is_homogeneous):
+        # create homogeneous data
 
-    return x, edge_index
+        tmp = np.arange(start=0, stop=4, step=1)
+        x = torch.from_numpy(tmp)
+        edge_index = torch.from_numpy(np.array([[0, 1, 0, 3, 3, 4, 2, 3], \
+                                                [1, 0, 3, 0, 4, 3, 3, 2]]))
+        data = Data(x = x, edge_index = edge_index)
+    else:
+        # create heterogeneous data
+
+        data = HeteroData()
+
+    return data
+
+# used to create custom teamsvecs.pkl
+def create_custom_teamsvecs():
+    pass
+
 
 # the method to add edges of a particular edge_type to the edge_index
 def add_edges(visited_index, set_edge_index, key1, key2, col1, col2, dict_key, reverse_dict_key):
@@ -61,7 +76,7 @@ def add_edges(visited_index, set_edge_index, key1, key2, col1, col2, dict_key, r
 # generate a graph based on the sparse matrix data (e.g: teamsvecs.pkl)
 # the generated graph will be saved as pickle for use in multiple models
 # also this method will return the graph data as a variable
-def create_graph(teamsvecs, node_type, output_filepath):
+def create_homogeneous_graph(teamsvecs, node_type, output_filepath):
     # we will encounter the same node id multiple times,
     # so x as a list of nodes should be a set
     x = set()
@@ -138,7 +153,8 @@ def create_graph(teamsvecs, node_type, output_filepath):
     x = torch.tensor(list(x), dtype = torch.float64)
     edge_index = torch.tensor(np.array(edge_index), dtype = torch.long)
 
-    teams_graph = create_homogeneous_graph_data(x, edge_index)
+    teams_graph = Data(x = x, edge_index = edge_index)
+    assert type(teams_graph) == torch_geometric.data.Data
     # save the file in the output path
     write_graph(teams_graph, output_filepath)
 
@@ -282,11 +298,6 @@ def write_graph(teams_graph, output_filepath):
         pickle.dump(teams_graph, outputfile)
     return
 
-# create sample homogeneous graph data in teamsvecs.pkl file format (sparse matrix)
-def create_homogeneous_graph_data(x, edge_index):
-    data = Data(x = x, edge_index = edge_index)
-    return data
-
 if __name__ == "__main__":
     print('---------------------------------------------------------------')
     print(f'This file handles all the pickle read and write for gnn tests')
@@ -314,6 +325,10 @@ if __name__ == "__main__":
     data_version = data_versions[0]
     model_names = list(params['model'].keys())
     model_name = model_names[params['misc']['model_index']]
+
+    node_types = params['data']['node_types']
+    edge_types = params['data']['edge_types']
+
     graph_edge_types = list(params['model'][model_name]['edge_types'].keys())
     graph_edge_type = graph_edge_types[0]
     # file names, in the base name, the details of the versions and models will be added
@@ -345,11 +360,11 @@ if __name__ == "__main__":
     # read from a teamsvecs pickle file if you want to create graph data with that file
     teamsvecs = read_data(teamsvecs_input_filepath)
 
-    # the graph will be made based on the mentioned node_types
-    # create_graph(teamsvecs, ['member'], teams_graph_output_filepath)
-    create_heterogeneous_graph(teamsvecs, ['id', 'skill', 'member'], \
-                               [['skill', 'id'], ['id', 'skill'], ['id', 'member'], ['member', 'id']], \
-                               teams_graph_output_filepath)
+    # the graph will be made based on the mentioned node_types in graph_params
+    if(len(node_types) == 1):
+        create_homogeneous_graph(teamsvecs, node_types, teams_graph_output_filepath)
+    else:
+        create_heterogeneous_graph(teamsvecs, node_types, edge_types, teams_graph_output_filepath)
     teams_graph = load_graph(teams_graph_input_filepath)
 
     print(teams_graph.__dict__)

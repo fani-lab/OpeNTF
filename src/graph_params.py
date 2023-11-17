@@ -9,16 +9,40 @@ this file contains the parameters to do all the graph based tasks
 '''
 
 settings = {
-    'model':{
+    'model': {
             'gnn':{},
-            'gcn':{},
+            'gcn':{
+                'edge_types' : {
+                    'EE' : {
+                        'graph_type' : 'homogeneous',
+                    },
+                    'SS' : {
+                        'graph_type' : 'homogeneous',
+                    },
+                    'STE' : {
+                        'graph_type' : 'heterogeneous',
+                    },
+                    'SE' : {
+                        'graph_type' : 'heterogeneous',
+                    },
+                },
+                'model_params':{
+                    'max_epochs' : [10],
+                    'num_features' : 1,
+                    'embedding_dim' : 5,
+                    'hidden_dim' : 16,
+                    'dropout' : 0.5,
+                    'p' : 1.0,
+                    'q' : 1.0,
+                    'lr' : 0.01,
+                },
+            },
             'gat':{},
             'gin':{},
             'n2v':{
                 'edge_types' : {
                     'EE' : {},
                     'SS' : {},
-                    'TT' : {},
                 },
                 'model_params':{
                     'max_epochs' : [250],
@@ -37,7 +61,7 @@ settings = {
                     'num_workers' : 0,
                 }
             },
-            'm2v':{
+            'm2v': {
                 'edge_types' : {
                     'STE' : {},
                     'SE' : {},
@@ -81,8 +105,11 @@ settings = {
                 'toy.title.basics.tsv':{},
             },
         },
+        # 'node_types': ['member'],
+        'node_types': ['id', 'skill', 'member'],
+        'edge_types':[['skill', 'id'], ['id', 'skill'], ['id', 'member'], ['member', 'id']],
     },
-    'storage':{
+    'storage' : {
         'base_folder' : '../../data/graph',
         'output_type': [
             'raw',
@@ -93,7 +120,8 @@ settings = {
         'base_graph_plot_filename' : 'teamsplot',
         'lazy_load' : True,
     },
-    'misc':{
+    'cmd' : ['graph', 'emb'],
+    'misc' : {
         'graph_datapath' : '../../data/graph/raw/dblp/toy.dblp.v12.json/metapath2vec/STE/teams_graph.pkl',
         'preprocessed_embedding_output_path' : '../../data/graph/preprocessed/dblp/toy.dblp.v12.json/metapath2vec/STE/teamsvecs_emb.pkl',
         'domain' : 'dblp',
@@ -102,5 +130,7 @@ settings = {
         'edge_type' : 'STE',
         'file_name' : 'teams_graph.pkl',
         'model_index' : 5,
-    }
+    },
+    'data_handler' : {
+    },
 }
