@@ -18,7 +18,6 @@ class N2V(src.mdl.graph.Graph):
         # it will already inherit all the variables in the super class
         super().__init__()
         self.init_child_variables()
-        self.load(self.teams_graph_input_filepath)
 
     # this method will already have all the variables contained in the super class
     # so the additional ones will be initialized here
@@ -78,6 +77,7 @@ class N2V(src.mdl.graph.Graph):
         return total_loss / len(loader)
 
     def run(self):
+        self.load(self.teams_graph_input_filepath)
         for num_epochs in self.max_epochs:
             self.init_model()
 

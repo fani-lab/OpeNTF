@@ -23,8 +23,9 @@ class DataHandler:
         self.init_variables()
 
     def init_variables(self):
-        # params when hardcoded
-        params = graph_params.settings
+        # params of graph_params
+        self.params = graph_params.settings
+        params = self.params
         # this base folder is specifically for teamsvecs sparse_matrix
         self.teamsvecs_base_folder = params['storage']['teamsvecs_base_folder']
         self.base_folder = params['storage']['base_folder']
@@ -32,14 +33,17 @@ class DataHandler:
         self.output_type = self.output_types[0]
         self.domains = list(params['data']['domain'].keys())
         self.domain = self.domains[0]
-        self.data_versions = list(params['data']['domain'][self.domain].keys())
-        self.data_version = self.data_versions[0]
         self.model_names = list(params['model'].keys())
+        # this model_name is set for a test purpose only
+        # the graph_main.py overrides this value
         self.model_name = self.model_names[params['misc']['model_index']]
 
+        # e.g. : ['member', 'skill']
         self.node_types = params['data']['node_types']
+        # e.g. : [['skill', 'member'], ['member', 'skill']]
         self.edge_types = params['data']['edge_types']
 
+        # 'STE', 'SE' etc
         self.graph_edge_types = list(params['model'][self.model_name]['edge_types'].keys())
         self.graph_edge_type = self.graph_edge_types[0]
         # file names, in the base name, the details of the versions and models will be added
@@ -48,17 +52,22 @@ class DataHandler:
 
         ### Locations ###
         # -------------------------------------------
-        self.teamsvecs_input_filepath = f'{self.teamsvecs_base_folder}/preprocessed/{self.domain}/{self.data_version}/{self.teamsvecs_file_name}'
-        self.teams_graph_output_folder = f'{self.base_folder}/{self.output_type}/{self.domain}/{self.data_version}'
-        # the filename should be with teamsvecs naming
-        self.teams_graph_output_filepath = f'{self.teams_graph_output_folder}/{self.graph_file_base_name}.{self.model_name}.{self.graph_edge_type}.pkl'
-        self.teams_graph_input_filepath = self.teams_graph_output_filepath
-        # this is the output folder for preprocessed embeddings and performance data
-        self.graph_preprocessed_output_folder = f'{self.base_folder}/preprocessed/{self.domain}/{self.data_version}'
-
+        self.init_locations()
         # to make sure the path to output exists or gets created
         os.makedirs(self.graph_preprocessed_output_folder, exist_ok=True)
         os.makedirs(self.teams_graph_output_folder, exist_ok=True)
+
+    def init_locations(self):
+        params = self.params
+        self.data_versions = list(params['data']['domain'][self.domain].keys())
+        self.data_version = self.data_versions[0]
+        self.teamsvecs_input_filepath = f'{self.teamsvecs_base_folder}/preprocessed/{self.domain}/{self.data_version}/{self.teamsvecs_file_name}'
+        self.teams_graph_output_folder = f'{self.base_folder}/{self.output_type}/{self.domain}/{self.data_version}'
+        # the filename should be with teamsvecs naming
+        self.teams_graph_output_filepath = f'{self.teams_graph_output_folder}/{self.graph_file_base_name}.{self.graph_edge_type}.pkl'
+        self.teams_graph_input_filepath = self.teams_graph_output_filepath
+        # this is the output folder for preprocessed embeddings and performance data
+        self.graph_preprocessed_output_folder = f'{self.base_folder}/preprocessed/{self.domain}/{self.data_version}'
 
     def read_data(self, filepath):
         try :
@@ -199,6 +208,7 @@ class DataHandler:
         teams_graph = Data(x = x, edge_index = edge_index)
         assert type(teams_graph) == torch_geometric.data.Data
         # save the file in the output path
+        print(f'saving teams_graph in {output_filepath}')
         self.write_graph(teams_graph, output_filepath)
 
         return teams_graph
@@ -315,6 +325,7 @@ class DataHandler:
         print()
 
         # write the graph into a file for future use
+        print(f'saving teams_graph in {output_filepath}')
         self.write_graph(teams_graph, output_filepath)
 
         # can this return type be generalized for both homo and hetero graphs?

@@ -61,23 +61,30 @@ class Graph():
         self.data_versions = list(params['data']['domain'][self.domain].keys())
         self.data_version = self.data_versions[0]
         self.model_names = list(params['model'].keys())
-        # only for n2v, the edge_types will be E-E or S-S
+        # only for n2v, the edge_types will be 'EE' or 'SS'
+        # otherwise, it will be 'STE', 'SE'
         self.graph_edge_types = list(params['model'][self.model_name]['edge_types'].keys())
         self.graph_edge_type = self.graph_edge_types[0]
 
         ### Locations ###
         # -------------------------------------------
-        # teams_graph_output_folder = f'{base_folder}/{output_type}/{domain}/{data_version}/{model_name}/{graph_edge_type}/'
         # base_filename
         # base_graph_emb_filename
         # base_graph_plot_filename
         # a personal DataHandler object
         self.dh = DataHandler()
         self.lazy_load = params['storage']['lazy_load']
+        self.init_locations()
+        # -------------------------------------------
+
+    def init_locations(self):
+        params = self.params
+        self.data_versions = list(params['data']['domain'][self.domain].keys())
+        self.data_version = self.data_versions[0]
         self.base_folder = params['storage']['base_folder']
         self.base_filename = params['storage']['base_filename']
         self.teams_graph_output_folder = f'{self.base_folder}/{self.output_type}/{self.domain}/{self.data_version}'
-        self.teams_graph_output_filepath = f'{self.teams_graph_output_folder}/{self.base_filename}.{self.model_name}.{self.graph_edge_type}.pkl'
+        self.teams_graph_output_filepath = f'{self.teams_graph_output_folder}/{self.base_filename}.{self.graph_edge_type}.pkl'
         self.teams_graph_input_filepath = self.teams_graph_output_filepath
 
         # this is the output folder for preprocessed embeddings and performance data
@@ -89,7 +96,6 @@ class Graph():
         # need to add '{epoch_number}.png' while running at each set of epochs
         self.base_graph_plot_filename = params['storage']['base_graph_plot_filename']
         self.graph_plot_filename = f'{self.graph_preprocessed_output_folder}/{self.base_graph_plot_filename}.{self.model_name}.{self.graph_edge_type}.'
-        # -------------------------------------------
 
     def init_child_variables(self):
         pass
