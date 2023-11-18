@@ -65,8 +65,6 @@ settings = {
                 'edge_types' : {
                     'STE' : {},
                     'SE' : {},
-                    'STE_TL' : {},
-                    'STEL' : {},
                 },
                 'model_params':{
                     'metapath' : [
@@ -110,7 +108,8 @@ settings = {
         'edge_types':[['skill', 'id'], ['id', 'skill'], ['id', 'member'], ['member', 'id']],
     },
     'storage' : {
-        'base_folder' : '../../data/graph',
+        'teamsvecs_base_folder' : '../data',
+        'base_folder' : '../data/graph',
         'output_type': [
             'raw',
             'preprocessed'
