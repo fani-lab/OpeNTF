@@ -121,16 +121,19 @@ settings = {
         'lazy_load' : True,
     },
     'cmd' : ['graph', 'emb'],
-    'misc' : {
-        'graph_datapath' : '../../data/graph/raw/dblp/toy.dblp.v12.json/metapath2vec/STE/teams_graph.pkl',
-        'preprocessed_embedding_output_path' : '../../data/graph/preprocessed/dblp/toy.dblp.v12.json/metapath2vec/STE/teamsvecs_emb.pkl',
-        'domain' : 'dblp',
-        'dataset_version' : 'toy.dblp.v12.json',
-        'model' : 'm2v',
-        'edge_type' : 'STE',
-        'file_name' : 'teams_graph.pkl',
-        'model_index' : 3,
+    'main':{
+        'models': ['n2v','m2v'],
+        'domains': ['dblp','uspt','imdb'],
+        'edge_types':['STE','SE'],
     },
-    'data_handler' : {
+    'misc': {
+        'graph_datapath': '../../data/graph/raw/dblp/toy.dblp.v12.json/metapath2vec/STE/teams_graph.pkl',
+        'preprocessed_embedding_output_path': '../../data/graph/preprocessed/dblp/toy.dblp.v12.json/metapath2vec/STE/teamsvecs_emb.pkl',
+        'domain': 'dblp',
+        'dataset_version': 'toy.dblp.v12.json',
+        'model': 'm2v',
+        'edge_type': 'STE',
+        'file_name': 'teams_graph.pkl',
+        'model_index': 3,
     },
 }
