@@ -1,5 +1,5 @@
-from src.mdl import graph
-from src.misc import data_handler
+from src.mdl import node2vec, metapath2vec
+from src.misc.data_handler import DataHandler
 from src import graph_params
 
 if __name__ == '__main__':
@@ -7,6 +7,7 @@ if __name__ == '__main__':
     # all the params inside graph_params
     params = graph_params.settings
     cmd = params['cmd']
+    # these are the params for graph_main.py
     models = params['main']['models']
     domains = params['main']['domains']
     edge_types = params['main']['edge_types']
@@ -17,12 +18,23 @@ if __name__ == '__main__':
     print(f'edge_types = {edge_types}')
     print('---------------------------------------')
 
-    for domain in domains:
-        print(f'domain : {domain}')
-        for edge in edge_types:
-            print(f'edge_type : {edge_types}')
-            if 'graph' in cmd:
-                # create and graph
+    # instantiate the objects
+    dh = DataHandler()
 
-    if 'emb' in cmd:
-        # create the embedding
+    for domain in domains:
+        print()
+        ('---------------------------------------')
+        ('---------------------------------------')
+        print(f'domain : {domain}')
+        ('---------------------------------------')
+        # change edge of the classes
+
+        if 'graph' in cmd:
+            # create the graph
+            dh.domain = domain
+            dh.run()
+
+        # if 'emb' in cmd:
+            # create the embedding
+            # n2v = node2vec.N2V()
+            # m2v = metapath2vec.M2V()

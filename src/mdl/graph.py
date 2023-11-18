@@ -2,7 +2,7 @@
 import torch
 import torch_geometric.data
 import graph_params
-from src.misc import data_handler
+from src.misc.data_handler import DataHandler
 from matplotlib import pyplot as plt
 import numpy as np
 import networkx as nx
@@ -61,7 +61,7 @@ class Graph():
         self.data_versions = list(params['data']['domain'][self.domain].keys())
         self.data_version = self.data_versions[0]
         self.model_names = list(params['model'].keys())
-        # only for n2v, the edge_types will be E-E, S-S or T-T
+        # only for n2v, the edge_types will be E-E or S-S
         self.graph_edge_types = list(params['model'][self.model_name]['edge_types'].keys())
         self.graph_edge_type = self.graph_edge_types[0]
 
@@ -71,6 +71,8 @@ class Graph():
         # base_filename
         # base_graph_emb_filename
         # base_graph_plot_filename
+        # a personal DataHandler object
+        self.dh = DataHandler()
         self.lazy_load = params['storage']['lazy_load']
         self.base_folder = params['storage']['base_folder']
         self.base_filename = params['storage']['base_filename']

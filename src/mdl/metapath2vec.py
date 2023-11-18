@@ -34,7 +34,7 @@ class M2V(src.mdl.graph.Graph):
     # this will load the desired graph data for running with the model
     def load(self, graph_datapath):
         print(f'graph data to load from : {graph_datapath}')
-        self.data = data_handler.load_graph(graph_datapath)
+        self.data = self.dh.load_graph(graph_datapath)
 
         print(f'loaded graph data : {self.data}')
 
@@ -120,7 +120,7 @@ class M2V(src.mdl.graph.Graph):
                 outfile.write(line)
 
             # store the final embeddings to a pickle file
-            data_handler.write_graph(weights, f'{self.graph_preprocessed_output_filename}.e{num_epochs}.pkl')
+            self.dh.write_graph(weights, f'{self.graph_preprocessed_output_filename}.e{num_epochs}.pkl')
 
             # draw and save the loss vs epoch plot
             self.plot(list_epochs, losses, f'{self.graph_plot_filename}.e{num_epochs}.png')
