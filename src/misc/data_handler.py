@@ -298,6 +298,7 @@ def write_graph(teams_graph, output_filepath):
         pickle.dump(teams_graph, outputfile)
     return
 
+
 if __name__ == "__main__":
     print('---------------------------------------------------------------')
     print(f'This file handles all the pickle read and write for gnn tests')
