@@ -3,45 +3,25 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch_geometric.nn import GCNConv
 from torch_geometric.data import Data
-import src.mdl.graph
-from src.misc import data_handler
+import src.mdl.gnn.graph
 
-class GCN(src.mdl.graph.Graph):
+class GCN(src.mdl.gnn.graph.Graph):
     def __init__(self):
         super().__init__()
-        self.init_child_variables()
 
     def init_model(self):
-        # initialize the gcn_model object here
-        self.gcn_model = GCN_Model(self.)
-
+        self.gcn_model = GCN_Model()
         self.optimizer = torch.optim.Adam(self.parameters(), lr=0.01)
         self.criterion = nn.MSELoss()
 
 
-
-    def init_child_variables(self):
-        model_params = self.params['model'][self.model_name]['model_params']
-        self.num_features = model_params['num_features']
-        self.hidden_dim = model_params['hidden_dim']
-        self.dropout = model_params['dropout']
-        self.training = model_params['training']
-
-
     def run(self):
-
-        # create custom graph data
         teams_graph = data_handler.create_custom_data(is_homogeneous = True)
-
         gcn_model = GCN_Model(self)
-        # Create an instance of the GCN model
         self.init_model(self.num_features, self.hidden_dim, self.embedding_dim)
-
-        # Forward pass to get the graph embeddings
         graph_embeddings = gcn_model.forward(teams_graph)
         print("Graph Embeddings:\n", graph_embeddings)
 
-# this class will only contain the model definitions
 class GCN_Model(torch.nn.Module):
     def __init__(self, gcn):
         super(GCN_Model, self).__init__()
@@ -52,17 +32,7 @@ class GCN_Model(torch.nn.Module):
 
     def forward(self, data):
         x, edge_index = data.x, data.edge_index
-
         x = F.relu(self.conv1(x, edge_index))
         x = F.dropout(x, p=self.gcn.dropout, training = self.gcn.training)  # Assuming training is always True
         x = self.conv2(x, edge_index)
-
         return x
-
-
-def main():
-    gcn = GCN()
-    gcn.run()
-
-if __name__ == '__main__':
-    main()

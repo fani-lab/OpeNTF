@@ -3,15 +3,15 @@ import math
 import torch_geometric.data
 
 import graph_params
-import src.mdl.graph
-from src.misc.data_handler import DataHandler
+import src.mdl.gnn.graph
+from src.mdl.team2vec import data_handler
 
 import os
 import torch
-from torch_geometric.nn import Node2Vec
+from torch_geometric.nn import MetaPath2Vec
 import numpy as np
 
-class N2V(src.mdl.graph.Graph):
+class M2V(src.mdl.gnn.graph.Graph):
 
     # setup the entire model before running
     def __init__(self):
@@ -26,8 +26,8 @@ class N2V(src.mdl.graph.Graph):
         # in the graph_params.py file
         # model_params is a local file for convenient access
         model_params = self.params['model'][self.model_name]['model_params']
-        self.p = model_params['p']
-        self.q = model_params['q']
+        self.shuffle = model_params['shuffle']
+        self.metapath = model_params['metapath']
         self.lr = model_params['lr']
 
     # this will load the desired graph data for running with the model
@@ -39,20 +39,16 @@ class N2V(src.mdl.graph.Graph):
 
     # initialize the model
     def init_model(self):
-        assert type(self.data) == torch_geometric.data.Data
+        assert type(self.data) == torch_geometric.data.hetero_data.HeteroData
 
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
-        self.model = Node2Vec(self.data.edge_index, embedding_dim=self.embedding_dim,
-                             walk_length=self.walk_length, context_size=self.context_size,
-                             walks_per_node=self.walks_per_node, num_negative_samples=self.num_negative_samples).to(self.device)
+        self.model = MetaPath2Vec(self.data.edge_index_dict, embedding_dim=self.embedding_dim,
+                             metapath=self.metapath, walk_length=self.walk_length, context_size=self.context_size,
+                             walks_per_node=self.walks_per_node, num_negative_samples=self.num_negative_samples,
+                             sparse=True).to(self.device)
 
         self.loader = self.model.loader(batch_size = self.batch_size, shuffle = self.loader_shuffle, num_workers = self.num_workers)
-        self.optimizer = torch.optim.Adam(list(self.model.parameters()), lr = self.lr)
-
-        try :
-            pos_rw, neg_rw = next(iter(self.loader))
-        except EOFError:
-            print(f'EOFError while generating pos_rw and neg_rw')
+        self.optimizer = torch.optim.SparseAdam(list(self.model.parameters()), lr = self.lr)
 
     # train the model to generate embeddings
     def learn(self, model, optimizer, loader, device, epoch, log_steps = 50, eval_steps = 2000):
@@ -97,8 +93,7 @@ class N2V(src.mdl.graph.Graph):
                     if(loss < min_loss):
                         min_loss = loss
                         print('.')
-
-                    if (epoch % 10 == 0):
+                    if (epoch % 20 == 0):
                         print(f'Epoch = {epoch : 02d}, loss = {loss : .4f}')
 
                         # the model() gives all the weights and biases of the model currently
@@ -132,8 +127,8 @@ class N2V(src.mdl.graph.Graph):
 
 
 def main():
-    n2v = N2V()
-    n2v.run()
+    m2v = M2V()
+    m2v.run()
 
 if __name__ == '__main__':
     main()
