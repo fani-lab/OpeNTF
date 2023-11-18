@@ -21,7 +21,7 @@ from mdl.rnd import Rnd
 from mdl.nmt import Nmt
 from mdl.tnmt import tNmt
 from mdl.tntf import tNtf
-from mdl.team2vec import Team2Vec
+from src.mdl.team2vec.team2doc2vec import Team2Vec
 from mdl.caser import Caser
 from mdl.rrn import Rrn
 from cmn.tools import generate_popular_and_nonpopular

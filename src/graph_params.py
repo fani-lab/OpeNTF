@@ -1,127 +1,57 @@
-'''
-this file contains the parameters to do all the graph based tasks
-
-1) reading teamsvecs pickle data
-2) creating graph data
-3) loading graph data
-4) generating embeddings
-
-'''
-
 settings = {
-    'model': {
-            'gcn':{
-                'edge_types' : {
-                    'EE' : {
-                        'graph_type' : 'homogeneous',
-                    },
-                    'SS' : {
-                        'graph_type' : 'homogeneous',
-                    },
-                    'STE' : {
-                        'graph_type' : 'heterogeneous',
-                    },
-                    'SE' : {
-                        'graph_type' : 'heterogeneous',
-                    },
-                },
-                'model_params':{
-                    'max_epochs' : [10],
-                    'num_features' : 1,
-                    'embedding_dim' : 5,
-                    'hidden_dim' : 16,
-                    'dropout' : 0.5,
-                    'training' : True,
-                    'p' : 1.0,
-                    'q' : 1.0,
-                    'lr' : 0.01,
-                },
-            },
-            'gat':{},
-            'gin':{},
-            'n2v':{
-                'edge_types' : {
-                    'EE' : {},
-                    'SS' : {},
-                },
-                'model_params':{
-                    'max_epochs' : [250],
-                    'embedding_dim' : 5,
-                    'walk_length' : 6,
-                    'context_size' : 3,
-                    'walks_per_node' : 5,
-                    'num_negative_samples' : 1,
-                    'p' : 1.0,
-                    'q' : 1.0,
-                    'lr' : 0.01,
-                },
-                'loader_params' : {
-                    'batch_size' : 5,
-                    'loader_shuffle' : True,
-                    'num_workers' : 0,
-                }
-            },
-            'm2v': {
-                'edge_types' : {
-                    'STE' : {},
-                    'SE' : {},
-                },
-                'model_params':{
-                    'metapath' : [
-                        ('member','to','id'),
-                        ('id', 'to', 'skill'),
-                        ('skill','to','id'),
-                        ('id', 'to', 'member'),
-                    ],
-                    'max_epochs' : [5],
-                    'embedding_dim' : 5,
-                    'walk_length' : 6,
-                    'context_size' : 3,
-                    'walks_per_node' : 5,
-                    'num_negative_samples' : 5,
-                    'batch_size' : 5,
-                    'shuffle' : True,
-                    'num_workers' : 1,
-                    'lr' : 0.01,
-                },
-                'loader_params' : {
-                    'batch_size' : 5,
-                    'loader_shuffle' : True,
-                    'num_workers' : 1
-                }
-            }
-        },
-    'data':{
-        'domain': {
-            'dblp':{
-                'toy.dblp.v12.json':{},
-            },
-            'uspt':{
-                'toy.patent.tsv':{},
-            },
-            'imdb':{
-                'toy.title.basics.tsv':{},
-            },
-        },
-        'node_types': ['member'],
-        # 'node_types': ['id', 'skill', 'member'],
-        'edge_types': 'STE',
-        'edge_type_mapping' : {
-            'STE' : [['skill', 'id'], ['id', 'skill'], ['id', 'member'], ['member', 'id']],
-            'SE' : [['skill', 'member'], ['member', 'skill']],
-        }
+    'edge_types': {
+        'ste': [('skill', '-', 'team'), ('member', '-', 'team')],
+         'se': [('skill', '-', 'member')], #for any ('x', '-', 'y'), we also do ('y', '-', 'x')
+          'e': 'member',
     },
-    'storage' : {
-        'teamsvecs_base_folder' : '../data',
-        'base_folder' : '../data/graph',
-        'output_type': [
-            'raw',
-            'preprocessed'
-        ],
-        'base_filename' : 'teamsvecs',
-        'base_graph_emb_filename' : 'teamsvecs.emb',
-        'base_graph_plot_filename' : 'teamsplot',
-        'lazy_load' : True,
+    'model': {
+        'max_epochs': 10,
+        'embedding_dim': 5,
+        'lr': 0.01,
+        'batch_size': 5,
+        'loader_shuffle': True,
+        'num_workers': 0,
+        'gcn': {
+            'hidden_dim': 16,
+            'dropout': 0.5,
+            'p': 1.0,
+            'q': 1.0,
+        },
+        'gat': {},
+        'gin': {},
+        'n2v': {
+            'max_epochs': 100,
+            'walk_length': 5,
+            'context_size': 2,
+            'walks_per_node': 10,
+            'num_negative_samples': 10,
+            'p' : 1.0,
+            'q' : 1.0,
+        },
+        'm2v': {
+            'metapath' : [
+                ('member','to','id'),
+                ('id', 'to', 'skill'),
+                ('skill','to','id'),
+                ('id', 'to', 'member'),
+            ],
+            'walk_length': 5,
+            'context_size': 3,
+            'walks_per_node': 10,
+            'num_negative_samples' : 10,
+        },
+        'd2v': {
+            '-dm': 1, #'The training algorithm; (1: distributed memory (default), 0: CBOW')
+            '-dbow_words': 0, #'Train word-vectors in skip-gram fashion; (0: no (default), 1: yes')
+            '-window': 1,
+            '-embtypes': 'skill', #Embedding types; (-embtypes=skill (default); member; joint; skill,member; skill,joint; ...
+        },
+    },
+    'data':{
+        'dblp':{},
+        'uspt':{},
+        'imdb':{},
+        'node_types': ['member'], #['id', 'skill', 'member'],
     },
     'cmd' : ['graph', 'emb'],
     'main':{
@@ -129,13 +59,5 @@ settings = {
         'domains': ['uspt','imdb','dblp'],
         'node_types': ['id', 'skill', 'member'],
         'edge_types': 'STE',
-    },
-    'misc': {
-        'domain': 'dblp',
-        'dataset_version': 'toy.dblp.v12.json',
-        'model': 'm2v',
-        'edge_type': 'STE',
-        'file_name': 'teams_graph.pkl',
-        'model_index': 3,
     },
 }
