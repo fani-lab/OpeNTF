@@ -2,7 +2,7 @@ import math
 
 import torch_geometric.data
 
-import graph_params
+import params
 import src.mdl.gnn.graph
 from src.mdl.team2vec.data_handler import DataHandler
 

@@ -17,9 +17,9 @@ logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=lo
 from team2vec import Team2Vec
 class Wnn(Team2Vec):
     def __init__(self, teamsvecs, indexes, settings, output):
-        super(Team2Vec, self).__init__(teamsvecs, indexes, settings, output)
+        super().__init__(teamsvecs, indexes, settings, output)
 
-    def _create(self, file):
+    def create(self, file):
         j = 0
         year = self.indexes['i2y'][0][1]
         for i, id in enumerate(self.teamsvecs['id']):
@@ -39,19 +39,19 @@ class Wnn(Team2Vec):
             elif self.settings["embtype"] == 'joint': td = gensim.models.doc2vec.TaggedDocument(skill_doc + member_doc, [str(int(id[0, 0]))])
             elif self.settings["embtype"] == 'dt2v': td = gensim.models.doc2vec.TaggedDocument(skill_doc + datetime_doc, [str(int(id[0, 0]))])
             self.data.append(td)
-        print(f'#Documents with word type of {self.settings["embtype"]} have created: {len(self.docs)}')
+        print(f'#Documents with word type of {self.settings["embtype"]} have created: {len(self.data)}')
         print(f'Saving the {self.settings["embtype"]} documents ...')
         with open(file, 'wb') as f: pickle.dump(self.data, f)
         return self.data
 
     def train(self):
-        settings_str = f'{self.settings["embtype"]}.{self.__class__.__name__.lower()}.d{self.settings["dimension"]}.w{self.settings["window"]}.dm{self.settings["dm"]}'
+        output = self.output + f'emb.d{self.settings["embedding_dim"]}.w{self.settings["window"]}.dm{self.settings["dm"]}'
         try:
-            print(f"Loading the {settings_str} embedding pickle ...")
-            self.model = gensim.models.Doc2Vec.load(f'{self.output}/{settings_str}.mdl')
+            print(f"Loading the embedding model {output}  ...")
+            self.model = gensim.models.Doc2Vec.load(f'{self.output}.mdl')
             return self.model
         except FileNotFoundError:
-            print(f"File not found! Learning {settings_str} embeddings from scratch ...")
+            print(f"File not found! Learning {output}.mdl embeddings from scratch ...")
 
             self.model = gensim.models.Doc2Vec(dm=self.settings["dm"],
                                                # training algorithm. If dm=1, ‘distributed memory’ (PV-DM) is used. Otherwise, distributed bag of words (PV-DBOW) is employed.
@@ -66,15 +66,15 @@ class Wnn(Team2Vec):
 
             if not self.data: self.init()
             self.model.build_vocab(self.data)
-            for e in tqdm(range(epochs)):
+            for e in tqdm(range(self.settings['max_epochs'])):
                 self.model.train(self.data, total_examples=self.model.corpus_count, epochs=self.model.epochs)
                 self.model.alpha -= 0.002  # decrease the learning rate
                 self.model.min_alpha = self.model.alpha  # fix the learning rate, no decay
 
-            print(f'Saving model for {settings_str} under directory {self.output} ...')
-            self.model.save(f'{self.output}/{settings_str}.mdl')
-            # self.model.save_word2vec_format(f'{output}/{self.settings}.w2v')
-            # self.model.docvecs.save_word2vec_format(f'{output}/{self.settings}.d2v')
+            print(f'Saving model for {output} ...')
+            self.model.save(f'{self.output}.mdl')
+            # self.model.save_word2vec_format(f'{output}.w2v')
+            # self.model.docvecs.save_word2vec_format(f'{output}.d2v')
             return self.model
         except Exception as e: raise e
 
@@ -96,11 +96,11 @@ def addargs(parser):
     embedding.add_argument('-embtype', type=str, default='skill', help="Embedding types; (-embtypes=skill (default); member; joint; )")
     embedding.add_argument('-output', type=str, required=True, help='Output folder; (e.g., ../data/preprocessed/dblp/toy.dblp.v12.json/')
 
-def run(teamsvecs_file, indexes_file, settings):
+def run(teamsvecs_file, indexes_file, settings, output):
     with open(teamsvecs_file, 'rb') as teamsvecs_f, open(indexes_file, 'rb') as indexes_f:
         teamsvecs, indexes = pickle.load(teamsvecs_f), pickle.load(indexes_f)
         t2v = Wnn(teamsvecs, indexes, settings, output)
-        #2v.init()
+        t2v.init()
         t2v.train()
 
         #unit tests :D
@@ -123,12 +123,12 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Team Doc2Vec Embedding')
     addargs(parser)
     args = parser.parse_args()
-    settings = {'-dm': args.dm,
-                '-dbow_words': args.dbow_words,
-                '-embedding_dim': args.embedding_dim,
-                '-window': args.windsow,
-                '-max_epochs': args.max_epochs,
-                '-embtype': args.embtype}
+    settings = {'dm': args.dm,
+                'dbow_words': args.dbow_words,
+                'embedding_dim': args.embedding_dim,
+                'window': args.windsow,
+                'max_epochs': args.max_epochs,
+                'embtype': args.embtype}
 
     run(f'{args.teamsvecs}teamsvec.pkl', f'{args.teamsvecs}indexes.pkl', settings, args.output)
 
