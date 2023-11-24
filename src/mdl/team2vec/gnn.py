@@ -1,4 +1,4 @@
-import numpy as np, networkx as nx, math, os, itertools
+import numpy as np, math, os, itertools, pickle
 from matplotlib import pyplot as plt
 from tqdm import tqdm
 
@@ -9,43 +9,48 @@ from team2vec import Team2Vec
 
 class Gnn(Team2Vec):
 
-    def __init__(self, teamsvecs, indexes, model, settings, output):
-        super(Team2Vec, self).__init__(teamsvecs, indexes, output, settings=settings)
-        self.model = model
+    def __init__(self, teamsvecs, indexes, settings, output):
+        super().__init__(teamsvecs, indexes, settings, output)
     def create(self, file):
-        if not isinstance(self.settings['edge_types'], list):#homo
-            teams = teamsvecs[ntypes[0]]
-            for i, row in enumerate(tqdm(teamsvecs[ntypes[0]])):
-                # https://pytorch-geometric.readthedocs.io/en/latest/generated/torch_geometric.transforms.RemoveDuplicatedEdges.html#torch_geometric.transforms.RemoveDuplicatedEdges
-                edges = []
-                for t in itertools.combinations(row.nonzero(), 2): edges += [list(t), list(reversed(t))]
+        # https://pytorch-geometric.readthedocs.io/en/latest/modules/utils.html#torch_geometric.utils.remove_self_loops
+
+        if not isinstance(self.settings['edge_types'][0], list):#homo
+            teams = self.teamsvecs[self.settings['edge_types'][0]] #TODO: if node_type == 'team'
+            edges = []
+            for i, row in enumerate(tqdm(teams)):
+                for t in itertools.combinations(row.nonzero()[1], 2): edges += [t]
             edge_index = torch.tensor(edges, dtype=torch.long).t().contiguous() #[1,2][1,2] >> [1,1][2,2]
             nodes = torch.tensor([[0]] * teams.shape[1], dtype=torch.float)
-            data = Data(x=nodes, edge_index=edge_index)
+            self.data = Data(x=nodes, edge_index=edge_index, edge_attr=torch.tensor([1] * len(edges), dtype=torch.long))
         else:
-            data = HeteroData()
-            edges = []
-            for ntype in ntypes: data[ntype].x = torch.tensor([[0]] * teams.shape[1 if ntype != 'team' else 0], dtype=torch.float)
-            # data['x'].x = torch.tensor([[0]] * 3, dtype=torch.float)
-            # data['y'].x = torch.tensor([[0]] * 4, dtype=torch.float)
-
-            for edge_type in self.settings['edge_types']:
-                for i, row1 in enumerate(tqdm(teamsvecs[edge_type[0]])):
+            self.data = HeteroData()
+            node_types = set()
+            #edges
+            for edge_type in self.settings['edge_types'][0]:
+                teams = self.teamsvecs[edge_type[0]]
+                for i, row1 in enumerate(tqdm(teams)):
                     edges = []; rev_edges = []
-                    row2 = teamsvecs[edge_type[2]] if edge_type[2] != 'team' else [1] * teamsvecs[edge_type[0]].shape[0]
-                    for t in itertools.product(row1.nonzero(), row2.nonzero()):
-                        edges += list(t)
-                        rev_edges += list(reversed(t))
-                    data[edge_type].edge_index = torch.tensor(edges, dtype=torch.long).t().contiguous()
-                    data[reversed(edge_type)].edge_index = torch.tensor(rev_edges, dtype=torch.long).t().contiguous()
-            # data[('x', '-', 'y')].edge_index = torch.tensor([[1, 1], [1, 2], [2, 3]], dtype=torch.long).t().contiguous()
-            # data[('y', '-', 'x')].edge_index = torch.tensor([[1, 1], [1, 2], [3, 2]], dtype=torch.long).t().contiguous()
-            # data[('x', '-', 'x')].edge_index = torch.tensor([[1, 1], [1, 2], [2, 2]], dtype=torch.long).t().contiguous()
-            # data[('y', '-', 'y')].edge_index = torch.tensor([[1, 1], [1, 2], [3, 3]], dtype=torch.long).t().contiguous()
+                    row2 = self.teamsvecs[edge_type[2]][i] if edge_type[2] != 'team' else [i]
+                    for t in itertools.product(row1.nonzero()[1], row2.nonzero()[1] if edge_type[2] != 'team' else row2): edges += [t]
+                    self.data[edge_type].edge_index = torch.tensor(edges, dtype=torch.long).t().contiguous()
+                    self.data[edge_type].edge_attr = torch.tensor([1] * len(edges), dtype=torch.long)
+                node_types = node_types.union({edge_type[0], edge_type[2]})
+            #nodes
+            for node_type in node_types: self.data[node_type].x = torch.tensor([[0]] * (self.teamsvecs[node_type].shape[1] if node_type != 'team' else self.teamsvecs['id'].shape[0]), dtype=torch.float)
 
-        data.validate(raise_on_error=True)
-        with open(file, 'wb') as f: pickle.dump(data, f)
-        return data
+        if not self.settings['dir']:
+            import torch_geometric.transforms as T
+            transform = T.ToUndirected()
+            self.data = transform(self.data)
+
+        if self.settings['dup_edge']:
+            import torch_geometric.transforms as T
+            transform = T.RemoveDuplicatedEdges(key=["edge_attr"], reduce=self.settings['dup_edge'])
+            self.data = transform(self.data)
+
+        self.data.validate(raise_on_error=True)
+        with open(file, 'wb') as f: pickle.dump(self.data, f)
+        return self.data
 
     def plot(self, x, y, output_filepath = None):
         mx = max(y)

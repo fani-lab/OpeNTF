@@ -2,7 +2,7 @@ import math
 
 import torch_geometric.data
 
-import graph_params
+import params
 import src.mdl.gnn.graph
 from src.mdl.team2vec import data_handler
 
@@ -23,7 +23,7 @@ class M2V(src.mdl.gnn.graph.Graph):
     # so the additional ones will be initialized here
     def init_child_variables(self):
         # the variables only specific to the model will be under the hierarchy of model_params section
-        # in the graph_params.py file
+        # in the params.py file
         # model_params is a local file for convenient access
         model_params = self.params['model'][self.model_name]['model_params']
         self.shuffle = model_params['shuffle']
