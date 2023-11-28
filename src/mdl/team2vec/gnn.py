@@ -28,12 +28,12 @@ class Gnn(Team2Vec):
             #edges
             for edge_type in self.settings['edge_types'][0]:
                 teams = self.teamsvecs[edge_type[0]]
+                edges = []
                 for i, row1 in enumerate(tqdm(teams)):
-                    edges = []; rev_edges = []
                     row2 = self.teamsvecs[edge_type[2]][i] if edge_type[2] != 'team' else [i]
                     for t in itertools.product(row1.nonzero()[1], row2.nonzero()[1] if edge_type[2] != 'team' else row2): edges += [t]
-                    self.data[edge_type].edge_index = torch.tensor(edges, dtype=torch.long).t().contiguous()
-                    self.data[edge_type].edge_attr = torch.tensor([1] * len(edges), dtype=torch.long)
+                self.data[edge_type].edge_index = torch.tensor(edges, dtype=torch.long).t().contiguous()
+                self.data[edge_type].edge_attr = torch.tensor([1] * len(edges), dtype=torch.long)
                 node_types = node_types.union({edge_type[0], edge_type[2]})
             #nodes
             for node_type in node_types: self.data[node_type].x = torch.tensor([[0]] * (self.teamsvecs[node_type].shape[1] if node_type != 'team' else self.teamsvecs['id'].shape[0]), dtype=torch.float)
