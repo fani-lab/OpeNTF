@@ -7,7 +7,6 @@ import pandas as pd
 import torch
 from torch import nn
 
-from Adila.src import main
 from eval.metric import *
 
 class Ntf(nn.Module):
@@ -53,9 +52,9 @@ class Ntf(nn.Module):
                 if per_instance: fold_mean_per_instance.truediv(len(splits['folds'].keys())).to_csv(f'{model_path}/{pred_set}.{epoch}pred.eval.per_instance_mean.csv')
 
     def fair(self, model_path, teamsvecs, splits, settings):
-
+        from Adila.src import main as adila
         if os.path.isfile(model_path):
-            main.Reranking.run(fpred=model_path,
+            adila.Reranking.run(fpred=model_path,
                           output=model_path,
                           teamsvecs=teamsvecs,
                           splits=splits,
@@ -86,7 +85,7 @@ class Ntf(nn.Module):
             if settings['mode'] == 0:  # sequential run
                 for algorithm in settings['fairness']:
                     for att in settings['attribute']:
-                        for fpred, output in pairs: main.Reranking.run(fpred=fpred,
+                        for fpred, output in pairs: adila.Reranking.run(fpred=fpred,
                                                                   output=output,
                                                                   teamsvecs=teamsvecs,
                                                                   splits=splits,
@@ -102,7 +101,7 @@ class Ntf(nn.Module):
                 for algorithm in settings['fairness']:
                     for att in settings['attribute']:
                         with multiprocessing.Pool(multiprocessing.cpu_count() if settings['core'] < 0 else settings['core']) as executor:
-                            executor.starmap(partial(main.Reranking.run,
+                            executor.starmap(partial(adila.Reranking.run,
                                                      teamsvecs=teamsvecs,
                                                      splits=splits,
                                                      np_ratio=settings['np_ratio'],

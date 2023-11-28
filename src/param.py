@@ -60,12 +60,12 @@ settings = {
         },
         'location_type': 'country', #should be one of 'city', 'state', 'country' and represents the location of members in teams (not the location of teams)
         'filter': {
-            'min_nteam': 75,
-            'min_team_size': 3,
+            'min_nteam': 5,
+            'min_team_size': 2,
         },
         'parallel': 1,
         'ncore': 0,# <= 0 for all
-        'bucket_size': 500
+        'bucket_size': 1000
     },
     'fair': {'np_ratio': None,
               'fairness': ['det_greedy',],
