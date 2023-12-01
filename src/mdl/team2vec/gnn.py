@@ -15,21 +15,24 @@ class Gnn(Team2Vec):
         # https://pytorch-geometric.readthedocs.io/en/latest/modules/utils.html#torch_geometric.utils.remove_self_loops
 
         if not isinstance(self.settings['edge_types'][0], list):#homo
+            print(f'Creating a homo graph with {self.settings["edge_types"][0]} node type ...')
             teams = self.teamsvecs[self.settings['edge_types'][0]] #TODO: if node_type == 'team'
             edges = []
-            for i, row in enumerate(tqdm(teams)):
+            for i, row in enumerate(tqdm(teams, total=teams.shape[0])):
                 for t in itertools.combinations(row.nonzero()[1], 2): edges += [t]
             edge_index = torch.tensor(edges, dtype=torch.long).t().contiguous() #[1,2][1,2] >> [1,1][2,2]
             nodes = torch.tensor([[0]] * teams.shape[1], dtype=torch.float)
             self.data = Data(x=nodes, edge_index=edge_index, edge_attr=torch.tensor([1] * len(edges), dtype=torch.long))
         else:
+            print(f'Creating a hetero graph ...')
             self.data = HeteroData()
             node_types = set()
             #edges
             for edge_type in self.settings['edge_types'][0]:
+                print(f'Adding edges of type {edge_type} ...')
                 teams = self.teamsvecs[edge_type[0]]
                 edges = []
-                for i, row1 in enumerate(tqdm(teams)):
+                for i, row1 in enumerate(tqdm(teams, total=teams.shape[0])):
                     row2 = self.teamsvecs[edge_type[2]][i] if edge_type[2] != 'team' else [i]
                     for t in itertools.product(row1.nonzero()[1], row2.nonzero()[1] if edge_type[2] != 'team' else row2): edges += [t]
                 self.data[edge_type].edge_index = torch.tensor(edges, dtype=torch.long).t().contiguous()
@@ -39,11 +42,13 @@ class Gnn(Team2Vec):
             for node_type in node_types: self.data[node_type].x = torch.tensor([[0]] * (self.teamsvecs[node_type].shape[1] if node_type != 'team' else self.teamsvecs['id'].shape[0]), dtype=torch.float)
 
         if not self.settings['dir']:
+            print('To undirected graph ...')
             import torch_geometric.transforms as T
             transform = T.ToUndirected()
             self.data = transform(self.data)
 
         if self.settings['dup_edge']:
+            print(f'To reduce duplicate edges by {self.settings["dup_edge"]} ...')
             import torch_geometric.transforms as T
             transform = T.RemoveDuplicatedEdges(key=["edge_attr"], reduce=self.settings['dup_edge'])
             self.data = transform(self.data)

@@ -68,32 +68,5 @@ C:\Users\Administrator\Github\Fani-Lab\opentf\gnn\src>python -u main.py -data ..
 100%|███████████████████████████████████████████████████████████████████████████████████████████▉| 17735569/17735570 [07:54<00:00, 37406.04it/s]
 100%|█████████████████████████████████████████████████████████████████████████████████████████████████| 960022/960022 [02:33<00:00, 6266.56it/s]
 
-multiprocessing.pool.RemoteTraceback:
-"""
-Traceback (most recent call last):
-  File "C:\ProgramData\Anaconda3\lib\multiprocessing\pool.py", line 125, in worker
-    result = (True, func(*args, **kwds))
-  File "C:\ProgramData\Anaconda3\lib\multiprocessing\pool.py", line 48, in mapstar
-    return list(map(*args))
-  File "C:\Users\Administrator\Github\Fani-Lab\opentf\gnn\src\cmn\team.py", line 155, in bucketing
-    data_ = np.zeros((bucket_size, 1 + skill_vec_dim + candidate_vec_dim + location_vec_dim))
-numpy.core._exceptions._ArrayMemoryError: Unable to allocate 6.76 GiB for an array with shape (1000, 907224) and data type float64
-"""
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-  File "main.py", line 210, in <module>
-    run(data_list=args.data_list,
-  File "main.py", line 140, in run
-    vecs, indexes = d_cls.generate_sparse_vectors(datapath, f'{prep_output}{filter_str}', filter, settings['data'])
-  File "C:\Users\Administrator\Github\Fani-Lab\opentf\gnn\src\cmn\team.py", line 196, in generate_sparse_vectors
-    data = p.map(func, subteams)
-  File "C:\ProgramData\Anaconda3\lib\multiprocessing\pool.py", line 364, in map
-    return self._map_async(func, iterable, mapstar, chunksize).get()
-  File "C:\ProgramData\Anaconda3\lib\multiprocessing\pool.py", line 771, in get
-    raise self._value
-numpy.core._exceptions.MemoryError: Unable to allocate 6.76 GiB for an array with shape (1000, 907224) and data type float64
-
 C:\Users\Administrator\Github\Fani-Lab\opentf\gnn\src>
 
