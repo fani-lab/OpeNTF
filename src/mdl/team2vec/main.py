@@ -1,4 +1,5 @@
 import argparse, pickle, os
+
 import torch
 
 import params
@@ -59,25 +60,32 @@ def run(teamsvecs_file, indexes_file, model, output):
 
         t2v.train()
 
-#python -u wnn.py -teamsvecs=./../../../data/preprocessed/dblp/toy.dblp.v12.json/ -model=gnn.n2v -output=./../../../data/preprocessed/dblp/toy.dblp.v12.json/
+def test_toys(args):
+    # test for all valid combinations on toys
+    for args.teamsvecs in ['./../../../data/preprocessed/dblp/toy.dblp.v12.json/',
+                           './../../../data/preprocessed/imdb/toy.title.basics.tsv/',
+                           './../../../data/preprocessed/gith/toy.data.csv/',
+                           './../../../data/preprocessed/uspt/toy.patent.tsv/']:
+        args.output = args.teamsvecs
+        args.model = 'gnn.n2v'
+        for edge_type in [('member', 'm'), ([('skill', '-', 'team'), ('member', '-', 'team')], 'stm'), ([('skill', '-', 'member')], 'sm')]:
+            for dir in [True, False]:
+                for dup in [None, 'add', 'mean', 'min', 'max', 'mul']:
+                    params.settings = {
+                        'graph': {
+                            'edge_types': edge_type,
+                            'dir': dir,
+                            'dup_edge': dup
+                        }
+                    }
+                    run(f'{args.teamsvecs}teamsvecs.pkl', f'{args.teamsvecs}indexes.pkl', args.model, f'{args.output}/{args.model.split(".")[0]}/')
+
+#python -u main.py -teamsvecs=./../../../data/preprocessed/dblp/toy.dblp.v12.json/ -model=gnn.n2v -output=./../../../data/preprocessed/dblp/toy.dblp.v12.json/
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Team Embedding')
     addargs(parser)
     args = parser.parse_args()
-    # run(f'{args.teamsvecs}teamsvecs.pkl', f'{args.teamsvecs}indexes.pkl', args.model, f'{args.output}/{args.model.split(".")[0]}/')
 
-    # for all valid combinations
-    args.model = 'gnn.n2v'
-    for edge_type in [('member', 'm'), ([('skill', '-', 'team'), ('member', '-', 'team')], 'stm'), ([('skill', '-', 'member')], 'sm')]:
-        for dir in [True, False]:
-            for dup in [None, 'add', 'mean', 'min', 'max', 'mul']:
-                params.settings = {
-                    'graph': {
-                        'edge_types': edge_type,
-                        'dir': dir,
-                        'dup_edge': dup
-                    }
-                }
-                run(f'{args.teamsvecs}teamsvecs.pkl', f'{args.teamsvecs}indexes.pkl', args.model, f'{args.output}/{args.model.split(".")[0]}/')
+    run(f'{args.teamsvecs}teamsvecs.pkl', f'{args.teamsvecs}indexes.pkl', args.model, f'{args.output}/{args.model.split(".")[0]}/')
 
-
+    # test_toys(args)
