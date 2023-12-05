@@ -1,7 +1,7 @@
 import os, json
 import argparse
 import pickle
-
+import random
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import KFold, train_test_split
@@ -75,7 +75,7 @@ def aggregate(output):
             dff.set_axis(names, axis=1, inplace=True)
             dff.to_csv(f"{output}{rd}/{rf.replace('.csv', '.agg.csv')}", index=False)
 
-def run(data_list, domain_list, fair, filter, future, model_list, output, exp_id, settings):
+def run(data_list, domain_list, fair, filter, future, augment, model_list, output, exp_id, settings):
     filter_str = f".filtered.mt{settings['data']['filter']['min_nteam']}.ts{settings['data']['filter']['min_team_size']}" if filter else ""
 
     if exp_id: output = f'{output}exp_{exp_id}/'
@@ -138,6 +138,15 @@ def run(data_list, domain_list, fair, filter, future, model_list, output, exp_id
         datapath = data_list[domain_list.index(d_name)]
         prep_output = f'./../data/preprocessed/{d_name}/{os.path.split(datapath)[-1]}'
         vecs, indexes = d_cls.generate_sparse_vectors(datapath, f'{prep_output}{filter_str}', filter, settings['data'])
+        gender = pd.read_csv(f'{prep_output}/i2gender.csv', index_col=None)
+        female_ids = gender[gender['gender'] == 0]
+        female_ids = female_ids['Unnamed: 0'].values.tolist()
+        indexes['female_ids'] = female_ids
+        random_indices = random.sample(female_ids, 3)
+        if augment:
+            #vecs['member'][:, female_ids] = 1.0
+            for index in random_indices:
+                vecs['member'][random_indices] = 1.0
         year_idx = []
         for i in range(1, len(indexes['i2y'])):
             if indexes['i2y'][i][0] - indexes['i2y'][i-1][0] > settings['model']['nfolds']:
@@ -161,10 +170,10 @@ def run(data_list, domain_list, fair, filter, future, model_list, output, exp_id
 
             output_path = f"{output}{os.path.split(datapath)[-1]}{filter_str}/{m_name}/t{vecs_['skill'].shape[0]}.s{vecs_['skill'].shape[1]}.m{vecs_['member'].shape[1]}.{'.'.join([k + str(v).replace(' ', '') for k, v in settings['model']['baseline'][baseline_name].items() if v])}"
             if not os.path.isdir(output_path): os.makedirs(output_path)
-            copyfile('./param.py', f'{output_path}/param.py')
+            # copyfile('./param.py', f'{output_path}/param.py')
             # make_popular_and_nonpopular_matrix(vecs_, data_list[0])
 
-            m_obj.run(splits, vecs_, indexes, f'{output_path}', settings['model']['baseline'][baseline_name], settings['model']['cmd'], settings['fair'], merge_skills=False)
+            m_obj.run(splits, vecs_, indexes, f'{output_path}', settings['model']['baseline'][baseline_name], settings['model']['cmd'], None, None)
     if 'agg' in settings['model']['cmd']: aggregate(output)
 
 
@@ -174,6 +183,7 @@ def addargs(parser):
     dataset.add_argument('-domain', '--domain-list', nargs='+', type=str.lower, default=[], required=True, help='a list of domains; required; (eg. -domain dblp imdb uspt gith)')
     dataset.add_argument('-filter', type=int, default=0, choices=[0, 1], help='remove outliers? (e.g., -filter 0 (default) or 1)')
     dataset.add_argument('-future', type=int, default=0, choices=[0, 1], help='predict future? (e.g., -future 0 (default) or 1)')
+    dataset.add_argument('-augment', type=int, default=0, choices=[0, 1], help='Augument data? (e.g., -augment 0 (default) or 1)')
 
     baseline = parser.add_argument_group('baseline')
     baseline.add_argument('-model', '--model-list', nargs='+', type=str.lower, default=[], required=True, help='a list of neural models (eg. -model random fnn bnn fnn_emb bnn_emb nmt)')
@@ -212,6 +222,7 @@ if __name__ == '__main__':
         fair = fair,
         filter=args.filter,
         future=args.future,
+        augment=args.augment,
         model_list=args.model_list,
         output=args.output,
         exp_id=args.exp_id,
