@@ -59,6 +59,7 @@ class Model(torch.nn.Module):
 
     def forward(self, data, is_directed) -> Tensor:
         x_dict = {}
+        self.x_dict = x_dict
         if(type(data) == HeteroData):
             edge_types = data.edge_types if is_directed else data.edge_types[:(len(data.edge_types)) // 2]
             for i, node_type in enumerate(data.node_types):
@@ -69,6 +70,7 @@ class Model(torch.nn.Module):
         else:
             x = self.node_lin(data.x)
             x = self.gcnlayer(x, data.edge_index)
+            self.x = x
             # x_dict['node'] = self.node_lin(data.x) + self.node_emb(data.n_id)
 
         # `x_dict` holds embedding matrices of all node types
