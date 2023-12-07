@@ -58,12 +58,15 @@ def run(teamsvecs_file, indexes_file, model, output):
             import gnn
             t2v = M2V()
 
-        # experimental section for gcn
+        # gcn (for homogeneous only)
         elif model == 'gnn.gcn':
             import gnn
             from gcn import Gcn
+
             output_ = output + f'{params.settings["graph"]["edge_types"][1]}.{"dir" if params.settings["graph"]["dir"] else "undir"}.{str(params.settings["graph"]["dup_edge"]).lower()}.'
             t2v = Gcn(teamsvecs, indexes, params.settings['graph'], output_)
+            t2v.init()
+            t2v.train()
             print(t2v)
             return
 
