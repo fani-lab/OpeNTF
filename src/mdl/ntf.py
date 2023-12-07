@@ -43,7 +43,7 @@ class Ntf(nn.Module):
                     topk = 5
                     topk_indices = np.argsort(Y_, axis=1)[:, -topk:]
 
-                    female_ids = indexes['female_ids']
+                    female_ids = vecs['gender'].nonzero()[1]
                     
                     female_presence_count = np.sum(np.isin(topk_indices, female_ids), axis=1)
                     if female_presence_count.ndim == 1:

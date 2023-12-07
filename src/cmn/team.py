@@ -197,12 +197,12 @@ class Team(object):
     @classmethod
     def generate_sparse_vectors(cls, datapath, output, filter, settings):
         pkl = f'{output}/teamsvecs.pkl'
-        gender_csv = f'{output}/i2gender.csv'
-        df = pd.read_csv(gender_csv)
-        df.columns = ['Expert_Index', 'Gender']
-        df['Gender'] = df['Gender'].astype(bool)
-        female_indices = df[df['Gender'] == False]['Expert_Index']
-        female_indices_list = female_indices.tolist()
+        # gender_csv = f'{output}/i2gender.csv'
+        # df = pd.read_csv(gender_csv)
+        # df.columns = ['Expert_Index', 'Gender']
+        # df['Gender'] = df['Gender'].astype(bool)
+        # female_indices = df[df['Gender'] == False]['Expert_Index']
+        # female_indices_list = female_indices.tolist()
         
         try:
             st = time()

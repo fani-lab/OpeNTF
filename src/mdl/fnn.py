@@ -54,18 +54,26 @@ class Fnn(Ntf):
         if ns == "unigram_b": return self.ns_unigram_mini_batch(y_['pred'], y, nns)
         if ns == "inverse_unigram" or ns.startswith("temporal_inverse_unigram"): return self.ns_inverse_unigram(y_['pred'], y, unigram, nns)
         if ns == "inverse_unigram_b": return self.ns_inverse_unigram_mini_batch(y_['pred'], y, nns)
-        if ns == "female_bias": return self.female_bias(y_, y, nns)
+        if ns == "female_bias": return self.female_bias(y_, y)
+        if ns == "fair_inverse_unigram_b": return self.ns_fair_inverse_unigram_b(y_, y, nns)
         # return self.weighted(y_, y)
         cri = nn.BCELoss()
         return cri(y_['pred'].squeeze(1), y.squeeze(1))
 
-    def female_bias(self, logits_gender, targets, pos_weight=2.5):
+    def female_bias(self, logits_gender, targets, pos_weight=2.5, female_weight=2):
         logits = logits_gender['pred']
-        genders = logits_gender['gender']
+        genders = logits_gender['gender'].nonzero()[1]
         targets = targets.squeeze(1)
         logits = logits.squeeze(1)
-        # this line should be adjusted for females
-        return (-targets * torch.log(logits) * pos_weight + (1 - targets) * - torch.log(1 - logits)).sum()
+
+        females = torch.zeros_like(targets)
+
+        for b in range(targets.shape[0]):
+            cor_idx = torch.nonzero(targets[b], as_tuple=True)[0]
+            for idx in genders:
+                if idx in cor_idx:
+                    females[b][idx] = 1
+        return (-targets * torch.log(logits) * pos_weight + (1 - targets) * - torch.log(1 - logits)- (female_weight * females * torch.log(logits))).sum()
 
     def weighted(self, logits, targets, pos_weight=2.5):
         targets = targets.squeeze(1)
@@ -145,16 +153,17 @@ class Fnn(Ntf):
                 if idx not in cor_idx:
                     random_samples[b][idx] = 1
         return (-targets * torch.log(logits) - random_samples * torch.log(1 - logits)).sum()
-    
-    def ns_fair_inverse_unigram_b(self, logits, targets, indexes, neg_samples=5, female_weight=1):
+    def ns_fair_inverse_unigram_b(self, logits_gender, targets, neg_samples=5, female_weight=1):
+        logits = logits_gender['pred']
+        genders = logits_gender['gender'].nonzero()[1]
         targets = targets.squeeze(1)
         logits = logits.squeeze(1)
+
         random_samples = torch.zeros_like(targets)
         n_paper_per_author = torch.sum(targets, dim=0) + 1
         unigram = (n_paper_per_author / (targets.shape[0] + targets.shape[1])).cpu()
 
         females = torch.zeros_like(targets)
-        female_ids = indexes['female_ids']
 
         for b in range(targets.shape[0]):
             rand = torch.rand(targets.shape[1])
@@ -165,9 +174,34 @@ class Fnn(Ntf):
             for idx in k_neg_idx:
                 if idx not in cor_idx:
                     random_samples[b][idx] = 1
-            for idx in female_ids:
-                females[b][idx] = 1
+            for idx in genders:
+                if idx in cor_idx:
+                    females[b][idx] = 1
         return (-targets * torch.log(logits) - random_samples * torch.log(1 - logits) - (female_weight * females * torch.log(logits))).sum()
+
+    # def ns_fair_inverse_unigram_b(self, logits, targets, indexes, neg_samples=5, female_weight=1):
+    #     targets = targets.squeeze(1)
+    #     logits = logits.squeeze(1)
+    #     random_samples = torch.zeros_like(targets)
+    #     n_paper_per_author = torch.sum(targets, dim=0) + 1
+    #     unigram = (n_paper_per_author / (targets.shape[0] + targets.shape[1])).cpu()
+    #
+    #     females = torch.zeros_like(targets)
+    #     female_ids = indexes['female_ids']
+    #
+    #     for b in range(targets.shape[0]):
+    #         rand = torch.rand(targets.shape[1])
+    #         neg_rands = (rand > unigram) * 1
+    #         neg_idx = torch.nonzero(torch.tensor(neg_rands), as_tuple=True)[0]
+    #         k_neg_idx = np.random.choice(neg_idx, neg_samples)
+    #         cor_idx = torch.nonzero(targets[b], as_tuple=True)[0]
+    #         for idx in k_neg_idx:
+    #             if idx not in cor_idx:
+    #                 random_samples[b][idx] = 1
+    #         for idx in female_ids:
+    #             # if idx in cor_idx:
+    #                 females[b][idx] = 1
+    #     return (-targets * torch.log(logits) - random_samples * torch.log(1 - logits) - (female_weight * females * torch.log(logits))).sum()
 
     def learn(self, splits, indexes, vecs, params, prev_model, output):
 
@@ -261,7 +295,7 @@ class Fnn(Ntf):
                             y_ = self.forward(X)
 
                             if loss_type == 'normal':
-                                loss = self.cross_entropy({'pred': y_, 'gender': vecs['gender']}, y, ns, nns, unigram, indexes)
+                                loss = self.cross_entropy({'pred': y_, 'gender': vecs['gender']}, y, ns, nns, unigram)
                             elif loss_type == 'SL':
                                 loss = criterion(y_.squeeze(1), y.squeeze(1), index)
                             elif loss_type == 'DP':
@@ -280,9 +314,9 @@ class Fnn(Ntf):
                             self.train(False)  # Set model to valid mode
                             y_ = self.forward(X)
                             if loss_type == 'normal' or loss_type == 'DP':
-                                loss = self.cross_entropy(y_, y, ns, nns, unigram, indexes)
+                                loss = self.cross_entropy({'pred': y_, 'gender': vecs['gender']}, y, ns, nns, unigram)
                             else:
-                                loss = criterion(y_.squeeze(), y.squeeze(), index)
+                                loss = criterion(y_.squeeze(), y.squeeze())
                             valid_running_loss += loss.item()
                         print(
                             f'Fold {foldidx}/{len(splits["folds"]) - 1}, Epoch {epoch}/{num_epochs - 1}, Minibatch {batch_idx}/{int(X_train.shape[0] / batch_size)}, Phase {phase}'

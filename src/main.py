@@ -139,9 +139,9 @@ def run(data_list, domain_list, fair, filter, future, augment, model_list, outpu
         prep_output = f'./../data/preprocessed/{d_name}/{os.path.split(datapath)[-1]}'
         vecs, indexes = d_cls.generate_sparse_vectors(datapath, f'{prep_output}{filter_str}', filter, settings['data'])
         gender = pd.read_csv(f'{prep_output}{filter_str}/females.csv', index_col=None)
-
-        vecs['gender'] = lil_matrix((1, vecs['member'].shape[0]), gender)# as a single sparse vector 1 * |size of expert| whose nonzero indexes are the file indexes
-
+        female_ids = gender['opentf_index'].values.tolist()
+        vecs['gender'] = lil_matrix((1, vecs['member'].shape[0]))# as a single sparse vector 1 * |size of expert| whose nonzero indexes are the file indexes
+        vecs['gender'][:, female_ids] = 1.0
         if augment:
             from tqdm import tqdm
             for row in tqdm(range(0, vecs['member'].shape[0])):
