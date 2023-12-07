@@ -7,6 +7,7 @@ import pandas as pd
 import torch
 from torch import nn
 
+from Adila.src import main
 from eval.metric import *
 
 class Ntf(nn.Module):
@@ -17,7 +18,7 @@ class Ntf(nn.Module):
     def learn(self, splits, indexes, vecs, params, prev_model, output): pass
     def test(self, model_path, splits, indexes, vecs, params, on_train_valid_set=False, per_epoch=False, merge_skills=False): pass
 
-    def evaluate(self, model_path, splits, vecs, on_train_valid_set=False, per_instance=False, per_epoch=False):
+    def evaluate(self, model_path, splits, vecs, indexes, on_train_valid_set=False, per_instance=False, per_epoch=False):
         if not os.path.isdir(model_path): raise Exception("The predictions do not exist!")
         y_test = vecs['member'][splits['test']]
         for pred_set in (['test', 'train', 'valid'] if on_train_valid_set else ['test']):
@@ -38,8 +39,29 @@ class Ntf(nn.Module):
                     else:
                         Y = y_test
                     Y_ = torch.load(f'{model_path}/f{foldidx}.{pred_set}.{epoch}pred')
+
+                    topk = 5
+                    topk_indices = np.argsort(Y_, axis=1)[:, -topk:]
+
+                    female_ids = indexes['female_ids']
+                    
+                    female_presence_count = np.sum(np.isin(topk_indices, female_ids), axis=1)
+                    if female_presence_count.ndim == 1:
+                        female_presence_count = female_presence_count.reshape((1, -1)).transpose()
+
+                    female_presence_percentage = female_presence_count / topk
+                    
+                    average_female_percentage_in_all_teams = np.mean(female_presence_percentage)
+
+                    print(f"Count of female indices in top {topk} probabilities for each team in fold {foldidx}:")
+                    print(female_presence_count)
+                    print(f"Percentage of female indices in top {topk} probabilities for each team in fold {foldidx}:")
+                    print(female_presence_percentage)
+                    print(f"Average percentage of females in all teams in fold {foldidx}: {average_female_percentage_in_all_teams}")
+                    
                     df, df_mean, (fpr, tpr) = calculate_metrics(Y, Y_, per_instance)
                     if per_instance: df.to_csv(f'{model_path}/f{foldidx}.{pred_set}.{epoch}pred.eval.per_instance.csv', float_format='%.15f')
+                    df_mean.loc['avg_female_perc'] = average_female_percentage_in_all_teams
                     df_mean.to_csv(f'{model_path}/f{foldidx}.{pred_set}.{epoch}pred.eval.mean.csv')
                     with open(f'{model_path}/f{foldidx}.{pred_set}.{epoch}pred.eval.roc.pkl', 'wb') as outfile:
                         pickle.dump((fpr, tpr), outfile)
@@ -52,9 +74,9 @@ class Ntf(nn.Module):
                 if per_instance: fold_mean_per_instance.truediv(len(splits['folds'].keys())).to_csv(f'{model_path}/{pred_set}.{epoch}pred.eval.per_instance_mean.csv')
 
     def fair(self, model_path, teamsvecs, splits, settings):
-        from Adila.src import main as adila
+
         if os.path.isfile(model_path):
-            adila.Reranking.run(fpred=model_path,
+            main.Reranking.run(fpred=model_path,
                           output=model_path,
                           teamsvecs=teamsvecs,
                           splits=splits,
@@ -85,7 +107,7 @@ class Ntf(nn.Module):
             if settings['mode'] == 0:  # sequential run
                 for algorithm in settings['fairness']:
                     for att in settings['attribute']:
-                        for fpred, output in pairs: adila.Reranking.run(fpred=fpred,
+                        for fpred, output in pairs: main.Reranking.run(fpred=fpred,
                                                                   output=output,
                                                                   teamsvecs=teamsvecs,
                                                                   splits=splits,
@@ -101,7 +123,7 @@ class Ntf(nn.Module):
                 for algorithm in settings['fairness']:
                     for att in settings['attribute']:
                         with multiprocessing.Pool(multiprocessing.cpu_count() if settings['core'] < 0 else settings['core']) as executor:
-                            executor.starmap(partial(adila.Reranking.run,
+                            executor.starmap(partial(main.Reranking.run,
                                                      teamsvecs=teamsvecs,
                                                      splits=splits,
                                                      np_ratio=settings['np_ratio'],
@@ -136,6 +158,6 @@ class Ntf(nn.Module):
 
         if 'train' in cmd: self.learn(splits, indexes, vecs, settings, None, output)
         if 'test' in cmd: self.test(output, splits, indexes, vecs, settings, on_train_valid_set, per_epoch, merge_skills)
-        if 'eval' in cmd: self.evaluate(output, splits, vecs, on_train_valid_set, per_instance, per_epoch)
+        if 'eval' in cmd: self.evaluate(output, splits, vecs, indexes, on_train_valid_set, per_instance, per_epoch)
         if 'plot' in cmd: self.plot_roc(output, splits, on_train_valid_set)
         if 'fair' in cmd: self.fair(output, vecs, splits, fair_settings)

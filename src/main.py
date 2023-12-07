@@ -138,15 +138,18 @@ def run(data_list, domain_list, fair, filter, future, augment, model_list, outpu
         datapath = data_list[domain_list.index(d_name)]
         prep_output = f'./../data/preprocessed/{d_name}/{os.path.split(datapath)[-1]}'
         vecs, indexes = d_cls.generate_sparse_vectors(datapath, f'{prep_output}{filter_str}', filter, settings['data'])
-        gender = pd.read_csv(f'{prep_output}/i2gender.csv', index_col=None)
-        female_ids = gender[gender['gender'] == 0]
-        female_ids = female_ids['Unnamed: 0'].values.tolist()
-        indexes['female_ids'] = female_ids
-        random_indices = random.sample(female_ids, 3)
+        gender = pd.read_csv(f'{prep_output}{filter_str}/females.csv', index_col=None)
+
+        vecs['gender'] = lil_matrix((1, vecs['member'].shape[0]), gender)# as a single sparse vector 1 * |size of expert| whose nonzero indexes are the file indexes
+
         if augment:
-            #vecs['member'][:, female_ids] = 1.0
-            for index in random_indices:
-                vecs['member'][random_indices] = 1.0
+            from tqdm import tqdm
+            for row in tqdm(range(0, vecs['member'].shape[0])):
+                # random_indices = random.sample([i for i in range(10)], 3)
+                random_indices = random.sample(gender, 3)
+                #vecs['member'][:, female_ids] = 1.0
+                vecs['member'][row, random_indices] = 1.0
+
         year_idx = []
         for i in range(1, len(indexes['i2y'])):
             if indexes['i2y'][i][0] - indexes['i2y'][i-1][0] > settings['model']['nfolds']:

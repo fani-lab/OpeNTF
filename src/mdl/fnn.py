@@ -49,14 +49,23 @@ class Fnn(Ntf):
                 nn.init.xavier_uniform_(m.weight)
 
     def cross_entropy(self, y_, y, ns, nns, unigram):
-        if ns == "uniform": return self.ns_uniform(y_, y, nns)
-        if ns == "unigram" or ns.startswith("temporal_unigram"): return self.ns_unigram(y_, y, unigram, nns)
-        if ns == "unigram_b": return self.ns_unigram_mini_batch(y_, y, nns)
-        if ns == "inverse_unigram" or ns.startswith("temporal_inverse_unigram"): return self.ns_inverse_unigram(y_, y, unigram, nns)
-        if ns == "inverse_unigram_b": return self.ns_inverse_unigram_mini_batch(y_, y, nns)
+        if ns == "uniform": return self.ns_uniform(y_['pred'], y, nns)
+        if ns == "unigram" or ns.startswith("temporal_unigram"): return self.ns_unigram(y_['pred'], y, unigram, nns)
+        if ns == "unigram_b": return self.ns_unigram_mini_batch(y_['pred'], y, nns)
+        if ns == "inverse_unigram" or ns.startswith("temporal_inverse_unigram"): return self.ns_inverse_unigram(y_['pred'], y, unigram, nns)
+        if ns == "inverse_unigram_b": return self.ns_inverse_unigram_mini_batch(y_['pred'], y, nns)
+        if ns == "female_bias": return self.female_bias(y_, y, nns)
         # return self.weighted(y_, y)
         cri = nn.BCELoss()
-        return cri(y_.squeeze(1), y.squeeze(1))
+        return cri(y_['pred'].squeeze(1), y.squeeze(1))
+
+    def female_bias(self, logits_gender, targets, pos_weight=2.5):
+        logits = logits_gender['pred']
+        genders = logits_gender['gender']
+        targets = targets.squeeze(1)
+        logits = logits.squeeze(1)
+        # this line should be adjusted for females
+        return (-targets * torch.log(logits) * pos_weight + (1 - targets) * - torch.log(1 - logits)).sum()
 
     def weighted(self, logits, targets, pos_weight=2.5):
         targets = targets.squeeze(1)
@@ -136,8 +145,34 @@ class Fnn(Ntf):
                 if idx not in cor_idx:
                     random_samples[b][idx] = 1
         return (-targets * torch.log(logits) - random_samples * torch.log(1 - logits)).sum()
+    
+    def ns_fair_inverse_unigram_b(self, logits, targets, indexes, neg_samples=5, female_weight=1):
+        targets = targets.squeeze(1)
+        logits = logits.squeeze(1)
+        random_samples = torch.zeros_like(targets)
+        n_paper_per_author = torch.sum(targets, dim=0) + 1
+        unigram = (n_paper_per_author / (targets.shape[0] + targets.shape[1])).cpu()
+
+        females = torch.zeros_like(targets)
+        female_ids = indexes['female_ids']
+
+        for b in range(targets.shape[0]):
+            rand = torch.rand(targets.shape[1])
+            neg_rands = (rand > unigram) * 1
+            neg_idx = torch.nonzero(torch.tensor(neg_rands), as_tuple=True)[0]
+            k_neg_idx = np.random.choice(neg_idx, neg_samples)
+            cor_idx = torch.nonzero(targets[b], as_tuple=True)[0]
+            for idx in k_neg_idx:
+                if idx not in cor_idx:
+                    random_samples[b][idx] = 1
+            for idx in female_ids:
+                females[b][idx] = 1
+        return (-targets * torch.log(logits) - random_samples * torch.log(1 - logits) - (female_weight * females * torch.log(logits))).sum()
 
     def learn(self, splits, indexes, vecs, params, prev_model, output):
+
+        genders = vecs['gender']#female column idx
+
         loss_type = params['loss']
 
         learning_rate = params['lr']
@@ -226,7 +261,7 @@ class Fnn(Ntf):
                             y_ = self.forward(X)
 
                             if loss_type == 'normal':
-                                loss = self.cross_entropy(y_, y, ns, nns, unigram)
+                                loss = self.cross_entropy({'pred': y_, 'gender': vecs['gender']}, y, ns, nns, unigram, indexes)
                             elif loss_type == 'SL':
                                 loss = criterion(y_.squeeze(1), y.squeeze(1), index)
                             elif loss_type == 'DP':
@@ -245,7 +280,7 @@ class Fnn(Ntf):
                             self.train(False)  # Set model to valid mode
                             y_ = self.forward(X)
                             if loss_type == 'normal' or loss_type == 'DP':
-                                loss = self.cross_entropy(y_, y, ns, nns, unigram)
+                                loss = self.cross_entropy(y_, y, ns, nns, unigram, indexes)
                             else:
                                 loss = criterion(y_.squeeze(), y.squeeze(), index)
                             valid_running_loss += loss.item()
@@ -263,12 +298,12 @@ class Fnn(Ntf):
                           f', Running Loss {phase} {train_loss_values[-1] if phase == "train" else valid_loss_values[-1]}'
                           f", Time {time.time() - fold_time}, Overall {time.time() - start_time} "
                           )
-                torch.save(self.state_dict(), f"{output}/state_dict_model.f{foldidx}.e{epoch}.pt", pickle_protocol=4)
+                # torch.save(self.state_dict(), f"{output}/state_dict_model.f{foldidx}.e{epoch}.pt", pickle_protocol=4)
                 scheduler.step(valid_running_loss / X_valid.shape[0])
-                earlystopping(valid_loss_values[-1], self)
-                if earlystopping.early_stop:
-                    print(f"Early Stopping Triggered at epoch: {epoch}")
-                    break
+                # earlystopping(valid_loss_values[-1], self)
+                # if earlystopping.early_stop:
+                #     print(f"Early Stopping Triggered at epoch: {epoch}")
+                #     break
 
             model_path = f"{output}/state_dict_model.f{foldidx}.pt"
 
@@ -287,7 +322,7 @@ class Fnn(Ntf):
                 plt.legend(loc='upper right')
                 plt.title(f'Training and Validation Loss for fold #{foldidx}')
                 plt.savefig(f'{output}/f{foldidx}.train_valid_loss.png', dpi=100, bbox_inches='tight')
-                plt.show()
+                # plt.show()
 
     def test(self, model_path, splits, indexes, vecs, params, on_train_valid_set=False, per_epoch=False, merge_skills=False):
         if not os.path.isdir(model_path): raise Exception("The model does not exist!")

@@ -20,7 +20,7 @@ settings = {
                 'b': 128,  # batch size
                 'e': 10,  # epoch
                 'nns': 3,  # number of negative samples
-                'ns': 'inverse_unigram_b',  # 'none', 'uniform', 'unigram', 'unigram_b'
+                'ns': 'female_bias',  # 'none', 'uniform', 'unigram', 'unigram_b', 'female_bias'
                 'loss': 'normal',  # 'SL'-> superloss, 'DP' -> Data Parameters, 'normal' -> Binary Cross Entropy
             },
             'bnn':{

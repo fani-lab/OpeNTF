@@ -18,7 +18,7 @@ class Team(object):
         self.members_locations = [] #[(city, state, country)] the living addresses of the members. might not be the same as the address of the team (venue of a paper or country that a patent is issued)
         self.members_details = []
 
-    def get_one_hot(self, s2i, c2i, l2i, location_type):
+    def get_one_hot(self, s2i, c2i, l2i, location_type, female_indices_list):
         # Generating one hot encoded vector for skills of team
         skill_vec_dim = len(s2i)
         x = np.zeros((1, skill_vec_dim))
@@ -30,6 +30,8 @@ class Team(object):
         idnames = [f'{m.id}_{m.name}' for m in self.members]
         for idname in idnames:
             y[0, c2i[idname]] = 1
+        # for female_ind in female_indices_list:
+        #     y[0, female_ind] = 1 
         id = np.zeros((1, 1))
         id[0, 0] = self.id
 
@@ -96,6 +98,24 @@ class Team(object):
         return i2t, t2i
     
     @staticmethod
+    def build_index_teamdatetimes(teams):
+        print('Indexing teams date (year) ...')
+        i2tdt = {}
+        for team in teams:
+            i2tdt[team.id] = team.datetime
+        return i2tdt
+    
+    @staticmethod 
+    def build_index_datetime(teams):
+        print('Indexing dates (year) ...')
+        dt2i = {}; i2dt = {}
+        for team in teams:
+            if team.datetime not in dt2i:
+                dt2i[team.datetime] = team.id #shouldn't be a collection of team ids in that date?
+                i2dt[team.id] = team.datetime
+        return i2dt, dt2i
+
+    @staticmethod
     def read_data(teams, output, filter, settings):
         # should be overridden by the children classes, customize their loading data
         # read data from file
@@ -120,6 +140,7 @@ class Team(object):
         indexes['i2s'], indexes['s2i'] = Team.build_index_skills(teams)
         indexes['i2t'], indexes['t2i'] = Team.build_index_teams(teams)
         indexes['i2l'], indexes['l2i'] = Team.build_index_location(teams, settings["location_type"])
+        indexes['i2tdt'] = Team.build_index_teamdatetimes(teams)
         indexes['i2y'] = year_idx
         st = time()
 
@@ -147,24 +168,24 @@ class Team(object):
         return indexes, teams
 
     @staticmethod
-    def bucketing(bucket_size, s2i, c2i, l2i, location_type, teams):
+    def bucketing(bucket_size, s2i, c2i, female_indices_list, l2i, location_type, teams):
         skill_vec_dim = len(s2i)
         candidate_vec_dim = len(c2i)
         location_vec_dim = len(l2i)
-        data = lil_matrix((len(teams), 1 + skill_vec_dim + candidate_vec_dim + location_vec_dim), dtype='u1')
+        data = lil_matrix((len(teams), 1 + skill_vec_dim + candidate_vec_dim + location_vec_dim))
         data_ = np.zeros((bucket_size, 1 + skill_vec_dim + candidate_vec_dim + location_vec_dim))
         j = -1
         st = time()
         for i, team in enumerate(teams):
             try:
                 j += 1
-                data_[j] = team.get_one_hot(s2i, c2i, l2i, location_type)
+                data_[j] = team.get_one_hot(s2i, c2i, l2i, location_type, female_indices_list)
             except IndexError as ex:
                 s = int(((i / bucket_size) - 1) * bucket_size)
                 e = int(s + bucket_size)
                 data[s: e] = data_
                 j = 0
-                data_[j] = team.get_one_hot(s2i, c2i, l2i, location_type)
+                data_[j] = team.get_one_hot(s2i, c2i, l2i, location_type, female_indices_list)
             except Exception as ex:
                 raise ex
 
@@ -176,6 +197,13 @@ class Team(object):
     @classmethod
     def generate_sparse_vectors(cls, datapath, output, filter, settings):
         pkl = f'{output}/teamsvecs.pkl'
+        gender_csv = f'{output}/i2gender.csv'
+        df = pd.read_csv(gender_csv)
+        df.columns = ['Expert_Index', 'Gender']
+        df['Gender'] = df['Gender'].astype(bool)
+        female_indices = df[df['Gender'] == False]['Expert_Index']
+        female_indices_list = female_indices.tolist()
+        
         try:
             st = time()
             print(f"Loading sparse matrices from {pkl} ...")
@@ -192,17 +220,49 @@ class Team(object):
                 with multiprocessing.Pool() as p:
                     n_core = multiprocessing.cpu_count() if settings['ncore'] <= 0 else settings['ncore']
                     subteams = np.array_split(teams, n_core)
-                    func = partial(Team.bucketing, settings['bucket_size'], indexes['s2i'], indexes['c2i'], indexes['l2i'], settings['location_type'])
+                    func = partial(Team.bucketing, settings['bucket_size'], indexes['s2i'], indexes['c2i'], female_indices_list, indexes['l2i'], settings['location_type'])
                     data = p.map(func, subteams)
                     #It took 12156.825613975525 seconds to generate and store the sparse matrices of size (1729691, 818915) at ./../data/preprocessed/uspt/patent.tsv.filtered.mt5.ts3/teamsvecs.pkl
                     #It took 11935.809179782867 seconds to generate and store the sparse matrices of size (661335, 1444501) at ./../data/preprocessed/gith/data.csv/teamsvecs.pkl
             # serial
             else:
-                data = Team.bucketing(settings['bucket_size'], indexes['s2i'], indexes['c2i'], teams)
+                data = Team.bucketing(settings['bucket_size'], indexes['s2i'], indexes['c2i'], female_indices_list, indexes['l2i'], settings['location_type'], teams)
             data = scipy.sparse.vstack(data, 'lil')#{'bsr', 'coo', 'csc', 'csr', 'dia', 'dok', 'lil'}, By default an appropriate sparse matrix format is returned!!
             vecs = {'id': data[:, 0], 'skill': data[:, 1:len(indexes['s2i']) + 1], 'loc': data[:, len(indexes['s2i']) + 1: len(indexes['s2i']) + 1 + len(indexes['l2i'])], 'member': data[:, - len(indexes['c2i']):]}
+            
+            ### Method 1 
+            # index_of_expert_in_each_team = {}
+            # for i, row in enumerate(vecs['member'].rows):
+            #     index_of_expert_in_each_team[i] = row    
+            # list_of_female_indices = [1,2] 
+            # teams_with_female = {}
+            # for k, v in index_of_expert_in_each_team.items():
+            #     for expert in v:
+            #         if expert in list_of_female_indices:
+            #             teams_with_female[k] = 1
+            #             break
+            #         teams_with_female[k] = 0     
+            
+            ### Method 2   
+            list_of_female_indices = [1,2]
+            female_expert_vector = np.zeros(vecs['member'].shape[1], dtype=int)
+
+            for idx in list_of_female_indices:
+                female_expert_vector[idx] = 1
+            
+            female_expert_sparse_matrix = scipy.sparse.lil_matrix(female_expert_vector)
+            sparse_teams_with_female = vecs['member'].dot(female_expert_sparse_matrix.T).tolil()
+            teams_with_female = {}
+            for i, row in enumerate(sparse_teams_with_female.rows):
+                if len(row) != 0:
+                    teams_with_female[i] = 1
+                else:
+                    teams_with_female[i] = 0
+            
+            # indexes['female_indices_list'] = female_indices_list
 
             with open(pkl, 'wb') as outfile: pickle.dump(vecs, outfile)
+            # with open(f'{output}/indexes.pkl', "wb") as outfile: pickle.dump(indexes, outfile)
             print(f"It took {time() - st} seconds to generate and store the sparse matrices of size {data.shape} at {pkl}")
             return vecs, indexes
 
