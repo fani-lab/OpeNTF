@@ -8,7 +8,7 @@ settings = {
         'dup_edge': None, #None: keep the duplicates, else: reduce by 'add', 'mean', 'min', 'max', 'mul'
     },
     'model': {
-        'max_epochs': 10,
+        'max_epochs': 100,
         'embedding_dim': 5,
         'lr': 0.01,
         'batch_size': 5,

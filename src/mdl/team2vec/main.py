@@ -41,37 +41,31 @@ def run(teamsvecs_file, indexes_file, model, output):
 
         if model == 'gnn.n2v':
             from torch_geometric.nn import Node2Vec
-            device = 'cuda' if torch.cuda.is_available() else 'cpu'
+            t2v.device = 'cuda' if torch.cuda.is_available() else 'cpu'
             t2v.model = Node2Vec(t2v.data.edge_index,
                                  embedding_dim=params.settings['model']['embedding_dim'],
                                  walk_length=params.settings['model'][model]['walk_length'],
                                  context_size=params.settings['model'][model]['context_size'],
                                  walks_per_node=params.settings['model'][model]['walks_per_node'],
-                                 num_negative_samples=params.settings['model'][model]['num_negative_samples']).to(device)
+                                 num_negative_samples=params.settings['model'][model]['num_negative_samples']).to(t2v.device)
 
-            loader = t2v.model.loader(batch_size=params.settings['model']['batch_size'],
+            t2v.loader = t2v.model.loader(batch_size=params.settings['model']['batch_size'],
                                        shuffle=params.settings['model']['loader_shuffle'],
                                        num_workers=params.settings['model']['num_workers'])
-            optimizer = torch.optim.Adam(list(t2v.model.parameters()), lr=params.settings['model']['lr'])
+            t2v.optimizer = torch.optim.Adam(list(t2v.model.parameters()), lr=params.settings['model']['lr'])
 
         elif model == 'gnn.m2v':
-            import gnn
             t2v = M2V()
 
         # gcn (for homogeneous only)
         elif model == 'gnn.gcn':
-            import gnn
             from gcn import Gcn
 
             output_ = output + f'{params.settings["graph"]["edge_types"][1]}.{"dir" if params.settings["graph"]["dir"] else "undir"}.{str(params.settings["graph"]["dup_edge"]).lower()}.'
             t2v = Gcn(teamsvecs, indexes, params.settings['graph'], output_)
-            t2v.init()
-            t2v.train()
-            print(t2v)
-            return
 
-
-        t2v.train()
+        t2v.train(params.settings['model']['max_epochs'])
+        print(t2v)
 
 def test_toys(args):
     # test for all valid combinations on toys

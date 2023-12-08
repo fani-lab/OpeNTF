@@ -1,106 +1,146 @@
-import math
+# import math
+#
+# import torch_geometric.data
+#
+# import params
+# import src.mdl.gnn.graph
+# from src.mdl.team2vec.data_handler import DataHandler
+#
+# import os
+# import torch
+# from torch_geometric.nn import Node2Vec
+# import numpy as np
+#
+# class N2V(src.mdl.gnn.graph.Graph):
+#
+#     # train the model to generate embeddings
+#     def run(self):
+#         losses = []; list_epochs = []; min_loss = math.inf
+#         # this file logs every 10 / 20 epochs
+#         # it is NOT the final pickle file for embeddings
+#         with open(f'{self.graph_preprocessed_output_filename}.e{num_epochs}.txt', 'w') as outfile:
+#             line = f'Graph : \n\n' \
+#                    f'data = {self.data.__dict__}\n' \
+#                    f'\nNumber of Epochs : {num_epochs}\n' \
+#                    f'---------------------------------\n'
+#             for epoch in range(num_epochs):
+#                 model.train()
+#                 total_loss = 0
+#                 for i, (pos_rw, neg_rw) in enumerate(loader):
+#                     optimizer.zero_grad()
+#                     loss = model.loss(pos_rw.to(device), neg_rw.to(device))
+#                     loss.backward()
+#                     optimizer.step()
+#
+#                     print(f'\ti : {i}, loss : {loss}')
+#                     total_loss += loss.item()
+#                     # if (i + 1) % log_steps == 0:
+#                     #     print((f'Epoch: {epoch}, Step: {i + 1:05d}/{len(loader)}, '
+#                     #            f'Loss: {total_loss / log_steps:.4f}'))
+#                     #     total_loss = 0
+#                 loss = total_loss / len(loader)
+#
+#                     # lines to write to file
+#                     line += f'Epoch : {epoch}\n'
+#                     line += f'--------------------------\n'
+#                     line += f'Node ----- Embedding -----\n\n'
+#                     for i, weights_per_node in enumerate(weights):
+#                         print(weights_per_node)
+#                         line += f'{i:2} : {weights_per_node}\n'
+#                     line += f'--------------------------\n\n'
+#                 losses.append(loss)
+#                 list_epochs.append(epoch)
+#             # write to file
+#             outfile.write(line)
+#
+#         # store the final embeddings to a pickle file
+#         self.dh.write_graph(weights, f'{self.graph_preprocessed_output_filename}.e{num_epochs}.pkl')
+#
+#         # draw and save the loss vs epoch plot
+#         self.plot(list_epochs, losses, f'{self.graph_plot_filename}.e{num_epochs}.png')
 
-import torch_geometric.data
+import os.path as osp
+import sys
 
-import params
-import src.mdl.gnn.graph
-from src.mdl.team2vec.data_handler import DataHandler
-
-import os
+import matplotlib.pyplot as plt
 import torch
+from sklearn.manifold import TSNE
+
+from torch_geometric.datasets import Planetoid
 from torch_geometric.nn import Node2Vec
-import numpy as np
 
-class N2V(src.mdl.gnn.graph.Graph):
+path = osp.join(osp.dirname(osp.realpath(__file__)), '..', 'data', 'Planetoid')
+dataset = Planetoid(path, name='Cora')
+data = dataset[0]
 
-    def init_model(self):
-        assert type(self.data) == torch_geometric.data.Data
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+model = Node2Vec(
+    data.edge_index,
+    embedding_dim=128,
+    walk_length=20,
+    context_size=10,
+    walks_per_node=10,
+    num_negative_samples=1,
+    p=1.0,
+    q=1.0,
+    sparse=True,
+).to(device)
 
-        self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
-        self.model = Node2Vec(self.data.edge_index, embedding_dim=self.embedding_dim,
-                             walk_length=self.walk_length, context_size=self.context_size,
-                             walks_per_node=self.walks_per_node, num_negative_samples=self.num_negative_samples).to(self.device)
+num_workers = 4 if sys.platform == 'linux' else 0
+loader = model.loader(batch_size=128, shuffle=True, num_workers=num_workers)
+optimizer = torch.optim.SparseAdam(list(model.parameters()), lr=0.01)
 
-        self.loader = self.model.loader(batch_size = self.batch_size, shuffle = self.loader_shuffle, num_workers = self.num_workers)
-        self.optimizer = torch.optim.Adam(list(self.model.parameters()), lr = self.lr)
+# data.train_mask = data.val_mask = data.test_mask = data.y = None
 
-        try :
-            pos_rw, neg_rw = next(iter(self.loader))
-        except EOFError:
-            print(f'EOFError while generating pos_rw and neg_rw')
 
-    # train the model to generate embeddings
-    def learn(self, model, optimizer, loader, device, epoch, log_steps = 50, eval_steps = 2000):
-        model.train()
+def train():
+    model.train()
+    total_loss = 0
+    for pos_rw, neg_rw in loader:
+        optimizer.zero_grad()
+        loss = model.loss(pos_rw.to(device), neg_rw.to(device))
+        loss.backward()
+        optimizer.step()
+        total_loss += loss.item()
+    return total_loss / len(loader)
 
-        total_loss = 0
-        print(f'learn(epoch({epoch})')
-        print(f'######################################')
-        for i, (pos_rw, neg_rw) in enumerate(loader):
-            optimizer.zero_grad()
-            loss = model.loss(pos_rw.to(device), neg_rw.to(device))
-            loss.backward()
-            optimizer.step()
 
-            print(f'\ti : {i}, loss : {loss}')
-            total_loss += loss.item()
-            # if (i + 1) % log_steps == 0:
-            #     print((f'Epoch: {epoch}, Step: {i + 1:05d}/{len(loader)}, '
-            #            f'Loss: {total_loss / log_steps:.4f}'))
-            #     total_loss = 0
-        print(f'######################################')
-        return total_loss / len(loader)
+@torch.no_grad()
+def test():
+    model.eval()
+    z = model()
+    acc = model.test(
+        train_z=z[data.train_mask],
+        train_y=data.y[data.train_mask],
+        test_z=z[data.test_mask],
+        test_y=data.y[data.test_mask],
+        max_iter=150,
+    )
+    return acc
 
-    def run(self):
-        self.load(self.teams_graph_input_filepath)
-        for num_epochs in self.max_epochs:
-            self.init_model()
 
-            losses = []
-            list_epochs = []
-            min_loss = math.inf
+for epoch in range(1, 100):
+    loss = train()
+    acc = 0#test()
+    print(f'Epoch: {epoch:03d}, Loss: {loss:.4f}, Acc: {acc:.4f}')
 
-            # this file logs every 10 / 20 epochs
-            # it is NOT the final pickle file for embeddings
-            with open(f'{self.graph_preprocessed_output_filename}.e{num_epochs}.txt', 'w') as outfile:
-                line = f'Graph : \n\n' \
-                       f'data = {self.data.__dict__}\n' \
-                       f'\nNumber of Epochs : {num_epochs}\n' \
-                       f'---------------------------------\n'
-                for epoch in range(num_epochs):
-                    loss = self.learn(self.model, self.optimizer, self.loader, self.device, epoch)
-                    if(loss < min_loss):
-                        min_loss = loss
-                        print('.')
 
-                    if (epoch % 10 == 0):
-                        print(f'Epoch = {epoch : 02d}, loss = {loss : .4f}')
+@torch.no_grad()
+def plot_points(colors):
+    model.eval()
+    z = model().cpu().numpy()
+    z = TSNE(n_components=2).fit_transform(z)
+    y = data.y.cpu().numpy()
 
-                        # the model() gives all the weights and biases of the model currently
-                        # the detach() enables this result to require no gradient
-                        # and then we convert the tensor to numpy array
-                        weights = self.model.embedding.weight.detach().numpy()
-                        # weights = self.normalize(weights)
-                        # weights = np.around(weights, 2)
+    plt.figure(figsize=(8, 8))
+    for i in range(dataset.num_classes):
+        plt.scatter(z[y == i, 0], z[y == i, 1], s=20, color=colors[i])
+    # plt.scatter(z[:, 0], z[:, 1], s=20)
+    plt.axis('off')
+    plt.show()
 
-                        print(f'\nepoch : {epoch}\n')
-                        print(weights)
 
-                        # lines to write to file
-                        line += f'Epoch : {epoch}\n'
-                        line += f'--------------------------\n'
-                        line += f'Node ----- Embedding -----\n\n'
-                        for i, weights_per_node in enumerate(weights):
-                            print(weights_per_node)
-                            line += f'{i:2} : {weights_per_node}\n'
-                        line += f'--------------------------\n\n'
-                    losses.append(loss)
-                    list_epochs.append(epoch)
-                # write to file
-                outfile.write(line)
-
-            # store the final embeddings to a pickle file
-            self.dh.write_graph(weights, f'{self.graph_preprocessed_output_filename}.e{num_epochs}.pkl')
-
-            # draw and save the loss vs epoch plot
-            self.plot(list_epochs, losses, f'{self.graph_plot_filename}.e{num_epochs}.png')
+colors = [
+    '#ffc0cb', '#bada55', '#008080', '#420420', '#7fe5f0', '#065535', '#ffd700'
+]
+plot_points(colors)

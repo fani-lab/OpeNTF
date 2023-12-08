@@ -11,6 +11,10 @@ class Gnn(Team2Vec):
 
     def __init__(self, teamsvecs, indexes, settings, output):
         super().__init__(teamsvecs, indexes, settings, output)
+
+        self.loader = None
+        self.optimizer = None
+        self.device = 'gpu'
     def create(self, file):
         # https://pytorch-geometric.readthedocs.io/en/latest/modules/utils.html#torch_geometric.utils.remove_self_loops
 
@@ -57,26 +61,32 @@ class Gnn(Team2Vec):
         with open(file, 'wb') as f: pickle.dump(self.data, f)
         return self.data
 
-    def plot(self, x, y, output_filepath = None):
-        mx = max(y)
-        mn = min(y)
-        threshold = (mx - mn) // 10
+    def train(self, epochs):
+        for epoch in range(epochs):
+            self.model.train()
+            total_loss = 0
+            for pos_rw, neg_rw in self.loader:
+                self.optimizer.zero_grad()
+                loss = self.model.loss(pos_rw.to(self.device), neg_rw.to(self.device))
 
-        plt.figure()
-        plt.ylabel('Loss')
-        plt.ylim(mn - threshold, mx + threshold)
-        plt.xlabel('Epochs')
-        plt.xlim(0, len(x))
-        plt.plot(x, y)
-        plt.legend('This is a legend')
-        # save the figure before showing the plot
-        # because after plt.show() another blank figure is created
-        if(output_filepath):
-            print(f'Saving plot in {output_filepath}')
-            plt.savefig(output_filepath)
+                #TODO: we can inject opentf here and add the loss
 
-        plt.show()
+                loss.backward()
+                self.optimizer.step()
+                total_loss += loss.item()
+            loss = total_loss / len(self.loader)
 
-    def plot_homogeneous_graph(self, teams_graph):
-        G = torch_geometric.utils.to_networkx(teams_graph, to_undirected=True)
-        nx.draw(G, with_labels=True)
+            # TODO: directly launch a pretrained model
+            acc = self.valid()
+            print(f'Epoch: {epoch:03d}, Loss: {loss:.4f}, Acc: {acc:.4f}')
+
+    @torch.no_grad()
+    def valid(self):
+        self.model.eval()
+        z = self.model()
+        #https://pytorch-geometric.readthedocs.io/en/latest/generated/torch_geometric.nn.models.Node2Vec.html
+        #TODO: the default test is LR on node labels, but we should bring it to team formation test
+        #acc = model.test(train_z=z[self.data.train_mask], train_y=data.y[self.data.train_mask], test_z=z[self.data.test_mask], test_y=data.y[self.data.test_mask], max_iter=150)
+        return 0# acc
+
+

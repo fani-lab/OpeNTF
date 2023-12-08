@@ -100,10 +100,9 @@ class Gcn(Gnn):
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=0.001)
 
     # learn for unbatched data
-    def learn(self, data):
+    def learn(self, data, epochs):
         start = time.time()
         min_loss = 100000000000
-        epochs = 1000
         emb = {}
 
         for epoch in range(1, epochs + 1):
@@ -226,7 +225,7 @@ class Gcn(Gnn):
             print(f"AUC : {auc:.4f}")
             return auc
 
-    def train(self):
+    def train(self, epochs):
         self.is_directed = self.data.is_directed()
 
         self.train_data, self.val_data, self.test_data = self.define_splits(self.data)
@@ -242,7 +241,7 @@ class Gcn(Gnn):
         # the train_data is needed to collect info about the metadata
         self.init_model(self.train_data)
 
-        self.learn(self.train_data)
+        self.learn(self.train_data, epochs)
         # the sampled_data from mini_batch_loader does not properly show the
         # is_directed status
         # self.learn_batch(train_loader, is_directed)
