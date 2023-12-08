@@ -89,4 +89,20 @@ class Gnn(Team2Vec):
         #acc = model.test(train_z=z[self.data.train_mask], train_y=data.y[self.data.train_mask], test_z=z[self.data.test_mask], test_y=data.y[self.data.test_mask], max_iter=150)
         return 0# acc
 
+    @torch.no_grad()
+    def plot_points(self):
+        from sklearn.manifold import TSNE
+        self.model.eval()
+        z = self.model().cpu().numpy()
+        z = TSNE(n_components=2).fit_transform(z)
+        #y = data.y.cpu().numpy()
+
+        plt.figure(figsize=(8, 8))
+        # for i in range(dataset.num_classes):
+        #     plt.scatter(z[y == i, 0], z[y == i, 1], s=20, color=colors[i])
+        plt.scatter(z[:, 0], z[:, 1], s=20)
+        plt.axis('off')
+        plt.show()
+
+
 
