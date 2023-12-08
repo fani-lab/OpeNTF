@@ -65,6 +65,7 @@ def run(teamsvecs_file, indexes_file, model, output):
             t2v = Gcn(teamsvecs, indexes, params.settings['graph'], output_)
 
         t2v.train(params.settings['model']['max_epochs'])
+        t2v.plot_points()
         print(t2v)
 
 def test_toys(args):
