@@ -10,8 +10,7 @@ from sklearn.metrics import roc_auc_score
 import os, argparse, pickle, time
 
 class Gcn(Gnn):
-    def __init__(self, teamsvecs, indexes, settings, output):
-        super().__init__(teamsvecs, indexes, settings, output)
+    def __init__(self, teamsvecs, indexes, settings, output): super().__init__(teamsvecs, indexes, settings, output)
 
     def define_splits(self, data):
 
@@ -88,74 +87,8 @@ class Gcn(Gnn):
 
         return mini_batch_loader
 
-    def init_model(self, data):
-
-        self.model = GCNModel(hidden_channels=10, data = data)
-        print(self.model)
-
-        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        print(f"Device: '{self.device}'")
-
-        self.model.to(self.device)
-        self.optimizer = torch.optim.Adam(self.model.parameters(), lr=0.001)
-
-    # learn for unbatched data
-    def learn(self, data, epochs):
-        start = time.time()
-        min_loss = 100000000000
-        emb = {}
-
-        for epoch in range(1, epochs + 1):
-            self.optimizer.zero_grad()
-            data.to(self.device)
-            pred = self.model(data, self.is_directed)
-
-            if (type(data) == HeteroData):
-                node_types = data.node_types
-                edge_types = data.edge_types if self.is_directed else data.edge_types[
-                                                                         :(len(data.edge_types)) // 2]
-                # we have ground_truths per edge_label_index
-                ground_truth = torch.empty(0)
-                for edge_type in edge_types:
-                    ground_truth = torch.cat((ground_truth, data[edge_type].edge_label.unsqueeze(0)), dim=1)
-                ground_truth = ground_truth.squeeze(0)
-
-                for node_type in node_types:
-                    if(epoch == epochs):
-                        emb[node_type] = self.model[node_type].x_dict
-                # ground_truth = sampled_data['user','rates','movie'].edge_label
-            else:
-                if (epoch == epochs):
-                    emb['node'] = self.model.x
-                ground_truth = data.edge_label
-
-            loss = F.binary_cross_entropy_with_logits(pred, ground_truth)
-            loss.backward()
-            self.optimizer.step()
-
-            if(loss < min_loss):
-                min_loss = loss
-            if(epoch % 10 == 0):
-                print(f'epoch : {epoch}, loss : {loss:.4f}')
-
-        print(f'min_loss after {epochs} epochs : {min_loss:.4f}')
-        end = time.time()
-        total_time = end - start
-        print(f'total time taken : {total_time:.2f} seconds || {total_time / 60:.2f} minutes || {total_time / (60 * 60)} hours')
-
-        # store the final embeddings
-        filepath = self.output
-        # filepath2 = os.path.split(filepath)[0] + 'temp.pkl'
-        # with open(filepath2, 'wb') as f:
-        #     pickle.dump(emb, f)
-
-
-    # learning with batching
-    def learn_batch(self, train_loader, is_directed):
-
-        epochs = 1000
-
-        for epoch in range(1, epochs + 1):
+    def learn_batch(self, epochs, train_loader, is_directed):
+        for epoch in range(epochs):
             total_loss = total_examples = 0
             # print(f'epoch = {epoch}')
             for sampled_data in train_loader:
@@ -193,8 +126,6 @@ class Gcn(Gnn):
                 # auc = eval(val_loader)
                 print(f"Epoch: {epoch:03d}, Loss: {total_loss / total_examples:.4f}")
 
-
-    # loader can be test or can be validation
     def eval(self, data, mode='validation'):
         with torch.no_grad():
             data.to(self.device)
@@ -202,12 +133,10 @@ class Gcn(Gnn):
             # The ground_truth and the pred shapes should be 1-dimensional
             # we squeeze them after generation
             if (type(data) == HeteroData):
-                edge_types = data.edge_types if self.is_directed else data.edge_types[
-                                                                 :(len(data.edge_types)) // 2]
+                edge_types = data.edge_types if self.is_directed else data.edge_types[:(len(data.edge_types)) // 2]
                 # we have ground_truths per edge_label_index
                 ground_truth = torch.empty(0)
-                for edge_type in edge_types:
-                    ground_truth = torch.cat((ground_truth, data[edge_type].edge_label.unsqueeze(0)), dim=1)
+                for edge_type in edge_types: ground_truth = torch.cat((ground_truth, data[edge_type].edge_label.unsqueeze(0)), dim=1)
                 ground_truth = ground_truth.squeeze(0)
             else:
                 ground_truth = data.edge_label
@@ -225,9 +154,8 @@ class Gcn(Gnn):
             print(f"AUC : {auc:.4f}")
             return auc
 
-    def train(self, epochs):
+    def train(self, epochs, save_per_epoch=False):
         self.is_directed = self.data.is_directed()
-
         self.train_data, self.val_data, self.test_data = self.define_splits(self.data)
 
         ## Sampling
@@ -235,14 +163,48 @@ class Gcn(Gnn):
         # val_loader = create_mini_batch_loader(val_data)
         # test_loader = create_mini_batch_loader(test_data)
 
-        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        print(f"Device: '{self.device}'")
-
-        # the train_data is needed to collect info about the metadata
-        self.init_model(self.train_data)
-
-        self.learn(self.train_data, epochs)
         # the sampled_data from mini_batch_loader does not properly show the
         # is_directed status
-        # self.learn_batch(train_loader, is_directed)
+        # self.learn_batch(epochs, train_loader, is_directed)
         # eval(test_loader)
+        t_start_time = time.time()
+        min_loss = 100000000000
+        emb = {}
+
+        for epoch in range(epochs):
+            e_start_time = time.time()
+            self.optimizer.zero_grad()
+            data.to(self.device)
+            pred = self.model(data, self.is_directed)
+
+            if (type(data) == HeteroData):
+                node_types = data.node_types
+                edge_types = data.edge_types if self.is_directed else data.edge_types[:(len(data.edge_types)) // 2]
+                # we have ground_truths per edge_label_index
+                ground_truth = torch.empty(0)
+                for edge_type in edge_types: ground_truth = torch.cat((ground_truth, data[edge_type].edge_label.unsqueeze(0)), dim=1)
+                ground_truth = ground_truth.squeeze(0)
+
+                for node_type in node_types:
+                    if(epoch == epochs): emb[node_type] = self.model[node_type].x_dict
+                # ground_truth = sampled_data['user','rates','movie'].edge_label
+            else:
+                if (epoch == epochs): emb['node'] = self.model.x
+                ground_truth = data.edge_label
+
+            loss = F.binary_cross_entropy_with_logits(pred, ground_truth)
+            loss.backward()
+            self.optimizer.step()
+
+            if(loss < min_loss): min_loss = loss
+            print(f'Epoch: {epoch:03d}, Loss: {loss:.4f}, Time: {time.time() - e_start_time: 0.4f}')
+            if save_per_epoch: torch.save(self.model.state_dict(), f'{model_output}/gnn_model.e{epoch}.pt', pickle_protocol=4)
+        torch.save(self.model.state_dict(), f'{model_output}/gnn_model.pt', pickle_protocol=4)
+        # to load later by: self.model.load_state_dict(torch.load(f'{self.output}/gnn_model.pt'))
+
+        print(f'It took {time.time() - t_start_time} to train the model.')
+        # store the final embeddings
+        filepath = self.output
+        # filepath2 = os.path.split(filepath)[0] + 'temp.pkl'
+        # with open(filepath2, 'wb') as f:
+        #     pickle.dump(emb, f)

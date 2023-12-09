@@ -14,7 +14,7 @@ class Gnn(Team2Vec):
 
         self.loader = None
         self.optimizer = None
-        self.device = 'gpu'
+        self.device = 'cuda'
         if not os.path.isdir(self.output): os.makedirs(self.output)
     def create(self, file):
         # https://pytorch-geometric.readthedocs.io/en/latest/modules/utils.html#torch_geometric.utils.remove_self_loops
@@ -63,6 +63,7 @@ class Gnn(Team2Vec):
         return self.data
 
     def train(self, epochs, save_per_epoch=False):
+        self.model.to(self.device)
         model_output = f'{self.output}/{self.model_name}'
         if not os.path.isdir(model_output): os.makedirs(model_output)
         train_loss_values = []
