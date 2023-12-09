@@ -80,7 +80,7 @@ def test_toys(args):
         args.model = 'gnn.n2v'
         for edge_type in [('member', 'm')]: #n2v is only for homo, ([('skill', '-', 'team'), ('member', '-', 'team')], 'stm'), ([('skill', '-', 'member')], 'sm')]:
             for dir in [True, False]:
-                for dup in [None, 'add', 'mean', 'min', 'max', 'mul']:
+                for dup in [None, 'mean']:#add', 'mean', 'min', 'max', 'mul']:
                     params.settings['graph'] = {'edge_types': edge_type, 'dir': dir, 'dup_edge': dup}
                     run(f'{args.teamsvecs}teamsvecs.pkl', f'{args.teamsvecs}indexes.pkl', args.model, f'{args.output}/{args.model.split(".")[0]}/')
 
