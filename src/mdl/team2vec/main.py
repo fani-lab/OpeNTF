@@ -62,9 +62,9 @@ def run(teamsvecs_file, indexes_file, model, output):
         # gcn (for homogeneous only)
         elif model == 'gnn.gcn':
             from gcn import Gcn
-
-            output_ = output + f'{params.settings["graph"]["edge_types"][1]}.{"dir" if params.settings["graph"]["dir"] else "undir"}.{str(params.settings["graph"]["dup_edge"]).lower()}.'
-            t2v = Gcn(teamsvecs, indexes, params.settings['graph'], output_)
+            t2v.model = GCNModel(hidden_channels=10, data=t2v.data)
+            t2v.optimizer = torch.optim.Adam(t2v.model.parameters(), lr=params.settings['model']['lr'])
+            t2v.model_name = 'gcn'
 
         t2v.train(params.settings['model']['max_epochs'], params.settings['model']['save_per_epoch'])
         t2v.plot_points()
