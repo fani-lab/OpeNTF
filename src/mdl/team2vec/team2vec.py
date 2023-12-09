@@ -8,6 +8,7 @@ class Team2Vec:
         self.settings = settings
         self.data = []
         self.model = None
+        self.model_name = 't2v'
 
     def init(self):
         datafile = f'{self.output}data.pkl'
