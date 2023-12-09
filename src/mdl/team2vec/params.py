@@ -14,6 +14,7 @@ settings = {
         'batch_size': 5,
         'loader_shuffle': True,
         'num_workers': 0,
+        'save_per_epoch': False,
         'w2v': {
             'dm': 1,  # training algorithm. 1: distributed memory (PV-DM), 0: distributed bag of words (PV-DBOW)
             'dbow_words': 0,  # 'train word-vectors in skip-gram fashion; 0: no (default), 1: yes

@@ -1,4 +1,4 @@
-import numpy as np, math, os, itertools, pickle
+import numpy as np, math, os, itertools, pickle, time, json
 from matplotlib import pyplot as plt
 from tqdm import tqdm
 
@@ -15,6 +15,7 @@ class Gnn(Team2Vec):
         self.loader = None
         self.optimizer = None
         self.device = 'gpu'
+        if not os.path.isdir(self.output): os.makedirs(self.output)
     def create(self, file):
         # https://pytorch-geometric.readthedocs.io/en/latest/modules/utils.html#torch_geometric.utils.remove_self_loops
 
@@ -61,8 +62,14 @@ class Gnn(Team2Vec):
         with open(file, 'wb') as f: pickle.dump(self.data, f)
         return self.data
 
-    def train(self, epochs):
+    def train(self, epochs, save_per_epoch=False):
+        model_output = f'{self.output}/{self.model_name}'
+        if not os.path.isdir(model_output): os.makedirs(model_output)
+        train_loss_values = []
+        valid_loss_values = []
+        t_start_time = time.time()
         for epoch in range(epochs):
+            e_start_time = time.time()
             self.model.train()
             total_loss = 0
             for pos_rw, neg_rw in self.loader:
@@ -75,10 +82,26 @@ class Gnn(Team2Vec):
                 self.optimizer.step()
                 total_loss += loss.item()
             loss = total_loss / len(self.loader)
+            train_loss_values.append(loss)
 
             # TODO: directly launch a pretrained model
             acc = self.valid()
-            print(f'Epoch: {epoch:03d}, Loss: {loss:.4f}, Acc: {acc:.4f}')
+            valid_loss_values.append(acc)
+
+            print(f'Epoch: {epoch:03d}, Loss: {loss:.4f}, Acc: {acc:.4f}, Time: {time.time() - e_start_time: 0.4f}')
+            if save_per_epoch: torch.save(self.model.state_dict(), f'{model_output}/gnn_model.e{epoch}.pt', pickle_protocol=4)
+        torch.save(self.model.state_dict(), f'{model_output}/gnn_model.pt', pickle_protocol=4)
+        #to load later by: self.model.load_state_dict(torch.load(f'{self.output}/gnn_model.pt'))
+
+        print(f'It took {time.time() - t_start_time} to train the model.')
+        with open(f'{model_output}/train_valid_loss.json', 'w') as outfile: json.dump({'train': train_loss_values, 'valid': valid_loss_values}, outfile)
+        plt.figure()
+        plt.plot(train_loss_values, label='Training Loss')
+        plt.plot(valid_loss_values, label='Validation Loss')
+        plt.legend(loc='upper right')
+        plt.title(f'Training and Validation Losses per Epoch')
+        plt.savefig(f'{model_output}/train_valid_loss.png', dpi=100, bbox_inches='tight')
+        plt.show()
 
     @torch.no_grad()
     def valid(self):
@@ -102,6 +125,7 @@ class Gnn(Team2Vec):
         #     plt.scatter(z[y == i, 0], z[y == i, 1], s=20, color=colors[i])
         plt.scatter(z[:, 0], z[:, 1], s=20)
         plt.axis('off')
+        plt.savefig(f'{self.output}/{self.model_name}/tsne.png', dpi=100, bbox_inches='tight')
         plt.show()
 
 

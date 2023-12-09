@@ -1,4 +1,4 @@
-import argparse, pickle, os
+import argparse, pickle, os, time
 
 import torch
 
@@ -34,7 +34,7 @@ def run(teamsvecs_file, indexes_file, model, output):
             return
 
         import gnn
-        output_ = output + f'{params.settings["graph"]["edge_types"][1]}.{"dir" if params.settings["graph"]["dir"] else "undir"}.{str(params.settings["graph"]["dup_edge"]).lower()}.'
+        output_ = output + f'{params.settings["graph"]["edge_types"][1]}.{"dir" if params.settings["graph"]["dir"] else "undir"}.{str(params.settings["graph"]["dup_edge"]).lower()}/'
         t2v = gnn.Gnn(teamsvecs, indexes, params.settings['graph'], output_)
         t2v.init()
         # return
@@ -53,9 +53,11 @@ def run(teamsvecs_file, indexes_file, model, output):
                                        shuffle=params.settings['model']['loader_shuffle'],
                                        num_workers=params.settings['model']['num_workers'])
             t2v.optimizer = torch.optim.Adam(list(t2v.model.parameters()), lr=params.settings['model']['lr'])
+            t2v.model_name = 'n2v'
 
         elif model == 'gnn.m2v':
             t2v = M2V()
+            t2v.model_name = 'm2v'
 
         # gcn (for homogeneous only)
         elif model == 'gnn.gcn':
@@ -64,7 +66,7 @@ def run(teamsvecs_file, indexes_file, model, output):
             output_ = output + f'{params.settings["graph"]["edge_types"][1]}.{"dir" if params.settings["graph"]["dir"] else "undir"}.{str(params.settings["graph"]["dup_edge"]).lower()}.'
             t2v = Gcn(teamsvecs, indexes, params.settings['graph'], output_)
 
-        t2v.train(params.settings['model']['max_epochs'])
+        t2v.train(params.settings['model']['max_epochs'], params.settings['model']['save_per_epoch'])
         t2v.plot_points()
         print(t2v)
 
@@ -76,16 +78,10 @@ def test_toys(args):
                            './../../../data/preprocessed/uspt/toy.patent.tsv/']:
         args.output = args.teamsvecs
         args.model = 'gnn.n2v'
-        for edge_type in [('member', 'm'), ([('skill', '-', 'team'), ('member', '-', 'team')], 'stm'), ([('skill', '-', 'member')], 'sm')]:
+        for edge_type in [('member', 'm')]: #n2v is only for homo, ([('skill', '-', 'team'), ('member', '-', 'team')], 'stm'), ([('skill', '-', 'member')], 'sm')]:
             for dir in [True, False]:
                 for dup in [None, 'add', 'mean', 'min', 'max', 'mul']:
-                    params.settings = {
-                        'graph': {
-                            'edge_types': edge_type,
-                            'dir': dir,
-                            'dup_edge': dup
-                        }
-                    }
+                    params.settings['graph'] = {'edge_types': edge_type, 'dir': dir, 'dup_edge': dup}
                     run(f'{args.teamsvecs}teamsvecs.pkl', f'{args.teamsvecs}indexes.pkl', args.model, f'{args.output}/{args.model.split(".")[0]}/')
 
 #python -u main.py -teamsvecs=./../../../data/preprocessed/dblp/toy.dblp.v12.json/ -model=gnn.n2v -output=./../../../data/preprocessed/dblp/toy.dblp.v12.json/
@@ -94,6 +90,6 @@ if __name__ == "__main__":
     addargs(parser)
     args = parser.parse_args()
 
-    run(f'{args.teamsvecs}teamsvecs.pkl', f'{args.teamsvecs}indexes.pkl', args.model, f'{args.output}/{args.model.split(".")[0]}/')
+    # run(f'{args.teamsvecs}teamsvecs.pkl', f'{args.teamsvecs}indexes.pkl', args.model, f'{args.output}/{args.model.split(".")[0]}/')
 
-    # test_toys(args)
+    test_toys(args)
