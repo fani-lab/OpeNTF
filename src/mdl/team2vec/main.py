@@ -61,7 +61,7 @@ def run(teamsvecs_file, indexes_file, model, output):
 
         # gcn (for homogeneous only)
         elif model == 'gnn.gcn':
-            from gcn import Gcn
+            from gcn import Gcn as GCNModel
             t2v.model = GCNModel(hidden_channels=10, data=t2v.data)
             t2v.optimizer = torch.optim.Adam(t2v.model.parameters(), lr=params.settings['model']['lr'])
             t2v.model_name = 'gcn'
