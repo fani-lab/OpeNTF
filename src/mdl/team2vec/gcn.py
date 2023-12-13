@@ -69,22 +69,6 @@ class Gcn(Gnn):
             shuffle=True,
         )
 
-        # mini_batch_loader = HGTLoader(
-        #     data = data,
-        #     # Sample 20 nodes per type
-        #     num_samples = [20],
-        #     # Use a batch size of 128 for sampling training nodes of type paper
-        #     batch_size=128,
-        #     input_nodes=edge_label_index_tuple,
-        # )
-
-        # Inspect a sample:
-        # sampled_data = next(iter(train_loader))
-        # for i, data in enumerate(mini_batch_loader):
-        #     print(f'sample data for iteration : {i}')
-        #     print(data)
-        #     print(f'---------------------------------------\n')
-
         return mini_batch_loader
 
     def learn_batch(self, epochs, train_loader, is_directed):
@@ -115,11 +99,6 @@ class Gcn(Gnn):
                 self.optimizer.step()
                 total_loss += float(loss) * pred.numel()
                 total_examples += pred.numel()
-                # print(f'loss = {loss}')
-                # print(f'epoch = {epoch}')
-                # print(f'loss = {loss}')
-                # print(f'total_examples = {total_examples}')
-                # print(f'total_loss = {total_loss}')
 
             # validation part here maybe ?
             if epoch % 10 == 0 :
