@@ -198,12 +198,11 @@ class Fnn(Ntf):
             # Train Network
             # Start data params
             learning_rate_schedule = np.array([2, 4, 10])
-            if loss_type == 'DP':
-                class_parameters, optimizer_class_param = get_class_data_params_n_optimizer(nr_classes=y_train.shape[1], lr=learning_rate, device=self.device)
+            if loss_type == 'DP': class_parameters, optimizer_class_param = get_class_data_params_n_optimizer(nr_classes=y_train.shape[1], lr=learning_rate, device=self.device)
             # End data params
-            if loss_type == 'SL':
-                criterion = SuperLoss(nsamples=X_train.shape[0], ncls=y_train.shape[1], wd_cls=0.9, loss_func=nn.BCELoss())
+            if loss_type == 'SL': criterion = SuperLoss(nsamples=X_train.shape[0], ncls=y_train.shape[1], wd_cls=0.9, loss_func=nn.BCELoss())
             earlystopping = EarlyStopping(patience=5, verbose=False, delta=0.01, path=f"{output}/state_dict_model.f{foldidx}.pt", trace_func=print)
+
             for epoch in range(num_epochs):
                 if loss_type == 'DP':
                     if epoch in learning_rate_schedule:
@@ -220,45 +219,39 @@ class Fnn(Ntf):
                             self.train(True)  # scheduler.step()
                             # forward
                             optimizer.zero_grad()
-                            if loss_type == 'DP':
-                                optimizer_class_param.zero_grad()
+                            if loss_type == 'DP': optimizer_class_param.zero_grad()
 
                             y_ = self.forward(X)
 
-                            if loss_type == 'normal':
-                                loss = self.cross_entropy(y_, y, ns, nns, unigram)
-                            elif loss_type == 'SL':
-                                loss = criterion(y_.squeeze(1), y.squeeze(1), index)
+                            if loss_type == 'normal': loss = self.cross_entropy(y_, y, ns, nns, unigram)
+                            elif loss_type == 'SL': loss = criterion(y_.squeeze(1), y.squeeze(1), index)
                             elif loss_type == 'DP':
                                 data_parameter_minibatch = torch.exp(class_parameters).view(1, -1)
                                 y_ = y_ / data_parameter_minibatch
                                 loss = self.cross_entropy(y_, y, ns, nns, unigram)
                                 loss = apply_weight_decay_data_parameters(loss, class_parameter_minibatch=class_parameters, weight_decay= 0.9)
-                            # backward
+
                             loss.backward()
                             # clip_grad_value_(model.parameters(), 1)
                             optimizer.step()
-                            if loss_type == 'DP':
-                                optimizer_class_param.step()
+                            if loss_type == 'DP': optimizer_class_param.step()
                             train_running_loss += loss.item()
                         else:  # valid
                             self.train(False)  # Set model to valid mode
                             y_ = self.forward(X)
-                            if loss_type == 'normal' or loss_type == 'DP':
-                                loss = self.cross_entropy(y_, y, ns, nns, unigram)
-                            else:
-                                loss = criterion(y_.squeeze(), y.squeeze(), index)
+                            if loss_type == 'normal' or loss_type == 'DP': loss = self.cross_entropy(y_, y, ns, nns, unigram)
+                            else: loss = criterion(y_.squeeze(), y.squeeze(), index)
                             valid_running_loss += loss.item()
+
                         print(
                             f'Fold {foldidx}/{len(splits["folds"]) - 1}, Epoch {epoch}/{num_epochs - 1}, Minibatch {batch_idx}/{int(X_train.shape[0] / batch_size)}, Phase {phase}'
                             f', Running Loss {phase} {loss.item()}'
                             f", Time {time.time() - fold_time}, Overall {time.time() - start_time} "
                         )
                     # Appending the loss of each epoch to plot later
-                    if phase == 'train':
-                        train_loss_values.append(train_running_loss / X_train.shape[0])
-                    else:
-                        valid_loss_values.append(valid_running_loss / X_valid.shape[0])
+                    if phase == 'train': train_loss_values.append(train_running_loss / X_train.shape[0])
+                    else: valid_loss_values.append(valid_running_loss / X_valid.shape[0])
+
                     print(f'Fold {foldidx}/{len(splits["folds"]) - 1}, Epoch {epoch}/{num_epochs - 1}'
                           f', Running Loss {phase} {train_loss_values[-1] if phase == "train" else valid_loss_values[-1]}'
                           f", Time {time.time() - fold_time}, Overall {time.time() - start_time} "
@@ -272,7 +265,6 @@ class Fnn(Ntf):
 
             model_path = f"{output}/state_dict_model.f{foldidx}.pt"
 
-            # Save
             torch.save(self.state_dict(), model_path, pickle_protocol=4)
             train_valid_loss[foldidx]['train'] = train_loss_values
             train_valid_loss[foldidx]['valid'] = valid_loss_values

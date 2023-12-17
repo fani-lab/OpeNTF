@@ -1,4 +1,4 @@
-import numpy as np, math, os, itertools, pickle
+import numpy as np, math, os, itertools, pickle, time, json
 from matplotlib import pyplot as plt
 from tqdm import tqdm
 
@@ -11,6 +11,11 @@ class Gnn(Team2Vec):
 
     def __init__(self, teamsvecs, indexes, settings, output):
         super().__init__(teamsvecs, indexes, settings, output)
+
+        self.loader = None
+        self.optimizer = None
+        self.device = 'cuda'
+        if not os.path.isdir(self.output): os.makedirs(self.output)
     def create(self, file):
         # https://pytorch-geometric.readthedocs.io/en/latest/modules/utils.html#torch_geometric.utils.remove_self_loops
 
@@ -57,26 +62,72 @@ class Gnn(Team2Vec):
         with open(file, 'wb') as f: pickle.dump(self.data, f)
         return self.data
 
-    def plot(self, x, y, output_filepath = None):
-        mx = max(y)
-        mn = min(y)
-        threshold = (mx - mn) // 10
+    def train(self, epochs, save_per_epoch=False):
+        self.model.to(self.device)
+        model_output = f'{self.output}/{self.model_name}'
+        if not os.path.isdir(model_output): os.makedirs(model_output)
+        train_loss_values = []
+        valid_loss_values = []
+        t_start_time = time.time()
+        for epoch in range(epochs):
+            e_start_time = time.time()
+            self.model.train()
+            total_loss = 0
+            for pos_rw, neg_rw in self.loader:
+                self.optimizer.zero_grad()
+                loss = self.model.loss(pos_rw.to(self.device), neg_rw.to(self.device))
 
+                #TODO: we can inject opentf here and add the loss
+
+                loss.backward()
+                self.optimizer.step()
+                total_loss += loss.item()
+            loss = total_loss / len(self.loader)
+            train_loss_values.append(loss)
+
+            # TODO: directly launch a pretrained model
+            acc = self.valid()
+            valid_loss_values.append(acc)
+
+            print(f'Epoch: {epoch:03d}, Loss: {loss:.4f}, Acc: {acc:.4f}, Time: {time.time() - e_start_time: 0.4f}')
+            if save_per_epoch: torch.save(self.model.state_dict(), f'{model_output}/gnn_model.e{epoch}.pt', pickle_protocol=4)
+        torch.save(self.model.state_dict(), f'{model_output}/gnn_model.pt', pickle_protocol=4)
+        #to load later by: self.model.load_state_dict(torch.load(f'{self.output}/gnn_model.pt'))
+
+        print(f'It took {time.time() - t_start_time} to train the model.')
+        with open(f'{model_output}/train_valid_loss.json', 'w') as outfile: json.dump({'train': train_loss_values, 'valid': valid_loss_values}, outfile)
         plt.figure()
-        plt.ylabel('Loss')
-        plt.ylim(mn - threshold, mx + threshold)
-        plt.xlabel('Epochs')
-        plt.xlim(0, len(x))
-        plt.plot(x, y)
-        plt.legend('This is a legend')
-        # save the figure before showing the plot
-        # because after plt.show() another blank figure is created
-        if(output_filepath):
-            print(f'Saving plot in {output_filepath}')
-            plt.savefig(output_filepath)
-
+        plt.plot(train_loss_values, label='Training Loss')
+        plt.plot(valid_loss_values, label='Validation Loss')
+        plt.legend(loc='upper right')
+        plt.title(f'Training and Validation Losses per Epoch')
+        plt.savefig(f'{model_output}/train_valid_loss.png', dpi=100, bbox_inches='tight')
         plt.show()
 
-    def plot_homogeneous_graph(self, teams_graph):
-        G = torch_geometric.utils.to_networkx(teams_graph, to_undirected=True)
-        nx.draw(G, with_labels=True)
+    @torch.no_grad()
+    def valid(self):
+        self.model.eval()
+        z = self.model()
+        #https://pytorch-geometric.readthedocs.io/en/latest/generated/torch_geometric.nn.models.Node2Vec.html
+        #TODO: the default test is LR on node labels, but we should bring it to team formation test
+        #acc = model.test(train_z=z[self.data.train_mask], train_y=data.y[self.data.train_mask], test_z=z[self.data.test_mask], test_y=data.y[self.data.test_mask], max_iter=150)
+        return 0# acc
+
+    @torch.no_grad()
+    def plot_points(self):
+        from sklearn.manifold import TSNE
+        self.model.eval()
+        z = self.model().cpu().numpy()
+        z = TSNE(n_components=2).fit_transform(z)
+        #y = data.y.cpu().numpy()
+
+        plt.figure(figsize=(8, 8))
+        # for i in range(dataset.num_classes):
+        #     plt.scatter(z[y == i, 0], z[y == i, 1], s=20, color=colors[i])
+        plt.scatter(z[:, 0], z[:, 1], s=20)
+        plt.axis('off')
+        plt.savefig(f'{self.output}/{self.model_name}/tsne.png', dpi=100, bbox_inches='tight')
+        plt.show()
+
+
+
