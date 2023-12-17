@@ -152,7 +152,7 @@ class Team(object):
         candidate_vec_dim = len(c2i)
         location_vec_dim = len(l2i)
         data = lil_matrix((len(teams), 1 + skill_vec_dim + candidate_vec_dim + location_vec_dim), dtype='u1')
-        data_ = np.zeros((bucket_size, 1 + skill_vec_dim + candidate_vec_dim + location_vec_dim))
+        data_ = np.zeros((bucket_size, 1 + skill_vec_dim + candidate_vec_dim + location_vec_dim), dtype='u1')
         j = -1
         st = time()
         for i, team in enumerate(teams):
