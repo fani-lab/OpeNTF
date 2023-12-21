@@ -33,7 +33,7 @@ class Gcn(Gnn):
             num_val=0.1,
             num_test=0.1,
             disjoint_train_ratio=0.3,
-            neg_sampling_ratio=1.0,
+            neg_sampling_ratio=0.0,
             add_negative_train_samples=False,
             edge_types= edge_types,
             rev_edge_types=rev_edge_types,
