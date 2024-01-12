@@ -138,6 +138,13 @@ def run(data_list, domain_list, fair, filter, future, model_list, output, exp_id
         datapath = data_list[domain_list.index(d_name)]
         prep_output = f'./../data/preprocessed/{d_name}/{os.path.split(datapath)[-1]}'
         vecs, indexes = d_cls.generate_sparse_vectors(datapath, f'{prep_output}{filter_str}', filter, settings['data'])
+
+        # vector, embedding dot product here
+        import torch
+        emb_filepath = f'{prep_output}{filter_str}/gs/stm.undir.none/gs.ns0.emb.pt'
+        emb_skill = torch.load(emb_filepath)['skill'].detach().cpu()
+        vecs['skill'] = vecs['skill'] * emb_skill
+
         year_idx = []
         for i in range(1, len(indexes['i2y'])):
             if indexes['i2y'][i][0] - indexes['i2y'][i-1][0] > settings['model']['nfolds']:

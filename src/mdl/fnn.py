@@ -55,6 +55,7 @@ class Fnn(Ntf):
         if ns == "inverse_unigram" or ns.startswith("temporal_inverse_unigram"): return self.ns_inverse_unigram(y_, y, unigram, nns)
         if ns == "inverse_unigram_b": return self.ns_inverse_unigram_mini_batch(y_, y, nns)
         # return self.weighted(y_, y)
+        if ns == "weighted": return self.weighted(y_, y)
         cri = nn.BCELoss()
         return cri(y_.squeeze(1), y.squeeze(1))
 
