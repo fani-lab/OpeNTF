@@ -17,11 +17,11 @@ settings = {
             'fnn':{
                 'l': [100],  # list of number of nodes in each layer
                 'lr': 0.001,  # learning rate
-                'b': 128,  # batch size
+                'b': 5500,  # batch size
                 'e': 10,  # epoch
                 'nns': 3,  # number of negative samples
                 'ns': 'none',  # 'none', 'uniform', 'unigram', 'unigram_b'
-                'loss': 'SL',  # 'SL'-> superloss, 'DP' -> Data Parameters, 'normal' -> Binary Cross Entropy
+                'loss': 'normal',  # 'SL'-> superloss, 'DP' -> Data Parameters, 'normal' -> Binary Cross Entropy
             },
             'bnn':{
                 'l': [128],  # list of number of nodes in each layer
@@ -41,13 +41,16 @@ settings = {
                 'with_zero': True
             },
             'emb':{
-                'd': 100,# embedding dimension
+                'd': 16,# embedding dimension
                 'e': 100,# epoch
                 'dm': 1,# training algorithm. 1: distributed memory (PV-DM), 0: distributed bag of words (PV-DBOW)
-                'w': 1 #cooccurrence window
+                'w': 1, #cooccurrence window
+                'b' : 0, # 0 means no batching
+                'ns' : 2,
             }
         },
-        'cmd': ['train', 'test', 'eval', 'fair'],  # 'train', 'test', 'eval', 'plot', 'agg', 'fair'
+        #'cmd':['train', 'test'],
+        'cmd': ['eval'],  # 'train', 'test', 'eval', 'plot', 'agg', 'fair'
         'nfolds': 3,
         'train_test_split': 0.85,
         'step_ahead': 2,#for now, it means that whatever are in the last [step_ahead] time interval will be the test set!
