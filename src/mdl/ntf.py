@@ -127,7 +127,7 @@ class Ntf(nn.Module):
             plt.show()
 
     def run(self, splits, vecs, indexes, output, settings, cmd, fair_settings, merge_skills):
-        output = f"{output}/t{vecs['skill'].shape[0]}.s{vecs['skill'].shape[1]}.m{vecs['member'].shape[1]}.{'.'.join([k + str(v).replace(' ', '') for k, v in settings.items() if v])}"
+        # output = f"{output}/t{vecs['skill'].shape[0]}.s{vecs['skill'].shape[1]}.m{vecs['member'].shape[1]}.{'.'.join([k + str(v).replace(' ', '') for k, v in settings.items() if v])}"
         if not os.path.isdir(output): os.makedirs(output)
 
         on_train_valid_set = False #random baseline cannot join this.

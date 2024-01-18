@@ -139,11 +139,21 @@ def run(data_list, domain_list, fair, filter, future, model_list, output, exp_id
         prep_output = f'./../data/preprocessed/{d_name}/{os.path.split(datapath)[-1]}'
         vecs, indexes = d_cls.generate_sparse_vectors(datapath, f'{prep_output}{filter_str}', filter, settings['data'])
 
-        # vector, embedding dot product here
-        import torch
-        emb_filepath = f'{prep_output}{filter_str}/gs/stm.undir.none/gs.ns0.emb.pt'
-        emb_skill = torch.load(emb_filepath)['skill'].detach().cpu()
-        vecs['skill'] = vecs['skill'] * emb_skill
+        # if the gnn embeddings exist
+        if(args.emb_model):
+            import torch
+
+            emb_ns = param.settings["model"]["baseline"]["emb"]["ns"]
+            emb_b = param.settings["model"]["baseline"]["emb"]["b"]
+            emb_d = param.settings["model"]["baseline"]["emb"]["d"]
+
+            # vector, embedding dot product here
+            # this string is needed to be appended to the output path of the final prediction results of fnn or bnn
+            emb_settings_str = f'{args.emb_model}.{args.emb_graph_type}.undir.{args.emb_agg}.ns{emb_ns}.b{emb_b}.d{emb_d}'
+            emb_filepath = f'{prep_output}{filter_str}/emb/{emb_settings_str}.emb.pt'
+            emb_skill = torch.load(emb_filepath)['skill'].detach().cpu()
+            from scipy import sparse
+            vecs['skill'] = sparse._lil.lil_matrix(vecs['skill'] * emb_skill)
 
         year_idx = []
         for i in range(1, len(indexes['i2y'])):
@@ -166,7 +176,10 @@ def run(data_list, domain_list, fair, filter, future, model_list, output, exp_id
             baseline_name = m_name.lstrip('t').replace('_emb', '').replace('_dt2v', '').replace('_a1', '')
             print(f'Running for (dataset, model): ({d_name}, {m_name}) ... ')
 
-            output_path = f"{output}{os.path.split(datapath)[-1]}{filter_str}/{m_name}/t{vecs_['skill'].shape[0]}.s{vecs_['skill'].shape[1]}.m{vecs_['member'].shape[1]}.{'.'.join([k + str(v).replace(' ', '') for k, v in settings['model']['baseline'][baseline_name].items() if v])}"
+            if(args.emb_model):
+                output_path = f"{output}{os.path.split(datapath)[-1]}{filter_str}/{emb_settings_str}/{m_name}/t{vecs_['skill'].shape[0]}.s{vecs_['skill'].shape[1]}.m{vecs_['member'].shape[1]}.{'.'.join([k + str(v).replace(' ', '') for k, v in settings['model']['baseline'][baseline_name].items() if v])}"
+            else:
+                output_path = f"{output}{os.path.split(datapath)[-1]}{filter_str}/{m_name}/t{vecs_['skill'].shape[0]}.s{vecs_['skill'].shape[1]}.m{vecs_['member'].shape[1]}.{'.'.join([k + str(v).replace(' ', '') for k, v in settings['model']['baseline'][baseline_name].items() if v])}"
             if not os.path.isdir(output_path): os.makedirs(output_path)
             copyfile('./param.py', f'{output_path}/param.py')
             # make_popular_and_nonpopular_matrix(vecs_, data_list[0])
@@ -184,6 +197,12 @@ def addargs(parser):
 
     baseline = parser.add_argument_group('baseline')
     baseline.add_argument('-model', '--model-list', nargs='+', type=str.lower, default=[], required=True, help='a list of neural models (eg. -model random fnn bnn fnn_emb bnn_emb nmt)')
+
+    # this group is for opentf running with generated embeddings
+    emb_baseline = parser.add_argument_group('emb_baseline')
+    emb_baseline.add_argument('--emb_model', type=str, help='a list of gnn models (eg. --emb_model gs gat gin gcn)')
+    emb_baseline.add_argument('--emb_graph_type', type=str, help='the graph type for the embedding generation (eg. --emb_graph_type stm.undir.none)')
+    emb_baseline.add_argument('--emb_agg', type=str, help='the graph aggregation for the embedding generation (eg. --emb_agg agg)')
 
     output = parser.add_argument_group('output')
     output.add_argument('-output', type=str, default='./../output/', help='The output path (default: -output ./../output/)')
@@ -204,6 +223,8 @@ def addargs(parser):
 # 					       fnn fnn_emb bnn bnn_emb nmt
 # 					       tfnn tbnn tnmt tfnn_emb tbnn_emb tfnn_a1 tbnn_a1 tfnn_emb_a1 tbnn_emb_a1 tfnn_dt2v_emb tbnn_dt2v_emb
 #                   -filter 1
+
+# python -u main.py -data ../data/raw/imdb/toy.title.basics.tsv -domain imdb -model random --emb_model gs --emb_graph_type stm --emb_agg mean
 
 # To run on compute canada servers you can use the following command: (time is in minutes)
 #sbatch --account=def-hfani --mem=96000MB --time=2880 cc.sh
