@@ -18,6 +18,7 @@ class Ntf(nn.Module):
     def test(self, model_path, splits, indexes, vecs, params, on_train_valid_set=False, per_epoch=False, merge_skills=False): pass
 
     def evaluate(self, model_path, splits, vecs, on_train_valid_set=False, per_instance=False, per_epoch=False):
+        print(f'\n.............. starting eval .................\n')
         if not os.path.isdir(model_path): raise Exception("The predictions do not exist!")
         y_test = vecs['member'][splits['test']]
         for pred_set in (['test', 'train', 'valid'] if on_train_valid_set else ['test']):
@@ -50,6 +51,7 @@ class Ntf(nn.Module):
                 mean_std['std'] = fold_mean.std(axis=1)
                 mean_std.to_csv(f'{model_path}/{pred_set}.{epoch}pred.eval.mean.csv')
                 if per_instance: fold_mean_per_instance.truediv(len(splits['folds'].keys())).to_csv(f'{model_path}/{pred_set}.{epoch}pred.eval.per_instance_mean.csv')
+        print(f'\n.............. ending eval .................\n')
 
     def fair(self, model_path, teamsvecs, splits, settings):
         from Adila.src import main as adila
