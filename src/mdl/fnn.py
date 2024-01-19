@@ -139,6 +139,7 @@ class Fnn(Ntf):
         return (-targets * torch.log(logits) - random_samples * torch.log(1 - logits)).sum()
 
     def learn(self, splits, indexes, vecs, params, prev_model, output):
+        print(f'\n.............. starting learn .................\n')
         loss_type = params['loss']
 
         learning_rate = params['lr']
@@ -281,8 +282,10 @@ class Fnn(Ntf):
                 plt.title(f'Training and Validation Loss for fold #{foldidx}')
                 plt.savefig(f'{output}/f{foldidx}.train_valid_loss.png', dpi=100, bbox_inches='tight')
                 plt.show()
+        print(f'\n.............. ending learn .................\n')
 
     def test(self, model_path, splits, indexes, vecs, params, on_train_valid_set=False, per_epoch=False, merge_skills=False):
+        print(f'\n.............. starting test .................\n')
         if not os.path.isdir(model_path): raise Exception("The model does not exist!")
         # input_size = len(indexes['i2s'])
         input_size = vecs['skill'].shape[1]
@@ -329,3 +332,4 @@ class Fnn(Ntf):
                     epoch = epoch.replace(f'f{foldidx}.', '')
                     torch.save(y_pred, f'{model_path}/f{foldidx}.{pred_set}.{epoch}pred', pickle_protocol=4)
 
+        print(f'\n.............. ending test .................\n')
