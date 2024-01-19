@@ -131,7 +131,7 @@ class Ntf(nn.Module):
         if not os.path.isdir(output): os.makedirs(output)
 
         on_train_valid_set = False #random baseline cannot join this.
-        per_instance = True
+        per_instance = False
         per_epoch = False
 
         if 'train' in cmd: self.learn(splits, indexes, vecs, settings, None, output)

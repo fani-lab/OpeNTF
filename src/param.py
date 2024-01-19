@@ -12,26 +12,26 @@ settings = {
     'model':{
         'baseline': {
             'random': {
-                'b': 128
+                'b': 5500
             },
             'fnn':{
                 'l': [100],  # list of number of nodes in each layer
                 'lr': 0.001,  # learning rate
-                'b': 128,  # batch size
+                'b': 5500,  # batch size
                 'e': 10,  # epoch
                 'nns': 3,  # number of negative samples
                 'ns': 'none',  # 'none', 'uniform', 'unigram', 'unigram_b'
-                'loss': 'SL',  # 'SL'-> superloss, 'DP' -> Data Parameters, 'normal' -> Binary Cross Entropy
+                'loss': 'normal',  # 'SL'-> superloss, 'DP' -> Data Parameters, 'normal' -> Binary Cross Entropy
             },
             'bnn':{
                 'l': [128],  # list of number of nodes in each layer
                 'lr': 0.1,  # learning rate
-                'b': 128,  # batch size
-                'e': 5,  # epoch
+                'b': 5500,  # batch size
+                'e': 10,  # epoch
                 'nns': 3,  # number of negative samples
-                'ns': 'unigram_b',  # 'uniform', 'unigram', 'unigram_b'
+                'ns': 'none',  # 'uniform', 'unigram', 'unigram_b'
                 's': 1,  # # sample_elbo for bnn
-                'loss': 'SL',  # 'SL'-> superloss, 'DP' -> Data Parameters, 'normal' -> Binary Cross Entropy
+                'loss': 'normal',  # 'SL'-> superloss, 'DP' -> Data Parameters, 'normal' -> Binary Cross Entropy
             },
             'nmt': {
                 'base_config': './mdl/nmt_config.yaml'
@@ -41,13 +41,16 @@ settings = {
                 'with_zero': True
             },
             'emb':{
-                'd': 100,# embedding dimension
+                'd': 16,# embedding dimension
                 'e': 100,# epoch
                 'dm': 1,# training algorithm. 1: distributed memory (PV-DM), 0: distributed bag of words (PV-DBOW)
-                'w': 1 #cooccurrence window
+                'w': 1, #cooccurrence window
+                'ns': 2, # negative sampling
+                'b' : 0, # batching; 0 means no batching, any other int means batch size
             }
         },
-        'cmd': ['train', 'test', 'eval', 'fair'],  # 'train', 'test', 'eval', 'plot', 'agg', 'fair'
+        'cmd': ['train', 'test'],
+        # 'cmd': ['eval'],  # 'train', 'test', 'eval', 'plot', 'agg', 'fair'
         'nfolds': 3,
         'train_test_split': 0.85,
         'step_ahead': 2,#for now, it means that whatever are in the last [step_ahead] time interval will be the test set!
