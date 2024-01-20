@@ -143,13 +143,19 @@ def run(data_list, domain_list, fair, filter, future, model_list, output, exp_id
         if(args.emb_model):
             import torch
 
+            if args.emb_ns: param.settings["model"]["baseline"]["emb"]["ns"] = args.emb_ns
+            if args.emb_d: param.settings["model"]["baseline"]["emb"]["d"] = args.emb_d
+            if args.emb_e: param.settings["model"]["baseline"]["emb"]["e"] = args.emb_e
+            if args.cmd: param.settings["model"]['cmd'] = args.cmd
+
+            emb_e = param.settings["model"]["baseline"]["emb"]["e"]
             emb_ns = param.settings["model"]["baseline"]["emb"]["ns"]
-            emb_b = param.settings["model"]["baseline"]["emb"]["b"]
             emb_d = param.settings["model"]["baseline"]["emb"]["d"]
+            emb_b = param.settings["model"]["baseline"]["emb"]["b"]
 
             # vector, embedding dot product here
             # this string is needed to be appended to the output path of the final prediction results of fnn or bnn
-            emb_settings_str = f'{args.emb_model}.{args.emb_graph_type}.undir.{args.emb_agg}.ns{emb_ns}.b{emb_b}.d{emb_d}'
+            emb_settings_str = f'{args.emb_model}.{args.emb_graph_type}.undir.{args.emb_agg}.e{emb_e}.ns{emb_ns}.b{emb_b}.d{emb_d}'
             emb_filepath = f'{prep_output}{filter_str}/emb/{emb_settings_str}.emb.pt'
             emb_skill = torch.load(emb_filepath)['skill'].detach().cpu()
             from scipy import sparse
@@ -197,12 +203,16 @@ def addargs(parser):
 
     baseline = parser.add_argument_group('baseline')
     baseline.add_argument('-model', '--model-list', nargs='+', type=str.lower, default=[], required=True, help='a list of neural models (eg. -model random fnn bnn fnn_emb bnn_emb nmt)')
+    baseline.add_argument('--cmd', nargs='+', type=str.lower, help='the arguments for the opentf pipeline')
 
     # this group is for opentf running with generated embeddings
     emb_baseline = parser.add_argument_group('emb_baseline')
     emb_baseline.add_argument('--emb_model', type=str, help='a list of gnn models (eg. --emb_model gs gat gin gcn)')
     emb_baseline.add_argument('--emb_graph_type', type=str, help='the graph type for the embedding generation (eg. --emb_graph_type stm.undir.none)')
     emb_baseline.add_argument('--emb_agg', type=str, help='the graph aggregation for the embedding generation (eg. --emb_agg agg)')
+    emb_baseline.add_argument('--emb_e', type=int, help='the number of epochs (eg. --emb_epochs 500)')
+    emb_baseline.add_argument('--emb_ns', type=int, help='the number of epochs (eg. --emb_ns 2)')
+    emb_baseline.add_argument('--emb_d', type=int, help='embedding dimension (eg. --emb_d 16)')
 
     output = parser.add_argument_group('output')
     output.add_argument('-output', type=str, default='./../output/', help='The output path (default: -output ./../output/)')
