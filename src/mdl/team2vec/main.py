@@ -7,9 +7,10 @@ from team2vec import Team2Vec
 
 def addargs(parser):
     embedding = parser.add_argument_group('Team Embedding')
-    embedding.add_argument('-teamsvecs', type=str, required=True, help='The path to the teamsvecs.pkl and indexes.pkl files; e.g., ../data/preprocessed/dblp/toy.dblp.v12.json/')
+    embedding.add_argument('-teamsvecs', nargs='+', type=str, required=True, help='The path to the teamsvecs.pkl and indexes.pkl files; e.g., ../data/preprocessed/dblp/toy.dblp.v12.json/')
     embedding.add_argument('-model', type=str, required=True, help='The embedding model; e.g., w2v, n2v, ...')
-    embedding.add_argument('-output', type=str, required=True, help='Output folder; e.g., ../data/preprocessed/dblp/toy.dblp.v12.json/')
+    embedding.add_argument('--output', nargs='+', type=str, required=False, help='Output folder; e.g., ../data/preprocessed/dblp/toy.dblp.v12.json/')
+    embedding.add_argument('--graph_only', type=int, required=False, help='if true, then only generates graph files and returns')
 
 def run(teamsvecs_file, indexes_file, model, output):
     if not os.path.isdir(output): os.makedirs(output)
@@ -34,10 +35,13 @@ def run(teamsvecs_file, indexes_file, model, output):
             return
 
         import gnn
-        output_ = output + f'{params.settings["graph"]["edge_types"][1]}.{"dir" if params.settings["graph"]["dir"] else "undir"}.{str(params.settings["graph"]["dup_edge"]).lower()}/'
+        # this line enables to output files into folders based on different graph types
+        # output_ = output + f'{params.settings["graph"]["edge_types"][1]}.{"dir" if params.settings["graph"]["dir"] else "undir"}.{str(params.settings["graph"]["dup_edge"]).lower()}/'
+        output_ = output + f'{params.settings["graph"]["edge_types"][1]}.{"dir" if params.settings["graph"]["dir"] else "undir"}.{str(params.settings["graph"]["dup_edge"]).lower()}.'
         t2v = gnn.Gnn(teamsvecs, indexes, params.settings['graph'], output_)
         t2v.init()
-        # return
+        if(args.graph_only):
+            return
 
         if model == 'gnn.n2v':
             from torch_geometric.nn import Node2Vec
@@ -78,13 +82,28 @@ def test_toys(args):
                            './../../../data/preprocessed/uspt/toy.patent.tsv/']:
         args.output = args.teamsvecs
         args.model = 'gnn.n2v'
-        for edge_type in [('member', 'm')]: #n2v is only for homo, ([('skill', '-', 'team'), ('member', '-', 'team')], 'stm'), ([('skill', '-', 'member')], 'sm')]:
-            for dir in [True, False]:
+        # for edge_type in [('member', 'm')]: #n2v is only for homo, [([('skill', '-', 'team'), ('member', '-', 'team')], 'stm'), ([('skill', '-', 'member')], 'sm')]:
+        for edge_type in [([('skill', 'to', 'team'), ('member', 'to', 'team')], 'stm')]:
+            # for dir in [True, False]:
+            for dir in [False]:
                 for dup in [None, 'mean']:#add', 'mean', 'min', 'max', 'mul']:
                     params.settings['graph'] = {'edge_types': edge_type, 'dir': dir, 'dup_edge': dup}
                     run(f'{args.teamsvecs}teamsvecs.pkl', f'{args.teamsvecs}indexes.pkl', args.model, f'{args.output}/{args.model.split(".")[0]}/')
 
-#python -u main.py -teamsvecs=./../../../data/preprocessed/dblp/toy.dblp.v12.json/ -model=gnn.n2v -output=./../../../data/preprocessed/dblp/toy.dblp.v12.json/
+def test_real(args):
+    # test for all valid combinations on toys
+    for teamsvecs in args.teamsvecs:
+        args.output = teamsvecs
+        for edge_type in [([('skill', 'to', 'team'), ('member', 'to', 'team')], 'stm')]:
+            for dir in [False]:
+                for dup in ['mean']:  # add', 'mean', 'min', 'max', 'mul']:
+                    params.settings['graph'] = {'edge_types': edge_type, 'dir': dir, 'dup_edge': dup}
+                    run(f'{teamsvecs}teamsvecs.pkl', f'{teamsvecs}indexes.pkl', args.model,
+                        f'{args.output}/{args.model.split(".")[0]}/')
+
+# we can ignore mentioning the --output argument
+#python -u main.py -teamsvecs= ./../../../data/preprocessed/dblp/dblp.v12.json.filtered.mt75.ts3/ -model=gnn.n2v --output=./../../../data/preprocessed/dblp/dblp.v12.json.filtered.mt75.ts3/
+#python -u main.py -teamsvecs=./../../../data/preprocessed/dblp/toy.dblp.v12.json/ -model=gnn.n2v --output=./../../../data/preprocessed/dblp/toy.dblp.v12.json/
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Team Embedding')
     addargs(parser)
@@ -92,4 +111,5 @@ if __name__ == "__main__":
 
     # run(f'{args.teamsvecs}teamsvecs.pkl', f'{args.teamsvecs}indexes.pkl', args.model, f'{args.output}/{args.model.split(".")[0]}/')
 
-    test_toys(args)
+    # test_toys(args)
+    test_real(args)
