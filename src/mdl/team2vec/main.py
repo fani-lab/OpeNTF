@@ -94,7 +94,7 @@ def test_real(args):
     # test for all valid combinations on toys
     for teamsvecs in args.teamsvecs:
         args.output = teamsvecs
-        for edge_type in [([('skill', 'to', 'team'), ('member', 'to', 'team')], 'stm')]:
+        for edge_type in [([('skill', 'to', 'member')], 'sm'), ([('skill', 'to', 'team'), ('member', 'to', 'team')], 'stm')]:
             for dir in [False]:
                 for dup in ['mean']:  # add', 'mean', 'min', 'max', 'mul']:
                     params.settings['graph'] = {'edge_types': edge_type, 'dir': dir, 'dup_edge': dup}
@@ -102,7 +102,7 @@ def test_real(args):
                         f'{args.output}/{args.model.split(".")[0]}/')
 
 # we can ignore mentioning the --output argument
-#python -u main.py -teamsvecs= ./../../../data/preprocessed/dblp/dblp.v12.json.filtered.mt75.ts3/ -model=gnn.n2v --output=./../../../data/preprocessed/dblp/dblp.v12.json.filtered.mt75.ts3/
+#python -u main.py -teamsvecs= ./../../../data/preprocessed/dblp/dblp.v12.json.filtered.mt75.ts3/ -model=gnn.n2v --output=./../../../data/preprocessed/dblp/dblp.v12.json.filtered.mt75.ts3/ --graph_only 1
 #python -u main.py -teamsvecs=./../../../data/preprocessed/dblp/toy.dblp.v12.json/ -model=gnn.n2v --output=./../../../data/preprocessed/dblp/toy.dblp.v12.json/
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Team Embedding')
