@@ -41,6 +41,7 @@ class Ntf(nn.Module):
                     Y_ = torch.load(f'{model_path}/f{foldidx}.{pred_set}.{epoch}pred')
                     df, df_mean, (fpr, tpr) = calculate_metrics(Y, Y_, per_instance)
                     if per_instance: df.to_csv(f'{model_path}/f{foldidx}.{pred_set}.{epoch}pred.eval.per_instance.csv', float_format='%.15f')
+                    print(f'Saving file per fold as : f{foldidx}.{pred_set}.{epoch}pred.eval.mean.csv')
                     df_mean.to_csv(f'{model_path}/f{foldidx}.{pred_set}.{epoch}pred.eval.mean.csv')
                     with open(f'{model_path}/f{foldidx}.{pred_set}.{epoch}pred.eval.roc.pkl', 'wb') as outfile:
                         pickle.dump((fpr, tpr), outfile)
@@ -49,6 +50,7 @@ class Ntf(nn.Module):
                 # the last row is a list of roc values
                 mean_std['mean'] = fold_mean.mean(axis=1)
                 mean_std['std'] = fold_mean.std(axis=1)
+                print(f'Saving mean evaluation file over nfolds as : {pred_set}.{epoch}pred.eval.mean.csv')
                 mean_std.to_csv(f'{model_path}/{pred_set}.{epoch}pred.eval.mean.csv')
                 if per_instance: fold_mean_per_instance.truediv(len(splits['folds'].keys())).to_csv(f'{model_path}/{pred_set}.{epoch}pred.eval.per_instance_mean.csv')
         print(f'\n.............. ending eval .................\n')
