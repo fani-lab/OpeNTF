@@ -157,7 +157,7 @@ def run(data_list, domain_list, fair, filter, future, model_list, output, exp_id
             # this string is needed to be appended to the output path of the final prediction results of fnn or bnn
             emb_settings_str = f'{args.emb_model}.{args.emb_graph_type}.undir.{args.emb_agg}.e{emb_e}.ns{emb_ns}.b{emb_b}.d{emb_d}'
             emb_filepath = f'{prep_output}{filter_str}/emb/{emb_settings_str}.emb.pt'
-            emb_skill = torch.load(emb_filepath, map_location=torch.device('cpu'))['skill']
+            emb_skill = torch.load(emb_filepath, map_location=torch.device('cpu'))['skill'].detach().numpy()
             from scipy import sparse
             vecs['skill'] = sparse._lil.lil_matrix(vecs['skill'] * emb_skill)
 
