@@ -83,6 +83,8 @@ For instance, for team recommendation, a long-standing well-experienced expert w
 To include a Curriculum Learning strategy, there is a parameter for a model to set in [``./src/param.py``](src/param.py):
 - ``CL``: the curriculum learning strategy which can be ``SL``, ``DP``, ``normal``(no curriculum learning).
 
+To have a better understanding of the impact of Curriculum Learning on Neural Team Formation, please refer to [CL on NTF Flow](https://github.com/rezaBarzgar/OpeNTF/blob/main/CL%20on%20NTF%20Flow.pdf)
+
 
 #### **3.2. Adila: Fairness aware Team Formation**
 
@@ -240,62 +242,8 @@ Full predictions of all models on test and training sets and the values of evalu
 We benefit from [``pytrec_eval``](https://github.com/cvangysel/pytrec_eval), [``gensim``](https://radimrehurek.com/gensim/), [Josh Feldman's blog](https://joshfeldman.net/WeightUncertainty/), and other libraries. We would like to thank the authors of these libraries and helpful resources.
   
 ## 6. License:
-©2021. This work is licensed under a [CC BY-NC-SA 4.0](license.txt) license.
-
-Arman Dashti<sup>1</sup>, [Hossein Fani](https://hosseinfani.github.io/)<sup>1,2</sup> 
-
-<sup><sup>1</sup>School of Computer Science, Faculty of Science, University of Windsor, ON, Canada.</sup>
-<sup><sup>2</sup>[hfani@uwindsor.ca](mailto:hfani@uwindsor.ca)</sup>
-
+Removed for anonymity
 ## 7. Citation:
-```
-@inproceedings{DBLP:conf/ecir/FaniBDS24,
-  author    = {Hossein Fani and Reza Barzegar and Arman Dashti and Mahdis Saeedi},
-  title     = {A Training Strategy for Future Collaborative Team Prediction},
-  booktitle = {Advances in Information Retrieval - 46th European Conference on Information Retrieval, {ECIR} 2024, Glasgow, Scotland, March 24th-28, 2024},
-  series    = {Lecture Notes in Computer Science},
-  volume    = {},
-  pages     = {},
-  publisher = {Springer},
-  year      = {2024},
-  url       = {https://doi.org/},
-  doi       = {},
-  biburl    = {},
-  bibsource = {dblp computer science bibliography, https://dblp.org}
-}
-  ```
-
-```
-@inproceedings{DBLP:conf/cikm/DashtiSF22,
-  author    = {Arman Dashti and Saeed Samet and Hossein Fani},
-  title     = {Effective Neural Team Formation via Negative Samples},
-  booktitle = {Proceedings of the 31st {ACM} International Conference on Information {\&} Knowledge Management, Atlanta, GA, USA, October 17-21, 2022},
-  pages     = {3908--3912},
-  publisher = {{ACM}},
-  year      = {2022},
-  url       = {https://doi.org/10.1145/3511808.3557590},
-  doi       = {10.1145/3511808.3557590},
-  biburl    = {https://dblp.org/rec/conf/cikm/DashtiSF22.bib},
-  bibsource = {dblp computer science bibliography, https://dblp.org}
-}
-  ```
-  ```
-@inproceedings{DBLP:conf/cikm/DashtiSPF22,
-  author    = {Arman Dashti and Karan Saxena and Dhwani Patel and Hossein Fani},
-  title     = {OpeNTF: {A} Benchmark Library for Neural Team Formation},
-  booktitle = {Proceedings of the 31st {ACM} International Conference on Information {\&} Knowledge Management, Atlanta, GA, USA, October 17-21, 2022},
-  pages     = {3913--3917},
-  publisher = {{ACM}},
-  year      = {2022},
-  url       = {https://doi.org/10.1145/3511808.3557526},
-  doi       = {10.1145/3511808.3557526},
-  biburl    = {https://dblp.org/rec/conf/cikm/DashtiSPF22.bib},
-  bibsource = {dblp computer science bibliography, https://dblp.org}
-}
-```
-
+Removed for anonymity 
 ## 8. Awards:
-
-> [CAD$300, Gold medalist, UWill Discover, 2022](https://scholar.uwindsor.ca/uwilldiscover/2022/2022Day3/30/)
-
-> CAD$300, Best Research, Demo Day, School of Computer Science, University of Windsor, 2022. 
+Removed for anonymity
