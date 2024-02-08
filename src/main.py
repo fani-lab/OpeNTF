@@ -163,7 +163,8 @@ def run(data_list, domain_list, fair, filter, future, model_list, output, exp_id
 
             if(emb_random): # generate a random emb_skill of the same shape and feed it
                 emb_skill_shape = (vecs['skill'].shape[1], emb_d)
-                emb_skill = torch.rand(emb_skill_shape)
+                for i in range(5):
+                    emb_skill = torch.rand(emb_skill_shape)
 
             from scipy import sparse
             vecs['skill'] = sparse._lil.lil_matrix(vecs['skill'] * emb_skill)
