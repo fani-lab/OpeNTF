@@ -56,10 +56,10 @@ python -u main.py -data ../data/raw/dblp/toy.dblp.v12.json -domain dblp -model f
 The above run, loads and preprocesses a tiny-size toy example dataset [``toy.dblp.v12.json``](data/raw/dblp/toy.dblp.v12.json) from [``dblp``](https://originalstatic.aminer.cn/misc/dblp.v12.7z) followed by _n_-fold train-evaluation on a training split and final test on the test set for ``feedforward`` and ``Bayesian`` neural models using default hyperparameters from [``./src/param.py``](./src/param.py). Then, the predictions will be passed through the `det_greedy` reranking fairness algorithm to mitigate popularity bias in teams with default `k_max`, `np_ratio` fromn [``./src/param.py``](./src/param.py).
 
 ```
-python -u main.py -data ../data/raw/dblp/toy.dblp.v12.json -domain dblp -model tbnn tbnn_dt2v_emb
+python -u main.py -data ../data/raw/dblp/toy.dblp.v12.json -domain dblp -model bnn bnn_emb
 ```
 
-This script loads and preprocesses the same dataset [``toy.dblp.v12.json``](data/raw/dblp/toy.dblp.v12.json) from [``dblp``](https://originalstatic.aminer.cn/misc/dblp.v12.7z), takes the teams from the the last year as the test set and trains the ``Bayesian`` neural model following our proposed streaming training strategy as explained in ``3.2.2. Temporal Neural Team Formation`` with two different input representations _i_) sparse vector represntation and _ii_) temporal skill vector represntation using default hyperparameters from [``./src/param.py``](./src/param.py).
+This script loads and preprocesses the same dataset [``toy.dblp.v12.json``](data/raw/dblp/toy.dblp.v12.json) from [``dblp``](https://originalstatic.aminer.cn/misc/dblp.v12.7z), takes the teams from the the last year as the test set and trains the ``Bayesian`` neural model
 
 ## 3. Features
 
@@ -73,9 +73,14 @@ To include a Curriculum Learning strategy, there is a parameter for a model to s
 To have a better understanding of our proposed loss-based curriculum learning strategy, we compare the flow of calculating training loss using normal cross entropy and our proposed loss function in (parametric curriculum).
 please note that &Phi; refers to the difficulty level of each expert (class).
 
-<p align="center"><img src='./misc/CL flow 1.png.png' width="300" ></p>
-
-
+<p align="center"><img src='./misc/CL flow 1.png' width="300" ></p>
+<p align="center"><img src='./misc/CL flow 2.png' width="300" ></p>
+<p align="center"><img src='./misc/CL flow 3.png' width="800" ></p>
+<p align="center"><img src='./misc/CL flow 4.png' width="800" ></p>
+<p align="center"><img src='./misc/CL flow 5.png' width="800" ></p>
+<p align="center"><img src='./misc/CL flow 6.png' width="800" ></p>
+<p align="center"><img src='./misc/CL flow 7.png' width="800" ></p>
+<p align="center"><img src='./misc/CL flow 8.png' width="800" ></p>
 
 
 
@@ -143,10 +148,45 @@ We used [``pytrec_eval``](https://github.com/cvangysel/pytrec_eval) to evaluate 
 
 1) ``f0.test.pred`` is the predictions per test instance for a model which is trained folds [1,2,3,4] and validated on fold [0].
 2) ``f0.test.pred.eval.csv`` is the values of evaluation metrics for the predictions per test instance
-3) ``f0.test.pred.eval.mean.csv`` is the average of values for evaluation metrics over all test instances.
+3) ``f0.test.pred.eval.mean.csv`` is the average of values for evaluation metrics overall test instances.
 4) ``test.pred.eval.mean.csv`` is the average of values for evaluation metrics over all _n_ fold models.
 
 **Benchmarks at Scale**
+
+|             | % precision |        | %recall |        |  %ndcg |        |  %map  |        |         |
+|-------------|:-----------:|:------:|:-------:|:------:|:------:|:------:|:------:|:------:|---------|
+|             |     @ 2     |  @ 10  |   @ 2   |  @ 10  |   @ 2  |  @ 10  |   @ 2  |  @ 10  |  aucroc |
+|             |             |        |         |  imdb  |        |        |        |        |         |
+|    random   |    0.1700   | 0.1800 |  0.0800 | 0.4500 | 0.1700 | 0.3100 | 0.0600 | 0.1200 | 49.8800 |
+|   fnn-std   |    0.9526   | 0.7750 |  0.4090 | 1.7625 | 0.9684 | 1.3405 | 0.3249 | 0.5839 | 58.9675 |
+|    fnn-pc   |    0.9240   | 0.6878 |  0.3927 | 1.5619 | 0.9205 | 1.2018 | 0.3096 | 0.5329 | 54.8621 |
+|   fnn-npc   |    0.9915   | 0.8840 |  0.4415 | 2.0059 | 1.0056 | 1.5104 | 0.3595 | 0.6820 | 63.0213 |
+| fnn-gnn-std |    0.7319   | 0.6582 |  0.3376 | 1.5096 | 0.7449 | 1.1390 | 0.2645 | 0.5111 | 62.3177 |
+|  fnn-gnn-pc |    0.6645   | 0.6214 |  0.2991 | 1.3973 | 0.6645 | 1.0456 | 0.2277 | 0.4565 | 64.7053 |
+| fnn-gnn-npc |    0.8150   | 0.7408 |  0.3555 | 1.6556 | 0.8162 | 1.2426 | 0.2686 | 0.5317 | 66.7753 |
+|   bnn-std   |    0.2544   | 0.2481 |  0.1284 | 0.6062 | 0.2626 | 0.4375 | 0.1016 | 0.1859 | 49.7615 |
+|    bnn-pc   |    0.1791   | 0.2149 |  0.0899 | 0.5177 | 0.1785 | 0.3553 | 0.0680 | 0.1431 | 50.1223 |
+|   bnn-npc   |    0.2076   | 0.1983 |  0.0986 | 0.4871 | 0.2088 | 0.3488 | 0.0747 | 0.1462 | 49.9923 |
+| bnn-gnn-std |    0.1973   | 0.2030 |  0.1005 | 0.5029 | 0.2008 | 0.3557 | 0.0772 | 0.1495 | 50.0626 |
+|  bnn-gnn-pc |    0.1661   | 0.2424 |  0.0809 | 0.5944 | 0.1614 | 0.3922 | 0.0587 | 0.1508 | 50.0527 |
+| bnn-gnn-std |    0.1869   | 0.1900 |  0.0988 | 0.4896 | 0.1869 | 0.3393 | 0.0733 | 0.1424 | 49.9541 |
+|             |             |        |         |        |        |        |        |        |         |
+|             |  %precision |        | %recall |        |  %ndcg |        |  %map  |        |         |
+|             |     @ 2     |  @ 10  |   @ 2   |  @ 10  |   @ 2  |  @ 10  |   @ 2  |  @ 10  |  aucroc |
+|             |             |        |         |  dblp  |        |        |        |        |         |
+|    random   |    0.0100   | 0.0200 |  0.0100 | 0.0600 | 0.0200 | 0.0400 | 0.0100 | 0.0200 | 49.9200 |
+|   fnn-std   |    0.2994   | 0.1799 |  0.1742 | 0.5300 | 0.2988 | 0.4024 | 0.1300 | 0.2049 | 68.3604 |
+|    fnn-pc   |    0.2407   | 0.1751 |  0.1403 | 0.5134 | 0.2568 | 0.3884 | 0.1157 | 0.1981 | 61.4063 |
+|   fnn-npc   |    0.5031   | 0.3633 |  0.2929 | 1.0643 | 0.5062 | 0.7770 | 0.2220 | 0.3798 | 71.4635 |
+| fnn-gnn-std |    0.3975   | 0.2252 |  0.2318 | 0.6450 | 0.3967 | 0.5400 | 0.1745 | 0.2895 | 74.7247 |
+|  fnn-gnn-pc |    0.4721   | 0.2007 |  0.2712 | 0.5822 | 0.4795 | 0.5182 | 0.2094 | 0.2840 | 75.9575 |
+| fnn-gnn-npc |    0.5182   | 0.3792 |  0.2991 | 1.0912 | 0.5269 | 0.8005 | 0.2277 | 0.3898 | 74.6674 |
+|   bnn-std   |    0.0285   | 0.0272 |  0.0179 | 0.0856 | 0.0289 | 0.0586 | 0.0138 | 0.0288 | 50.0227 |
+|    bnn-pc   |    0.0268   | 0.0300 |  0.0166 | 0.0954 | 0.0003 | 0.0630 | 0.0133 | 0.0306 | 50.0703 |
+|   bnn-npc   |    0.0369   | 0.0223 |  0.0233 | 0.0698 | 0.0388 | 0.0534 | 0.0188 | 0.0278 | 50.0220 |
+| bnn-gnn-std |    0.0210   | 0.0263 |  0.0120 | 0.0811 | 0.0215 | 0.0509 | 0.0096 | 0.0217 | 50.0061 |
+|  bnn-gnn-pc |    0.0293   | 0.0247 |  0.0180 | 0.0773 | 0.0284 | 0.0526 | 0.0126 | 0.0254 | 50.0863 |
+| bnn-gnn-std |    0.0310   | 0.0309 |  0.0195 | 0.0960 | 0.0308 | 0.0624 | 0.0144 | 0.0278 | 49.9071 |
 
 Full predictions of all models on test and training sets and the values of evaluation metrics are available in a rar file and will be delivered upon request! 
 
