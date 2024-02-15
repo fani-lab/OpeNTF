@@ -147,7 +147,7 @@ def run(data_list, domain_list, fair, filter, future, model_list, output, exp_id
             if args.emb_d: param.settings["model"]["baseline"]["emb"]["d"] = args.emb_d
             if args.emb_e: param.settings["model"]["baseline"]["emb"]["e"] = args.emb_e
             if args.cmd: param.settings["model"]['cmd'] = args.cmd
-            if args.emb_random: param.settings["model"]["baseline"]["emb"]["random"] = args.emb_random
+            if args.emb_random is not None: param.settings["model"]["baseline"]["emb"]["random"] = args.emb_random
 
             emb_e = param.settings["model"]["baseline"]["emb"]["e"]
             emb_ns = param.settings["model"]["baseline"]["emb"]["ns"]
