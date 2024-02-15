@@ -1,5 +1,5 @@
-# ``OpeNTF``: An Open-Source Neural Team Formation Benchmark Library 
-Team formation involves selecting a team of skillful experts who will, more likely than not, accomplish a task. Researchers have proposed a rich body of computational methods to automate the traditionally tedious and error-prone manual process. We previously released OpeNTF, an open-source framework hosting canonical neural models as the cutting-edge class of approaches, along with large-scale training datasets from varying domains. In this paper, we contribute OpeNTF, which extends the initial release in two prime directions. (1) The first of its kind in neural team formation, we integrated `debiasing reranking algorithms` to mitigate the `popularity` and `gender` disparities in the neural models’ team recommendations based on two alternative notions of fairness: equality of opportunity and demographic parity. (2) We further contribute a `curriculum learning` training strategy for neural models’ training to capture the difficulty level of experts to learn easy popular experts first, then moving toward hard nonpopular experts, as opposed to randomly shuffled training datasets. OpeNTF is a forward-looking effort to automate team formation via fairness-aware and time-sensitive methods. AI-ML-based solutions are increasingly impacting how resources are allocated to various groups in society, and ensuring fairness and time are systematically considered is key.
+# ``OpeNTF``: An Open-Source Neural Team Formation via Adaptive Loss-based Curricula
+Team formation involves selecting a team of skillful experts who will, more likely than not, accomplish a task. Researchers have proposed a rich body of computational methods to automate the traditionally tedious and error-prone manual process. We previously released OpeNTF, an open-source framework hosting canonical neural models as the cutting-edge class of approaches, along with large-scale training datasets from varying domains. In this repo, we extend OpeNTF with `curriculum learning` training strategy for neural models' training to capture the difficulty level of experts to learn easy popular experts first, then moving toward hard nonpopular experts, as opposed to randomly shuffled training datasets. 
 
 <table border=0>
 <tr>
@@ -27,14 +27,14 @@ gensim==3.8.3
 ```
 By ``pip``, clone the codebase and install the required packages:
 ```sh
-git clone --recursive https://github.com/Fani-Lab/opentf
+git clone --recursive https://github.com/[anonymous]
 cd opentf
 pip install -r requirements.txt
 ```
 By [``conda``](https://www.anaconda.com/products/individual):
 
 ```sh
-git clone --recursive https://github.com/Fani-Lab/opentf
+git clone --recursive https://github.com/[anonymous]
 cd opentf
 conda env create -f environment.yml
 conda activate opentf
