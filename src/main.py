@@ -156,15 +156,18 @@ def run(data_list, domain_list, fair, filter, future, model_list, output, exp_id
             emb_random = param.settings["model"]["baseline"]["emb"]["random"]
 
             # vector, embedding dot product here
-            # this string is needed to be appended to the output path of the final prediction results of fnn or bnn
-            emb_settings_str = f'{args.emb_model}.{args.emb_graph_type}.undir.{args.emb_agg}.e{emb_e}.ns{emb_ns}.b{emb_b}.d{emb_d}'
-            emb_filepath = f'{prep_output}{filter_str}/emb/{emb_settings_str}.emb.pt'
-            emb_skill = torch.load(emb_filepath, map_location=torch.device('cpu'))['skill'].detach().numpy()
 
             if(emb_random): # generate a random emb_skill of the same shape and feed it
                 emb_skill_shape = (vecs['skill'].shape[1], emb_d)
                 for i in range(5):
                     emb_skill = torch.rand(emb_skill_shape)
+                # r is for referring to random
+                emb_settings_str = f'emb.random.d{emb_d}'
+            else:
+                # this string is needed to be appended to the output path of the final prediction results of fnn or bnn
+                emb_settings_str = f'{args.emb_model}.{args.emb_graph_type}.undir.{args.emb_agg}.e{emb_e}.ns{emb_ns}.b{emb_b}.d{emb_d}'
+                emb_filepath = f'{prep_output}{filter_str}/emb/{emb_settings_str}.emb.pt'
+                emb_skill = torch.load(emb_filepath, map_location=torch.device('cpu'))['skill'].detach().numpy()
 
             from scipy import sparse
             vecs['skill'] = sparse._lil.lil_matrix(vecs['skill'] * emb_skill)
