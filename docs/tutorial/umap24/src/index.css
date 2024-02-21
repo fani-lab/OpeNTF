@@ -1,0 +1,20 @@
+body {
+  margin: 0;
+  font-family: "Montserrat", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.sidebar {
+  height: 100vh;
+  position: relative;
+}
+
+.main-content {
+  padding-top: 6rem;
+}
+
+.top-menu {
+  background-color: white;
+  height: 6rem;
+}
