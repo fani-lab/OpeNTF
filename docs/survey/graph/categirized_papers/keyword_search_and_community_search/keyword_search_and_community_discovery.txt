@@ -1,0 +1,12 @@
+1--2020 SNA TKDE Effective Keyword Search over Weighted Graphs.pdf
+12--2016 SNA VLDB Effective community search for large attributed graphs.pdf
+2--2020 IPM Compact group discovery in attributed graphs and social networks.pdf
+3--2020 IRJ Robust keyword search in large attributed graphs.pdf
+41--2008 Keyword_proximity_search_in_complex_data_graphs.pdf
+42--2009 Querying Communities in Relational Databases.pdf
+55--2016 Forming Grouped Teams with Efficient.pdf
+68--2010 RecSys Breaking out of the box of recommendations from items to packages.pdf
+69--2011 Keyword_Search_in_Graphs_Finding_r-cliques.pdf
+71--2010 SNA KDD The community-search problem and how to plan a successful cocktail party.pdf
+9--2018 Multityped Community Discovery in Time-Evolving Heterogeneous Information Networks Based on Tensor Decomposition.pdf
+

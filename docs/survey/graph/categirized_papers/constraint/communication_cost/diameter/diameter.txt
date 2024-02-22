@@ -1,0 +1,5 @@
+14--2009 Finding a Team of Experts in Social Networks.pdf
+61--2012 Online Team Formation in Social Networks.pdf
+63--2012 Multi-skill Collaborative Teams based on Densest Subgraphs.pdf
+64--2012 Capacitated Team Formation Problem on Social Networks.pdf
+

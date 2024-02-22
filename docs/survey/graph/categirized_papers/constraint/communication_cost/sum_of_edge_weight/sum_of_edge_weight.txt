@@ -1,0 +1,5 @@
+15--2011 Discovering Top-k Teams of Experts.pdf
+18--2021 A unified framework for effective team formation in social networks.pdf
+47--P-2017 SNA EDBT Authority-based Team Discovery in Social Networks(related to 6).pdf
+55--2016 Forming Grouped Teams with Efficient.pdf
+
