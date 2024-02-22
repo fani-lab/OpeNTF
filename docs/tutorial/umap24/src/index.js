@@ -10,7 +10,7 @@ import reportWebVitals from './reportWebVitals';
 import Home from './routes/Home';
 
 ReactDOM.render(
-  <HashRouter basename="/docs/tutorial/umap24">
+  <HashRouter basename="/tutorial/umap24">
     <Routes>
       <Route path="/" element={<App />}>
         <Route index element={<Home />} />
