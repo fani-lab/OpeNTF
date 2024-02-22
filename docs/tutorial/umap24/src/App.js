@@ -6,7 +6,7 @@ import Sidebar from './components/Sidebar';
 function App() {
   return (
     <div className='container-fluid'>
-      <div className='row fixed-top'>
+      <div className='row'>
         <Menu />
       </div>
       <div className='row main-content'>
