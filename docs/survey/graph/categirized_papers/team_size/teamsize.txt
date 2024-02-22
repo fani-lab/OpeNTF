@@ -1,0 +1,6 @@
+14--2009 Finding a Team of Experts in Social Networks.pdf
+67--2010 Forming Teams in Large-Scale Community Systems.pdf
+71--2010 SNA KDD The community-search problem and how to plan a successful cocktail party.pdf
+77--2013 Towards Realistic Team Formation in Social Networks.pdf
+8--2018 The sociotechnical teams formation problem a mathematical optimization approach.pdf
+

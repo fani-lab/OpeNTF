@@ -1,0 +1,9 @@
+23--2018 A Multi-objective Formulation of the Team Formation Problem.pdf
+39--2009 OR ESA A team formation model based on knowledge and collaboration.pdf
+4--2020 Team Recommendation Using Order-Based Fuzzy.pdf
+52--2019 Application of Genetic Algorithms to the Multiple team formation problem.pdf
+58--2014 ESA Non-additive multi-objective robot coalition formation.pdf
+60--2014 A_Method_for_Group_Formation_Using_Genetic_Algorit.pdf
+65--2012 A genetic algorithm approach for group formation in collaborative learning considering multiple student characteristics.pdf
+70--2011 OR SNA DKE Interaction mining and skill-dependent recommendations for multi-objective team composition.pdf
+
