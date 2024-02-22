@@ -325,7 +325,7 @@ function Home() {
                 target="_blank"
                 href="https://hosseinfani.github.io/res/papers/2024_UMAP_Collaborative_Team_Recommendation_for_Skilled_Users_Objectives_Techniques_and_New_Perspectives.pdf"
               >
-                <i class="bi bi-filetype-pdf pe-3"></i>Download
+                <i className="bi bi-filetype-pdf pe-3"></i>Download
               </a>
             </div>
           </div>
