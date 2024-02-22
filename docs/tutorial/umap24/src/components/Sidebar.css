@@ -4,6 +4,12 @@
   text-transform: uppercase;
 }
 
+@media (max-width: 600px) {
+  .side-menu {
+    display: none;
+  }
+}
+
 .side-menu li:not(:first-child):not(:last-child) {
   padding: 5px 0;
 }
