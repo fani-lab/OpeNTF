@@ -137,10 +137,7 @@ function Home() {
             alt="Figure 1. Categories of team recommendation methods."
             height="300"
           />
-          <p>
-            {" "}
-            Figure 1. Categories of team recommendation methods.
-          </p>
+          <p> Figure 1. Categories of team recommendation methods.</p>
           <div className="outline-topic">
             <span className="section-date">35 minutes</span>
             <span className="fw-bold text-uppercase h5">
@@ -223,14 +220,14 @@ function Home() {
                 </li>
               </ul>
               <img
-                src={require("../img/bnn.png")}
+                src={require("../img/bnn.jpg")}
                 alt="Figure 2. Bayesian bnn, one of OpeNTF's supported neural models."
                 height="300"
               />
               <p>
                 {" "}
-                Figure 2. Bayesian <i>bnn</i>, one of <i>OpeNTF</i>'s supported neural
-                models.
+                Figure 2. Bayesian <i>bnn</i>, one of <i>OpeNTF</i>'s supported
+                neural models.
               </p>
             </div>
             <div className="topic-item">
@@ -261,7 +258,7 @@ function Home() {
                 proposed solutions.
               </span>
               <img
-                src={require("../img/flow.png")}
+                src={require("../img/flow.jpg")}
                 alt="Figure 3. Adila's pipeline architecture."
                 height="300"
               />
