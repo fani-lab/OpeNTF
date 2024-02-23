@@ -157,12 +157,15 @@ def run(data_list, domain_list, fair, filter, future, model_list, output, exp_id
 
             # vector, embedding dot product here
 
+            # emb_random = 1 -> random gnn embedding
+            # emb_random = 2 -> random sparse matrix (0,1)
             if(emb_random): # generate a random emb_skill of the same shape and feed it
                 emb_skill_shape = (vecs['skill'].shape[1], emb_d)
                 for i in range(5):
                     emb_skill = torch.rand(emb_skill_shape)
+                if (emb_random == 2): emb_skill = (emb_skill > 0.5).int() # convert the random decimals to zeros and ones
                 # r is for referring to random
-                emb_settings_str = f'emb.random.d{emb_d}'
+                emb_settings_str = f'emb.random{emb_random}.d{emb_d}'
             else:
                 # this string is needed to be appended to the output path of the final prediction results of fnn or bnn
                 emb_settings_str = f'{args.emb_model}.{args.emb_graph_type}.undir.{args.emb_agg}.e{emb_e}.ns{emb_ns}.b{emb_b}.d{emb_d}'
@@ -170,7 +173,7 @@ def run(data_list, domain_list, fair, filter, future, model_list, output, exp_id
                 emb_skill = torch.load(emb_filepath, map_location=torch.device('cpu'))['skill'].detach().numpy()
 
             from scipy import sparse
-            vecs['skill'] = sparse._lil.lil_matrix(vecs['skill'] * emb_skill)
+            vecs['skill'] = sparse._lil.lil_matrix(vecs['skill'] * emb_skill) if emb_random == 1 else sparse._lil.lil_matrix(emb_skill)
 
         year_idx = []
         for i in range(1, len(indexes['i2y'])):
