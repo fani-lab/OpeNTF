@@ -1,21 +1,21 @@
 {
   "files": {
     "main.css": "/OpeNTF/tutorial/umap24/static/css/main.fca4ce11.css",
-    "main.js": "/OpeNTF/tutorial/umap24/static/js/main.121c7173.js",
+    "main.js": "/OpeNTF/tutorial/umap24/static/js/main.49664560.js",
     "static/js/787.85b43d0b.chunk.js": "/OpeNTF/tutorial/umap24/static/js/787.85b43d0b.chunk.js",
     "static/media/taxonomy.jpg": "/OpeNTF/tutorial/umap24/static/media/taxonomy.a2f45c3ebffad51b0316.jpg",
     "static/media/banner-background.jpg": "/OpeNTF/tutorial/umap24/static/media/banner-background.e7bbc14824c496263313.jpg",
-    "static/media/flow.png": "/OpeNTF/tutorial/umap24/static/media/flow.505ac04292b19e697bc0.png",
+    "static/media/flow.jpg": "/OpeNTF/tutorial/umap24/static/media/flow.6a999de42bd81bb0ef3f.jpg",
     "static/media/bootstrap-icons.woff?": "/OpeNTF/tutorial/umap24/static/media/bootstrap-icons.c1d7432ee75fa194e499.woff",
     "static/media/bootstrap-icons.woff2?": "/OpeNTF/tutorial/umap24/static/media/bootstrap-icons.a13b815539b49de48d23.woff2",
-    "static/media/bnn.png": "/OpeNTF/tutorial/umap24/static/media/bnn.7e8d1a7c6177a53d94ec.png",
+    "static/media/bnn.jpg": "/OpeNTF/tutorial/umap24/static/media/bnn.a23ef36c3343a47487f8.jpg",
     "index.html": "/OpeNTF/tutorial/umap24/index.html",
     "main.fca4ce11.css.map": "/OpeNTF/tutorial/umap24/static/css/main.fca4ce11.css.map",
-    "main.121c7173.js.map": "/OpeNTF/tutorial/umap24/static/js/main.121c7173.js.map",
+    "main.49664560.js.map": "/OpeNTF/tutorial/umap24/static/js/main.49664560.js.map",
     "787.85b43d0b.chunk.js.map": "/OpeNTF/tutorial/umap24/static/js/787.85b43d0b.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.fca4ce11.css",
-    "static/js/main.121c7173.js"
+    "static/js/main.49664560.js"
   ]
 }
