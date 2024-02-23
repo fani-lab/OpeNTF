@@ -15,7 +15,6 @@ function Menu() {
           </div>
         </div>
       </div>
-      <hr />
     </div>
   );
 }
