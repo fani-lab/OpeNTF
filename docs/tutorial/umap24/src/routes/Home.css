@@ -67,7 +67,7 @@ section .presenter span {
 
 section .presenter {
   padding-left: 1rem;
-  display:flex;
+  display: flex;
   flex-wrap: wrap;
 }
 
@@ -100,4 +100,19 @@ section .outline-topic:not(:last-child) {
 
 section .topic-item {
   padding-top: 0.4rem;
+}
+
+img {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+a {
+  color: #1d824c;
+  text-decoration: none;
+}
+
+a:hover {
+  color: #1d824c;
+  text-decoration: underline;
 }

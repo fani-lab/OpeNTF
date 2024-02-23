@@ -125,6 +125,22 @@ function Home() {
           Outline
         </span>
         <div className="section-body">
+          <span className="d-block w-100">
+            From Figure 1 (below), we begin to introduce intuitive definitions
+            of a team and some representative, historical to modern and
+            state-of-the-art methods for solving the team recommendation
+            problem, motivating the importance of the problem, followed by a
+            novel taxonomy of computational methods, as explained hereafter.
+          </span>
+          <img
+            src={require("../img/taxonomy.jpg")}
+            alt="Figure 1. Categories of team recommendation methods."
+            height="300"
+          />
+          <p>
+            {" "}
+            Figure 1. Categories of team recommendation methods.
+          </p>
           <div className="outline-topic">
             <span className="section-date">35 minutes</span>
             <span className="fw-bold text-uppercase h5">
@@ -138,41 +154,31 @@ function Home() {
               excluded in our tutorial.
             </span>
             <div className="topic-item">
-              <span className="fw-bold">Subgraph Optimization Objectives</span>
-              <span className="d-block w-100">
-                The graph-based team formation approaches defines subgraph
-                optimization of objectives on a graph where the different
-                aspects of real-world teams (e.g., communication cost) are
-                captured. In our tutorial, we formalized more than 13 objectives
-                in a unified framework with integrated notations for better
-                readability and fostering conventions in this realm.
-              </span>
-            </div>
-            <div className="topic-item">
-              <span className="fw-bold">Subgraph Optimization Techniques</span>
-              <span className="d-block w-100">
-                Subgraph optimization problems are proven to be NP-hard [7].
-                Different heuristics have been developed to solve this problem
-                in polynomial time through greedy and/or approximation
-                algorithms. We describe the seminal heuristics that have been
-                followed by the majority of researchers. As will be explained,
-                optimization techniques can be studied in three groups: ​i)
-                those that minimizes communication cost only [8]; ii) those that
-                consider additional objectives jointly with communication cost
-                [6]; and, iii) those considering maximizing the teams’ density.
-              </span>
-            </div>
-            <div className="topic-item">
-              <span className="fw-bold">Evaluation Methodology</span>
-              <span className="d-block w-100">
-                Finally, we lay out the methodologies used to evaluate the
-                performance of the graph-based approaches. We discuss the
-                benchmark datasets, what has been considered as teams and how
-                they have been assumed successful to function as gold truth, as
-                well as quantitative and qualitative metrics that are utilized
-                to measure the quality of the recommended teams by proposed
-                approaches as compared to the gold truth.
-              </span>
+              <ul>
+                <li>
+                  <span className="fw-bold">
+                    Subgraph Optimization Objectives:
+                  </span>
+                  &nbsp;In our tutorial, we formalized more than 13 objectives
+                  in a unified framework with integrated notations for better
+                  readability and fostering conventions in this realm.
+                </li>
+                <li>
+                  <span className="fw-bold">
+                    Subgraph Optimization Techniques:
+                  </span>
+                  &nbsp;We describe the seminal heuristics that have been
+                  followed by the majority of researchers, as well as the groups
+                  that optimization techniques can be studied in.
+                </li>
+                <li>
+                  <span className="fw-bold">Evaluation Methodology:</span>
+                  &nbsp;Finally, we lay out the methodologies, benchmark
+                  datasets, and quantitative and qualitative metrics that are
+                  used to evaluate the performance of the graph-based
+                  approaches.
+                </li>
+              </ul>
             </div>
           </div>
           <div className="outline-topic">
@@ -189,47 +195,47 @@ function Home() {
               as well as dynamic expert networks [10, 11].
             </span>
             <div className="topic-item">
-              <span className="fw-bold">Neural Architectures</span>
-              <span className="d-block w-100">
-                We will lay out the details of different neural architecture and
-                their applications in team recommendation. Sapienza et al. [13],
-                who started neural team recommendation with employing an
-                autoencoder, is being followed by researchers through other
-                neural-based architectures. Graph neural networks, on the other
-                hand, have provided an effective yet efficient way to solve the
-                graph analytic problem by converting a graph into a
-                low-dimensional vector space while preserving the graph
-                structure.
-              </span>
+              <ul>
+                <li>
+                  <span className="fw-bold">Neural Architectures:</span>
+                  &nbsp;We will lay out the details of different neural
+                  architecture and their applications in team recommendation,
+                  from autoencoder to graph neural networks.
+                </li>
+                <li>
+                  <span className="fw-bold">Training Strategies:</span>
+                  &nbsp;In our tutorial, we will discuss the details of
+                  different negative sampling heuristics to draw virtually
+                  unsuccessful teams and streaming training strategy that put a
+                  chronological order on teams during training.
+                </li>
+                <li>
+                  <span className="fw-bold">
+                    Hands-On <i>OpeNTF</i>:
+                  </span>
+                  &nbsp;In our tutorial, we introduce publicly available
+                  libraries and tools for the task of team recommendation.
+                  Notably, we provide hands-on experience with{" "}
+                  <a href="https://github.com/fani-lab/OpeNTF">
+                    <i>OpeNTF</i>
+                  </a>
+                  , an open-source benchmark library for neural models.​
+                </li>
+              </ul>
+              <img
+                src={require("../img/bnn.png")}
+                alt="Figure 2. Bayesian bnn, one of OpeNTF's supported neural models."
+                height="300"
+              />
+              <p>
+                {" "}
+                Figure 2. Bayesian <i>bnn</i>, one of <i>OpeNTF</i>'s supported neural
+                models.
+              </p>
             </div>
             <div className="topic-item">
-              <span className="fw-bold">Training Strategies</span>
-              <span className="d-block w-100">
-                Literatures have shown that leveraging not only positive samples
-                (e.g., friendship in social networks) but also negative samples
-                (e.g., distrust) improve accuracy in various tasks in social
-                network analysis and recommender systems. In our tutorial, we
-                will discuss the details of different negative sampling
-                heuristics to draw virtually unsuccessful teams and will show
-                their synergy to the model convergence and improved inference
-                during training and test, respectively. As well, we will explain
-                streaming training strategy that put a chronological order on
-                teams during training to incorporate the temporal dependency of
-                teams vs. randomly shuffled that assumes the independent and
-                identically distributed instances of teams (bag of teams)[12].
-              </span>
-            </div>
-            <div className="topic-item">
-              <span className="fw-bold expand-button">Hands-On OpeNTF</span>
-              <span className="d-block w-100">
-                In our tutorial, we introduce publicly available libraries and
-                tools for the task of team recommendation. Notably, we provide
-                hands-on experience with OpeNTF [2], an open-source benchmark
-                library for neural models that: i) can efficiently preprocess
-                large-scale datasets, ii) can be easily extended or customized
-                to new neural methods, and iii) is extensible to experiments on
-                new datasets from other domains.​
-              </span>
+              <span className="fw-bold expand-button"></span>
+              <span className="d-block w-100"></span>
             </div>
           </div>
           <div className="outline-topic">
@@ -245,12 +251,24 @@ function Home() {
                 The primary focus of existing team recommendation methods is the
                 maximization of the success rate for the recommended teams,
                 largely ignoring diversity in the recommended users. In our
-                tutorial, we introduce notions of fairness and Adila [9], that
-                enables further post-processing reranking refinements to
+                tutorial, we introduce notions of fairness and{" "}
+                <a href="https://github.com/fani-lab/Adila">
+                  <i>Adila</i>
+                </a>
+                , that enables further post-processing reranking refinements to
                 reassure the desired fair outcome and explore the synergistic
                 trade-offs between notions of fairness and success rate for the
                 proposed solutions.
               </span>
+              <img
+                src={require("../img/flow.png")}
+                alt="Figure 3. Adila's pipeline architecture."
+                height="300"
+              />
+              <p>
+                {" "}
+                Figure 3. <i>Adila</i>'s pipeline architecture.
+              </p>
             </div>
             <div className="topic-item">
               <span className="fw-bold">Spatial Team Recommendation</span>
@@ -318,7 +336,9 @@ function Home() {
         </span>
         <div className="section-body">
           <div>
-            <span className="fw-bold text-uppercase">Full Outline</span>
+            <span className="fw-bold text-uppercase">
+              View the Full Outline
+            </span>
             <div>
               <a
                 className="btn btn-outline-primary btn-lg"
