@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/OpeNTF/tutorial/umap24/static/css/main.011770ce.css",
-    "main.js": "/OpeNTF/tutorial/umap24/static/js/main.97b17a6c.js",
+    "main.js": "/OpeNTF/tutorial/umap24/static/js/main.aafba79d.js",
     "static/js/787.85b43d0b.chunk.js": "/OpeNTF/tutorial/umap24/static/js/787.85b43d0b.chunk.js",
     "static/media/taxonomy.jpg": "/OpeNTF/tutorial/umap24/static/media/taxonomy.fd3bd115d557081a0b40.jpg",
     "static/media/banner-background.jpg": "/OpeNTF/tutorial/umap24/static/media/banner-background.e7bbc14824c496263313.jpg",
@@ -11,11 +11,11 @@
     "static/media/bnn.jpg": "/OpeNTF/tutorial/umap24/static/media/bnn.a23ef36c3343a47487f8.jpg",
     "index.html": "/OpeNTF/tutorial/umap24/index.html",
     "main.011770ce.css.map": "/OpeNTF/tutorial/umap24/static/css/main.011770ce.css.map",
-    "main.97b17a6c.js.map": "/OpeNTF/tutorial/umap24/static/js/main.97b17a6c.js.map",
+    "main.aafba79d.js.map": "/OpeNTF/tutorial/umap24/static/js/main.aafba79d.js.map",
     "787.85b43d0b.chunk.js.map": "/OpeNTF/tutorial/umap24/static/js/787.85b43d0b.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.011770ce.css",
-    "static/js/main.97b17a6c.js"
+    "static/js/main.aafba79d.js"
   ]
 }
