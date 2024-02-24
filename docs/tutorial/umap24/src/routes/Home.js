@@ -114,14 +114,14 @@ function Home() {
               network (GNN) community for a comprehensive review of subgraph
               optimization objectives and calls them for further development of
               effective yet efficient graph neural networks with a special focus
-              on team recommendation. Last, having regard to the unified
-              comparative analysis, this tutorial enables
+              on team recommendation.
             </li>
             <li className="justify-paragraph">
-            organizations and practitioners to compare different models
-          and readily pick the most suitable one for their application to form
-          collaborative teams of skilled users whose success is almost surely
-          guaranteed.
+              Last, having regard to the unified comparative analysis, this
+              tutorial enables organizations and practitioners to compare
+              different models and readily pick the most suitable one for their
+              application to form collaborative teams of skilled users whose
+              success is almost surely guaranteed.
             </li>
           </ol>
         </div>
@@ -377,7 +377,7 @@ function Home() {
               <a
                 className="btn btn-outline-primary btn-lg"
                 target="_blank"
-                href="/Team_Formation_Tutorial.pdf"
+                href="/OpeNTF/tutorial/umap24/Team_Formation_Tutorial.pdf"
               >
                 <i className="bi bi-filetype-pdf pe-3"></i>Download
               </a>
