@@ -273,7 +273,7 @@ function Home() {
             </div>
           </div>
           <div className="outline-topic">
-            <span className="section-date">15 minutes</span>
+            <span className="section-date">20 minutes</span>
             <span className="fw-bold text-uppercase h5">
               Challenges and New Perspectives
             </span>
@@ -318,12 +318,6 @@ function Home() {
                 synergistic effects.
               </span>
             </div>
-          </div>
-          <div className="outline-topic">
-            <span className="section-date">5 minutes</span>
-            <span className="fw-bold text-uppercase h5">
-              Questions and Discussions
-            </span>
           </div>
         </div>
       </section>
