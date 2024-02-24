@@ -42,7 +42,7 @@ section.active .section-list li::before {
   padding-right: 0.7rem;
 }
 
-section .section-list {
+section .section-list > ul > li {
   list-style: circle;
 }
 
@@ -115,4 +115,14 @@ a {
 a:hover {
   color: #1d824c;
   text-decoration: underline;
+}
+
+.justify-paragraph {
+  text-align: justify;
+}
+
+.footnote:hover {
+  font-size: larger;
+  color: #1d824c;
+  padding: none;
 }
