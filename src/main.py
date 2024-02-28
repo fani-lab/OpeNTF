@@ -179,7 +179,10 @@ def run(data_list, domain_list, fair, filter, future, model_list, output, exp_id
                 emb_skill = torch.load(emb_filepath, map_location=torch.device('cpu'))['skill'].detach().numpy()
 
             from scipy import sparse
-            vecs['skill'] = sparse._lil.lil_matrix(vecs['skill'] * emb_skill) if emb_random == 1 else sparse._lil.lil_matrix(emb_skill)
+            if(emb_random > 1):
+                sparse._lil.lil_matrix(emb_skill) # no need of sigmoid
+            else:
+                vecs['skill'] = sparse._lil.lil_matrix(torch.sigmoid(torch.tensor(vecs['skill'] * emb_skill))) # need to scale down with sigmoid
 
         year_idx = []
         for i in range(1, len(indexes['i2y'])):
