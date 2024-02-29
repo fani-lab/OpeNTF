@@ -5,17 +5,14 @@ settings = {
             # ([('skill', '-', 'team'), ('member', '-', 'team')], 'stm'),
             # ([('skill', '-', 'member')], 'sm'),
         'dir': False,
-        'dup_edge': None, #None: keep the duplicates, else: reduce by 'add', 'mean', 'min', 'max', 'mul'
+        'dup_edge': 'mean', #None: keep the duplicates, else: reduce by 'add', 'mean', 'min', 'max', 'mul'
     },
     'model': {
-        'd' : 128, # embedding dim
-        'b' : 128, # batching settings for loaders
+        'd' : 32, # embedding dim
+        'b' : 128, # batch_size for loaders
         'e' : 100, # num epochs
         'ns' : 2, # number of negative samples
-        'max_epochs': 100,
-        'embedding_dim': 5,
         'lr': 0.01,
-        'batch_size': 5,
         'loader_shuffle': True,
         'num_workers': 0,
         'save_per_epoch': False,
@@ -50,7 +47,7 @@ settings = {
             'walk_length': 5,
             'context_size': 3,
             'walks_per_node': 10,
-            'num_negative_samples' : 10,
+            'ns' : 2,
         },
     },
     'data':{
