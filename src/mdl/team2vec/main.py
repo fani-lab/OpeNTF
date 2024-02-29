@@ -12,7 +12,7 @@ def addargs(parser):
     embedding.add_argument('--output', nargs='+', type=str, required=False, help='Output folder; e.g., ../data/preprocessed/dblp/toy.dblp.v12.json/')
     embedding.add_argument('--graph_only', type=int, required=False, help='if true, then only generates graph files and returns')
 
-def run(teamsvecs_file, indexes_file, model, output):
+def run(teamsvecs_file, indexes_file, model, output, emb_output = None):
     if not os.path.isdir(output): os.makedirs(output)
     with open(teamsvecs_file, 'rb') as teamsvecs_f, open(indexes_file, 'rb') as indexes_f:
         teamsvecs, indexes = pickle.load(teamsvecs_f), pickle.load(indexes_f)
@@ -60,7 +60,9 @@ def run(teamsvecs_file, indexes_file, model, output):
             t2v.model_name = 'n2v'
 
         elif model == 'gnn.m2v':
-            t2v = M2V()
+            from m2v import M2V
+            # initialize all settings inside m2v class
+            t2v = M2V(teamsvecs, indexes, params.settings, output, emb_output)
             t2v.model_name = 'm2v'
 
         # gcn (for homogeneous only)
@@ -91,7 +93,7 @@ def test_toys(args):
                     run(f'{args.teamsvecs}teamsvecs.pkl', f'{args.teamsvecs}indexes.pkl', args.model, f'{args.output}/{args.model.split(".")[0]}/')
 
 def test_real(args):
-    # test for all valid combinations on toys
+    # test for all valid combinations on full data
     for teamsvecs in args.teamsvecs:
         args.output = teamsvecs
         for edge_type in [([('skill', 'to', 'member')], 'sm'), ([('skill', 'to', 'team'), ('member', 'to', 'team')], 'stm')]:
@@ -99,7 +101,7 @@ def test_real(args):
                 for dup in ['mean']:  # add', 'mean', 'min', 'max', 'mul']:
                     params.settings['graph'] = {'edge_types': edge_type, 'dir': dir, 'dup_edge': dup}
                     run(f'{teamsvecs}teamsvecs.pkl', f'{teamsvecs}indexes.pkl', args.model,
-                        f'{args.output}/{args.model.split(".")[0]}/')
+                        f'{args.output}/{args.model.split(".")[0]}/', f'{args.output}/emb/')
 
 # we can ignore mentioning the --output argument
 #python -u main.py -teamsvecs= ./../../../data/preprocessed/dblp/dblp.v12.json.filtered.mt75.ts3/ -model=gnn.n2v --output=./../../../data/preprocessed/dblp/dblp.v12.json.filtered.mt75.ts3/ --graph_only 1

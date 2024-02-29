@@ -8,6 +8,10 @@ settings = {
         'dup_edge': None, #None: keep the duplicates, else: reduce by 'add', 'mean', 'min', 'max', 'mul'
     },
     'model': {
+        'd' : 128, # embedding dim
+        'b' : 128, # batching settings for loaders
+        'e' : 100, # num epochs
+        'ns' : 2, # number of negative samples
         'max_epochs': 100,
         'embedding_dim': 5,
         'lr': 0.01,
@@ -38,10 +42,10 @@ settings = {
         'gnn.gin': {},
         'gnn.m2v': {
             'metapath' : [
-                ('member','to','id'),
-                ('id', 'to', 'skill'),
-                ('skill','to','id'),
-                ('id', 'to', 'member'),
+                ('member','to','team'),
+                ('team', 'rev_to', 'skill'),
+                ('skill','to','team'),
+                ('team', 'rev_to', 'member'),
             ],
             'walk_length': 5,
             'context_size': 3,
