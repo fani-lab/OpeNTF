@@ -19,8 +19,8 @@ def run(teamsvecs_file, indexes_file, model, output, emb_output = None):
 
         if model == 'w2v':
             import wnn
-            settings = {'embedding_dim': params.settings['model']['embedding_dim'],
-                        'max_epochs': params.settings['model']['max_epochs'],
+            settings = {'d': params.settings['model']['d'],
+                        'e': params.settings['model']['e'],
                         'dm': params.settings['model'][model]['dm'],
                         'dbow_words': params.settings['model'][model]['dbow_words'],
                         'window': params.settings['model'][model]['dbow_words'],
@@ -39,7 +39,7 @@ def run(teamsvecs_file, indexes_file, model, output, emb_output = None):
         # output_ = output + f'{params.settings["graph"]["edge_types"][1]}.{"dir" if params.settings["graph"]["dir"] else "undir"}.{str(params.settings["graph"]["dup_edge"]).lower()}/'
         output_ = output + f'{params.settings["graph"]["edge_types"][1]}.{"dir" if params.settings["graph"]["dir"] else "undir"}.{str(params.settings["graph"]["dup_edge"]).lower()}.'
         t2v = gnn.Gnn(teamsvecs, indexes, params.settings['graph'], output_)
-        t2v.init()
+        t2v.init() # call the team2vec's init
         if(args.graph_only):
             return
 
@@ -47,13 +47,13 @@ def run(teamsvecs_file, indexes_file, model, output, emb_output = None):
             from torch_geometric.nn import Node2Vec
             t2v.device = 'cuda' if torch.cuda.is_available() else 'cpu'
             t2v.model = Node2Vec(t2v.data.edge_index,
-                                 embedding_dim=params.settings['model']['embedding_dim'],
+                                 embedding_dim=params.settings['model']['d'],
                                  walk_length=params.settings['model'][model]['walk_length'],
                                  context_size=params.settings['model'][model]['context_size'],
                                  walks_per_node=params.settings['model'][model]['walks_per_node'],
                                  num_negative_samples=params.settings['model'][model]['num_negative_samples']).to(t2v.device)
 
-            t2v.loader = t2v.model.loader(batch_size=params.settings['model']['batch_size'],
+            t2v.loader = t2v.model.loader(batch_size=params.settings['model']['b'],
                                        shuffle=params.settings['model']['loader_shuffle'],
                                        num_workers=params.settings['model']['num_workers'])
             t2v.optimizer = torch.optim.Adam(list(t2v.model.parameters()), lr=params.settings['model']['lr'])
@@ -61,9 +61,28 @@ def run(teamsvecs_file, indexes_file, model, output, emb_output = None):
 
         elif model == 'gnn.m2v':
             from m2v import M2V
+            from torch_geometric.nn import MetaPath2Vec
+
             # initialize all settings inside m2v class
-            t2v = M2V(teamsvecs, indexes, params.settings, output, emb_output)
+            t2v = M2V(teamsvecs, indexes, params.settings, output_, emb_output)
             t2v.model_name = 'm2v'
+            t2v.init() # call the m2v's init
+            t2v.model = MetaPath2Vec(t2v.data.edge_index_dict, embedding_dim=t2v.settings['d'],
+                                     metapath=t2v.settings['metapath'], walk_length=t2v.settings['walk_length'],
+                                     context_size=t2v.settings['context_size'],
+                                     walks_per_node=t2v.settings['walks_per_node'],
+                                     num_negative_samples=t2v.settings['ns'],
+                                     sparse=True).to(t2v.device)
+            t2v.init_model()
+            t2v.train(t2v.settings['e'])
+            t2v.model.eval()
+            emb = {}
+            node_types = t2v.data._node_store_dict.keys()
+            for node_type in node_types:
+                emb[node_type] = t2v.model(node_type)  # output of embeddings
+            embedding_output = f'{t2v.emb_output}.emb.pt'
+            torch.save(emb, embedding_output, pickle_protocol=4)
+            return
 
         # gcn (for homogeneous only)
         elif model == 'gnn.gcn':
@@ -90,13 +109,14 @@ def test_toys(args):
             for dir in [False]:
                 for dup in [None, 'mean']:#add', 'mean', 'min', 'max', 'mul']:
                     params.settings['graph'] = {'edge_types': edge_type, 'dir': dir, 'dup_edge': dup}
-                    run(f'{args.teamsvecs}teamsvecs.pkl', f'{args.teamsvecs}indexes.pkl', args.model, f'{args.output}/{args.model.split(".")[0]}/')
+                    run(f'{args.teamsvecs}teamsvecs.pkl', f'{args.teamsvecs}indexes.pkl', args.model, f'{args.output}/{args.model.split(".")[0]}/', f'{args.output}/emb/')
 
 def test_real(args):
     # test for all valid combinations on full data
     for teamsvecs in args.teamsvecs:
         args.output = teamsvecs
-        for edge_type in [([('skill', 'to', 'member')], 'sm'), ([('skill', 'to', 'team'), ('member', 'to', 'team')], 'stm')]:
+        # for edge_type in [([('skill', 'to', 'member')], 'sm'), ([('skill', 'to', 'team'), ('member', 'to', 'team')], 'stm')]:
+        for edge_type in [([('skill', 'to', 'team'), ('member', 'to', 'team')], 'stm')]:
             for dir in [False]:
                 for dup in ['mean']:  # add', 'mean', 'min', 'max', 'mul']:
                     params.settings['graph'] = {'edge_types': edge_type, 'dir': dir, 'dup_edge': dup}

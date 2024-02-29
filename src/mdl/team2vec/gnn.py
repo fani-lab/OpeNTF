@@ -14,10 +14,11 @@ class Gnn(Team2Vec):
 
         self.loader = None
         self.optimizer = None
-        self.device = 'cuda'
+        self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
         # this line enables to produce separate directories for separate graph_types
         # if not os.path.isdir(self.output): os.makedirs(self.output)
+
     def create(self, file):
         # https://pytorch-geometric.readthedocs.io/en/latest/modules/utils.html#torch_geometric.utils.remove_self_loops
 
