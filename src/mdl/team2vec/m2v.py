@@ -37,6 +37,7 @@ class M2V(Gnn):
     def train(self, num_epochs, log_steps=100, eval_steps=2000):
         for epoch in tqdm(range(1, num_epochs + 1)):
             self.model.train()
+            torch.cuda.empty_cache()
 
             total_loss = 0
             for i, (pos_rw, neg_rw) in enumerate(self.loader):
