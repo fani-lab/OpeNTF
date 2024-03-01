@@ -1,5 +1,7 @@
-import argparse, pickle, os, time
-
+import argparse, pickle, os, time, sys
+sys.path.append("..")
+sys.path.append("../..")
+sys.path.append("../../..")
 import torch
 
 import params
