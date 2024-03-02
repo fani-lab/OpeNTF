@@ -56,13 +56,21 @@ class Fnn(Ntf):
         if ns == "inverse_unigram_b": return self.ns_inverse_unigram_mini_batch(y_, y, nns)
         # return self.weighted(y_, y)
         if ns == "weighted": return self.weighted(y_, y)
+        if ns == "pos-ce": return self.weighted2(y_, y) # positive cross-entropy
         cri = nn.BCELoss()
         return cri(y_.squeeze(1), y.squeeze(1))
 
     def weighted(self, logits, targets, pos_weight=2.5):
         targets = targets.squeeze(1)
         logits = logits.squeeze(1)
-        return (-targets * torch.log(logits) * pos_weight + (1 - targets) * - torch.log(1 - logits)).sum()
+        return (-targets * torch.log(logits) * pos_weight + (1 - targets) * - torch.log(1 - logits)).sum() # we both reward the TP and penalize the FP
+
+    # we only consider the loss on TP (the members which should be part of the final team)
+    def weighted2(self, logits, targets):
+        targets = targets.squeeze(1)
+        logits = logits.squeeze(1)
+        return (-targets * torch.log(logits)).sum()
+
 
     def ns_uniform(self, logits, targets, neg_samples=5):
         targets = targets.squeeze(1)
