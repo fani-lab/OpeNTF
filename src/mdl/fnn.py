@@ -48,14 +48,14 @@ class Fnn(Ntf):
             if isinstance(m, nn.Linear):
                 nn.init.xavier_uniform_(m.weight)
 
-    def cross_entropy(self, y_, y, ns, nns, unigram):
+    def cross_entropy(self, y_, y, ns, nns, unigram, weight):
         if ns == "uniform": return self.ns_uniform(y_, y, nns)
         if ns == "unigram" or ns.startswith("temporal_unigram"): return self.ns_unigram(y_, y, unigram, nns)
         if ns == "unigram_b": return self.ns_unigram_mini_batch(y_, y, nns)
         if ns == "inverse_unigram" or ns.startswith("temporal_inverse_unigram"): return self.ns_inverse_unigram(y_, y, unigram, nns)
         if ns == "inverse_unigram_b": return self.ns_inverse_unigram_mini_batch(y_, y, nns)
         # return self.weighted(y_, y)
-        if ns == "weighted": return self.weighted(y_, y)
+        if ns == "weighted": return self.weighted(y_, y, weight)
         if ns == "pos-ce": return self.weighted2(y_, y) # positive cross-entropy
         cri = nn.BCELoss()
         return cri(y_.squeeze(1), y.squeeze(1))
@@ -155,6 +155,7 @@ class Fnn(Ntf):
         num_epochs = params['e']
         nns = params['nns']
         ns = params['ns']
+        weight = params['weight'] # if the ns == weighted
         input_size = vecs['skill'].shape[1]
         output_size = len(indexes['i2c'])
         # output_size = vecs['member'].shape[1]
@@ -233,7 +234,7 @@ class Fnn(Ntf):
 
                             y_ = self.forward(X)
 
-                            if loss_type == 'normal': loss = self.cross_entropy(y_, y, ns, nns, unigram)
+                            if loss_type == 'normal': loss = self.cross_entropy(y_, y, ns, nns, unigram, weight)
                             elif loss_type == 'SL': loss = criterion(y_.squeeze(1), y.squeeze(1), index)
                             elif loss_type == 'DP':
                                 data_parameter_minibatch = torch.exp(class_parameters).view(1, -1)
@@ -266,7 +267,7 @@ class Fnn(Ntf):
                           f', Running Loss {phase} {train_loss_values[-1] if phase == "train" else valid_loss_values[-1]}'
                           f", Time {time.time() - fold_time}, Overall {time.time() - start_time} "
                           )
-                torch.save(self.state_dict(), f"{output}/state_dict_model.f{foldidx}.e{epoch}.pt", pickle_protocol=4)
+                # torch.save(self.state_dict(), f"{output}/state_dict_model.f{foldidx}.e{epoch}.pt", pickle_protocol=4)
                 scheduler.step(valid_running_loss / X_valid.shape[0])
                 earlystopping(valid_loss_values[-1], self)
                 if earlystopping.early_stop:
@@ -275,7 +276,7 @@ class Fnn(Ntf):
 
             model_path = f"{output}/state_dict_model.f{foldidx}.pt"
 
-            torch.save(self.state_dict(), model_path, pickle_protocol=4)
+            # torch.save(self.state_dict(), model_path, pickle_protocol=4)
             train_valid_loss[foldidx]['train'] = train_loss_values
             train_valid_loss[foldidx]['valid'] = valid_loss_values
 
