@@ -8,11 +8,11 @@ settings = {
         'dup_edge': 'mean', #None: keep the duplicates, else: reduce by 'add', 'mean', 'min', 'max', 'mul'
     },
     'model': {
-        'd' : 32, # embedding dim
+        'd' : 64, # embedding dim
         'b' : 128, # batch_size for loaders
         'e' : 100, # num epochs
-        'ns' : 2, # number of negative samples
-        'lr': 0.01,
+        'ns' : 5, # number of negative samples
+        'lr': 0.001,
         'loader_shuffle': True,
         'num_workers': 0,
         'save_per_epoch': False,
@@ -44,10 +44,10 @@ settings = {
                 ('skill','to','team'),
                 ('team', 'rev_to', 'member'),
             ],
-            'walk_length': 5,
-            'context_size': 3,
-            'walks_per_node': 10,
-            'ns' : 2,
+            'walk_length': 10,
+            'context_size': 7,
+            'walks_per_node': 20,
+            'ns' : 5,
         },
     },
     'data':{
