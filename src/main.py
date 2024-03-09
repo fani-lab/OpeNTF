@@ -180,9 +180,9 @@ def run(data_list, domain_list, fair, filter, future, model_list, output, exp_id
 
             from scipy import sparse
             if(emb_random > 1):
-                sparse._lil.lil_matrix(emb_skill) # no need of sigmoid
+                sparse._lil.lil_matrix(emb_skill)
             else:
-                vecs['skill'] = sparse._lil.lil_matrix(torch.tensor(vecs['skill'] * emb_skill)) # need to scale down with sigmoid
+                vecs['skill'] = sparse._lil.lil_matrix(torch.tensor(vecs['skill'] * emb_skill))
 
         year_idx = []
         for i in range(1, len(indexes['i2y'])):
