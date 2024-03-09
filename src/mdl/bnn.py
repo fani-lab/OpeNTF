@@ -85,6 +85,7 @@ class Bnn(Fnn):
         nns = params['nns']
         ns = params['ns']
         s = params['s']
+        weight = params['weight']
         input_size = vecs['skill'].shape[1]
         output_size = len(indexes['i2c'])
 
@@ -165,7 +166,7 @@ class Bnn(Fnn):
                                 optimizer_class_param.zero_grad()
                             layer_loss, y_ = self.sample_elbo(X.squeeze(1), y, s)
                             if loss_type == 'normal':
-                                loss = self.cross_entropy(y_.to(self.device), y, ns, nns, unigram) + layer_loss / batch_size
+                                loss = self.cross_entropy(y_.to(self.device), y, ns, nns, unigram, weight) + layer_loss / batch_size
                             elif loss_type == 'SL':
                                 loss = criterion(y_.squeeze(1), y.squeeze(1), index) + layer_loss / batch_size
                             elif loss_type == 'DP':
@@ -184,7 +185,7 @@ class Bnn(Fnn):
                             self.train(False)  # Set model to valid mode
                             layer_loss, y_ = self.sample_elbo(X.squeeze(1), y, s)
                             if loss_type == 'normal' or loss_type == 'DP':
-                                loss = self.cross_entropy(y_.to(self.device), y, ns, nns, unigram) + layer_loss / batch_size
+                                loss = self.cross_entropy(y_.to(self.device), y, ns, nns, unigram, weight) + layer_loss / batch_size
                             else:
                                 loss = criterion(y_.squeeze(), y.squeeze(), index)
                             valid_running_loss += loss.item()

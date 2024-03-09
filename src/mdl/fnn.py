@@ -250,7 +250,7 @@ class Fnn(Ntf):
                         else:  # valid
                             self.train(False)  # Set model to valid mode
                             y_ = self.forward(X)
-                            if loss_type == 'normal' or loss_type == 'DP': loss = self.cross_entropy(y_, y, ns, nns, unigram)
+                            if loss_type == 'normal' or loss_type == 'DP': loss = self.cross_entropy(y_, y, ns, nns, unigram, weight)
                             else: loss = criterion(y_.squeeze(), y.squeeze(), index)
                             valid_running_loss += loss.item()
 
