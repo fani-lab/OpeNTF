@@ -34,7 +34,7 @@ def main():
     parser.add_argument("--ns", help="NS")
     parser.add_argument("--weight", type=float, help="Weight")
     parser.add_argument("--loss", help="Loss")
-    parser.add_argument("--cmd", help="Pipeline")
+    parser.add_argument("--cmd", nargs = '+', help="Pipeline")
 
     args = parser.parse_args()
 
