@@ -139,7 +139,15 @@ def run(data_list, domain_list, fair, filter, future, model_list, output, exp_id
         prep_output = f'./../data/preprocessed/{d_name}/{os.path.split(datapath)[-1]}'
         vecs, indexes = d_cls.generate_sparse_vectors(datapath, f'{prep_output}{filter_str}', filter, settings['data'])
 
-        # if the gnn embeddings exist
+        year_idx = []
+        for i in range(1, len(indexes['i2y'])):
+            if indexes['i2y'][i][0] - indexes['i2y'][i-1][0] > settings['model']['nfolds']:
+                year_idx.append(indexes['i2y'][i-1])
+        year_idx.append(indexes['i2y'][-1])
+        indexes['i2y'] = year_idx
+        splits = create_evaluation_splits(vecs['id'].shape[0], settings['model']['nfolds'], settings['model']['train_test_split'], indexes['i2y'] if future else None, output=f'{prep_output}{filter_str}', step_ahead=settings['model']['step_ahead'])
+
+        # if the gnn embeddings exist or we need to generate random data
         if(args.emb_model):
             import torch
 
@@ -180,17 +188,14 @@ def run(data_list, domain_list, fair, filter, future, model_list, output, exp_id
 
             from scipy import sparse
             if(emb_random > 1):
-                sparse._lil.lil_matrix(emb_skill)
+                # replace the actual rows with random rows from emb_skill for only the indices in train and valid splits
+                for phase in splits['folds'][0]: # 'train' and 'valid' phases
+                    for row_idx in splits['folds'][0][phase]:
+                        vecs['skill'][row_idx] = sparse._lil.lil_matrix(emb_skill[row_idx])
             else:
+                # need to review this section
                 vecs['skill'] = sparse._lil.lil_matrix(torch.tensor(vecs['skill'] * emb_skill))
 
-        year_idx = []
-        for i in range(1, len(indexes['i2y'])):
-            if indexes['i2y'][i][0] - indexes['i2y'][i-1][0] > settings['model']['nfolds']:
-                year_idx.append(indexes['i2y'][i-1])
-        year_idx.append(indexes['i2y'][-1])
-        indexes['i2y'] = year_idx
-        splits = create_evaluation_splits(vecs['id'].shape[0], settings['model']['nfolds'], settings['model']['train_test_split'], indexes['i2y'] if future else None, output=f'{prep_output}{filter_str}', step_ahead=settings['model']['step_ahead'])
 
         for (m_name, m_obj) in models.items():
             vecs_ = vecs.copy()
