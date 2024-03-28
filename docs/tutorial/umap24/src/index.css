@@ -15,14 +15,12 @@ body {
 }
 
 .top-menu {
-  height: 10rem;
+  height: 20rem;
   background-image: url("./img/banner-background.jpg");
   background-position: center;
   background-size: cover;
 }
 
-
 .title-text {
-  text-align: center;
   color: white;
 }
