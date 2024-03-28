@@ -331,30 +331,18 @@ function Home() {
             <span className="text-muted fs-6 fst-italic">
               University of Windsor
             </span>
-            Email:{" "}
-            <a href="mailto:msaeedi@uwindsor.ca" className="email-link">
-              msaeedi@uwindsor.ca
-            </a>
           </div>
           <div className="presenter">
             <span className="ref-name fs-5">Christine Wong</span>
             <span className="text-muted fs-6 fst-italic">
               University of Windsor
             </span>
-            Email:{" "}
-            <a href="mailto:wong93@uwindsor.ca" className="email-link">
-              wong93@uwindsor.ca
-            </a>
           </div>
           <div className="presenter">
             <span className="ref-name fs-5">Hossein Fani</span>
             <span className="text-muted fs-6 fst-italic">
               University of Windsor
             </span>
-            Email:{" "}
-            <a href="mailto:hfani@uwindsor.ca" className="email-link">
-              hfani@uwindsor.ca
-            </a>
           </div>
         </div>
       </section>
