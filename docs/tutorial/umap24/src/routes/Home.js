@@ -102,7 +102,7 @@ function Home() {
           (Social IR) where we seek to find the right group of skillful users to
           solve the tasks at hand or only with the assistance of social
           resources. In this tutorial,
-          <ol type="i">
+          <ul>
             <li className="justify-paragraph">
               we target beginner or intermediate researchers, industry
               technologists and practitioners with a broad interest in user
@@ -123,7 +123,7 @@ function Home() {
               application to form collaborative teams of skilled users whose
               success is almost surely guaranteed.
             </li>
-          </ol>
+          </ul>
         </div>
       </section>
       <section id="section-prereq">
