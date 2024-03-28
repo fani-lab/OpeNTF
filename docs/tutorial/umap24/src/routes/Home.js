@@ -208,15 +208,15 @@ function Home() {
               efficiency while enhancing efficacy due to the inherently
               iterative and online learning procedure, and can address the
               limitations of search-based solutions with respect to scalability,
-              as well as dynamic expert networks [
-              <span onClick={scrollToItem} id="1" className="footnote">
-                1
-              </span>
-              ,
-              <span onClick={scrollToItem} id="2" className="footnote">
-                2
-              </span>
-              ].
+              as well as dynamic expert networks (
+              <a href="https://dl.acm.org/doi/10.1145/3589762">
+                Rad, R. et al., 2023
+              </a>
+              ;{" "}
+              <a href="https://dl.acm.org/doi/10.1145/3340531.3412140">
+                Rad, R.H., et al., 2020
+              </a>
+              ).
             </span>
             <div className="topic-item">
               <ul>
@@ -255,16 +255,6 @@ function Home() {
                 {" "}
                 Figure 2. Bayesian neural network (bnn), one of OpeNTF's
                 supported neural models.
-              </p>
-              <p id="footnote-1" className="justify-paragraph">
-                [1] Rad, R., Fani, H., Bagheri, E., Kargar, M., Srivastava, D.,
-                Szlichta, J.: A variational neural architecture for skill-based
-                team formation. TOIS 42(1), 1–28 (2023).
-              </p>
-              <p id="footnote-2" className="justify-paragraph">
-                [2] Rad, R.H., Fani, H., Kargar, M., Szlichta, J., Bagheri, E.:
-                Learning to form skill-based teams of experts. In: CIKM ’20. pp.
-                2049–2052. ACM (2020)
               </p>
             </div>
             <div className="topic-item">
