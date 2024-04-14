@@ -2,7 +2,7 @@ function Menu() {
   return (
     <div className="d-flex flex-column justify-content-center top-menu">
       <div className="row">
-        <div className="center-block">
+        <div className="center-block title-box">
           <div className="text-center">
             <span className="fw-bold small title-text text-uppercase">
               <a className="plain-link" href="https://www.um.org/umap2024/">

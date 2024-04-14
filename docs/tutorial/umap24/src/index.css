@@ -17,10 +17,14 @@ body {
 .top-menu {
   height: 20rem;
   background-image: url("./img/banner-background.jpg");
-  background-position: center;
+  background-position: center top;
   background-size: cover;
 }
 
 .title-text {
   color: white;
+}
+
+.title-box {
+  background: #3a4039b0;
 }
