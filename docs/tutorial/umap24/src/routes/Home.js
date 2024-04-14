@@ -340,19 +340,39 @@ function Home() {
         <span id="section-title-download" className="section-title">
           Materials
         </span>
-        <div className="section-body">
-          <div>
-            <span className="fw-bold text-uppercase">
-              View the Full Outline
-            </span>
-            <div>
-              <a
-                className="btn btn-outline-primary btn-lg"
-                target="_blank"
-                href="/OpeNTF/tutorial/umap24/Team_Formation_Tutorial.pdf"
-              >
-                <i className="bi bi-filetype-pdf pe-3"></i>Download
-              </a>
+        <div className="section-body p-2">
+          <div class="d-grid gap-3">
+            <div class="p-2">
+              <span className="fw-bold">View the Full Outline</span>
+              <div>
+                <a
+                  className="btn btn-outline-primary btn-lg"
+                  target="_blank"
+                  href="/OpeNTF/tutorial/umap24/Team_Formation_Tutorial.pdf"
+                >
+                  <i className="bi bi-filetype-pdf pe-3"></i>Download
+                </a>
+              </div>
+            </div>
+            <div class="p-2">
+              <span className="fw-bold">
+                View the Slide Presentation (Upcoming)
+              </span>
+              <div>
+                <a className="btn btn-outline-primary btn-lg">
+                  <i className="bi bi-filetype-pdf pe-3"></i>Download
+                </a>
+              </div>
+            </div>
+            <div class="p-2">
+              <span className="fw-bold">
+                View the Presentation Video (Upcoming)
+              </span>
+              <div>
+                <a className="btn btn-outline-primary btn-lg">
+                  <i className="bi bi-filetype-pdf pe-3"></i>Download
+                </a>
+              </div>
             </div>
           </div>
         </div>
