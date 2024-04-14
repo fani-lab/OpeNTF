@@ -5,7 +5,9 @@ function Menu() {
         <div className="center-block">
           <div className="text-center">
             <span className="fw-bold small title-text text-uppercase">
-              UMAP 2024
+              <a className="plain-link" href="https://www.um.org/umap2024/">
+                UMAP 2024
+              </a>
             </span>
           </div>
           <div className="text-center">
