@@ -245,7 +245,11 @@ function Home() {
                 </p>
                 <li className="justify-paragraph">
                   <span className="fw-bold">
-                    Hands-On <i>OpeNTF</i>:
+                    Hands-On{" "}
+                    <a href="https://github.com/fani-lab/OpeNTF">
+                      <i>OpeNTF</i>
+                    </a>
+                    :
                   </span>
                   &nbsp;In our tutorial, we introduce publicly available
                   libraries and tools for the task of team recommendation.
@@ -262,8 +266,11 @@ function Home() {
                 />
                 <p>
                   {" "}
-                  Figure 3. Bayesian neural network (bnn), one of OpeNTF's
-                  supported neural models.
+                  Figure 3. Bayesian neural network (bnn), one of{" "}
+                  <a href="https://github.com/fani-lab/OpeNTF">
+                    <i>OpeNTF</i>
+                  </a>
+                  's supported neural models.
                 </p>
               </ul>
             </div>
@@ -279,7 +286,10 @@ function Home() {
             </span>
             <div className="topic-item">
               <span className="fw-bold">
-                Adila: Fair and Diverse Team Recommendation
+                <a href="https://github.com/fani-lab/Adila">
+                  <i>Adila</i>
+                </a>
+                : Fair and Diverse Team Recommendation
               </span>
               <span className="d-block w-100 justify-paragraph">
                 The primary focus of existing team recommendation methods is the
@@ -301,7 +311,11 @@ function Home() {
               />
               <p>
                 {" "}
-                Figure 4. <i>Adila</i>'s pipeline architecture.
+                Figure 4.{" "}
+                <a href="https://github.com/fani-lab/Adila">
+                  <i>Adila</i>
+                </a>
+                's pipeline architecture.
               </p>
             </div>
             <div className="topic-item">
