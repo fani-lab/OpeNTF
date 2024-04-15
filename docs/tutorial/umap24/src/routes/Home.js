@@ -397,15 +397,24 @@ function Home() {
           Materials
         </span>
         <div className="section-body p-2">
-            <div class="p-2">
-              <a target="_blank" href="https://hosseinfani.github.io/res/papers/2024_UMAP_Collaborative_Team_Recommendation_for_Skilled_Users_Objectives_Techniques_and_New_Perspectives.pdf">Full Outline</a>
-            </div>
-            <div class="p-2">
-              <a href="javascript:void(0)" style="cursor: default;">Presentation Slides (Upcoming)</a>
-            </div>
-            <div class="p-2">
-              <a href="javascript:void(0)" style="cursor: default;">Presentation Video (Upcoming)</a>
-            </div>
+          <div class="p-2">
+            <a
+              target="_blank"
+              href="https://hosseinfani.github.io/res/papers/2024_UMAP_Collaborative_Team_Recommendation_for_Skilled_Users_Objectives_Techniques_and_New_Perspectives.pdf"
+            >
+              Full Outline
+            </a>
+          </div>
+          <div class="p-2">
+            <a href="javascript:void(0)" style={{ cursor: "default" }}>
+              Presentation Slides (Upcoming)
+            </a>
+          </div>
+          <div class="p-2">
+            <a href="javascript:void(0)" style={{ cursor: "default" }}>
+              Presentation Video (Upcoming)
+            </a>
+          </div>
         </div>
       </section>
     </div>
