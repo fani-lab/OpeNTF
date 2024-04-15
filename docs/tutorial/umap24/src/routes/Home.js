@@ -153,7 +153,7 @@ function Home() {
           </span>
           <img
             src={require("../img/taxonomy.jpg")}
-            alt="Figure 1. Taxonomy of team recommendation methods."
+            alt="Taxonomy of team recommendation methods."
             height="300"
           />
           <p> Figure 1. Taxonomy of team recommendation methods.</p>
@@ -233,6 +233,16 @@ function Home() {
                   unsuccessful teams and streaming training strategy that put a
                   chronological order on teams during training.
                 </li>
+                <img
+                  src={require("../img/flow-t.jpg")}
+                  alt="Streaming training strategy in neural-based team formation methods."
+                  height="300"
+                />
+                <p>
+                  {" "}
+                  Figure 2. Streaming training strategy in neural-based team
+                  formation methods.
+                </p>
                 <li className="justify-paragraph">
                   <span className="fw-bold">
                     Hands-On <i>OpeNTF</i>:
@@ -245,17 +255,17 @@ function Home() {
                   </a>
                   , an open-source benchmark library for neural models.​
                 </li>
+                <img
+                  src={require("../img/bnn.jpg")}
+                  alt="Bayesian neural network (bnn), one of OpeNTF's supported neural models."
+                  height="300"
+                />
+                <p>
+                  {" "}
+                  Figure 3. Bayesian neural network (bnn), one of OpeNTF's
+                  supported neural models.
+                </p>
               </ul>
-              <img
-                src={require("../img/bnn.jpg")}
-                alt="Figure 2. Bayesian neural network (bnn), one of OpeNTF's supported neural models."
-                height="300"
-              />
-              <p>
-                {" "}
-                Figure 2. Bayesian neural network (bnn), one of OpeNTF's
-                supported neural models.
-              </p>
             </div>
             <div className="topic-item">
               <span className="fw-bold expand-button"></span>
@@ -286,12 +296,12 @@ function Home() {
               </span>
               <img
                 src={require("../img/flow.jpg")}
-                alt="Figure 3. Adila's pipeline architecture."
+                alt="Adila's pipeline architecture."
                 height="300"
               />
               <p>
                 {" "}
-                Figure 3. <i>Adila</i>'s pipeline architecture.
+                Figure 4. <i>Adila</i>'s pipeline architecture.
               </p>
             </div>
             <div className="topic-item">
