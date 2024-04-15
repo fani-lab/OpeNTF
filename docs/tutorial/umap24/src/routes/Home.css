@@ -135,3 +135,27 @@ a:hover {
   color: #1d824c;
   padding: none;
 }
+
+.presenter-img {
+  position: relative;
+}
+
+.presenter-img .front {
+  height: 170px;
+  width: 150px;
+  object-fit: cover;
+}
+
+.presenter-img .back {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: none;
+}
+
+.presenter-img:hover .back {
+  display: block;
+  height: 170px;
+  width: 150px;
+  object-fit: fill;
+}
