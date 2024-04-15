@@ -397,40 +397,15 @@ function Home() {
           Materials
         </span>
         <div className="section-body p-2">
-          <div class="d-grid gap-3">
             <div class="p-2">
-              <span className="fw-bold">View the Full Outline</span>
-              <div>
-                <a
-                  className="btn btn-outline-primary btn-lg"
-                  target="_blank"
-                  href="https://hosseinfani.github.io/res/papers/2024_UMAP_Collaborative_Team_Recommendation_for_Skilled_Users_Objectives_Techniques_and_New_Perspectives.pdf"
-                >
-                  <i className="bi bi-filetype-pdf pe-3"></i>Download
-                </a>
-              </div>
+              <a target="_blank" href="https://hosseinfani.github.io/res/papers/2024_UMAP_Collaborative_Team_Recommendation_for_Skilled_Users_Objectives_Techniques_and_New_Perspectives.pdf">Full Outline</a>
             </div>
             <div class="p-2">
-              <span className="fw-bold">
-                View the Slide Presentation (Upcoming)
-              </span>
-              <div>
-                <a className="btn btn-outline-primary btn-lg">
-                  <i className="bi bi-filetype-pdf pe-3"></i>Download
-                </a>
-              </div>
+              <a href="javascript:void(0)" style="cursor: default;">Presentation Slides (Upcoming)</a>
             </div>
             <div class="p-2">
-              <span className="fw-bold">
-                View the Presentation Video (Upcoming)
-              </span>
-              <div>
-                <a className="btn btn-outline-primary btn-lg">
-                  <i className="bi bi-filetype-pdf pe-3"></i>Download
-                </a>
-              </div>
+              <a href="javascript:void(0)" style="cursor: default;">Presentation Video (Upcoming)</a>
             </div>
-          </div>
         </div>
       </section>
     </div>
