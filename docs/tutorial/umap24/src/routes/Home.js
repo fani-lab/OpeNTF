@@ -404,7 +404,7 @@ function Home() {
                 <a
                   className="btn btn-outline-primary btn-lg"
                   target="_blank"
-                  href="/OpeNTF/tutorial/umap24/Team_Formation_Tutorial.pdf"
+                  href="https://hosseinfani.github.io/res/papers/2024_UMAP_Collaborative_Team_Recommendation_for_Skilled_Users_Objectives_Techniques_and_New_Perspectives.pdf"
                 >
                   <i className="bi bi-filetype-pdf pe-3"></i>Download
                 </a>
