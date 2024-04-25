@@ -117,8 +117,8 @@ def test_real(args):
     # test for all valid combinations on full data
     for teamsvecs in args.teamsvecs:
         args.output = teamsvecs
-        # for edge_type in [([('skill', 'to', 'member')], 'sm'), ([('skill', 'to', 'team'), ('member', 'to', 'team')], 'stm')]:
-        for edge_type in [([('skill', 'to', 'team'), ('member', 'to', 'team')], 'stm')]:
+        for edge_type in [([('skill', 'to', 'member')], 'sm'), ([('skill', 'to', 'team'), ('member', 'to', 'team')], 'stm')]:
+        # for edge_type in [([('skill', 'to', 'team'), ('member', 'to', 'team')], 'stm')]:
             for dir in [False]:
                 for dup in ['mean']:  # add', 'mean', 'min', 'max', 'mul']:
                     params.settings['graph'] = {'edge_types': edge_type, 'dir': dir, 'dup_edge': dup}

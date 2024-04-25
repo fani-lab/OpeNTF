@@ -290,7 +290,7 @@ class Fnn(Ntf):
                 plt.legend(loc='upper right')
                 plt.title(f'Training and Validation Loss for fold #{foldidx}')
                 plt.savefig(f'{output}/f{foldidx}.train_valid_loss.png', dpi=100, bbox_inches='tight')
-                plt.show()
+                # plt.show() # temporarily turning this off, to better automate in bash environment
         print(f'\n.............. ending learn .................\n')
 
     def test(self, model_path, splits, indexes, vecs, params, on_train_valid_set=False, per_epoch=False, merge_skills=False):
