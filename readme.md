@@ -6,21 +6,22 @@ Team formation involves selecting a team of skillful experts who will, more like
 <td >
 
   
-- [1. Setup](#1-setup)
-- [2. Quickstart](#2-quickstart)
-- [3. Features](#3-features)
-  * [`Fairness aware Team Formation`](#31-adila-fairness-aware-team-formation)
-  * [`Datasets and Parallel Preprocessing`](#32-datasets-and-parallel-preprocessing)
-  * [`Non-Temporal Neural Team Formation`](#33-non-temporal-neural-team-formation)
-  * [`Temporal Neural Team Prediction`](#34-temporal-neural-team-prediction)
-  * [`Model Architecture`](#35-model-architecture)
-  * [`Negative Sampling Strategies`](#36-negative-sampling-strategies)
-  * [`Run`](#37-run)
-- [4. Results](#4-results)
-- [5. Acknowledgement](#5-acknowledgement)
-- [6. License](#6-license)
-- [7. Citation](#7-citation)
-- [8. Awards](#8-awards)
+- [``OpeNTF``: An Open-Source Neural Team Formation Benchmark Library](#opentf-an-open-source-neural-team-formation-benchmark-library)
+  - [1. Setup](#1-setup)
+  - [2. Quickstart ](#2-quickstart-)
+  - [3. Features](#3-features)
+      - [**3.1. `Adila`: Fairness aware Team Formation**](#31-adila-fairness-aware-team-formation)
+      - [**3.2. Datasets and Parallel Preprocessing**](#32-datasets-and-parallel-preprocessing)
+      - [**3.3. Non-Temporal Neural Team Formation**](#33-non-temporal-neural-team-formation)
+      - [**3.4. Temporal Neural Team Prediction**](#34-temporal-neural-team-prediction)
+      - [**3.5. Model Architecture**](#35-model-architecture)
+      - [**3.6. Negative Sampling Strategies**](#36-negative-sampling-strategies)
+      - [**3.7. Run**](#37-run)
+  - [4. Results](#4-results)
+  - [5. Acknowledgement:](#5-acknowledgement)
+  - [6. License:](#6-license)
+  - [7. Citation:](#7-citation)
+  - [8. Awards:](#8-awards)
 
 
 
@@ -72,7 +73,7 @@ The above run, loads and preprocesses a tiny-size toy example dataset [``toy.dbl
 python -u main.py -data ../data/raw/dblp/toy.dblp.v12.json -domain dblp -model tbnn tbnn_dt2v_emb
 ```
 
-This script loads and preprocesses the same dataset [``toy.dblp.v12.json``](data/raw/dblp/toy.dblp.v12.json) from [``dblp``](https://originalstatic.aminer.cn/misc/dblp.v12.7z), takes the teams from the the last year as the test set and trains the ``Bayesian`` neural model following our proposed streaming training strategy as explained in ``3.2.2. Temporal Neural Team Formation`` with two different input representations _i_) sparse vector represntation and _ii_) temporal skill vector represntation using default hyperparameters from [``./src/param.py``](./src/param.py).
+This script loads and preprocesses the same dataset [``toy.dblp.v12.json``](data/raw/dblp/toy.dblp.v12.json) from [``dblp``](https://originalstatic.aminer.cn/misc/dblp.v12.7z), takes the teams from the last year as the test set and trains the ``Bayesian`` neural model following our proposed streaming training strategy as explained in ``3.2.2. Temporal Neural Team Formation`` with two different input representations _i_) sparse vector represntation and _ii_) temporal skill vector represntation using default hyperparameters from [``./src/param.py``](./src/param.py).
 
 ## 3. Features
 #### **3.1. [`Adila`](https://github.com/fani-lab/Adila): Fairness aware Team Formation**
