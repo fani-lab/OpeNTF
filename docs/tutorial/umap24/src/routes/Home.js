@@ -375,7 +375,7 @@ function Home() {
               <span className="fw-bold text-uppercase h6">Reading List</span>
               <ul>
                 <li>
-                  <a href="https://doi.org/10.1007/978-3-031-56027-9\_20">
+                  <a href="https://link.springer.com/chapter/10.1007/978-3-031-56027-9_20">
                     A Streaming Approach to Neural Team Formation Training
                   </a>{" "}
                   (Fani et al., 2024)
@@ -448,27 +448,27 @@ function Home() {
                   <a href="https://dl.acm.org/doi/10.1145/3340531.3412140">
                     Learning to Form Skill-based Teams of Experts
                   </a>{" "}
-                  (Rad et al. 2019)
+                  (Rad et al., 2019)
                 </li>
                 <li>
                   <a href="https://dl.acm.org/doi/10.1145/3097983.3098036">
                     metapath2vec: Scalable Representation Learning for
                     Heterogeneous Networks
                   </a>{" "}
-                  (Dong et al. 2017)
+                  (Dong et al., 2017)
                 </li>
                 <li>
-                  <a href="http://sites.computer.org/debull/A17sept/p52.pdf">
+                  <a href="https://www.semanticscholar.org/paper/Representation-Learning-on-Graphs%3A-Methods-and-Hamilton-Ying/ecf6c42d84351f34e1625a6a2e4cc6526da45c74">
                     Representation Learning on Graphs: Methods and Applications
                   </a>{" "}
-                  (Hamilton et al. 2017)
+                  (Hamilton et al., 2017)
                 </li>
                 <li>
                   <a href="https://doi.org/10.1145/1935826.1935914">
                     Supervised Random Walks: Predicting and Recommending Links
                     in Social Networks
                   </a>{" "}
-                  (Backstrom et al. 2011)
+                  (Backstrom et al., 2011)
                 </li>
               </ul>
             </div>
