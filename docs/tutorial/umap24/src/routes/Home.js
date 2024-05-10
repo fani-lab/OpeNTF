@@ -592,50 +592,66 @@ function Home() {
         </span>
         <div className="section-body d-flex p-3 direction-row justify-content-between">
           <div className="presenter">
-            <div class="presenter-img">
-              <img
-                class="front"
-                src={require("../img/mahdis.jpg")}
-                alt="Mahdis Saeedi"
-              />
-              <img
-                class="back"
-                src={require("../img/flamingo.jpg")}
-                alt="Flamingo"
-              />
-            </div>
+            <a
+              href="https://www.linkedin.com/in/mahdis-saeedi-b80b8321a/"
+              target="_blank"
+            >
+              <div class="presenter-img">
+                <img
+                  class="front"
+                  src={require("../img/mahdis.jpg")}
+                  alt="Mahdis Saeedi"
+                />
+                <img
+                  class="back"
+                  src={require("../img/flamingo.jpg")}
+                  alt="Flamingo"
+                />
+              </div>
+            </a>
             <span className="ref-name fs-5">Mahdis Saeedi</span>
             <span className="text-muted fs-6 fst-italic">
               University of Windsor
             </span>
           </div>
           <div className="presenter">
-            <div class="presenter-img">
-              <img
-                class="front"
-                src={require("../img/christine.jpg")}
-                alt="Christine Wong"
-              />
-              <img
-                class="back"
-                src={require("../img/cardinal.jpg")}
-                alt="Cardinal"
-              />
-            </div>
+            <a
+              href="https://www.linkedin.com/in/christine-wong-6828b0193/"
+              target="_blank"
+            >
+              <div class="presenter-img">
+                <img
+                  class="front"
+                  src={require("../img/christine.jpg")}
+                  alt="Christine Wong"
+                />
+                <img
+                  class="back"
+                  src={require("../img/cardinal.jpg")}
+                  alt="Cardinal"
+                />
+              </div>
+            </a>
             <span className="ref-name fs-5">Christine Wong</span>
             <span className="text-muted fs-6 fst-italic">
               University of Windsor
             </span>
           </div>
           <div className="presenter">
-            <div class="presenter-img">
-              <img
-                class="front"
-                src={require("../img/hossein.jpg")}
-                alt="Hossein Fani"
-              />
-              <img class="back" src={require("../img/sloth.jpg")} alt="Sloth" />
-            </div>
+            <a href="http://hosseinfani.github.io/" target="_blank">
+              <div class="presenter-img">
+                <img
+                  class="front"
+                  src={require("../img/hossein.jpg")}
+                  alt="Hossein Fani"
+                />
+                <img
+                  class="back"
+                  src={require("../img/sloth.jpg")}
+                  alt="Sloth"
+                />
+              </div>
+            </a>
             <span className="ref-name fs-5">Hossein Fani</span>
             <span className="text-muted fs-6 fst-italic">
               University of Windsor
