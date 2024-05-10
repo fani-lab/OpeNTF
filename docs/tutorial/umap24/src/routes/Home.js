@@ -530,6 +530,59 @@ function Home() {
                 synergistic effects.
               </span>
             </div>
+            <div className="topic-item">
+              <span className="fw-bold text-uppercase h6">Reading List</span>
+              <ul>
+                <li>
+                  <a href="https://doi.org/10.1007/978-3-031-37249-0_9">
+                    Bootless Application of Greedy Re-ranking Algorithms in Fair
+                    Neural Team Formation
+                  </a>{" "}
+                  (Loghmani et al., 2023)
+                </li>
+                <li>
+                  <a href="https://doi.org/10.1016/j.ipm.2021.102707">
+                    Fair Top-k Ranking with Multiple Protected Groups
+                  </a>{" "}
+                  (Zehlike et al., 2022)
+                </li>
+                <li>
+                  <a href="https://doi.org/10.1609/aaai.v36i11.21445">
+                    Has ceo gender bias really been fixed? adversarial attacking
+                    and improving gender fairness in image search
+                  </a>{" "}
+                  (Feng et al., 2022)
+                </li>
+                <li>
+                  <a href="http://papers.nips.cc/paper_files/paper/2022/hash/cdd0640218a27e9e2c0e52e324e25db0-Abstract-Conference.html">
+                    Fair Ranking with Noisy Protected Attributes
+                  </a>{" "}
+                  (Mehrotra et al., 2022)
+                </li>
+                <li>
+                  <a href="https://link.springer.com/article/10.1007/s42452-020-2801-5">
+                    Challenges and barriers in virtual teams: a literature
+                    review
+                  </a>{" "}
+                  (Morrison et al., 2020)
+                </li>
+                <li>
+                  <a href="https://doi.org/10.1145/3292500.3330691">
+                    Fairness-Aware Ranking in Search & Recommendation Systems
+                    with Application to LinkedIn Talent Search
+                  </a>{" "}
+                  (Geyik et al., 2019)
+                </li>
+                <li>
+                  <a href="https://doi.org/10.1145/1460563.1460633">
+                    Who collaborates successfully? prior experience reduces
+                    collaboration barriers in distributed interdisciplinary
+                    research
+                  </a>{" "}
+                  (Cummings et al., 2008)
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
       </section>
