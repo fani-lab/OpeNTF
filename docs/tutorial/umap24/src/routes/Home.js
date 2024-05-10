@@ -204,92 +204,92 @@ function Home() {
                     A unified framework for effective team formation in social
                     networks
                   </a>{" "}
-                  (Selvarajah et al, 2021)
+                  (Selvarajah et al., 2021)
                 </li>
                 <li>
                   <a href="https://doi.org/10.1145/3459637.3481969">
                     RW-Team: Robust Team Formation using Random Walk
                   </a>{" "}
-                  (Nemec et al. 2021)
+                  (Nemec et al., 2021)
                 </li>
                 <li>
                   <a href="https://doi.org/10.1145/3465399">
                     A Comprehensive Review and a Taxonomy Proposal of Team
                     Formation Problems
                   </a>{" "}
-                  (Juarez et al. 2021)
+                  (Juarez et al., 2021)
                 </li>
                 <li>
                   <a href="https://doi.org/10.1109/TKDE.2020.2985376">
                     Effective Keyword Search Over Weighted Graphs
                   </a>{" "}
-                  (Kargar et al. 2020)
+                  (Kargar et al., 2020)
                 </li>
                 <li>
                   <a href="https://doi.org/10.1093/comjnl/bxw088">
                     Forming Grouped Teams with Efficient Collaboration in Social
                     Networks
                   </a>{" "}
-                  (Huang et al. 2017)
+                  (Huang et al., 2017)
                 </li>
                 <li>
                   <a href="https://doi.org/10.5441/002/edbt.2017.54">
                     Authority-based Team Discovery in Social Networks
                   </a>{" "}
-                  (Zyhayat et al. 2017)
+                  (Zihayat et al., 2017)
                 </li>
                 <li>
                   <a href="https://doi.org/10.1109/WI-IAT.2014.112">
                     Two-Phase Pareto Set Discovery for Team Formation in Social
                     Networks
                   </a>{" "}
-                  (Zyhayat et al. 2014)
+                  (Zihayat et al., 2014)
                 </li>
                 <li>
                   <a href="https://doi.org/10.1145/2488388.2488482">
                     Towards realistic team formation in social networks based on
-                    densest
+                    densest subgraphs
                   </a>{" "}
-                  (Rangapuram et al.2013)
+                  (Rangapuram et al., 2013)
                 </li>
                 <li>
                   <a href="https://doi.org/10.1137/1.9781611972825.15">
                     Multi-skill Collaborative Teams based on Densest Subgraphs
                   </a>{" "}
-                  (Gajewar et al. 2012)
+                  (Gajewar et al., 2012)
                 </li>
                 <li>
                   <a href="https://doi.org/10.1145/2339530.2339690">
                     Capacitated team formation problem on social networks
                   </a>{" "}
-                  (Datta et al. 2012)
+                  (Datta et al., 2012)
                 </li>
                 <li>
                   <a href="https://doi.org/10.1109/ICDMW.2011.28">
                     An Effective Expert Team Formation in Social Networks Based
                     on Skill Grading
                   </a>{" "}
-                  (Farhadi et al. 2011)
+                  (Farhadi et al., 2011)
                 </li>
                 <li>
                   <a href="https://doi.org/10.1145/2063576.2063718">
                     Discovering top-k teams of experts with/without a leader in
                     social networks
                   </a>{" "}
-                  (Kargar et al. 2011)
+                  (Kargar et al., 2011)
                 </li>
                 <li>
                   <a href="https://doi.org/10.1109/SocialCom.2010.12">
                     Team Formation for Generalized Tasks in Expertise Social
                     Networks
                   </a>{" "}
-                  (Li et al. 2010)
+                  (Li et al., 2010)
                 </li>
                 <li>
                   <a href="https://doi.org/10.1145/1557019.1557074">
                     Finding a team of experts in social networks
                   </a>{" "}
-                  (Lappas et al. 2009)
+                  (Lappas et al., 2009)
                 </li>
               </ul>
             </div>
