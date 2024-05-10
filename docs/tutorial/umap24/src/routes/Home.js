@@ -372,6 +372,107 @@ function Home() {
               </ul>
             </div>
             <div className="topic-item">
+              <span className="fw-bold text-uppercase h6">Reading List</span>
+              <ul>
+                <li>
+                  <a href="https://doi.org/10.1007/978-3-031-56027-9\_20">
+                    A Streaming Approach to Neural Team Formation Training
+                  </a>{" "}
+                  (Fani et al., 2024)
+                </li>
+                <li>
+                  <a href="https://doi.org/10.1145/3589762">
+                    A Variational Neural Architecture for Skill-based Team
+                    Formation
+                  </a>{" "}
+                  (Rad et al., 2023)
+                </li>
+                <li>
+                  <a href="https://doi.org/10.1109/IJCNN54540.2023.10191717">
+                    Transfer Learning with Graph Attention Networks for Team
+                    Recommendation
+                  </a>{" "}
+                  (Kaw et al., 2023)
+                </li>
+                <li>
+                  <a href="https://doi.org/10.1007/s10791-023-09421-6">
+                    Learning heterogeneous subgraph representations for team
+                    discovery
+                  </a>{" "}
+                  (Nguyen et al., 2023)
+                </li>
+                <li>
+                  <a href="https://doi.org/10.1145/3511808.3557526">
+                    OpeNTF: A Benchmark Library for Neural Team Formation
+                  </a>{" "}
+                  (Dashti et al., 2022)
+                </li>
+                <li>
+                  <a href="https://doi.org/10.1145/3511808.3557590">
+                    Effective Neural Team Formation via Negative Samples
+                  </a>{" "}
+                  (Dashti et al., 2022)
+                </li>
+                <li>
+                  <a href="https://doi.org/10.48786/edbt.2022.37">
+                    A Neural Approach to Forming Coherent Teams in Collaboration
+                    Networks
+                  </a>{" "}
+                  (Rad et al., 2022)
+                </li>
+                <li>
+                  <a href="https://doi.org/10.1145/3501247.3531578">
+                    Subgraph Representation Learning for Team Mining
+                  </a>{" "}
+                  (Rad et al., 2022)
+                </li>
+                <li>
+                  <a href="https://doi.org/10.1145/3404835.3463105">
+                    Retrieving Skill-Based Teams from Collaboration Networks
+                  </a>{" "}
+                  (Rad et al., 2021)
+                </li>
+                <li>
+                  <a href="https://doi.org/10.1145/3459637.3481992">
+                    PyTFL: A Python-based Neural Team Formation Toolkit
+                  </a>{" "}
+                  (Rad et al., 2021)
+                </li>
+                <li>
+                  <a href="https://doi.org/10.3389%2Ffdata.2019.00014">
+                    Deep Neural Networks for Optimal Team Composition
+                  </a>{" "}
+                  (Sapienza et al., 2019)
+                </li>
+                <li>
+                  <a href="https://dl.acm.org/doi/10.1145/3340531.3412140">
+                    Learning to Form Skill-based Teams of Experts
+                  </a>{" "}
+                  (Rad et al. 2019)
+                </li>
+                <li>
+                  <a href="https://dl.acm.org/doi/10.1145/3097983.3098036">
+                    metapath2vec: Scalable Representation Learning for
+                    Heterogeneous Networks
+                  </a>{" "}
+                  (Dong et al. 2017)
+                </li>
+                <li>
+                  <a href="http://sites.computer.org/debull/A17sept/p52.pdf">
+                    Representation Learning on Graphs: Methods and Applications
+                  </a>{" "}
+                  (Hamilton et al. 2017)
+                </li>
+                <li>
+                  <a href="https://doi.org/10.1145/1935826.1935914">
+                    Supervised Random Walks: Predicting and Recommending Links
+                    in Social Networks
+                  </a>{" "}
+                  (Backstrom et al. 2011)
+                </li>
+              </ul>
+            </div>
+            <div className="topic-item">
               <span className="fw-bold expand-button"></span>
               <span className="d-block w-100 justify-paragraph"></span>
             </div>
