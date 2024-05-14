@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 import torch
 
+from tqdm import tqdm
 from eval.metric import *
 from mdl.ntf import Ntf
 
@@ -53,8 +54,16 @@ class Nmt(Ntf):
             cli_cmd = 'onmt_build_vocab '
             cli_cmd += f'-config {fold_path}/config.yml '
             cli_cmd += f'-n_sample {len(input_data)}'
-            print(f'{cli_cmd}')
-            subprocess.Popen(shlex.split(cli_cmd)).wait()
+            # print(f'{cli_cmd}')
+
+            with tqdm(total=7, desc="{:<20}".format("Building Vocab"), bar_format='{desc}: {percentage:3.0f}%|{bar:20}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}]') as pbar:
+                process = subprocess.Popen(shlex.split(cli_cmd), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                for line in process.stdout:
+                    # Assuming each line indicates some progress; you can adjust the logic
+                    if b"corpus_1" or b"Weighted corpora loaded so far:" in line:
+                        pbar.update(1)
+                process.wait()
+            # subprocess.Popen(shlex.split(cli_cmd)).wait()
 
         with open(f"{model_path}/src-test.txt", "w") as src_test: src_test.writelines(input_data[splits['test']])
         with open(f"{model_path}/tgt-test.txt", "w") as tgt_test: tgt_test.writelines(output_data[splits['test']])
@@ -65,8 +74,20 @@ class Nmt(Ntf):
         for foldidx in splits['folds'].keys():
             cli_cmd = 'onmt_train '
             cli_cmd += f'-config {path}/fold{foldidx}/config.yml '
-            print(f'{cli_cmd}')
-            subprocess.Popen(shlex.split(cli_cmd)).wait()
+            # print(f'{cli_cmd}')
+
+
+            with tqdm(total=123860, desc="{:<20}".format(f'Learning {foldidx}'), bar_format='{desc}: {percentage:3.0f}%|{bar:20}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}]') as pbar:
+                    process = subprocess.Popen(shlex.split(cli_cmd), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                    for line in process.stdout:
+                        # Assuming each line indicates some progress; you can adjust the logic
+                        if b"corpus_1" or b"Weighted corpora loaded so far:" in line:
+                            pbar.update(1)
+                        # Output the log if needed or comment out
+                        # print(line.decode(), end="")
+
+                    process.wait()
+            # subprocess.Popen(shlex.split(cli_cmd)).wait()
 
     #todo: per_trainstep => per_epoch
     #todo: eval on prediction files
@@ -85,8 +106,17 @@ class Nmt(Ntf):
                 cli_cmd += '-gpu 0 ' if torch.cuda.is_available() else ''
                 cli_cmd += '--min_length 2 '
                 cli_cmd += '-verbose '
-                print(f'{cli_cmd}')
-                subprocess.Popen(shlex.split(cli_cmd)).wait()
+                # print(f'{cli_cmd}')
+                
+                with tqdm(total=30, desc="{:<20}".format("Testing"), bar_format='{desc}: {percentage:3.0f}%|{bar:20}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}]') as pbar:
+                    process = subprocess.Popen(shlex.split(cli_cmd), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                    for line in process.stdout:
+                        # Assuming each line indicates some progress; you can adjust the logic
+                        if b"corpus_1" or b"Weighted corpora loaded so far:" in line:
+                            pbar.update(1)
+
+                    process.wait()
+            # subprocess.Popen(shlex.split(cli_cmd)).wait()
     
     def eval(self, splits, path, member_count, y_test, per_epoch):
         fold_mean = pd.DataFrame()
@@ -126,7 +156,9 @@ class Nmt(Ntf):
                 fold_mean = pd.concat([fold_mean, df_mean], axis=1)
         fold_mean.mean(axis=1).to_frame('mean').to_csv(f'{path}/test.epoch{epoch}.pred.eval.mean.csv')
                       
-    def run(self, splits, vecs, indexes, output, settings, cmd):
+    def run(self, splits, vecs, indexes, output, settings, cmd, *args, **kwargs):
+        # print extra positional arguments
+        # for arg in args: print(f'arg: {arg}')
         with open(settings['base_config']) as infile: base_config = yaml.safe_load(infile)
 
         encoder_type = base_config['encoder_type']
@@ -144,6 +176,8 @@ class Nmt(Ntf):
         elif encoder_type == 'transformer':
             layer_size = base_config['transformer_ff']
 
+        # fix output path by removing the . in ./../output/toy.dblp.v12.json/nmt/t31.s10.m13.base_config./mdl/nmt_config.yaml after the base_config, use replace
+        output = output.replace('base_config.', 'base_config')
         
         model_path = f"{output}/t{team_count}.s{skill_count}.m{member_count}.et{encoder_type}.l{layer_size}.wv{word_vec_size}.lr{learning_rate}.b{batch_size}.e{epochs}"
         if not os.path.isdir(output): os.makedirs(output)
