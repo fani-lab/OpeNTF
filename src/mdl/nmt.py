@@ -43,27 +43,14 @@ class Nmt(Ntf):
             settings['tgt_vocab'] = f'{fold_path}/vocab.tgt'
             settings['save_data'] = f'{fold_path}/'
             settings['save_model'] = f'{fold_path}/model'
-
             settings['world_size'] = 1
             settings['gpu_ranks'] = [0] if torch.cuda.is_available() else []
-
             settings['save_checkpoint_steps'] = 500 #overrides per_epoch evaluation and it becomes per_checkpoints
 
             with open(f'{fold_path}/config.yml', 'w') as outfile: yaml.safe_dump(settings, outfile)
 
-            cli_cmd = 'onmt_build_vocab '
-            cli_cmd += f'-config {fold_path}/config.yml '
-            cli_cmd += f'-n_sample {len(input_data)}'
-            # print(f'{cli_cmd}')
-
-            with tqdm(total=7, desc="{:<20}".format("Building Vocab"), bar_format='{desc}: {percentage:3.0f}%|{bar:20}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}]') as pbar:
-                process = subprocess.Popen(shlex.split(cli_cmd), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-                for line in process.stdout:
-                    # Assuming each line indicates some progress; you can adjust the logic
-                    if b"corpus_1" or b"Weighted corpora loaded so far:" in line:
-                        pbar.update(1)
-                process.wait()
-            # subprocess.Popen(shlex.split(cli_cmd)).wait()
+            cli_cmd = f'onmt_build_vocab -config {fold_path}/config.yml -n_sample {len(input_data)}'
+            subprocess.Popen(shlex.split(cli_cmd)).wait()
 
         with open(f"{model_path}/src-test.txt", "w") as src_test: src_test.writelines(input_data[splits['test']])
         with open(f"{model_path}/tgt-test.txt", "w") as tgt_test: tgt_test.writelines(output_data[splits['test']])
@@ -72,22 +59,8 @@ class Nmt(Ntf):
 
     def learn(self, splits, path):
         for foldidx in splits['folds'].keys():
-            cli_cmd = 'onmt_train '
-            cli_cmd += f'-config {path}/fold{foldidx}/config.yml '
-            # print(f'{cli_cmd}')
-
-
-            with tqdm(total=123860, desc="{:<20}".format(f'Learning {foldidx}'), bar_format='{desc}: {percentage:3.0f}%|{bar:20}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}]') as pbar:
-                    process = subprocess.Popen(shlex.split(cli_cmd), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-                    for line in process.stdout:
-                        # Assuming each line indicates some progress; you can adjust the logic
-                        if b"corpus_1" or b"Weighted corpora loaded so far:" in line:
-                            pbar.update(1)
-                        # Output the log if needed or comment out
-                        # print(line.decode(), end="")
-
-                    process.wait()
-            # subprocess.Popen(shlex.split(cli_cmd)).wait()
+            cli_cmd = f'onmt_train -config {path}/fold{foldidx}/config.yml'
+            subprocess.Popen(shlex.split(cli_cmd)).wait()
 
     #todo: per_trainstep => per_epoch
     #todo: eval on prediction files
@@ -106,17 +79,9 @@ class Nmt(Ntf):
                 cli_cmd += '-gpu 0 ' if torch.cuda.is_available() else ''
                 cli_cmd += '--min_length 2 '
                 cli_cmd += '-verbose '
-                # print(f'{cli_cmd}')
+                print(f'{cli_cmd}')
                 
-                with tqdm(total=30, desc="{:<20}".format("Testing"), bar_format='{desc}: {percentage:3.0f}%|{bar:20}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}]') as pbar:
-                    process = subprocess.Popen(shlex.split(cli_cmd), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-                    for line in process.stdout:
-                        # Assuming each line indicates some progress; you can adjust the logic
-                        if b"corpus_1" or b"Weighted corpora loaded so far:" in line:
-                            pbar.update(1)
-
-                    process.wait()
-            # subprocess.Popen(shlex.split(cli_cmd)).wait()
+            subprocess.Popen(shlex.split(cli_cmd)).wait()
     
     def eval(self, splits, path, member_count, y_test, per_epoch):
         fold_mean = pd.DataFrame()
@@ -157,8 +122,6 @@ class Nmt(Ntf):
         fold_mean.mean(axis=1).to_frame('mean').to_csv(f'{path}/test.epoch{epoch}.pred.eval.mean.csv')
                       
     def run(self, splits, vecs, indexes, output, settings, cmd, *args, **kwargs):
-        # print extra positional arguments
-        # for arg in args: print(f'arg: {arg}')
         with open(settings['base_config']) as infile: base_config = yaml.safe_load(infile)
 
         encoder_type = base_config['encoder_type']
