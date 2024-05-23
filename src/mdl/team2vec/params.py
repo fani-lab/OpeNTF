@@ -8,7 +8,7 @@ settings = {
         'dup_edge': 'mean', #None: keep the duplicates, else: reduce by 'add', 'mean', 'min', 'max', 'mul'
     },
     'model': {
-        'd' : 64, # embedding dim
+        'd' : 4, # embedding dim
         'b' : 128, # batch_size for loaders
         'e' : 100, # num epochs
         'ns' : 5, # number of negative samples
@@ -21,6 +21,7 @@ settings = {
             'dbow_words': 0,  # 'train word-vectors in skip-gram fashion; 0: no (default), 1: yes
             'window': 2,  # cooccurrence window
             'embtype': 'joint',  # 'member', 'joint', 'dt2v'
+            'max_e': 1000, # max epochs for training
         },
         'gnn.n2v': {
             'walk_length': 5,
@@ -35,7 +36,14 @@ settings = {
             'p': 1.0,
             'q': 1.0,
         },
-        'gnn.gat': {},
+        'gnn.gat': {
+            'e' : 5,
+            'b' : 128,
+            'd' : [4, 8, 16, 32],
+            'ns' : 2,
+            'h' : 2,
+            'nn' : [20, 10],
+        },
         'gnn.gin': {},
         'gnn.m2v': {
             'metapath' : [
