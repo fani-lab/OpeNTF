@@ -73,6 +73,15 @@ class Gnn(Team2Vec):
     # emb_output = the path for the embedding output and model output storage
     def init_model(self, emb_output):
 
+        # getting from the gnn params
+        self.e = self.settings['e']
+        self.d = self.settings['d']
+        self.b = self.settings['b']
+        self.ns = self.settings['ns']
+        self.nn = self.settings['nn']
+        self.agg = self.settings['agg']
+        self.graph_type = self.settings['graph_type']
+
         # e.g : domain = 'imdb/title.basics.tsv.filtered.mt5.ts2'
         # self.filepath = f'../../data/preprocessed/{domain}/gnn/{graph_type}.undir.{agg}.data.pkl'
         self.model_output = emb_output
@@ -93,11 +102,11 @@ class Gnn(Team2Vec):
         torch.cuda.empty_cache()
         train_data.to(self.device)
         # the train_data is needed to collect info about the metadata
-        self.model, self.optimizer = self.create_gnn_model(train_data, self.model_name)
+        self.model, self.optimizer = self.create_gnn_model()
 
     def train(self, epochs, save_per_epoch=False):
-        self.learn(self.train_loader, self.is_directed)
-        self.eval(self.val_loader, self.is_directed)
+        self.learn(self.train_loader, epochs)
+        self.eval(self.val_loader)
         print(f'-------------- ending eval --------------')
         # store the embeddings
         with torch.no_grad():
@@ -106,14 +115,16 @@ class Gnn(Team2Vec):
             self.data.to(self.device)
             # for simplicity, we just pass seed_edge_type = edge_types[0]. This does not impact any output
             emb = self.model(self.data, self.edge_types[0], self.is_directed, emb=True)
-            embedding_output = f'{self.model_output}/{self.model_name}.{graph_type}.undir.{agg}.e{epochs}.ns{int(ns)}.b{b}.d{dim}.emb.pt'
+            embedding_output = f'{self.model_output}/{self.model_name}.{self.graph_type}.undir.{self.agg}.e{epochs}.ns{int(self.ns)}.b{self.b}.d{self.d}.emb.pt'
             torch.save(emb, embedding_output, pickle_protocol=4)
             print(f'\nsaved embedding as : {embedding_output} ..............\n')
         # eval_batch(test_loader, is_directed)
         torch.cuda.empty_cache()
-        torch.save(self.model.state_dict(), f'{self.model_output}/gnn_model.pt', pickle_protocol=4)
+        # torch.save(self.model.state_dict(), f'{self.model_output}/gnn_model.pt', pickle_protocol=4)
         #to load later by: self.model.load_state_dict(torch.load(f'{self.output}/gnn_model.pt'))
 
+
+        # @Hossein Fani
         # print(f'It took {time.time() - t_start_time} to train the model.')
         # with open(f'{self.model_output}/train_valid_loss.json', 'w') as outfile: json.dump({'train': train_loss_values, 'valid': valid_loss_values}, outfile)
         # plt.figure()
@@ -150,7 +161,7 @@ class Gnn(Team2Vec):
         plt.show()
 
     # made specifically for the gnn training
-    def plot_graph(x, y, *args, xlabel='Epochs', ylabel='Loss', title='Loss vs Epochs', fig_output='plot.png'):
+    def plot_graph(self, x, y, *args, xlabel='Epochs', ylabel='Loss', title='Loss vs Epochs', fig_output='plot.png'):
         plt.plot(x, y, label='Train')  # Plot the first set of data
 
         if len(args) > 0:
@@ -185,7 +196,7 @@ class Gnn(Team2Vec):
             num_val=0.1,
             num_test=0.0,
             disjoint_train_ratio=0.3,
-            neg_sampling_ratio=ns,
+            neg_sampling_ratio=self.ns,
             add_negative_train_samples=False,
             edge_types=edge_types,
             rev_edge_types=rev_edge_types,
@@ -200,36 +211,38 @@ class Gnn(Team2Vec):
         return train_data, val_data, test_data, edge_types, rev_edge_types
 
     # d = dim
-    def create_gnn_model(self, d):
+    def create_gnn_model(self):
 
-        # if (model_name == 'gcn'):
-        #     # gcn
-        #     model = GCNModel(hidden_channels=dim, data=data, b=b)
-        # elif (model_name == 'gs'):
-        #     # gs
-        #     model = GSModel(hidden_channels=dim, data=data, b=b)
-        if self.model_name == 'gat':
+        if self.model_name == 'gs':
+            from gs import Model as GSModel
+            # gs
+            model = GSModel(hidden_channels=self.d, data=self.data)
+        elif self.model_name == 'gin':
+            from gin import Model as GINModel
+            # gin
+            model = GINModel(hidden_channels=self.d, data=self.data)
+        elif self.model_name == 'gat':
             from gat import Model as GATModel
             # gat
-            model = GATModel(hidden_channels=d, data=self.data)
-        # elif (model_name == 'gatv2'):
-        #     # gatv2
-        #     model = GATV2Model(hidden_channels=dim, data=data, b=b)
-        # elif (model_name == 'han'):
-        #     # han
-        #     model = HANModel(hidden_channels=dim, data=data, b=b)
-        # elif (model_name == 'gin'):
-        #     # gin
-        #     model = GINModel(hidden_channels=dim, data=data, b=b)
-        # elif (model_name == 'gine'):
-        #     # gine
-        #     model = GINEModel(hidden_channels=dim, data=data, b=b)
+            model = GATModel(hidden_channels=self.d, data=self.data)
+        elif self.model_name == 'gatv2':
+            from gatv2 import Model as GATv2Model
+            # gatv2
+            model = GATv2Model(hidden_channels=self.d, data=self.data)
+        elif self.model_name == 'han':
+            from han import Model as HANModel
+            # han
+            model = HANModel(hidden_channels=self.d, data=self.data)
+        elif self.model_name == 'gine':
+            from gine import Model as GINEModel
+            # gine
+            model = GINEModel(hidden_channels=self.d, data=self.data)
 
         print(model)
         print(f'\nDevice = {self.device}')
 
         model = model.to(self.device)
-        optimizer = torch.optim.Adam(model.parameters(), lr=self.lr)
+        optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
         return model, optimizer
 
     # create a mbatch for a given split_data (mode = train / val / test)
@@ -245,7 +258,7 @@ class Gnn(Team2Vec):
         print(f'mini batch loader for mode {mode}')
         mini_batch_loader = LinkNeighborLoader(
             data=split_data,
-            num_neighbors=nn,
+            num_neighbors=self.nn,
             neg_sampling_ratio=neg_sampling,  # prev : neg_sampling
             edge_label_index=(seed_edge_type, split_data[seed_edge_type].edge_label_index),
             edge_label=split_data[seed_edge_type].edge_label,
@@ -254,7 +267,7 @@ class Gnn(Team2Vec):
         )
         return mini_batch_loader
 
-    def learn(self, epochs, loader):
+    def learn(self, loader, epochs):
         start = time.time()
         min_loss = 100000000000
         loss_array = []
@@ -263,7 +276,7 @@ class Gnn(Team2Vec):
 
         for epoch in range(1, epochs + 1):
             self.optimizer.zero_grad()  # ensuring clearing out the gradients before each validation loop
-            l1, l2 = self.eval_batch(self.val_loader, self.is_directed)
+            l1, l2 = self.eval(self.val_loader)
             val_loss_array.append(l1)
             val_auc_array.append(l2)
             total_loss = 0
@@ -295,14 +308,14 @@ class Gnn(Team2Vec):
             loss_array.append((total_loss / total_examples))
 
         # plot the figure and save
-        fig_output = f'{self.model_output}/{self.model_name}.{self.settings["graph_type"]}.undir.{self.settings["agg"]}.e{epochs}.ns{int(self.settings["ns"])}.b{self.settings["b"]}.d{self.settings["d"]}.png'
+        fig_output = f'{self.model_output}/{self.model_name}.{self.graph_type}.undir.{self.agg}.e{epochs}.ns{int(self.ns)}.b{self.b}.d{self.d}.png'
         self.plot_graph(torch.arange(1, epochs + 1, 1), loss_array, val_loss_array, fig_output=fig_output)
-        fig_output = f'{self.model_output}/{self.model_name}.{graph_type}.undir.{agg}.e{epochs}.ns{int(ns)}.b{b}.d{dim}.val_auc_per_epoch.png'
+        fig_output = f'{self.model_output}/{self.model_name}.{self.graph_type}.undir.{self.agg}.e{epochs}.ns{int(self.ns)}.b{self.b}.d{self.d}.val_auc_per_epoch.png'
         self.plot_graph(torch.arange(1, epochs + 1, 1), val_auc_array, xlabel='Epochs', ylabel='Val AUC',
                    title=f'Validation AUC vs Epochs for Embedding Generation', fig_output=fig_output)
-        print(
-            f'\nit took {(time.time() - start) / 60} mins || {(time.time() - start) / 3600} hours to train the model\n')
+        print(f'\nit took {(time.time() - start) / 60} mins || {(time.time() - start) / 3600} hours to train the model\n')
 
+    @torch.no_grad
     def eval(self, loader):
         preds = []
         ground_truths = []
