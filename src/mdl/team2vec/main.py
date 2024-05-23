@@ -14,6 +14,14 @@ def addargs(parser):
     embedding.add_argument('--output', nargs='+', type=str, required=False, help='Output folder; e.g., ../data/preprocessed/dblp/toy.dblp.v12.json/')
     embedding.add_argument('--graph_only', type=int, required=False, help='if true, then only generates graph files and returns')
 
+    # args for gnn methods
+    gnn_args = parser.add_argument_group('Gnn Settings')
+    gnn_args.add_argument('--agg', type=str, required=False, help='The aggregation method used for the graph data; e.g : mean, none, max, min etc.')
+    gnn_args.add_argument('--d', type=int, required=False, help='Embedding dimension; e.g : 4, 8, 16, 32 etc.')
+    gnn_args.add_argument('--e', type=int, required=False, help='Train epochs ; e.g : 5, 100 etc.')
+    gnn_args.add_argument('--ns', type=int, required=False, help='Train epochs ; e.g : 2, 3, 5 etc.')
+    gnn_args.add_argument('--graph_type', type=str, required=False, help='Graph types used for the training; e.g : sm, stm etc.')
+
 def run(teamsvecs_file, indexes_file, model, output, emb_output = None):
     if not os.path.isdir(output): os.makedirs(output)
     with open(teamsvecs_file, 'rb') as teamsvecs_f, open(indexes_file, 'rb') as indexes_f:
@@ -94,11 +102,11 @@ def run(teamsvecs_file, indexes_file, model, output, emb_output = None):
             t2v.optimizer = torch.optim.Adam(t2v.model.parameters(), lr=params.settings['model']['lr'])
             t2v.model_name = 'gcn'
 
-        elif model == 'gnn.gat':
-            t2v.settings = params.settings[model]
-            t2v.model_name = 'gat'
-            t2v.init_model()
-            t2v.train(t2v.settings[model]['e'])
+        elif model in {"gnn.gs", "gnn.gin", "gnn.gat", "gnn.gatv2", "gnn.han", "gnn.gine"}:
+            t2v.settings = params.settings['model'][model]
+            t2v.model_name = model.split(".")[1]
+            t2v.init_model(emb_output)
+            t2v.train(t2v.settings['e'])
 
             return
 
@@ -142,5 +150,13 @@ if __name__ == "__main__":
             for dir in [False]:
                 for dup in ['mean']:  # add', 'mean', 'min', 'max', 'mul']:
                     params.settings['graph'] = {'edge_types': edge_type, 'dir': dir, 'dup_edge': dup}
+
+                    # change the relevant parameter in the params file based on the gnn args
+                    if args.e is not None: params.settings['model'][args.model]['e'] = args.e
+                    if args.d is not None: params.settings['model'][args.model]['d'] = args.d
+                    if args.ns is not None: params.settings['model'][args.model]['ns'] = args.ns
+                    if args.agg is not None: params.settings['model'][args.model]['agg'] = args.agg
+                    if args.graph_type is not None: params.settings['model'][args.model]['graph_type'] = args.graph_type
+
                     run(f'{teamsvecs}teamsvecs.pkl', f'{teamsvecs}indexes.pkl', args.model,
                         f'{args.output}/{args.model.split(".")[0]}/', f'{args.output}/emb/')
