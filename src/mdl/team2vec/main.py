@@ -26,10 +26,11 @@ def run(teamsvecs_file, indexes_file, model, output, emb_output = None):
                         'dm': params.settings['model'][model]['dm'],
                         'dbow_words': params.settings['model'][model]['dbow_words'],
                         'window': params.settings['model'][model]['dbow_words'],
-                        'embtype': params.settings['model'][model]['embtype']}
-
+                        'embtype': params.settings['model'][model]['embtype'],
+                        'max_e': params.settings['model'][model]['max_e'],
+                        }
             output_ = output + f'{settings["embtype"]}.'
-            wnn.run(f'{args.teamsvecs}teamsvecs.pkl', f'{args.teamsvecs}indexes.pkl', settings, output_)
+            wnn.run(teamsvecs_file, indexes_file, settings, output_)
             #or
             t2v = wnn.Wnn(teamsvecs, indexes, settings, output_)
             t2v.init()
@@ -41,7 +42,7 @@ def run(teamsvecs_file, indexes_file, model, output, emb_output = None):
         # output_ = output + f'{params.settings["graph"]["edge_types"][1]}.{"dir" if params.settings["graph"]["dir"] else "undir"}.{str(params.settings["graph"]["dup_edge"]).lower()}/'
         output_ = output + f'{params.settings["graph"]["edge_types"][1]}.{"dir" if params.settings["graph"]["dir"] else "undir"}.{str(params.settings["graph"]["dup_edge"]).lower()}.'
         t2v = gnn.Gnn(teamsvecs, indexes, params.settings['graph'], output_)
-        t2v.init() # call the team2vec's init
+        t2v.init() # call the team2vec's init, this will lazy load the graph data e.g = "{domain}/gnn/stm.undir.mean.data.pkl"
         if(args.graph_only):
             return
 
@@ -93,6 +94,14 @@ def run(teamsvecs_file, indexes_file, model, output, emb_output = None):
             t2v.optimizer = torch.optim.Adam(t2v.model.parameters(), lr=params.settings['model']['lr'])
             t2v.model_name = 'gcn'
 
+        elif model == 'gnn.gat':
+            t2v.settings = params.settings[model]
+            t2v.model_name = 'gat'
+            t2v.init_model()
+            t2v.train(t2v.settings[model]['e'])
+
+            return
+
         t2v.train(params.settings['model']['max_epochs'], params.settings['model']['save_per_epoch'])
         t2v.plot_points()
         print(t2v)
@@ -113,18 +122,6 @@ def test_toys(args):
                     params.settings['graph'] = {'edge_types': edge_type, 'dir': dir, 'dup_edge': dup}
                     run(f'{args.teamsvecs}teamsvecs.pkl', f'{args.teamsvecs}indexes.pkl', args.model, f'{args.output}/{args.model.split(".")[0]}/', f'{args.output}/emb/')
 
-def test_real(args):
-    # test for all valid combinations on full data
-    for teamsvecs in args.teamsvecs:
-        args.output = teamsvecs
-        for edge_type in [([('skill', 'to', 'member')], 'sm'), ([('skill', 'to', 'team'), ('member', 'to', 'team')], 'stm')]:
-        # for edge_type in [([('skill', 'to', 'team'), ('member', 'to', 'team')], 'stm')]:
-            for dir in [False]:
-                for dup in ['mean']:  # add', 'mean', 'min', 'max', 'mul']:
-                    params.settings['graph'] = {'edge_types': edge_type, 'dir': dir, 'dup_edge': dup}
-                    run(f'{teamsvecs}teamsvecs.pkl', f'{teamsvecs}indexes.pkl', args.model,
-                        f'{args.output}/{args.model.split(".")[0]}/', f'{args.output}/emb/')
-
 # we can ignore mentioning the --output argument
 #python -u main.py -teamsvecs= ./../../../data/preprocessed/dblp/dblp.v12.json.filtered.mt75.ts3/ -model=gnn.n2v --output=./../../../data/preprocessed/dblp/dblp.v12.json.filtered.mt75.ts3/ --graph_only 1
 #python -u main.py -teamsvecs=./../../../data/preprocessed/dblp/toy.dblp.v12.json/ -model=gnn.n2v --output=./../../../data/preprocessed/dblp/toy.dblp.v12.json/
@@ -136,4 +133,14 @@ if __name__ == "__main__":
     # run(f'{args.teamsvecs}teamsvecs.pkl', f'{args.teamsvecs}indexes.pkl', args.model, f'{args.output}/{args.model.split(".")[0]}/')
 
     # test_toys(args)
-    test_real(args)
+
+    for teamsvecs in args.teamsvecs:
+        args.output = teamsvecs
+        # for edge_type in [([('skill', 'to', 'member')], 'sm')]:
+        # for edge_type in [([('skill', 'to', 'member')], 'sm'), ([('skill', 'to', 'team'), ('member', 'to', 'team')], 'stm')]:
+        for edge_type in [([('skill', 'to', 'team'), ('member', 'to', 'team')], 'stm')]:
+            for dir in [False]:
+                for dup in ['mean']:  # add', 'mean', 'min', 'max', 'mul']:
+                    params.settings['graph'] = {'edge_types': edge_type, 'dir': dir, 'dup_edge': dup}
+                    run(f'{teamsvecs}teamsvecs.pkl', f'{teamsvecs}indexes.pkl', args.model,
+                        f'{args.output}/{args.model.split(".")[0]}/', f'{args.output}/emb/')
