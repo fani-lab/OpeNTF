@@ -154,9 +154,9 @@ class FBnn(Fnn):
                             self.train(True)  # scheduler.step()
                             # forward
                             optimizer.zero_grad()
-                            output = self(X)
+                            y_ = self(X)
                             kl = get_kl_loss(self)
-                            ce_loss = criterion(output, y)
+                            ce_loss = criterion(y_, y)
                             loss = ce_loss + kl / params['b'] # is the batch size equal everytime?
 
                             loss.backward()
@@ -166,7 +166,7 @@ class FBnn(Fnn):
                             self.train(False)  # Set model to valid mode
                             output = self(X)
                             kl = get_kl_loss(self)
-                            ce_loss = criterion(output, y)
+                            ce_loss = criterion(y_, y)
                             loss = ce_loss + kl / params['b']
                             valid_running_loss += loss.item()
                         print(
