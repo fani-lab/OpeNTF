@@ -105,18 +105,6 @@ class FBnn(Fnn):
 
         unigram = Team.get_unigram(vecs['member'])
 
-        if ns.startswith('temporal'):
-            cur_year = int(output.split('/')[-1])
-            index_cur_year = next((i for i, (idx, yr) in enumerate(indexes['i2y']) if yr == cur_year), None)
-            window_size = int(ns.split('_')[-1])
-            if index_cur_year - window_size >= 0:
-                start = indexes['i2y'][index_cur_year - window_size][0] if 'until' not in ns else 0
-                end = indexes['i2y'][index_cur_year][0] if 'until' in ns else \
-                indexes['i2y'][index_cur_year - window_size + 1][0]
-                unigram = Team.get_unigram(vecs['member'][start:end])
-            else:
-                unigram = np.zeros(unigram.shape)
-
         # Prime a dict for train and valid loss
         train_valid_loss = dict()
         for i in range(len(splits['folds'].keys())):
@@ -144,32 +132,17 @@ class FBnn(Fnn):
             self.init(input_size=input_size, output_size=output_size, param=params).to(self.device)
             if prev_model: self.load_state_dict(torch.load(prev_model[foldidx]))
 
-            optimizer = optim.Adam(self.parameters(), lr=learning_rate)
-            scheduler = ReduceLROnPlateau(optimizer, factor=0.5, patience=10, verbose=True)
+            criterion = torch.nn.CrossEntropyLoss()
+            optimizer = torch.optim.Adam(self.parameters(), 0.001)
             # scheduler = StepLR(optimizer, step_size=3, gamma=0.9)
 
             train_loss_values = []
             valid_loss_values = []
             fold_time = time.time()
             # Train Network
-            # Start data params
-            learning_rate_schedule = np.array([2, 4, 10])
-            if loss_type == 'DP':
-                class_parameters, optimizer_class_param = get_class_data_params_n_optimizer(nr_classes=y_train.shape[1],
-                                                                                            lr=learning_rate,
-                                                                                            device=self.device)
-            # End data params
-            if loss_type == 'SL':
-                criterion = SuperLoss(nsamples=X_train.shape[0], ncls=y_train.shape[1], wd_cls=0.9,
-                                      loss_func=nn.BCELoss())
-            earlystopping = EarlyStopping(patience=5, verbose=False, delta=0.01,
-                                          path=f"{output}/state_dict_model.f{foldidx}.pt", trace_func=print)
-            for epoch in range(num_epochs):
-                if loss_type == 'DP':
-                    if epoch in learning_rate_schedule:
-                        adjust_learning_rate(model_initial_lr=learning_rate, optimizer=optimizer, gamma=0.1,
-                                             step=np.sum(epoch >= learning_rate_schedule))
 
+            # earlystopping = EarlyStopping(patience=5, verbose=False, delta=0.01, path=f"{output}/state_dict_model.f{foldidx}.pt", trace_func=print)
+            for epoch in range(num_epochs):
                 train_running_loss = valid_running_loss = 0.0
                 # Each epoch has a training and validation phase
                 for phase in ['train', 'valid']:
@@ -181,36 +154,20 @@ class FBnn(Fnn):
                             self.train(True)  # scheduler.step()
                             # forward
                             optimizer.zero_grad()
-                            if loss_type == 'DP':
-                                optimizer_class_param.zero_grad()
-                            layer_loss, y_ = self.sample_elbo(X.squeeze(1), y, s)
-                            if loss_type == 'normal':
-                                loss = self.cross_entropy(y_.to(self.device), y, ns, nns, unigram,
-                                                          weight) + layer_loss / batch_size
-                            elif loss_type == 'SL':
-                                loss = criterion(y_.squeeze(1), y.squeeze(1), index) + layer_loss / batch_size
-                            elif loss_type == 'DP':
-                                data_parameter_minibatch = torch.exp(class_parameters).view(1, -1)
-                                y_ = y_ / data_parameter_minibatch
-                                loss = self.cross_entropy(y_, y, ns, nns, unigram)
-                                loss = apply_weight_decay_data_parameters(loss,
-                                                                          class_parameter_minibatch=class_parameters,
-                                                                          weight_decay=0.9) + layer_loss / batch_size
-                            # backward
+                            output = self(X)
+                            kl = get_kl_loss(self)
+                            ce_loss = criterion(output, y)
+                            loss = ce_loss + kl / params['b'] # is the batch size equal everytime?
+
                             loss.backward()
-                            # clip_grad_value_(model.parameters(), 1)
                             optimizer.step()
-                            if loss_type == 'DP':
-                                optimizer_class_param.step()
                             train_running_loss += loss.item()
                         else:  # valid
                             self.train(False)  # Set model to valid mode
-                            layer_loss, y_ = self.sample_elbo(X.squeeze(1), y, s)
-                            if loss_type == 'normal' or loss_type == 'DP':
-                                loss = self.cross_entropy(y_.to(self.device), y, ns, nns, unigram,
-                                                          weight) + layer_loss / batch_size
-                            else:
-                                loss = criterion(y_.squeeze(), y.squeeze(), index)
+                            output = self(X)
+                            kl = get_kl_loss(self)
+                            ce_loss = criterion(output, y)
+                            loss = ce_loss + kl / params['b']
                             valid_running_loss += loss.item()
                         print(
                             f'Fold {foldidx}/{len(splits["folds"]) - 1}, Epoch {epoch}/{num_epochs - 1}, Minibatch {batch_idx}/{int(X_train.shape[0] / batch_size)}, Phase {phase}'
@@ -227,12 +184,6 @@ class FBnn(Fnn):
                           f", Time {time.time() - fold_time}, Overall {time.time() - start_time} "
                           )
                 torch.save(self.state_dict(), f"{output}/state_dict_model.f{foldidx}.e{epoch}.pt", pickle_protocol=4)
-                scheduler.step(valid_running_loss / X_valid.shape[0])
-                earlystopping(valid_loss_values[-1], self)
-                if earlystopping.early_stop:
-                    print(f"Early Stopping Triggered at epoch: {epoch}")
-                    break
-
             model_path = f"{output}/state_dict_model.f{foldidx}.pt"
 
             # Save
@@ -303,17 +254,6 @@ class FBnn(Fnn):
                     epoch = modelfile.split('.')[-2] + '.' if per_epoch else ''
                     epoch = epoch.replace(f'f{foldidx}.', '')
                     torch.save(y_pred, f'{model_path}/f{foldidx}.{pred_set}.{epoch}pred', pickle_protocol=4)
-                    # plt.figure(figsize=(8,4))
-                    # plt.plot(y_pred.mean(axis=0), label=f"avg", color='blue', linewidth=1)
-                    # plt.plot(y_maxs.mean(axis=0), label=f"max", color='green', linewidth=1)
-                    # plt.plot(y_mins.mean(axis=0), label=f"min", color='red', linewidth=1)
-                    # plt.fill_between(np.arange(len(y_pred[0])), y_pred.mean(axis=0), y_maxs.mean(axis=0), color='palegreen')
-                    # plt.fill_between(np.arange(len(y_pred[0])), y_mins.mean(axis=0), y_pred.mean(axis=0), color='palegreen')
-                    # plt.legend(loc='upper right')
-                    # plt.grid(linestyle=':')
-                    # plt.title(f"max-min-avg plot")
-                    # plt.savefig(f'{model_path}/f{foldidx}.{pred_set}.min-max-avg-plot.png', dpi=100, bbox_inches='tight')
-                    # plt.show()
 
 
 # class BayesianLayer(nn.Module):
