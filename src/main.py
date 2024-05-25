@@ -99,7 +99,7 @@ def run(data_list, domain_list, fair, filter, future, model_list, output, exp_id
     if 'bnn' in model_list: models['bnn'] = Bnn()
     if 'fbnn' in model_list:
         from mdl.fbnn import FBnn
-        models['bnn'] = FBnn()
+        models['fbnn'] = FBnn()
 
     if 'fnn_emb' in model_list: models['fnn_emb'] = Fnn()
     if 'bnn_emb' in model_list: models['bnn_emb'] = Bnn()

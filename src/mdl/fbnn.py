@@ -164,7 +164,7 @@ class FBnn(Fnn):
                             train_running_loss += loss.item()
                         else:  # valid
                             self.train(False)  # Set model to valid mode
-                            output = self(X)
+                            y_ = self(X)
                             kl = get_kl_loss(self)
                             ce_loss = criterion(y_, y)
                             loss = ce_loss + kl / params['b']
@@ -232,77 +232,33 @@ class FBnn(Fnn):
                         matrix = TFDataset(X, y)
                         dl = DataLoader(matrix, batch_size=params['b'], shuffle=True, num_workers=0)
                     else:
-                        X = X_test;
-                        y = y_test;
-                        matrix = test_matrix
+                        X = X_test; y = y_test; matrix = test_matrix
                         dl = test_dl
 
                     torch.cuda.empty_cache()
+                    ####
+                    criterion = torch.nn.CrossEntropyLoss()
+
+                    y_pred = []
+                    test_running_loss = 0.0
+
                     with torch.no_grad():
-                        y_pred = torch.empty(0, dl.dataset.output.shape[1])
-                        # y_mins = torch.empty(0, dl.dataset.output.shape[1])
-                        # y_maxs = torch.empty(0, dl.dataset.output.shape[1])
-                        for x, y in dl:
-                            x = x.to(device=self.device)
-                            outputs = np.zeros((params['s'], y.shape[0], y.shape[2]))
-                            for i in range(params['s']):
-                                outputs[i] = self.forward(x).squeeze(1).cpu().numpy()
-                            scores = outputs.mean(axis=0)
-                            # y_mins = np.vstack((y_mins, np.amin(outputs, axis=0)))
-                            # y_maxs = np.vstack((y_maxs, np.amax(outputs, axis=0)))
-                            y_pred = np.vstack((y_pred, scores))
+                        for batch_idx, (X, y) in enumerate(dl):
+                            X = X.float().to(self.device)
+                            y = y.float().to(self.device)  # Ensure y_batch is long for CrossEntropyLoss
+
+                            y_ = self(X)
+                            kl = get_kl_loss(self)
+                            ce_loss = criterion(y_, y)
+                            loss = ce_loss + kl / params['b']
+                            test_running_loss += loss.item()
+
+                            y_pred_batch = y_.cpu().numpy()
+                            y_pred.append(y_pred_batch)
+
+                            print(f'Fold {foldidx}, Batch {batch_idx}, {pred_set} set, Loss: {loss.item()}')
+                    y_pred = np.vstack(y_pred).squeeze()
+
                     epoch = modelfile.split('.')[-2] + '.' if per_epoch else ''
                     epoch = epoch.replace(f'f{foldidx}.', '')
                     torch.save(y_pred, f'{model_path}/f{foldidx}.{pred_set}.{epoch}pred', pickle_protocol=4)
-
-
-# class BayesianLayer(nn.Module):
-#     def __init__(self, input_features, output_features, prior_var=1.):
-#         """
-#             Initialization of our layer : our prior is a normal distribution
-#             centered in 0 and of variance 20.
-#         """
-#         # initialize layers
-#         super().__init__()
-#         # set input and output dimensions
-#         self.input_features = input_features
-#         self.output_features = output_features
-#
-#         # initialize mu and rho parameters for the weights of the layer
-#         self.w_mu = nn.Parameter(torch.zeros(output_features, input_features))
-#         self.w_rho = nn.Parameter(torch.zeros(output_features, input_features))
-#
-#         # initialize mu and rho parameters for the layer's bias
-#         self.b_mu = nn.Parameter(torch.zeros(output_features))
-#         self.b_rho = nn.Parameter(torch.zeros(output_features))
-#
-#         # initialize weight samples (these will be calculated whenever the layer makes a prediction)
-#         self.w = None
-#         self.b = None
-#
-#         # initialize prior distribution for all of the weights and biases
-#         self.prior = Normal(0, prior_var)
-#
-#     def forward(self, input):
-#         """
-#           Optimization process
-#         """
-#         # sample weights
-#         w_epsilon = Normal(0, 1).sample(self.w_mu.shape).to(self.w_mu.device)
-#         self.w = self.w_mu + torch.log(1 + torch.exp(self.w_rho)) * w_epsilon
-#
-#         # sample bias
-#         b_epsilon = Normal(0, 1).sample(self.b_mu.shape).to(self.b_mu.device)
-#         self.b = self.b_mu + torch.log(1 + torch.exp(self.b_rho)) * b_epsilon
-#
-#         # record log prior by evaluating log pdf of prior at sampled weight and bias
-#         w_log_prior = self.prior.log_prob(self.w).to(self.w.device)
-#         b_log_prior = self.prior.log_prob(self.b).to(self.b.device)
-#         self.log_prior = torch.sum(w_log_prior) + torch.sum(b_log_prior)
-#
-#         # record log variational posterior by evaluating log pdf of normal distribution defined by parameters with respect at the sampled values
-#         self.w_post = Normal(self.w_mu.data, torch.log(1 + torch.exp(self.w_rho)))
-#         self.b_post = Normal(self.b_mu.data, torch.log(1 + torch.exp(self.b_rho)))
-#         self.log_post = self.w_post.log_prob(self.w).sum() + self.b_post.log_prob(self.b).sum()
-#
-#         return F.linear(input, self.w, self.b)
