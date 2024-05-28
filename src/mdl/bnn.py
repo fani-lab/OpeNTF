@@ -203,7 +203,7 @@ class Bnn(Fnn):
                           f', Running Loss {phase} {train_loss_values[-1] if phase == "train" else valid_loss_values[-1]}'
                           f", Time {time.time() - fold_time}, Overall {time.time() - start_time} "
                           )
-                torch.save(self.state_dict(), f"{output}/state_dict_model.f{foldidx}.e{epoch}.pt", pickle_protocol=4)
+                # torch.save(self.state_dict(), f"{output}/state_dict_model.f{foldidx}.e{epoch}.pt", pickle_protocol=4)
                 scheduler.step(valid_running_loss / X_valid.shape[0])
                 earlystopping(valid_loss_values[-1], self)
                 if earlystopping.early_stop:

@@ -156,7 +156,7 @@ class FBnn(Fnn):
                             optimizer.zero_grad()
                             y_ = self(X)
                             kl = get_kl_loss(self)
-                            ce_loss = criterion(y_, y)
+                            ce_loss = self.cross_entropy(y_, y, ns, nns, unigram, weight)
                             loss = ce_loss + kl / params['b'] # is the batch size equal everytime?
 
                             loss.backward()
@@ -166,7 +166,7 @@ class FBnn(Fnn):
                             self.train(False)  # Set model to valid mode
                             y_ = self(X)
                             kl = get_kl_loss(self)
-                            ce_loss = criterion(y_, y)
+                            ce_loss = self.cross_entropy(y_, y, ns, nns, unigram, weight)
                             loss = ce_loss + kl / params['b']
                             valid_running_loss += loss.item()
                         print(
@@ -183,7 +183,7 @@ class FBnn(Fnn):
                           f', Running Loss {phase} {train_loss_values[-1] if phase == "train" else valid_loss_values[-1]}'
                           f", Time {time.time() - fold_time}, Overall {time.time() - start_time} "
                           )
-                torch.save(self.state_dict(), f"{output}/state_dict_model.f{foldidx}.e{epoch}.pt", pickle_protocol=4)
+                # torch.save(self.state_dict(), f"{output}/state_dict_model.f{foldidx}.e{epoch}.pt", pickle_protocol=4)
             model_path = f"{output}/state_dict_model.f{foldidx}.pt"
 
             # Save
@@ -205,6 +205,7 @@ class FBnn(Fnn):
 
     def test(self, model_path, splits, indexes, vecs, params, on_train_valid_set=False, per_epoch=False,
              merge_skills=False):
+
         if not os.path.isdir(model_path): raise Exception("The model does not exist!")
         # input_size = len(indexes['i2s'])
         input_size = vecs['skill'].shape[1]
@@ -237,26 +238,26 @@ class FBnn(Fnn):
 
                     torch.cuda.empty_cache()
                     ####
-                    criterion = torch.nn.CrossEntropyLoss()
-
+                    # criterion = torch.nn.CrossEntropyLoss()
+                    # criterion = self.cross_entropy(self, y_, y, ns, nns, unigram, weight)
                     y_pred = []
                     test_running_loss = 0.0
 
                     with torch.no_grad():
                         for batch_idx, (X, y) in enumerate(dl):
                             X = X.float().to(self.device)
-                            y = y.float().to(self.device)  # Ensure y_batch is long for CrossEntropyLoss
+                            # y = y.float().to(self.device)  # Ensure y_batch is long for CrossEntropyLoss
 
                             y_ = self(X)
-                            kl = get_kl_loss(self)
-                            ce_loss = criterion(y_, y)
-                            loss = ce_loss + kl / params['b']
-                            test_running_loss += loss.item()
+                            # kl = get_kl_loss(self)
+                            # ce_loss = criterion(y_, y)
+                            # loss = ce_loss + kl / params['b']
+                            # test_running_loss += loss.item()
 
                             y_pred_batch = y_.cpu().numpy()
                             y_pred.append(y_pred_batch)
 
-                            print(f'Fold {foldidx}, Batch {batch_idx}, {pred_set} set, Loss: {loss.item()}')
+                            # print(f'Fold {foldidx}, Batch {batch_idx}, {pred_set} set, Loss: {loss.item()}')
                     y_pred = np.vstack(y_pred).squeeze()
 
                     epoch = modelfile.split('.')[-2] + '.' if per_epoch else ''

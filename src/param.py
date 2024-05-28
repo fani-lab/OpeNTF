@@ -25,23 +25,23 @@ settings = {
                 'loss': 'normal',  # 'SL'-> superloss, 'DP' -> Data Parameters, 'normal' -> Binary Cross Entropy 'pos-ce' -> positive ce, 'weighted' -> weighted ce
             },
             'bnn':{
-                'l': [128],  # list of number of nodes in each layer
+                'l': [100],  # list of number of nodes in each layer
                 'lr': 0.01,  # learning rate
                 'b': 4096,  # batch size
                 'e': 20,  # epoch
                 'nns': 3,  # number of negative samples
-                'ns': 'unigram_b',  # 'uniform', 'unigram', 'unigram_b'
+                'ns': 'uniform',  # 'uniform', 'unigram', 'unigram_b'
                 'weight': 5, # weight if ns == 'weighted'
                 's': 1,  # # sample_elbo for bnn
                 'loss': 'normal',  # 'SL'-> superloss, 'DP' -> Data Parameters, 'normal' -> Binary Cross Entropy
             },
             'fbnn':{
-                'l': [128],  # list of number of nodes in each layer
+                'l': [100],  # list of number of nodes in each layer
                 'lr': 0.01,  # learning rate
                 'b': 4096,  # batch size
-                'e': 10,  # epoch
+                'e': 20,  # epoch
                 'nns': 3,  # number of negative samples
-                'ns': 'none',  # 'uniform', 'unigram', 'unigram_b'
+                'ns': 'uniform',  # 'uniform', 'unigram', 'unigram_b'
                 'weight': 5, # weight if ns == 'weighted'
                 's': 1,  # # sample_elbo for bnn
                 'loss': 'normal',  # 'SL'-> superloss, 'DP' -> Data Parameters, 'normal' -> Binary Cross Entropy
