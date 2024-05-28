@@ -138,9 +138,6 @@ class Nmt(Ntf):
             layer_size = base_config['rnn_size']
         elif encoder_type == 'transformer':
             layer_size = base_config['transformer_ff']
-
-        # fix output path by removing the . in ./../output/toy.dblp.v12.json/nmt/t31.s10.m13.base_config./mdl/nmt_config.yaml after the base_config, use replace
-        output = output.replace('base_config.', 'base_config')
         
         model_path = f"{output}/t{team_count}.s{skill_count}.m{member_count}.et{encoder_type}.l{layer_size}.wv{word_vec_size}.lr{learning_rate}.b{batch_size}.e{epochs}"
         if not os.path.isdir(output): os.makedirs(output)

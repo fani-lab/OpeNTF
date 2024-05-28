@@ -19,3 +19,4 @@ data/raw/dblp/dblp.v12.json
 *.npy
 *.rar
 *.mdl
+*.pt

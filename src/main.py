@@ -9,6 +9,8 @@ from scipy.sparse import lil_matrix
 from shutil import copyfile
 import scipy.sparse
 
+import torch
+
 import param
 from cmn.tools import NumpyArrayEncoder, popular_nonpopular_ratio
 from cmn.publication import Publication
@@ -155,6 +157,10 @@ def run(data_list, domain_list, fair, filter, future, model_list, output, exp_id
                 vecs_['skill'] = t2v.dv()
 
             if m_name.endswith('a1'): vecs_['skill'] = lil_matrix(scipy.sparse.hstack((vecs_['skill'], lil_matrix(np.ones((vecs_['skill'].shape[0], 1))))))
+
+            # Kap: added to indicate if GPU is available
+            device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+            print(f"Using device: {device}")
 
             baseline_name = m_name.lstrip('t').replace('_emb', '').replace('_dt2v', '').replace('_a1', '')
             print(f'Running for (dataset, model): ({d_name}, {m_name}) ... ')
