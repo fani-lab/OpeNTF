@@ -1,4 +1,4 @@
-name: opentf-kapnmt
+name: opentf
 channels:
   - pytorch
   - pyg

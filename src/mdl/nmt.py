@@ -72,16 +72,24 @@ class Nmt(Ntf):
             if per_epoch: modelfiles += [f'{fold_path}/{_}' for _ in os.listdir(fold_path) if re.match(f'model_step_\d+.pt', _)]
             for model in modelfiles:
                 epoch = model.split('.')[-2].split('/')[-1].split('_')[-1]
+                pred_path = f'{fold_path}/test.fold{foldidx}.epoch{epoch}.pred.csv'
                 cli_cmd = 'onmt_translate '
                 cli_cmd += f'-model {model} '
                 cli_cmd += f'-src {path}/src-test.txt '
-                cli_cmd += f'-output {path}/fold{foldidx}/test.fold{foldidx}.epoch{epoch}.pred.csv '
+                cli_cmd += f'-output {pred_path} '
                 cli_cmd += '-gpu 0 ' if torch.cuda.is_available() else ''
                 cli_cmd += '--min_length 2 '
                 cli_cmd += '-verbose '
-                print(f'{cli_cmd}')
+                print(f'Executing command: {cli_cmd}')
                 
-            subprocess.Popen(shlex.split(cli_cmd)).wait()
+                try:
+                    result = subprocess.run(shlex.split(cli_cmd), check=True, capture_output=True, text=True)
+                    print(f'Command output: {result.stdout}')
+                    print(f'Command error (if any): {result.stderr}')
+                except subprocess.CalledProcessError as e:
+                    print(f'Error executing command: {e}')
+                    print(f'Command output: {e.stdout}')
+                    print(f'Command error: {e.stderr}')
     
     def eval(self, splits, path, member_count, y_test, per_epoch):
         fold_mean = pd.DataFrame()
