@@ -16,6 +16,7 @@ from cmn.movie import Movie
 from cmn.patent import Patent
 from cmn.github import Repo
 from mdl.fnn import Fnn
+from mdl.bnn_old import Bnn_Old
 from mdl.bnn import Bnn
 from mdl.rnd import Rnd
 from mdl.nmt import Nmt
@@ -96,10 +97,8 @@ def run(data_list, domain_list, fair, filter, future, model_list, output, exp_id
     # non-temporal (no streaming scenario, bag of teams)
     if 'random' in model_list: models['random'] = Rnd()
     if 'fnn' in model_list: models['fnn'] = Fnn()
+    if 'bnn_old' in model_list: models['bnn_old'] = Bnn_Old()
     if 'bnn' in model_list: models['bnn'] = Bnn()
-    if 'fbnn' in model_list:
-        from mdl.fbnn import FBnn
-        models['fbnn'] = FBnn()
 
     if 'fnn_emb' in model_list: models['fnn_emb'] = Fnn()
     if 'bnn_emb' in model_list: models['bnn_emb'] = Bnn()

@@ -15,16 +15,16 @@ settings = {
                 'b': 128
             },
             'fnn':{
-                'l': [128],  # list of number of nodes in each layer
+                'l': [100],  # list of number of nodes in each layer
                 'lr': 0.01,  # learning rate
                 'b': 4096,  # batch size
-                'e': 10,  # epoch
+                'e': 20,  # epoch
                 'nns': 3,  # number of negative samples
-                'ns': 'unigram_b',  # 'none', 'uniform', 'unigram', 'unigram_b'
+                'ns': 'uniform',  # 'none', 'uniform', 'unigram', 'unigram_b'
                 'weight': 5, # weight if ns == 'weighted'
                 'loss': 'normal',  # 'SL'-> superloss, 'DP' -> Data Parameters, 'normal' -> Binary Cross Entropy 'pos-ce' -> positive ce, 'weighted' -> weighted ce
             },
-            'bnn':{
+            'bnn_old':{
                 'l': [100],  # list of number of nodes in each layer
                 'lr': 0.01,  # learning rate
                 'b': 4096,  # batch size
@@ -35,7 +35,7 @@ settings = {
                 's': 1,  # # sample_elbo for bnn
                 'loss': 'normal',  # 'SL'-> superloss, 'DP' -> Data Parameters, 'normal' -> Binary Cross Entropy
             },
-            'fbnn':{
+            'bnn':{
                 'l': [100],  # list of number of nodes in each layer
                 'lr': 0.01,  # learning rate
                 'b': 4096,  # batch size
@@ -59,7 +59,7 @@ settings = {
                 'dm': 1,# training algorithm. 1: distributed memory (PV-DM), 0: distributed bag of words (PV-DBOW)
                 'w': 1, #cooccurrence window
                 'b' : 128, # 0 means no batching
-                'ns' : 2,
+                'ns' : 5,
             }
         },
         'cmd':['train', 'test', 'eval'],
