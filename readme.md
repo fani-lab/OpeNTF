@@ -234,12 +234,7 @@ Full predictions of all models on test and training sets and the values of evalu
 We benefit from [``pytrec_eval``](https://github.com/cvangysel/pytrec_eval), [``gensim``](https://radimrehurek.com/gensim/), [Josh Feldman's blog](https://joshfeldman.net/WeightUncertainty/), and other libraries. We would like to thank the authors of these libraries and helpful resources.
   
 ## 6. License:
-©2021. This work is licensed under a [CC BY-NC-SA 4.0](license.txt) license.
-
-Arman Dashti<sup>1</sup>, [Hossein Fani](https://hosseinfani.github.io/)<sup>1,2</sup> 
-
-<sup><sup>1</sup>School of Computer Science, Faculty of Science, University of Windsor, ON, Canada.</sup>
-<sup><sup>2</sup>[hfani@uwindsor.ca](mailto:hfani@uwindsor.ca)</sup>
+©2024. This work is licensed under a [CC BY-NC-SA 4.0](license.txt) license.
 
 ## 7. Citation:
 ```
