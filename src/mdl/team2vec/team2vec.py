@@ -11,12 +11,15 @@ class Team2Vec:
         self.model_name = 't2v'
 
     def init(self):
-        datafile = f'{self.output}data.pkl'
+        datafile = f'{self.output}data.pkl' # e.g : stm.undir.mean.data.pkl
+
         try:
+            # load the graph data
             print(f"Loading the data file {datafile} ...")
             with open(datafile, 'rb') as f: self.data = pickle.load(f)
             return self.data
         except FileNotFoundError:
+            # create the graph data
             print(f"File not found! Generating data file {datafile} ...")
             self.create(datafile)
 
