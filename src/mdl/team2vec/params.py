@@ -5,13 +5,14 @@ settings = {
             # ([('skill', '-', 'team'), ('member', '-', 'team')], 'stm'),
             # ([('skill', '-', 'member')], 'sm'),
         'dir': False,
-        'dup_edge': None, #None: keep the duplicates, else: reduce by 'add', 'mean', 'min', 'max', 'mul'
+        'dup_edge': 'mean', #None: keep the duplicates, else: reduce by 'add', 'mean', 'min', 'max', 'mul'
     },
     'model': {
-        'max_epochs': 100,
-        'embedding_dim': 5,
-        'lr': 0.01,
-        'batch_size': 5,
+        'd' : 4, # embedding dim
+        'b' : 128, # batch_size for loaders
+        'e' : 100, # num epochs
+        'ns' : 5, # number of negative samples
+        'lr': 0.001,
         'loader_shuffle': True,
         'num_workers': 0,
         'save_per_epoch': False,
@@ -20,6 +21,7 @@ settings = {
             'dbow_words': 0,  # 'train word-vectors in skip-gram fashion; 0: no (default), 1: yes
             'window': 2,  # cooccurrence window
             'embtype': 'joint',  # 'member', 'joint', 'dt2v'
+            'max_e': 1000, # max epochs for training
         },
         'gnn.n2v': {
             'walk_length': 5,
@@ -34,19 +36,71 @@ settings = {
             'p': 1.0,
             'q': 1.0,
         },
-        'gnn.gat': {},
-        'gnn.gin': {},
+        'gnn.gs': {
+            'e' : 5,
+            'b' : 128,
+            'd' : 8,
+            'ns' : 2,
+            'h' : 2,
+            'nn' : [20, 10],
+            'graph_type' : 'stm',
+        },
+        'gnn.gin': {
+            'e': 5,
+            'b': 128,
+            'd': 8,
+            'ns': 2,
+            'h': 2,
+            'nn': [20, 10],
+            'graph_type': 'stm',
+        },
+        'gnn.gat': {
+            'e': 5,
+            'b': 128,
+            'd': 8,
+            'ns': 2,
+            'h': 2,
+            'nn': [20, 10],
+            'graph_type': 'stm',
+        },
+        'gnn.gatv2': {
+            'e': 5,
+            'b': 128,
+            'd': 8,
+            'ns': 2,
+            'h': 2,
+            'nn': [20, 10],
+            'graph_type': 'stm',
+        },
+        'gnn.han': {
+            'e': 5,
+            'b': 128,
+            'd': 8,
+            'ns': 2,
+            'h': 2,
+            'nn': [20, 10],
+            'graph_type': 'stm',
+        },
+        'gnn.gine': {
+            'e': 5,
+            'b': 128,
+            'd': 8,
+            'ns': 2,
+            'h': 2,
+            'nn': [20, 10],
+            'graph_type': 'stm',
+        },
         'gnn.m2v': {
             'metapath' : [
-                ('member','to','id'),
-                ('id', 'to', 'skill'),
-                ('skill','to','id'),
-                ('id', 'to', 'member'),
+                ('member','to','team'),
+                ('team', 'rev_to', 'skill'),
+                ('skill','to','team'),
+                ('team', 'rev_to', 'member'),
             ],
-            'walk_length': 5,
-            'context_size': 3,
-            'walks_per_node': 10,
-            'num_negative_samples' : 10,
+            'walk_length': 10,
+            'context_size': 7,
+            'walks_per_node': 20,
+            'ns' : 5,
         },
     },
     'data':{

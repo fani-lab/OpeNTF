@@ -18,6 +18,7 @@ from cmn.movie import Movie
 from cmn.patent import Patent
 from cmn.github import Repo
 from mdl.fnn import Fnn
+from mdl.bnn_old import Bnn_Old
 from mdl.bnn import Bnn
 from mdl.rnd import Rnd
 from mdl.nmt import Nmt
@@ -98,7 +99,9 @@ def run(data_list, domain_list, fair, filter, future, model_list, output, exp_id
     # non-temporal (no streaming scenario, bag of teams)
     if 'random' in model_list: models['random'] = Rnd()
     if 'fnn' in model_list: models['fnn'] = Fnn()
+    if 'bnn_old' in model_list: models['bnn_old'] = Bnn_Old()
     if 'bnn' in model_list: models['bnn'] = Bnn()
+
     if 'fnn_emb' in model_list: models['fnn_emb'] = Fnn()
     if 'bnn_emb' in model_list: models['bnn_emb'] = Bnn()
     if 'nmt' in model_list: models['nmt'] = Nmt()
@@ -140,6 +143,7 @@ def run(data_list, domain_list, fair, filter, future, model_list, output, exp_id
         datapath = data_list[domain_list.index(d_name)]
         prep_output = f'./../data/preprocessed/{d_name}/{os.path.split(datapath)[-1]}'
         vecs, indexes = d_cls.generate_sparse_vectors(datapath, f'{prep_output}{filter_str}', filter, settings['data'])
+
         year_idx = []
         for i in range(1, len(indexes['i2y'])):
             if indexes['i2y'][i][0] - indexes['i2y'][i-1][0] > settings['model']['nfolds']:
@@ -147,6 +151,56 @@ def run(data_list, domain_list, fair, filter, future, model_list, output, exp_id
         year_idx.append(indexes['i2y'][-1])
         indexes['i2y'] = year_idx
         splits = create_evaluation_splits(vecs['id'].shape[0], settings['model']['nfolds'], settings['model']['train_test_split'], indexes['i2y'] if future else None, output=f'{prep_output}{filter_str}', step_ahead=settings['model']['step_ahead'])
+
+        # if the gnn embeddings exist or we need to generate random data
+        if(args.emb_model):
+            import torch
+
+            if args.emb_ns: param.settings["model"]["baseline"]["emb"]["ns"] = args.emb_ns
+            if args.emb_d: param.settings["model"]["baseline"]["emb"]["d"] = args.emb_d
+            if args.emb_e: param.settings["model"]["baseline"]["emb"]["e"] = args.emb_e
+            if args.cmd: param.settings["model"]['cmd'] = args.cmd
+            if args.emb_random is not None: param.settings["model"]["baseline"]["emb"]["random"] = args.emb_random
+
+            emb_e = param.settings["model"]["baseline"]["emb"]["e"]
+            emb_ns = param.settings["model"]["baseline"]["emb"]["ns"]
+            emb_d = param.settings["model"]["baseline"]["emb"]["d"]
+            emb_b = param.settings["model"]["baseline"]["emb"]["b"]
+            emb_random = param.settings["model"]["baseline"]["emb"]["random"]
+
+            # vector, embedding dot product here
+
+            # emb_random = 1 -> random gnn embedding
+            # emb_random = 2 -> random sparse matrix (0,1) of shape (number_of_skills * dimension of embedding)
+            # emb_random = 3 -> random sparse matrix (0,1) of the same shape as vecs['skill']
+            if(emb_random): # generate a random emb_skill of the same shape and feed it
+                if(emb_random == 1):
+                    emb_skill_shape = (vecs['skill'].shape[1], emb_d) # this matrix gets multiplied with vecs['skill']
+                elif(emb_random == 2):
+                    emb_skill_shape = (vecs['skill'].shape[0], emb_d) # this matrix does not get multiplied with vecs['skill']
+                elif(emb_random == 3):
+                    emb_skill_shape = vecs['skill'].shape # this matrix does not get multiplied with vecs['skill']
+                for i in range(5):
+                    emb_skill = torch.rand(emb_skill_shape)
+                if (emb_random > 1): emb_skill = (emb_skill > 0.5).int() # convert the random decimals to zeros and ones
+                # r is for referring to random
+                emb_settings_str = f'emb.random{emb_random}.d{emb_d}'
+            else:
+                # this string is needed to be appended to the output path of the final prediction results of fnn or bnn
+                emb_settings_str = f'{args.emb_model}.{args.emb_graph_type}.undir.{args.emb_agg}.e{emb_e}.ns{emb_ns}.b{emb_b}.d{emb_d}'
+                emb_filepath = f'{prep_output}{filter_str}/emb/{emb_settings_str}.emb.pt'
+                emb_skill = torch.load(emb_filepath, map_location=torch.device('cpu'))['skill'].detach().numpy()
+
+            from scipy import sparse
+            if(emb_random > 1):
+                # replace the actual rows with random rows from emb_skill for only the indices in train and valid splits
+                for phase in splits['folds'][0]: # 'train' and 'valid' phases
+                    for row_idx in splits['folds'][0][phase]:
+                        vecs['skill'][row_idx] = sparse._lil.lil_matrix(emb_skill[row_idx])
+            else:
+                # need to review this section
+                vecs['skill'] = sparse._lil.lil_matrix(torch.tensor(vecs['skill'] * emb_skill))
+
 
         for (m_name, m_obj) in models.items():
             vecs_ = vecs.copy()
@@ -165,7 +219,10 @@ def run(data_list, domain_list, fair, filter, future, model_list, output, exp_id
             baseline_name = m_name.lstrip('t').replace('_emb', '').replace('_dt2v', '').replace('_a1', '')
             print(f'Running for (dataset, model): ({d_name}, {m_name}) ... ')
 
-            output_path = f"{output}{os.path.split(datapath)[-1]}{filter_str}/{m_name}/t{vecs_['skill'].shape[0]}.s{vecs_['skill'].shape[1]}.m{vecs_['member'].shape[1]}.{'.'.join([k + str(v).replace(' ', '') for k, v in settings['model']['baseline'][baseline_name].items() if v])}"
+            if(args.emb_model):
+                output_path = f"{output}{os.path.split(datapath)[-1]}{filter_str}/{m_name}/{emb_settings_str}/t{vecs_['skill'].shape[0]}.s{vecs_['skill'].shape[1]}.m{vecs_['member'].shape[1]}.{'.'.join([k + str(v).replace(' ', '') for k, v in settings['model']['baseline'][baseline_name].items() if v])}"
+            else:
+                output_path = f"{output}{os.path.split(datapath)[-1]}{filter_str}/{m_name}/t{vecs_['skill'].shape[0]}.s{vecs_['skill'].shape[1]}.m{vecs_['member'].shape[1]}.{'.'.join([k + str(v).replace(' ', '') for k, v in settings['model']['baseline'][baseline_name].items() if v])}"
             if not os.path.isdir(output_path): os.makedirs(output_path)
             copyfile('./param.py', f'{output_path}/param.py')
             # make_popular_and_nonpopular_matrix(vecs_, data_list[0])
@@ -183,6 +240,17 @@ def addargs(parser):
 
     baseline = parser.add_argument_group('baseline')
     baseline.add_argument('-model', '--model-list', nargs='+', type=str.lower, default=[], required=True, help='a list of neural models (eg. -model random fnn bnn fnn_emb bnn_emb nmt)')
+    baseline.add_argument('--cmd', required=False,  nargs='+', type=str.lower, help='the arguments for the opentf pipeline (eg. --cmd train test)')
+
+    # this group is for opentf running with generated embeddings
+    emb_baseline = parser.add_argument_group('emb_baseline')
+    emb_baseline.add_argument('--emb_model', type=str, required=False, help='a list of gnn models (eg. --emb_model gs gat gin gcn)')
+    emb_baseline.add_argument('--emb_graph_type', type=str, required=False, help='the graph type for the embedding generation (eg. --emb_graph_type stm.undir.none)')
+    emb_baseline.add_argument('--emb_agg', type=str, required=False, help='the graph aggregation for the embedding generation (eg. --emb_agg agg)')
+    emb_baseline.add_argument('--emb_e', type=int, required=False, help='the number of epochs (eg. --emb_epochs 500)')
+    emb_baseline.add_argument('--emb_ns', type=int, required=False, help='the number of epochs (eg. --emb_ns 2)')
+    emb_baseline.add_argument('--emb_d', type=int, required=False, help='embedding dimension (eg. --emb_d 16)')
+    emb_baseline.add_argument('--emb_random', type=int, required=False, help='if 1, it will feed randomly generated embedding into the neural network (eg. --emb_d 16)')
 
     output = parser.add_argument_group('output')
     output.add_argument('-output', type=str, default='./../output/', help='The output path (default: -output ./../output/)')
@@ -203,6 +271,8 @@ def addargs(parser):
 # 					       fnn fnn_emb bnn bnn_emb nmt
 # 					       tfnn tbnn tnmt tfnn_emb tbnn_emb tfnn_a1 tbnn_a1 tfnn_emb_a1 tbnn_emb_a1 tfnn_dt2v_emb tbnn_dt2v_emb
 #                   -filter 1
+
+# python -u main.py -data ../data/raw/imdb/toy.title.basics.tsv -domain imdb -model random --emb_model gs --emb_graph_type stm --emb_agg mean
 
 # To run on compute canada servers you can use the following command: (time is in minutes)
 #sbatch --account=def-hfani --mem=96000MB --time=2880 cc.sh
