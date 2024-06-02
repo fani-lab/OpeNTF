@@ -36,6 +36,8 @@ def run(teamsvecs_file, indexes_file, model, output, emb_output = None):
                         'window': params.settings['model'][model]['dbow_words'],
                         'embtype': params.settings['model'][model]['embtype'],
                         'max_e': params.settings['model'][model]['max_e'],
+                        'embedding_dim' : params.settings['model'][model]['embedding_dim'],
+                        'max_epochs' : params.settings['model'][model]['max_epochs']
                         }
             output_ = output + f'{settings["embtype"]}.'
             wnn.run(teamsvecs_file, indexes_file, settings, output_)
