@@ -137,7 +137,8 @@ def plot_points(colors):
         plt.scatter(z[y == i, 0], z[y == i, 1], s=20, color=colors[i])
     # plt.scatter(z[:, 0], z[:, 1], s=20)
     plt.axis('off')
-    plt.show()
+    # Kap: I am commenting this out to avoid the interruption
+    # plt.show()
 
 
 colors = [
