@@ -102,7 +102,8 @@ class Gnn(Team2Vec):
         plt.legend(loc='upper right')
         plt.title(f'Training and Validation Losses per Epoch')
         plt.savefig(f'{model_output}/train_valid_loss.png', dpi=100, bbox_inches='tight')
-        plt.show()
+        # Kap: I'm commenting this out to avoid the interruption
+        # plt.show()
 
     @torch.no_grad()
     def valid(self):
@@ -127,7 +128,7 @@ class Gnn(Team2Vec):
         plt.scatter(z[:, 0], z[:, 1], s=20)
         plt.axis('off')
         plt.savefig(f'{self.output}/{self.model_name}/tsne.png', dpi=100, bbox_inches='tight')
-        plt.show()
+        # plt.show()
 
 
 
