@@ -94,8 +94,8 @@ settings = {
         'gnn.m2v': {
             'metapath' : {
                 'sm' : [
-                    ('skill','to','member'),
-                    ('member', 'rev_to', 'skill'),
+                    ('member','rev_to','skill'),
+                    ('skill', 'to', 'member'),
                 ],
                 'stm' : [
                     ('member','to','team'),
