@@ -58,8 +58,8 @@ settings = {
                 'd': 128,# embedding dimension
                 'dm': 1,# training algorithm. 1: distributed memory (PV-DM), 0: distributed bag of words (PV-DBOW)
                 'w': 1, #cooccurrence window
-                # 'b' : 128, # 0 means no batching
-                # 'ns' : 5,
+                'b' : 128, # 0 means no batching
+                'ns' : 2,
             }
         },
         'cmd':['train', 'test', 'eval'],
