@@ -8,7 +8,7 @@ settings = {
         'dup_edge': 'mean', #None: keep the duplicates, else: reduce by 'add', 'mean', 'min', 'max', 'mul'
     },
     'model': {
-        'd' : 4, # embedding dim
+        'd' : 4, # embedding dim array
         'b' : 128, # batch_size for loaders
         'e' : 100, # num epochs
         'ns' : 5, # number of negative samples
@@ -17,9 +17,10 @@ settings = {
         'num_workers': 0,
         'save_per_epoch': False,
         'w2v': {
-            'max_epochs' : 1000,
+            'd' : [8, 16, 32, 64, 128],
+            'max_epochs' : 10,
             'dm': 1,  # training algorithm. 1: distributed memory (PV-DM), 0: distributed bag of words (PV-DBOW)
-            'dbow_words': 0,  # 'train word-vectors in skip-gram fashion; 0: no (default), 1: yes
+            'dbow_words': 1,  # 'train word-vectors in skip-gram fashion; 0: no (default), 1: yes
             'window': 2,  # cooccurrence window
             'embtype': 'joint',  # 'member', 'joint', 'dt2v'
             'max_e': 1000, # max epochs for training

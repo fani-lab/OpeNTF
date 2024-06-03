@@ -60,9 +60,9 @@ class Wnn(Team2Vec):
                                                dbow_words=self.settings["dbow_words"],
                                                # ({1,0}, optional) – If set to 1 trains word-vectors (in skip-gram fashion) simultaneous with DBOW doc-vector training; If 0, only trains doc-vectors (faster).
                                                min_alpha=0.025,
-                                               min_count=0,
-                                               seed=0)
-                                               # workers=multiprocessing.cpu_count())
+                                               min_count=1,
+                                               seed=0,
+                                               workers=min(16, multiprocessing.cpu_count())) # capping for moderate server usage
 
             if not self.data: self.init()
             self.model.build_vocab(self.data)
