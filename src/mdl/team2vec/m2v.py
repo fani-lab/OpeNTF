@@ -11,7 +11,7 @@ class M2V(Gnn):
 
         self.settings = {
             'e': settings['model']['e'],
-            'd': settings['model']['d'],
+            'd': settings['model']['gnn.m2v']['d'], # set by command line arguments
             'b': settings['model']['b'],
             'ns': settings['model']['ns'],
             'metapath': settings['model']['gnn.m2v']['metapath'],

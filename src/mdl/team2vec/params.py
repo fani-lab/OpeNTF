@@ -105,9 +105,10 @@ settings = {
                 ],
             },
             'walk_length': 10,
-            'context_size': 7,
+            'context_size': 10,
             'walks_per_node': 20,
             'ns' : 5,
+            'd': 8,
         },
     },
     'data':{
