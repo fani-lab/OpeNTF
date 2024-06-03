@@ -18,13 +18,11 @@ settings = {
         'save_per_epoch': False,
         'w2v': {
             'd' : [8, 16, 32, 64, 128],
-            'max_epochs' : 10,
+            'max_epochs' : 100,
             'dm': 1,  # training algorithm. 1: distributed memory (PV-DM), 0: distributed bag of words (PV-DBOW)
             'dbow_words': 1,  # 'train word-vectors in skip-gram fashion; 0: no (default), 1: yes
             'window': 2,  # cooccurrence window
-            'embtype': 'joint',  # 'member', 'joint', 'dt2v'
-            'max_e': 1000, # max epochs for training
-            'embedding_dim' : 8, # the dimension for the w2v embeddings
+            'embtype': 'skill',  # 'member', 'joint', 'dt2v'
         },
         'gnn.n2v': {
             'walk_length': 5,

@@ -203,17 +203,29 @@ def run(data_list, domain_list, fair, filter, future, model_list, output, exp_id
         for (m_name, m_obj) in models.items():
             vecs_ = vecs.copy()
             if m_name.find('_emb') > 0:
-                t2v = Team2Vec(vecs, indexes, 'dt2v' if m_name.find('_dt2v') > 0 else 'skill', f'./../data/preprocessed/{d_name}/{os.path.split(datapath)[-1]}{filter_str}')
-                emb_setting = settings['model']['baseline']['emb']
-                t2v.train(emb_setting['d'], emb_setting['w'], emb_setting['dm'], emb_setting['e'])
-                vecs_['skill'] = t2v.dv()
+                if args.t2v_new: # new addition in the emb section for t2v
+                    from gensim.models import Doc2Vec
+
+                    args.t2v_w = 1 if args.t2v_w is None else args.t2v_w
+                    args.t2v_dm = 1 if args.t2v_dm is None else args.t2v_dm
+
+                    emb_settings_str = 'dt2v' if m_name.find('_dt2v') > 0 else 'skill' + f'.emb.d{args.t2v_d}.w{args.t2v_w}.dm{args.t2v_dm}' # e.g: skill.emb.d8.w1.dm1
+                    emb_filepath = prep_output + f'/{args.t2v_model}/{emb_settings_str}.mdl'
+                    t2v = Doc2Vec.load(emb_filepath)
+                    vecs_['skill'] = t2v.dv.vectors
+                    emb_settings_str = f'w2v.{emb_settings_str}' # for opentf output, we create a separate folder named as that : w2v.skill.emb.d8.w1.dm1 under fnn or bnn
+                else:
+                    t2v = Team2Vec(vecs, indexes, 'dt2v' if m_name.find('_dt2v') > 0 else 'skill', f'./../data/preprocessed/{d_name}/{os.path.split(datapath)[-1]}{filter_str}')
+                    emb_setting = settings['model']['baseline']['emb']
+                    t2v.train(emb_setting['d'], emb_setting['w'], emb_setting['dm'], emb_setting['e'])
+                    vecs_['skill'] = t2v.dv()
 
             if m_name.endswith('a1'): vecs_['skill'] = lil_matrix(scipy.sparse.hstack((vecs_['skill'], lil_matrix(np.ones((vecs_['skill'].shape[0], 1))))))
 
             baseline_name = m_name.lstrip('t').replace('_emb', '').replace('_dt2v', '').replace('_a1', '')
             print(f'Running for (dataset, model): ({d_name}, {m_name}) ... ')
 
-            if(args.emb_model):
+            if(args.emb_model or args.t2v_new):
                 output_path = f"{output}{os.path.split(datapath)[-1]}{filter_str}/{m_name}/{emb_settings_str}/t{vecs_['skill'].shape[0]}.s{vecs_['skill'].shape[1]}.m{vecs_['member'].shape[1]}.{'.'.join([k + str(v).replace(' ', '') for k, v in settings['model']['baseline'][baseline_name].items() if v])}"
             else:
                 output_path = f"{output}{os.path.split(datapath)[-1]}{filter_str}/{m_name}/t{vecs_['skill'].shape[0]}.s{vecs_['skill'].shape[1]}.m{vecs_['member'].shape[1]}.{'.'.join([k + str(v).replace(' ', '') for k, v in settings['model']['baseline'][baseline_name].items() if v])}"
@@ -245,6 +257,14 @@ def addargs(parser):
     emb_baseline.add_argument('--emb_ns', type=int, required=False, help='the number of epochs (eg. --emb_ns 2)')
     emb_baseline.add_argument('--emb_d', type=int, required=False, help='embedding dimension (eg. --emb_d 16)')
     emb_baseline.add_argument('--emb_random', type=int, required=False, help='if 1, it will feed randomly generated embedding into the neural network (eg. --emb_d 16)')
+
+    # this group is for additional t2v params
+    t2v_baseline = parser.add_argument_group('t2v_baseline')
+    t2v_baseline.add_argument('--t2v_new', type=int, required=False, help='if 1 then it will follow the new section for handling t2v data for opentf')
+    t2v_baseline.add_argument('--t2v_model', type=str, required=False, help='--t2v_model w2v')
+    t2v_baseline.add_argument('--t2v_d', type=int, required=False, help='--t2v_d 8 16 32')
+    t2v_baseline.add_argument('--t2v_dm', type=int, required=False, help='dm1 = distributed memory, dm0 = distributed bag of words')
+    t2v_baseline.add_argument('--t2v_w', type=int, required=False, help='co-occurrence window')
 
     output = parser.add_argument_group('output')
     output.add_argument('-output', type=str, default='./../output/', help='The output path (default: -output ./../output/)')

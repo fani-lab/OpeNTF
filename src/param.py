@@ -15,20 +15,20 @@ settings = {
                 'b': 128
             },
             'fnn':{
-                'l': [100],  # list of number of nodes in each layer
-                'lr': 0.01,  # learning rate
-                'b': 4096,  # batch size
-                'e': 20,  # epoch
+                'l': [128],  # list of number of nodes in each layer
+                'lr': 0.0001,  # learning rate
+                'b': 2048,  # batch size
+                'e': 25,  # epoch
                 'nns': 3,  # number of negative samples
                 'ns': 'uniform',  # 'none', 'uniform', 'unigram', 'unigram_b'
                 'weight': 5, # weight if ns == 'weighted'
                 'loss': 'normal',  # 'SL'-> superloss, 'DP' -> Data Parameters, 'normal' -> Binary Cross Entropy 'pos-ce' -> positive ce, 'weighted' -> weighted ce
             },
             'bnn_old':{
-                'l': [100],  # list of number of nodes in each layer
+                'l': [128],  # list of number of nodes in each layer
                 'lr': 0.01,  # learning rate
-                'b': 4096,  # batch size
-                'e': 20,  # epoch
+                'b': 2048,  # batch size
+                'e': 25,  # epoch
                 'nns': 3,  # number of negative samples
                 'ns': 'uniform',  # 'uniform', 'unigram', 'unigram_b'
                 'weight': 5, # weight if ns == 'weighted'
@@ -36,10 +36,10 @@ settings = {
                 'loss': 'normal',  # 'SL'-> superloss, 'DP' -> Data Parameters, 'normal' -> Binary Cross Entropy
             },
             'bnn':{
-                'l': [100],  # list of number of nodes in each layer
+                'l': [128],  # list of number of nodes in each layer
                 'lr': 0.01,  # learning rate
-                'b': 4096,  # batch size
-                'e': 20,  # epoch
+                'b': 2048,  # batch size
+                'e': 25,  # epoch
                 'nns': 3,  # number of negative samples
                 'ns': 'uniform',  # 'uniform', 'unigram', 'unigram_b'
                 'weight': 5, # weight if ns == 'weighted'
@@ -54,12 +54,12 @@ settings = {
                 'with_zero': True
             },
             'emb':{
+                'e': 100,# max epoch
                 'd': 128,# embedding dimension
-                'e': 100,# epoch
                 'dm': 1,# training algorithm. 1: distributed memory (PV-DM), 0: distributed bag of words (PV-DBOW)
                 'w': 1, #cooccurrence window
-                'b' : 128, # 0 means no batching
-                'ns' : 5,
+                # 'b' : 128, # 0 means no batching
+                # 'ns' : 5,
             }
         },
         'cmd':['train', 'test', 'eval'],
