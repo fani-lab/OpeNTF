@@ -29,21 +29,21 @@ def run(teamsvecs_file, indexes_file, model, output, emb_output = None):
 
         if model == 'w2v':
             import wnn
-            for d in params.settings['model'][model]['d']: # this is specific to w2v for now
-                settings = {'d': d,
-                            'e': params.settings['model']['e'],
-                            'dm': params.settings['model'][model]['dm'],
-                            'dbow_words': params.settings['model'][model]['dbow_words'],
-                            'window': params.settings['model'][model]['dbow_words'],
-                            'embtype': params.settings['model'][model]['embtype'],
-                            'max_epochs' : params.settings['model'][model]['max_epochs']
-                            }
-                output_ = output + f'{settings["embtype"]}.'
-                wnn.run(teamsvecs_file, indexes_file, settings, output_)
-                #or
-                t2v = wnn.Wnn(teamsvecs, indexes, settings, output_)
-                t2v.init()
-                t2v.train()
+            # for d in params.settings['model'][model]['d']: # this is specific to w2v for now
+            settings = {'d': params.settings['model'][model]['d'],
+                        'e': params.settings['model']['e'],
+                        'dm': params.settings['model'][model]['dm'],
+                        'dbow_words': params.settings['model'][model]['dbow_words'],
+                        'window': params.settings['model'][model]['dbow_words'],
+                        'embtype': params.settings['model'][model]['embtype'],
+                        'max_epochs' : params.settings['model'][model]['max_epochs']
+                        }
+            output_ = output + f'{settings["embtype"]}.'
+            wnn.run(teamsvecs_file, indexes_file, settings, output_)
+            #or
+            t2v = wnn.Wnn(teamsvecs, indexes, settings, output_)
+            t2v.init()
+            t2v.train()
             return
 
         import gnn
@@ -98,7 +98,7 @@ def run(teamsvecs_file, indexes_file, model, output, emb_output = None):
 
         # gcn (for homogeneous only)
         elif model == 'gnn.gcn':
-            from gcn import Gcn as GCNModel
+            from gcn_old import Gcn as GCNModel
             t2v.model = GCNModel(hidden_channels=10, data=t2v.data)
             t2v.optimizer = torch.optim.Adam(t2v.model.parameters(), lr=params.settings['model']['lr'])
             t2v.model_name = 'gcn'
