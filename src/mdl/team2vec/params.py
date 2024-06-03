@@ -92,12 +92,18 @@ settings = {
             'graph_type': 'stm',
         },
         'gnn.m2v': {
-            'metapath' : [
-                ('member','to','team'),
-                ('team', 'rev_to', 'skill'),
-                ('skill','to','team'),
-                ('team', 'rev_to', 'member'),
-            ],
+            'metapath' : {
+                'sm' : [
+                    ('skill','to','member'),
+                    ('member', 'rev_to', 'skill'),
+                ],
+                'stm' : [
+                    ('member','to','team'),
+                    ('team', 'rev_to', 'skill'),
+                    ('skill','to','team'),
+                    ('team', 'rev_to', 'member'),
+                ],
+            },
             'walk_length': 10,
             'context_size': 7,
             'walks_per_node': 20,

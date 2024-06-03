@@ -39,8 +39,8 @@ def run(teamsvecs_file, indexes_file, model, output, emb_output = None):
                         'max_epochs' : params.settings['model'][model]['max_epochs']
                         }
             output_ = output + f'{settings["embtype"]}.'
-            wnn.run(teamsvecs_file, indexes_file, settings, output_)
-            #or
+            # wnn.run(teamsvecs_file, indexes_file, settings, output_)
+
             t2v = wnn.Wnn(teamsvecs, indexes, settings, output_)
             t2v.init()
             t2v.train()
@@ -80,7 +80,7 @@ def run(teamsvecs_file, indexes_file, model, output, emb_output = None):
             t2v.model_name = 'm2v'
             t2v.init() # call the m2v's init
             t2v.model = MetaPath2Vec(t2v.data.edge_index_dict, embedding_dim=t2v.settings['d'],
-                                     metapath=t2v.settings['metapath'], walk_length=t2v.settings['walk_length'],
+                                     metapath=t2v.settings['metapath'][edge_type[1]], walk_length=t2v.settings['walk_length'],
                                      context_size=t2v.settings['context_size'],
                                      walks_per_node=t2v.settings['walks_per_node'],
                                      num_negative_samples=t2v.settings['ns'],
@@ -146,8 +146,8 @@ if __name__ == "__main__":
     for teamsvecs in args.teamsvecs:
         args.output = teamsvecs
         # for edge_type in [([('skill', 'to', 'member')], 'sm')]:
-        # for edge_type in [([('skill', 'to', 'member')], 'sm'), ([('skill', 'to', 'team'), ('member', 'to', 'team')], 'stm')]:
-        for edge_type in [([('skill', 'to', 'team'), ('member', 'to', 'team')], 'stm')]:
+        for edge_type in [([('skill', 'to', 'member')], 'sm'), ([('skill', 'to', 'team'), ('member', 'to', 'team')], 'stm')]:
+        # for edge_type in [([('skill', 'to', 'team'), ('member', 'to', 'team')], 'stm')]:
             for dir in [False]:
                 for dup in ['mean']:  # add', 'mean', 'min', 'max', 'mul']:
                     params.settings['graph'] = {'edge_types': edge_type, 'dir': dir, 'dup_edge': dup}
