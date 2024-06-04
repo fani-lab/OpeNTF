@@ -34,10 +34,10 @@ class Wnn(Team2Vec):
             # End Hossein
             datetime_doc = [f"dt{str(year)}"]
 
-            if   self.settings["embtype"] == 'skill': td = gensim.models.doc2vec.TaggedDocument(skill_doc, [str(int(id[0, 0]))])
-            elif self.settings["embtype"] == 'member': td = gensim.models.doc2vec.TaggedDocument(member_doc, [str(int(id[0, 0]))])
-            elif self.settings["embtype"] == 'joint': td = gensim.models.doc2vec.TaggedDocument(skill_doc + member_doc, [str(int(id[0, 0]))])
-            elif self.settings["embtype"] == 'dt2v': td = gensim.models.doc2vec.TaggedDocument(skill_doc + datetime_doc, [str(int(id[0, 0]))])
+            if   self.settings["embtype"] == 'skill': td = gensim.models.doc2vec.TaggedDocument(skill_doc, [str(i)])
+            elif self.settings["embtype"] == 'member': td = gensim.models.doc2vec.TaggedDocument(member_doc, [str(i)])
+            elif self.settings["embtype"] == 'joint': td = gensim.models.doc2vec.TaggedDocument(skill_doc + member_doc, [str(i)])
+            elif self.settings["embtype"] == 'dt2v': td = gensim.models.doc2vec.TaggedDocument(skill_doc + datetime_doc, [str(i)])
             self.data.append(td)
         print(f'#Documents with word type of {self.settings["embtype"]} have created: {len(self.data)}')
         print(f'Saving the {self.settings["embtype"]} documents ...')

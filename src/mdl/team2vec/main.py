@@ -158,6 +158,7 @@ if __name__ == "__main__":
                     if args.ns is not None: params.settings['model'][args.model]['ns'] = args.ns
                     if args.agg is not None: params.settings['model'][args.model]['agg'] = args.agg
                     if args.graph_type is not None: params.settings['model'][args.model]['graph_type'] = args.graph_type
+                    else : params.settings['model'][args.model]['graph_type'] = edge_type[1] # take the value from the current loop
 
                     run(f'{teamsvecs}teamsvecs.pkl', f'{teamsvecs}indexes.pkl', args.model,
                         f'{args.output}/{args.model.split(".")[0]}/', f'{args.output}/emb/')
