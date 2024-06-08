@@ -193,14 +193,22 @@ We used [``pytrec_eval``](https://github.com/cvangysel/pytrec_eval) to evaluate 
 |Baselines|{bnn, random}×{sparse, emb}×{unigram_b}|
 |Results|for further details and results, please visit [Adila's submodule](https://github.com/fani-lab/Adila)|
 
-The following table is a sample result of Adila module's reranking on imdb dataset and bnn embedding baseline:
-<p align="center"><img src='./misc/bnn_emb.png'></p>
+Average performance of 5-fold neural models on the test set of the `imdb`, `dblp` and `uspt` datasets. For the metrics: `ndkl`, lower values are better (↓); `skew`, values closer to 0 are better (→0); and `map` and `ndcg`, higher values are better (↑).
+<hr>
+imdb dataset
+<p align="center"><img src='./misc/fair_imdb.png'></p>
+<hr>
+dblp table
+<p align="center"><img src='./misc/fair_dblp.png'></p>
+<hr>
+uspt table
+<p align="center"><img src='./misc/fair_uspt.png'></p>
 
 **2. Non-Temporal Neural Team Formation**
 
 ||min. #member's team: 75, min team size: 3, epochs: 20, learning rate: 0.1, hidden layer: [1, 100d], minibatch: 4096, #negative samples: 3|
 |--------|------|
-|Datasets|[dblp.v12](https://originalstatic.aminer.cn/misc/dblp.v12.7z), [imdb](https://imdb.com/interfaces/), [uspt](https://patentsview.org/download/data-download-tables) (running ...)|
+|Datasets|[dblp.v12](https://originalstatic.aminer.cn/misc/dblp.v12.7z), [imdb](https://imdb.com/interfaces/), [uspt](https://patentsview.org/download/data-download-tables)|
 |Metrics|recall@2,5,10, map@2,5,10, ndcg@2,5,10, p@2,5,10, auc|
 |Baselines|{fnn,bnn}×{sparse, emb}×{none, uniform, unigram, unigram_b}|
 |Results|[``./output/dblp.v12.json.filtered.mt75.ts3/``](./output/dblp.v12.json.filtered.mt75.ts3/), [``./output/title.basics.tsv.filtered.mt75.ts3/``](./output/title.basics.tsv.filtered.mt75.ts3/)|
@@ -217,12 +225,12 @@ We kick-started our experiments based on the best results from the non-temporal 
 
 ||min. #member's team: 75, min team size: 3, epochs: 20, learning rate: 0.1, hidden layer: [1, 128d], minibatch: 128, #negative samples: 3|
 |--------|------|
-|Datasets|[dblp.v12](https://originalstatic.aminer.cn/misc/dblp.v12.7z), [imdb](https://imdb.com/interfaces/), [uspt](https://patentsview.org/download/data-download-tables)|
+|Datasets|[dblp.v12](https://originalstatic.aminer.cn/misc/dblp.v12.7z), [imdb](https://imdb.com/interfaces/), [uspt](https://patentsview.org/download/data-download-tables), [gith](https://codelabs.developers.google.com/codelabs/bigquery-github#0)|
 |Metrics|recall@2,5,10, map@2,5,10, ndcg@2,5,10, p@2,5,10, auc|
 |Baselines|{bnn, tbnn}×{sparse, emb, dt2v_emb}×{unigram_b},{[rrn](https://dl.acm.org/doi/10.1145/3018661.3018689)}|
 |Results|[``./output/dblp.v12.json.filtered.mt75.ts3/``](./output/dblp.v12.json.filtered.mt75.ts3/), [``./output/title.basics.tsv.filtered.mt75.ts3/``](./output/title.basics.tsv.filtered.mt75.ts3/), [``./output/patent.tsv.filtered.mt75.ts3/``](./output/patent.tsv.filtered.mt75.ts3/)|
 
-<p align="center"><img src='./output/ecir_results.PNG'></p>
+<p align="center"><img src='./misc/temporal_results.png'></p>
 
 Full predictions of all models on test and training sets and the values of evaluation metrics are available in a rar file and will be delivered upon request! 
 
