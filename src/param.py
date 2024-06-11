@@ -16,11 +16,11 @@ settings = {
             },
             'fnn':{
                 'l': [100],  # list of number of nodes in each layer
-                'lr': 0.001,  # learning rate
-                'b': 128,  # batch size
-                'e': 10,  # epoch
+                'lr': 0.01, # learning rate 0.001
+                'b': 128,  # batch size used to  be 4
+                'e': 20,  # epoch used to be 10
                 'nns': 3,  # number of negative samples
-                'ns': 'female_bias',  # 'none', 'uniform', 'unigram', 'unigram_b', 'female_bias'
+                'ns': 'female_bias',  # 'none', 'uniform', 'unigram', 'unigram_b', 'female_bias', 'all-female_bias
                 'loss': 'normal',  # 'SL'-> superloss, 'DP' -> Data Parameters, 'normal' -> Binary Cross Entropy
             },
             'bnn':{
@@ -29,7 +29,7 @@ settings = {
                 'b': 128,  # batch size
                 'e': 5,  # epoch
                 'nns': 3,  # number of negative samples
-                'ns': 'inverse_unigram_b',  # 'uniform', 'unigram', 'unigram_b'
+                'ns': 'female_bias',  # 'uniform', 'unigram', 'unigram_b'
                 's': 1,  # # sample_elbo for bnn
                 'loss': 'normal',  # 'SL'-> superloss, 'DP' -> Data Parameters, 'normal' -> Binary Cross Entropy
             },
@@ -47,9 +47,9 @@ settings = {
                 'w': 1 #cooccurrence window
             }
         },
-        'cmd': ['train', 'test','eval'],  # 'train', 'test', 'eval', 'plot', 'agg', 'fair'
-       #'nfolds': 3, toy
-        'nfolds': 5,
+        'cmd': ['train','test','eval'],  # 'train', 'test', 'eval', 'plot', 'agg', 'fair'
+       #' nfolds': 3, toy
+         'nfolds': 5,
         'train_test_split': 0.85,
         'step_ahead': 1,#for now, it means that whatever are in the last [step_ahead] time interval will be the test set!
     },
@@ -61,8 +61,8 @@ settings = {
         },
         'location_type': 'country', #should be one of 'city', 'state', 'country' and represents the location of members in teams (not the location of teams)
         'filter': {
-            'min_nteam': 5,
-            'min_team_size': 2,
+            'min_nteam': 75,
+            'min_team_size': 3,
         },
         'parallel': 1,
         'ncore': 4,# <= 0 for all

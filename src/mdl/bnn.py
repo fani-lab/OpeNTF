@@ -27,6 +27,7 @@ from mdl.cds import SuperlossDataset
 from mdl.earlystopping import EarlyStopping
 from mdl.superloss import SuperLoss
 
+from scipy.sparse import lil_matrix, hstack
 
 class Bnn(Fnn):
     def __init__(self):
@@ -86,7 +87,8 @@ class Bnn(Fnn):
         ns = params['ns']
         s = params['s']
         input_size = vecs['skill'].shape[1]
-        output_size = len(indexes['i2c'])
+        # output_size = len(indexes['i2c'])
+        output_size = vecs['member'].shape[1]
 
         unigram = Team.get_unigram(vecs['member'])
 
@@ -106,14 +108,18 @@ class Bnn(Fnn):
         for i in range(len(splits['folds'].keys())):
             train_valid_loss[i] = {'train': [], 'valid': []}
 
+        vecs['member_female'] = lil_matrix(hstack([vecs['member'],vecs['female']]))
+        vecs['member_female'] = lil_matrix(hstack([vecs['member_female'], vecs['all_female']]))
+
+        
         start_time = time.time()
         # Training K-fold
         for foldidx in splits['folds'].keys():
             # Retrieving the folds
             X_train = vecs['skill'][splits['folds'][foldidx]['train'], :]
-            y_train = vecs['member'][splits['folds'][foldidx]['train']]
+            y_train = vecs['member_female'][splits['folds'][foldidx]['train']]
             X_valid = vecs['skill'][splits['folds'][foldidx]['valid'], :]
-            y_valid = vecs['member'][splits['folds'][foldidx]['valid']]
+            y_valid = vecs['member_female'][splits['folds'][foldidx]['valid']]
 
             # Building custom dataset
             training_matrix = SuperlossDataset(X_train, y_train)
@@ -153,8 +159,11 @@ class Bnn(Fnn):
                 train_running_loss = valid_running_loss = 0.0
                 # Each epoch has a training and validation phase
                 for phase in ['train', 'valid']:
-                    for batch_idx, (X, y, index) in enumerate(data_loaders[phase]):
+                    for batch_idx, (X, y_f, index) in enumerate(data_loaders[phase]):
                         torch.cuda.empty_cache()
+                        y = y_f[:, :, :output_size]
+                        f = y_f[:, :, -output_size*2:-output_size]
+                        all_f = y_f[:, :, -output_size:]
                         X = X.float().to(device=self.device)  # Get data to cuda if possible
                         y = y.float().to(device=self.device)
                         if phase == 'train':
@@ -165,7 +174,7 @@ class Bnn(Fnn):
                                 optimizer_class_param.zero_grad()
                             layer_loss, y_ = self.sample_elbo(X.squeeze(1), y, s)
                             if loss_type == 'normal':
-                                loss = self.cross_entropy(y_.to(self.device), y, ns, nns, unigram) + layer_loss / batch_size
+                                loss = self.cross_entropy({'pred': y_, 'female': f, 'all_female': all_f}, y, ns, nns, unigram) + layer_loss / batch_size
                             elif loss_type == 'SL':
                                 loss = criterion(y_.squeeze(1), y.squeeze(1), index) + layer_loss / batch_size
                             elif loss_type == 'DP':
@@ -184,7 +193,7 @@ class Bnn(Fnn):
                             self.train(False)  # Set model to valid mode
                             layer_loss, y_ = self.sample_elbo(X.squeeze(1), y, s)
                             if loss_type == 'normal' or loss_type == 'DP':
-                                loss = self.cross_entropy(y_.to(self.device), y, ns, nns, unigram) + layer_loss / batch_size
+                                loss = self.cross_entropy({'pred': y_, 'female': f, 'all_female': all_f}, y, ns, nns, unigram) + layer_loss / batch_size
                             else:
                                 loss = criterion(y_.squeeze(), y.squeeze(), index)
                             valid_running_loss += loss.item()

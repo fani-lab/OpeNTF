@@ -140,15 +140,24 @@ def run(data_list, domain_list, fair, filter, future, augment, model_list, outpu
         vecs, indexes = d_cls.generate_sparse_vectors(datapath, f'{prep_output}{filter_str}', filter, settings['data'])
         gender = pd.read_csv(f'{prep_output}{filter_str}/females.csv', index_col=None)
         female_ids = gender['opentf_index'].values.tolist()
-        vecs['gender'] = lil_matrix((1, vecs['member'].shape[0]))# as a single sparse vector 1 * |size of expert| whose nonzero indexes are the file indexes
-        vecs['gender'][:, female_ids] = 1.0
+        vecs['gender'] = lil_matrix((1, vecs['member'].shape[1]))# as a single sparse vector 1 * |size of expert| whose nonzero indexes are the file indexes
+        vecs['gender'][:, female_ids] = 1.
+        vecs['all_female'] = lil_matrix((vecs['member'].shape[0], vecs['member'].shape[1]))
+        vecs['all_female'][:, female_ids] = 1.
+        
         if augment:
-            from tqdm import tqdm
-            for row in tqdm(range(0, vecs['member'].shape[0])):
-                # random_indices = random.sample([i for i in range(10)], 3)
-                random_indices = random.sample(gender, 3)
-                #vecs['member'][:, female_ids] = 1.0
-                vecs['member'][row, random_indices] = 1.0
+            female_in_team = vecs['member'].multiply(vecs['gender'])
+            vecs['female'] = lil_matrix(female_in_team)
+            with open(f'{prep_output}{filter_str}/teamsvecs.pkl', 'wb') as outfile: pickle.dump(vecs, outfile)
+
+        # if augment:
+        #     from tqdm import tqdm
+        #     for row in tqdm(range(0, vecs['member'].shape[0])):
+        #         # random_indices = random.sample([i for i in range(10)], 3)
+        #         # random_indices = random.sample(female_ids, 30)
+        #         random_indices = female_ids[:10]
+        #         #vecs['member'][:, female_ids] = 1.0
+        #         vecs['member'][row, random_indices] = 1.0
 
         year_idx = []
         for i in range(1, len(indexes['i2y'])):
