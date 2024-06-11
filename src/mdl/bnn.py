@@ -141,7 +141,7 @@ class Bnn(Fnn):
             fold_time = time.time()
             # Train Network
 
-            # earlystopping = EarlyStopping(patience=5, verbose=False, delta=0.01, path=f"{output}/state_dict_model.f{foldidx}.pt", trace_func=print)
+            earlystopping = EarlyStopping(patience=5, verbose=False, delta=0.01, path=f"{output}/state_dict_model.f{foldidx}.pt", trace_func=print)
             for epoch in range(num_epochs):
                 train_running_loss = valid_running_loss = 0.0
                 # Each epoch has a training and validation phase
@@ -184,6 +184,11 @@ class Bnn(Fnn):
                           f", Time {time.time() - fold_time}, Overall {time.time() - start_time} "
                           )
                 # torch.save(self.state_dict(), f"{output}/state_dict_model.f{foldidx}.e{epoch}.pt", pickle_protocol=4)
+                earlystopping(valid_loss_values[-1], self)
+                if earlystopping.early_stop:
+                    print(f"Early Stopping Triggered at epoch: {epoch}")
+                    break
+
             model_path = f"{output}/state_dict_model.f{foldidx}.pt"
 
             # Save

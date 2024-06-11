@@ -132,8 +132,11 @@ def test_toys(args):
                     run(f'{args.teamsvecs}teamsvecs.pkl', f'{args.teamsvecs}indexes.pkl', args.model, f'{args.output}/{args.model.split(".")[0]}/', f'{args.output}/emb/')
 
 # we can ignore mentioning the --output argument
-#python -u main.py -teamsvecs= ./../../../data/preprocessed/dblp/dblp.v12.json.filtered.mt75.ts3/ -model=gnn.n2v --output=./../../../data/preprocessed/dblp/dblp.v12.json.filtered.mt75.ts3/ --graph_only 1
-#python -u main.py -teamsvecs=./../../../data/preprocessed/dblp/toy.dblp.v12.json/ -model=gnn.n2v --output=./../../../data/preprocessed/dblp/toy.dblp.v12.json/
+#python -u main.py -teamsvecs ./../../../data/preprocessed/dblp/toy.dblp.v12.json/ -model gnn.w2v --output ./../../../data/preprocessed/dblp/toy.dblp.v12.json/
+
+# with gnn args
+#python -u main.py -teamsvecs ./../../../data/preprocessed/dblp/toy.dblp.v12.json/ -model gnn.gs --graph_type stm --agg mean --ns 2 --e 100 --d 8
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Team Embedding')
     addargs(parser)
