@@ -6,6 +6,9 @@ tgt_vocab: /run/example.vocab.tgt
 # Prevent overwriting existing files in the folder
 overwrite: True
 
+# vocabulary size limit
+vocab_size: 30000
+
 # Corpus opts:
 data:
     corpus_1:

@@ -9,6 +9,8 @@ from tqdm import tqdm
 from eval.metric import *
 from mdl.ntf import Ntf
 
+
+
 class Nmt(Ntf):
     def __init__(self):
         super(Ntf, self).__init__()
@@ -49,7 +51,10 @@ class Nmt(Ntf):
 
             with open(f'{fold_path}/config.yml', 'w') as outfile: yaml.safe_dump(settings, outfile)
 
+            # old
             cli_cmd = f'onmt_build_vocab -config {fold_path}/config.yml -n_sample {len(input_data)}'
+            # Kap: new
+            # cli_cmd = f'onmt_build_vocab -config {fold_path}/config.yml -n_sample 30000'
             subprocess.Popen(shlex.split(cli_cmd)).wait()
 
         with open(f"{model_path}/src-test.txt", "w") as src_test: src_test.writelines(input_data[splits['test']])
