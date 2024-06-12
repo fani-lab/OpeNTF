@@ -69,6 +69,7 @@ class Wnn(Team2Vec):
                 self.init()
             
             self.model.build_vocab(self.data)
+            
             for e in tqdm(range(self.settings['max_epochs'])):
                 self.model.train(self.data, total_examples=self.model.corpus_count, epochs=1)
                 self.model.alpha -= 0.002  # decrease the learning rate
