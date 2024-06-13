@@ -103,7 +103,7 @@ class Gnn(Team2Vec):
         torch.cuda.empty_cache()
         train_data.to(self.device)
         # the train_data is needed to collect info about the metadata
-        self.model, self.optimizer = self.create_gnn_model()
+        self.model, self.optimizer = self.create_gnn_model(train_data)
 
     def train(self, epochs, save_per_epoch=False):
         self.learn(self.train_loader, epochs)
@@ -212,32 +212,33 @@ class Gnn(Team2Vec):
         return train_data, val_data, test_data, edge_types, rev_edge_types
 
     # d = dim
-    def create_gnn_model(self):
+    # we pass only train_data for providing metadata to the model
+    def create_gnn_model(self, data):
 
         if self.model_name == 'gs':
             from gs import Model as GSModel
             # gs
-            model = GSModel(hidden_channels=self.d, data=self.data)
+            model = GSModel(hidden_channels=self.d, data=data)
         elif self.model_name == 'gin':
             from gin import Model as GINModel
             # gin
-            model = GINModel(hidden_channels=self.d, data=self.data)
+            model = GINModel(hidden_channels=self.d, data=data)
         elif self.model_name == 'gat':
             from gat import Model as GATModel
             # gat
-            model = GATModel(hidden_channels=self.d, data=self.data)
+            model = GATModel(hidden_channels=self.d, data=data)
         elif self.model_name == 'gatv2':
             from gatv2 import Model as GATv2Model
             # gatv2
-            model = GATv2Model(hidden_channels=self.d, data=self.data)
+            model = GATv2Model(hidden_channels=self.d, data=data)
         elif self.model_name == 'han':
             from han import Model as HANModel
             # han
-            model = HANModel(hidden_channels=self.d, data=self.data)
+            model = HANModel(hidden_channels=self.d, data=data)
         elif self.model_name == 'gine':
             from gine import Model as GINEModel
             # gine
-            model = GINEModel(hidden_channels=self.d, data=self.data)
+            model = GINEModel(hidden_channels=self.d, data=data)
 
         print(model)
         print(f'\nDevice = {self.device}')
