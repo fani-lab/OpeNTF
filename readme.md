@@ -220,10 +220,10 @@ For ease of summarization, we put the entire set of average results (over all fo
 | Full Results | [``./output/dblp.v12.json.filtered.mt120.ts3/``](./output/dblp.v12.json.filtered.mt120.ts3/), [``./output/title.basics.tsv.filtered.mt75.ts3/``](./output/title.basics.tsv.filtered.mt75.ts3/) |
 
 <p align="center">
-<img src='./misc/gnn/fnn.dblp.png' >
-<img src='./misc/gnn/bnn.dblp.png' >
-<img src='./misc/gnn/fnn.imdb.png' >
-<img src='./misc/gnn/bnn.imdb.png' >
+<img src='./misc/gnn/fnn.dblp.PNG' >
+<img src='./misc/gnn/bnn.dblp.PNG' >
+<img src='./misc/gnn/fnn.imdb.PNG' >
+<img src='./misc/gnn/bnn.imdb.PNG' >
 
 ## 5. Acknowledgement:
 We benefit from  bayesian-torch (https://github.com/IntelLabs/bayesian-torch), PyG (https://github.com/pyg-team/pytorch_geometric), [``pytrec_eval``](https://github.com/cvangysel/pytrec_eval), [``gensim``](https://radimrehurek.com/gensim/), [Josh Feldman's blog](https://joshfeldman.net/WeightUncertainty/) and other libraries. We would like to thank the authors of these libraries and helpful resources.
