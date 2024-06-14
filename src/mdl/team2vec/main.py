@@ -1,4 +1,7 @@
 import argparse, pickle, os, time, sys
+
+import param
+
 sys.path.append("..")
 sys.path.append("../..")
 sys.path.append("../../..")
@@ -21,6 +24,7 @@ def addargs(parser):
     gnn_args.add_argument('--e', type=int, required=False, help='Train epochs ; e.g : 5, 100 etc.')
     gnn_args.add_argument('--ns', type=int, required=False, help='Train epochs ; e.g : 2, 3, 5 etc.')
     gnn_args.add_argument('--graph_type', type=str, required=False, help='Graph types used for the training; e.g : sm, stm etc.')
+    gnn_args.add_argument('--pt', type=int, required=False, help='If true, then takes similar sized d2v pretrained vectors as initial node features; e.g : for --d 8, will take the word vectors from skill.emb.d8.w1.dm1.mdl')
 
 def run(teamsvecs_file, indexes_file, model, output, emb_output = None):
     if not os.path.isdir(output): os.makedirs(output)
@@ -46,12 +50,22 @@ def run(teamsvecs_file, indexes_file, model, output, emb_output = None):
             t2v.train()
             return
 
+        # general init section for any
+        # gnn methods
         import gnn
-        # this line enables to output files into folders based on different graph types
-        # output_ = output + f'{params.settings["graph"]["edge_types"][1]}.{"dir" if params.settings["graph"]["dir"] else "undir"}.{str(params.settings["graph"]["dup_edge"]).lower()}/'
         output_ = output + f'{params.settings["graph"]["edge_types"][1]}.{"dir" if params.settings["graph"]["dir"] else "undir"}.{str(params.settings["graph"]["dup_edge"]).lower()}.'
         t2v = gnn.Gnn(teamsvecs, indexes, params.settings['graph'], output_)
         t2v.init() # call the team2vec's init, this will lazy load the graph data e.g = "{domain}/gnn/stm.undir.mean.data.pkl"
+
+        # replace the 1 dimensional node features with pretrained d2v skill vectors of required dimension
+        if params.settings['model']['pt']:
+            from gensim.models import Doc2Vec
+            for node_type in t2v.data.node_types:
+                d2v_emb_type = 'joint' if args.graph_type == 'stm' and node_type == 'team' else node_type
+                d2v_output = output.split('gnn')[0] + f'/w2v/{d2v_emb_type}.emb.d{params.settings["model"][model]["d"]}.w1.dm1.mdl'
+                node_type_vecs = Doc2Vec.load(d2v_output).dv.vectors if d2v_emb_type == 'joint' else Doc2Vec.load(d2v_output).wv.vectors # team vectors (dv) for 'team' nodes, else individual node vectors (wv)
+                t2v.data[node_type].x = torch.tensor(node_type_vecs)
+
         if(args.graph_only):
             return
 
@@ -160,7 +174,8 @@ if __name__ == "__main__":
                     if args.d is not None: params.settings['model'][args.model]['d'] = args.d
                     if args.ns is not None: params.settings['model'][args.model]['ns'] = args.ns
                     if args.agg is not None: params.settings['model'][args.model]['agg'] = args.agg
-                    if args.graph_type is not None: params.settings['model'][args.model]['graph_type'] = args.graph_type
+                    if args.graph_type is not None: params.settings['model'][args.model]['graph_type'] = edge_type[1]
+                    if args.pt is not None: params.settings['model']['pt'] = args.pt
                     else : params.settings['model'][args.model]['graph_type'] = edge_type[1] # take the value from the current loop
 
                     run(f'{teamsvecs}teamsvecs.pkl', f'{teamsvecs}indexes.pkl', args.model,

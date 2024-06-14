@@ -275,7 +275,7 @@ class Gnn(Team2Vec):
         loss_array = []
         val_auc_array = []
         val_loss_array = []
-        earlystopping = EarlyStopping(patience=5, verbose=True, delta=0.01,
+        earlystopping = EarlyStopping(patience=5, verbose=True, delta=0.001,
                                       path=f"{self.model_output}/state_dict_model.e{epochs}.pt", trace_func=print, save_model=False)
         for epoch in range(1, epochs + 1):
             self.optimizer.zero_grad()  # ensuring clearing out the gradients before each validation loop

@@ -8,7 +8,7 @@ settings = {
         'dup_edge': 'mean', #None: keep the duplicates, else: reduce by 'add', 'mean', 'min', 'max', 'mul'
     },
     'model': {
-        'd' : 4, # embedding dim array
+        'd' : 8, # embedding dim array
         'b' : 128, # batch_size for loaders
         'e' : 100, # num epochs
         'ns' : 5, # number of negative samples
@@ -16,13 +16,14 @@ settings = {
         'loader_shuffle': True,
         'num_workers': 0,
         'save_per_epoch': False,
+        'pt' : 0, # 1 -> use pretrained d2v skill vectors as initial node features of graph data
         'w2v': {
             'd' : [8, 16, 32, 64, 128],
             'max_epochs' : 1,
             'dm': 1,  # training algorithm. 1: distributed memory (PV-DM), 0: distributed bag of words (PV-DBOW)
             'dbow_words': 1,  # 'train word-vectors in skip-gram fashion; 0: no (default), 1: yes
             'window': 2,  # cooccurrence window
-            'embtype': 'skill',  # 'member', 'joint', 'dt2v'
+            'embtype': 'joint',  # 'member', 'joint', 'dt2v'
         },
         'gnn.n2v': {
             'walk_length': 5,
