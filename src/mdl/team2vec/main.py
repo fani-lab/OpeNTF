@@ -26,6 +26,11 @@ def addargs(parser):
     gnn_args.add_argument('--graph_type', type=str, required=False, help='Graph types used for the training; e.g : sm, stm etc.')
     gnn_args.add_argument('--pt', type=int, required=False, help='If true, then takes similar sized d2v pretrained vectors as initial node features; e.g : for --d 8, will take the word vectors from skill.emb.d8.w1.dm1.mdl')
 
+    # args for d2v
+    d2v_args = parser.add_argument_group('D2V Settings')
+    d2v_args.add_argument('--emb_type', type=str, required=False,help='What type of vectors to produce, joint makes skill+member paragraph vector for each team e.g : member, skill or joint')
+
+
 def run(teamsvecs_file, indexes_file, model, output, emb_output = None):
     if not os.path.isdir(output): os.makedirs(output)
     with open(teamsvecs_file, 'rb') as teamsvecs_f, open(indexes_file, 'rb') as indexes_f:
@@ -168,15 +173,15 @@ if __name__ == "__main__":
             for dir in [False]:
                 for dup in ['mean']:  # add', 'mean', 'min', 'max', 'mul']:
                     params.settings['graph'] = {'edge_types': edge_type, 'dir': dir, 'dup_edge': dup}
+                    params.settings['model'][args.model]['graph_type'] = edge_type[1]  # take the value from the current loop
 
                     # change the relevant parameter in the params file based on the gnn args
                     if args.e is not None: params.settings['model'][args.model]['e'] = args.e
                     if args.d is not None: params.settings['model'][args.model]['d'] = args.d
                     if args.ns is not None: params.settings['model'][args.model]['ns'] = args.ns
                     if args.agg is not None: params.settings['model'][args.model]['agg'] = args.agg
-                    if args.graph_type is not None: params.settings['model'][args.model]['graph_type'] = edge_type[1]
                     if args.pt is not None: params.settings['model']['pt'] = args.pt
-                    else : params.settings['model'][args.model]['graph_type'] = edge_type[1] # take the value from the current loop
+                    if args.emb_type is not None: params.settings['model'][args.model]['emb_type'] = args.emb_type
 
                     run(f'{teamsvecs}teamsvecs.pkl', f'{teamsvecs}indexes.pkl', args.model,
                         f'{args.output}/{args.model.split(".")[0]}/', f'{args.output}/emb/')
