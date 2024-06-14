@@ -26,7 +26,7 @@ def addargs(parser):
 
     # args for d2v
     d2v_args = parser.add_argument_group('D2V Settings')
-    d2v_args.add_argument('--emb_type', type=str, required=False,help='What type of vectors to produce, joint makes skill+member paragraph vector for each team e.g : member, skill or joint')
+    d2v_args.add_argument('--embtype', type=str, required=False,help='What type of vectors to produce, joint makes skill+member paragraph vector for each team e.g : member, skill or joint')
 
 
 def run(teamsvecs_file, indexes_file, model, output, emb_output = None):
@@ -64,9 +64,9 @@ def run(teamsvecs_file, indexes_file, model, output, emb_output = None):
         if params.settings['model']['pt']:
             from gensim.models import Doc2Vec
             for node_type in t2v.data.node_types:
-                d2v_emb_type = 'joint' if args.graph_type == 'stm' and node_type == 'team' else node_type
-                d2v_output = output.split('gnn')[0] + f'/w2v/{d2v_emb_type}.emb.d{params.settings["model"][model]["d"]}.w1.dm1.mdl'
-                node_type_vecs = Doc2Vec.load(d2v_output).dv.vectors if d2v_emb_type == 'joint' else Doc2Vec.load(d2v_output).wv.vectors # team vectors (dv) for 'team' nodes, else individual node vectors (wv)
+                d2v_embtype = 'joint' if args.graph_type == 'stm' and node_type == 'team' else node_type
+                d2v_output = output.split('gnn')[0] + f'/w2v/{d2v_embtype}.emb.d{params.settings["model"][model]["d"]}.w1.dm1.mdl'
+                node_type_vecs = Doc2Vec.load(d2v_output).dv.vectors if d2v_embtype == 'joint' else Doc2Vec.load(d2v_output).wv.vectors # team vectors (dv) for 'team' nodes, else individual node vectors (wv)
                 t2v.data[node_type].x = torch.tensor(node_type_vecs)
 
         if(args.graph_only):
@@ -179,7 +179,7 @@ if __name__ == "__main__":
                     if args.ns is not None: params.settings['model'][args.model]['ns'] = args.ns
                     if args.agg is not None: params.settings['model'][args.model]['agg'] = args.agg
                     if args.pt is not None: params.settings['model']['pt'] = args.pt
-                    if args.emb_type is not None: params.settings['model'][args.model]['emb_type'] = args.emb_type
+                    if args.embtype is not None: params.settings['model'][args.model]['embtype'] = args.embtype
 
                     run(f'{teamsvecs}teamsvecs.pkl', f'{teamsvecs}indexes.pkl', args.model,
                         f'{args.output}/{args.model.split(".")[0]}/', f'{args.output}/emb/')
