@@ -19,7 +19,7 @@ settings = {
         'pt' : 0, # 1 -> use pretrained d2v skill vectors as initial node features of graph data
         'w2v': {
             'd' : [8, 16, 32, 64, 128],
-            'max_epochs' : 1,
+            'max_epochs' : 100,
             'dm': 1,  # training algorithm. 1: distributed memory (PV-DM), 0: distributed bag of words (PV-DBOW)
             'dbow_words': 1,  # 'train word-vectors in skip-gram fashion; 0: no (default), 1: yes
             'window': 10,  # cooccurrence window
