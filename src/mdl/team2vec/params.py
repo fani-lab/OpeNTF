@@ -22,8 +22,8 @@ settings = {
             'max_epochs' : 1,
             'dm': 1,  # training algorithm. 1: distributed memory (PV-DM), 0: distributed bag of words (PV-DBOW)
             'dbow_words': 1,  # 'train word-vectors in skip-gram fashion; 0: no (default), 1: yes
-            'window': 2,  # cooccurrence window
-            'embtype': 'joint',  # 'member', 'joint', 'dt2v'
+            'window': 10,  # cooccurrence window
+            'embtype': 'skill',  # 'skill', 'member', 'joint', 'dt2v'
         },
         'gnn.n2v': {
             'walk_length': 5,

@@ -1,7 +1,5 @@
 import argparse, pickle, os, time, sys
 
-import param
-
 sys.path.append("..")
 sys.path.append("../..")
 sys.path.append("../../..")
