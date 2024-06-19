@@ -28,6 +28,7 @@ class Encoder(nn.Module):
             'gatv2': GATv2,
             'gin': GIN,
             'gine': GINE
+            # HAN is excluded because it has a separate case
         }
 
         if(type(data) == HeteroData):
