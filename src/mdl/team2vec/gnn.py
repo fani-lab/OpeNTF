@@ -198,7 +198,7 @@ class Gnn(Team2Vec):
             num_test=0.0,
             disjoint_train_ratio=0.3,
             neg_sampling_ratio=self.ns,
-            add_negative_train_samples=False,
+            add_negative_train_samples=True,
             edge_types=edge_types,
             rev_edge_types=rev_edge_types,
         )
