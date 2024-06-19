@@ -215,30 +215,8 @@ class Gnn(Team2Vec):
     # we pass only train_data for providing metadata to the model
     def create_gnn_model(self, data):
 
-        if self.model_name == 'gs':
-            from gs import Model as GSModel
-            # gs
-            model = GSModel(hidden_channels=self.d, data=data)
-        elif self.model_name == 'gin':
-            from gin import Model as GINModel
-            # gin
-            model = GINModel(hidden_channels=self.d, data=data)
-        elif self.model_name == 'gat':
-            from gat import Model as GATModel
-            # gat
-            model = GATModel(hidden_channels=self.d, data=data)
-        elif self.model_name == 'gatv2':
-            from gatv2 import Model as GATv2Model
-            # gatv2
-            model = GATv2Model(hidden_channels=self.d, data=data)
-        elif self.model_name == 'han':
-            from han import Model as HANModel
-            # han
-            model = HANModel(hidden_channels=self.d, data=data)
-        elif self.model_name == 'gine':
-            from gine import Model as GINEModel
-            # gine
-            model = GINEModel(hidden_channels=self.d, data=data)
+        from encoder import Encoder as Encoder
+        model = Encoder(hidden_channels=self.d, data=data, model_name= self.model_name)
 
         print(model)
         print(f'\nDevice = {self.device}')

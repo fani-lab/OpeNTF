@@ -20,6 +20,7 @@ class Encoder(nn.Module):
     def __init__(self, hidden_channels, data, model_name):
         super().__init__()
 
+        self.model_name = model_name
         # Define a dictionary that maps model names to class constructors
         model_classes = {
             'gs': GS,
@@ -51,9 +52,8 @@ class Encoder(nn.Module):
                 self.node_lin = nn.Linear(data.num_features, hidden_channels)
                 self.node_emb = nn.Linear(data.num_nodes, hidden_channels)
 
-        # Instantiate homogeneous gat:
-
-        if model_name == 'han':
+        # Instantiate homogeneous model:
+        if self.model_name == 'han':
             self.model = HAN(hidden_channels, data.metadata())
         else:
             self.model = model_classes[model_name](hidden_channels)
@@ -72,9 +72,16 @@ class Encoder(nn.Module):
             self.x_dict = {}
             for i, node_type in enumerate(data.node_types):
                 self.x_dict[node_type] = self.node_lin[i](data[node_type].x) + self.node_emb[i](data[node_type].n_id)
-            # `x_dict` holds embedding matrices of all node types
-            # `edge_index_dict` holds all edge indices of all edge types
-            self.x_dict = self.model(self.x_dict, data.edge_index_dict)
+            if self.model_name == 'gine':
+                self.edge_attr_dict = {}
+                for edge_type in data.edge_types:
+                    self.edge_attr_dict[edge_type] = data[edge_type].edge_attr.view(-1, 1).float()
+
+                self.x_dict = self.model(self.x_dict, data.edge_index_dict, self.edge_attr_dict)
+            else:
+                # `x_dict` holds embedding matrices of all node types
+                # `edge_index_dict` holds all edge indices of all edge types
+                self.x_dict = self.model(self.x_dict, data.edge_index_dict)
             if emb : return self.x_dict
         else:
             # for batching mode and homogeneous graphs, this line should be tested by appending node_emb part
@@ -93,10 +100,10 @@ class Encoder(nn.Module):
             # source_node_emb contains the embeddings of each node of the defined node_type
             source_node_emb = self.x_dict[seed_edge_type[0]]
             target_node_emb = self.x_dict[seed_edge_type[2]]
-            pred = self.classifier(source_node_emb, target_node_emb, data[seed_edge_type].edge_label_index)
+            pred = self.decoder(source_node_emb, target_node_emb, data[seed_edge_type].edge_label_index)
             preds = torch.cat((preds, pred.unsqueeze(0)), dim = 1)
         else:
-            pred = self.classifier(x, x, data.edge_label_index)
+            pred = self.decoder(x, x, data.edge_label_index)
             # pred = self.classifier(x_dict['node'], x_dict['node'], data.edge_label_index)
             preds = torch.cat((preds, pred.unsqueeze(0)), dim = 1)
         return preds.squeeze(dim=0)
