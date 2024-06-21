@@ -226,8 +226,8 @@ For ease of summarization, we put the entire set of average results (over all fo
 | Full Results | [``./output/dblp.v12.json.filtered.mt120.ts3/``](./output/dblp.v12.json.filtered.mt120.ts3/), [``./output/title.basics.tsv.filtered.mt75.ts3/``](./output/title.basics.tsv.filtered.mt75.ts3/) |
 
 <p align="center">
-<img src='./misc/gnn/fnn.dblp.PNG' >
-<img src='./misc/gnn/bnn.dblp.PNG' >
+<img src='.//misc//gnn//fnn.dblp.PNG' >
+<img src='.//misc//gnn//bnn.dblp.PNG' >
 <img src='./misc/gnn/fnn.imdb.PNG' >
 <img src='./misc/gnn/bnn.imdb.PNG' >
 
