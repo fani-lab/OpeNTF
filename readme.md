@@ -27,12 +27,11 @@ both variational and non-variational neural recommenders.
 - [1. Setup](#1-setup)
 - [2. Quickstart](#2-quickstart)
 - [3. Features](#3-features)
-  * [`Transfer Learning with GNN`](#31-gnn-transfer-learning)
-  * [`Datasets and Parallel Preprocessing`](#32-datasets-and-parallel-preprocessing)
-  * [`Neural Team Formation`](#33-non-temporal-neural-team-formation)
+  * [`Datasets and Parallel Preprocessing`](#31-datasets-and-parallel-preprocessing)
+  * [`Transfer Learning with GNN`](#32-gnn-transfer-learning)
+  * [`Neural Team Formation`](#33-neural-team-formation)
   * [`Model Architecture`](#35-model-architecture)
-  * [`Negative Sampling Strategies`](#36-negative-sampling-strategies)
-  * [`Run`](#37-run)
+  * [`Run`](#36-run)
 - [4. Results](#4-results)
 - [5. Acknowledgement](#5-acknowledgement)
 
@@ -81,15 +80,9 @@ python -u main.py -data ../data/raw/dblp/toy.dblp.v12.json -domain dblp -model t
 This script loads and preprocesses the same dataset [``toy.dblp.v12.json``](data/raw/dblp/toy.dblp.v12.json) from [``dblp``](https://originalstatic.aminer.cn/misc/dblp.v12.7z), takes the teams from the the last year as the test set and trains the ``Bayesian`` neural model following our proposed streaming training strategy as explained in ``3.2.2. Temporal Neural Team Formation`` with two different input representations _i_) sparse vector represntation and _ii_) temporal skill vector represntation using default hyperparameters from [``./src/param.py``](./src/param.py).
 
 ## 3. Features
-#### **3.1. Transfer Learning with GNN**
-
-While state-of-the-art neural team formation methods are able to efficiently analyze massive collections of experts to form effective collaborative teams, they largely ignore the fairness in recommended teams of experts. In `Adila`, we study the application of `fairness-aware` team formation algorithms to mitigate the potential popularity bias in the neural team formation models. We support two fairness notions namely, `equality of opportunity` and `demographic parity`. To achieve fairness, we utilize three deterministic greedy reranking algorithms (`det_greedy`, `det_cons`, `det_relaxed`) in addition to `fa*ir`, a probabilistic greedy reranking algorithm . 
 
 
-<p align="center"><img src='./misc/gnn/gnn_pipeline.jpg' width="1000" ></p>
-
-
-#### **3.2. Datasets and Parallel Preprocessing**
+#### **3.1. Datasets and Parallel Preprocessing**
 
 Raw dataset, e.g., scholarly papers from AMiner's citation network dataset of [``dblp``](https://originalstatic.aminer.cn/misc/dblp.v12.7z), movies from [``imdb``](https://datasets.imdbws.com/), or US patents from [``uspt``](https://patentsview.org/download/data-download-tables) were assumed to be populated in [``data/raw``](data/raw). For the sake of integration test, tiny-size toy example datasets [``toy.dblp.v12.json``](data/raw/dblp/toy.dblp.v12.json) from [``dblp``](https://originalstatic.aminer.cn/misc/dblp.v12.7z), [[``toy.title.basics.tsv``](data/raw/imdb/toy.title.basics.tsv), [``toy.title.principals.tsv``](data/raw/imdb/toy.title.principals.tsv), [``toy.name.basics.tsv``](data/raw/imdb/toy.name.basics.tsv)] from [``imdb``](https://datasets.imdbws.com/) and [``toy.patent.tsv``](data/preprocessed/uspt/toy.patent.tsv) have been already provided.
 
@@ -98,7 +91,7 @@ Raw dataset, e.g., scholarly papers from AMiner's citation network dataset of [`
 Raw data will be preprocessed into two main ``sparse`` matrices each row of which represents: 
 
 >i) ``vecs['member']``: occurrence (boolean) vector representation for members of a team, e.g., authors of a paper or crew members of a movie,
-> 
+>
 >ii) ``vecs['skill']``: occurrence (boolean) vector representation for required skills for a team, e.g., keywords of a paper or genre of a movie.
 
 Also, indexes will be created to map the vector's indexes to members' names and skills' names, i.e., ``i2c``, ``c2i``, ``i2s``, ``s2i``.
@@ -106,14 +99,22 @@ Also, indexes will be created to map the vector's indexes to members' names and 
 The sparse matrices and the indices will be persisted in [``data/preprocessed/{dblp,imdb,uspt}/{name of dataset}``](data/preprocessed/) as pickles ``teamsvecs.pkl`` and ``indexes.pkl``. For example, the preprocessed data for our dblp toy example are [``data/preprocessed/dblp/toy.dblp.v12.json/teamsvecs.pkl``](data/preprocessed/dblp/toy.dblp.v12.json/teams.pkl) and [``data/preprocessed/dblp/toy.dblp.v12.json/indexes.pkl``](data/preprocessed/dblp/toy.dblp.v12.json/indexes.pkl).
 
 > Our pipeline benefits from parallel generation of sparse matrices for teams that significantly reduces the preprocessing time as shown below:
-> 
+>
 > <p align="center"><img src="./data/speedup.jpg" width="200"><img src="./data/speedup_loglog.jpg" width="190"></p>
 
 
 Please note that the preprocessing step will be executed once. Subsequent runs load the persisted pickle files. In order to regenerate them, one should simply delete them. 
 
+#### **3.2. Transfer Learning with GNN**
+
+While state-of-the-art neural team formation methods are able to efficiently analyze massive collections of experts to form effective collaborative teams, they largely ignore the fairness in recommended teams of experts. In `Adila`, we study the application of `fairness-aware` team formation algorithms to mitigate the potential popularity bias in the neural team formation models. We support two fairness notions namely, `equality of opportunity` and `demographic parity`. To achieve fairness, we utilize three deterministic greedy reranking algorithms (`det_greedy`, `det_cons`, `det_relaxed`) in addition to `fa*ir`, a probabilistic greedy reranking algorithm .
+
+
+<p align="center"><img src='./misc/gnn/gnn_pipeline.jpg' width="1000" ></p>
 
 #### **3.3. Neural Team Formation**
+
+
 
 We randomly take ``85%`` of the dataset for the train-validation set and ``15%`` as the test set, i.e., the model never sees these instances during training or model tuning. You can change ``train_test_split`` parameter in [``./src/param.py``](./src/param.py).
 
@@ -121,21 +122,20 @@ We randomly take ``85%`` of the dataset for the train-validation set and ``15%``
 
 #### **3.5. Model Architecture**
 
-Each model has been defined in [``./src/mdl/``](./src/mdl/) under an inheritance hierarchy. They override abstract functions for ``train``, ``test``, ``eval``, and ``plot`` steps.
+For neural networks, each model has been defined in [``./src/mdl/``](./src/mdl/) under an inheritance hierarchy. They override abstract functions for ``learn`` and ``test`` steps.
 
 For example, for our feedforward baseline [``fnn``](./src/mdl/fnn.py), the model has been implemented in [``./src/mdl/fnn.py``](src/mdl/fnn.py). Model's hyperparameters such as the learning rate (``lr``) or the number of epochs (``e``) can be set in [``./src/param.py``](src/param.py).
 
-
-<p align="center"><img src='./src/mdl/team_inheritance_hierarchy.png' width="550" ></p>
+<p align="center"><img src='./misc/ntf_hierarchy.png' width="550" ></p>
   
-Currently, we support neural models:
+Currently, we possess neural models:
 1) Bayesian [``bnn``](./src/mdl/bnn.py) where model's parameter (weights) is assumed to be drawn from Gaussian (Normal) distribution and the task is to not to learn the weight but the mean (μ) and standard deviation (σ) of the distribution at each parameter.
 
 <p align="center"><img src='./src/mdl/bnn.png' width="350" ></p>
 
 2) non-Bayesian feedforward [``fnn``](./src/mdl/fnn.py) where the model's parameter (weights) is to be learnt.
 
-The input to the models is the vector representations for (_temporal_) skills and the output is the vector representation for members. In another word, given the input skills, the models predict the members from the pool of candidates. We support three vector representations:
+The input to the models is the vector representations for (_temporal_) skills and the output is the vector representation for members. In another word, given the input skills, the models predict the members from the pool of candidates. We support two vector representations:
 
 i) Sparse vector representation (occurrence or boolean vector): See preprocessing section above.
 
@@ -149,21 +149,15 @@ ii) Dense vector representation ([``team2vec``](src/mdl/team2vec/main.py)) chann
 
   For message-passing-based methods i.e. Graph Neural Network methods (GraphSAGE, Graph Attention Network etc.), we use message passing to
   learn a node vector (``node_type == skill``) based on a recursive aggregation (``agg``) and a combination (``comb``) of direct (1-hop) or indirect (𝑘-hop) neighbouring nodes’
-  vectors via neural message passing. 
+  vectors via neural message passing.
 
-#### **3.6. Negative Sampling Strategies**
+For embedding generation models (All types of methods), each model has been defined in [``./src/mdl/team2vec/``](./src/mdl/team2vec/) under an organized hierarchy employing inheritance wherever applicable.
 
-As known, employing ``unsuccessful`` teams convey complementary negative signals to the model to alleviate the long-tail problem. Most real-world training datasets in the team formation domain, however, do not have explicit unsuccessful teams (e.g., collections of rejected papers.) In the absence of unsuccessful training instances, we proposed negative sampling strategies based on the ``closed-world`` assumption where no currently known successful group of experts for the required skills is assumed to be unsuccessful.  We study the effect of ``three`` different negative sampling strategies: two based on static distributions, and one based on adaptive noise distribution:
+For example, one of our GNN baselines, [``gat``](./src/mdl/team2vec/gat.py) has been implemented in [``./src/mdl/team2vec/gat.py``](./src/mdl/team2vec/gat.py). This class holds the message passing layer configuration for the ``gat`` model. 
+Similarly other GNN models have been defined in their respective distinct classes. The gnn model creation and training pipeline implemented in [``./src/mdl/team2vec/gnn.py``](./src/mdl/team2vec/gnn.py)
+instantiates each ???
 
-1) Uniform distribution (``uniform``), where subsets of experts are randomly chosen with the ``same probability`` as unsuccessful teams from the uniform distribution over all subsets of experts.
-
-2) Unigram distribution (``unigram``), where subsets of experts are chosen regarding ``their frequency`` in all previous successful teams. Intuitively, teams of experts that have been more successful but for other skill subsets will be given a higher probability and chosen more frequently as a negative sample to dampen the effect of popularity bias.
-
-3) Smoothed unigram distribution in each training minibatch (``unigram_b``), where we employed the ``add-1 or Laplace smoothing`` when computing the unigram distribution of the experts but in each training minibatch. Minibatch stochastic gradient descent is the _de facto_ method for neural models where the data is split into batches of data, each of which is sent to the model for the partial calculation to speed up training while maintaining high accuracy. 
-
-To include a negative sampling strategy, there are two parameters for a model to set in [``./src/param.py``](src/param.py):
-- ``ns``: the negative sampling strategy which can be ``uniform``, ``unigram``, ``unigram_b`` or ``None``(no negative sampling).
-- ``nns``: number of negative samples
+<p align="center"><img src='./misc/gnn/gnn_hierarchy.png' width="1000" ></p>
 
 #### **3.7. Run**
 
@@ -226,7 +220,7 @@ For ease of summarization, we put the entire set of average results (over all fo
 <img src='./misc/gnn/bnn.imdb.PNG' >
 
 ## 5. Acknowledgement:
-We benefit from  bayesian-torch (https://github.com/IntelLabs/bayesian-torch), PyG (https://github.com/pyg-team/pytorch_geometric), [``pytrec_eval``](https://github.com/cvangysel/pytrec_eval), [``gensim``](https://radimrehurek.com/gensim/), [Josh Feldman's blog](https://joshfeldman.net/WeightUncertainty/) and other libraries. We would like to thank the authors of these libraries and helpful resources.
+We benefit from  bayesian-torch (https://github.com/IntelLabs/bayesian-torch), PyG (https://github.com/pyg-team/pytorch_geometric), [``pytrec_eval``](https://github.com/cvangysel/pytrec_eval), [``gensim``](https://radimrehurek.com/gensim/), [Josh Feldman's blog](https://joshfeldman.net/WeightUncertainty/) and other valuable libraries. We would like to thank the authors of these libraries and helpful resources.
   
 [//]: # (## 6. License:)
 
