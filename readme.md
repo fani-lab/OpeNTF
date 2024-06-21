@@ -39,7 +39,7 @@ both variational and non-variational neural recommenders.
 
 
 </td>
-<td><img src='./misc/gnn/gnn_pipeline.jpg' width="100%" align="right"" /></td>
+<td><img src='gnn_pipeline.jpg' width="100%" align="right" /></td>
 <!-- <td><img src='./src/mdl/team_inheritance_hierarchy.png' width="90%%" /></td> -->
 </tr>
 </table>
@@ -86,7 +86,7 @@ This script loads and preprocesses the same dataset [``toy.dblp.v12.json``](data
 
 Raw dataset, e.g., scholarly papers from AMiner's citation network dataset of [``dblp``](https://originalstatic.aminer.cn/misc/dblp.v12.7z), movies from [``imdb``](https://datasets.imdbws.com/), or US patents from [``uspt``](https://patentsview.org/download/data-download-tables) were assumed to be populated in [``data/raw``](data/raw). For the sake of integration test, tiny-size toy example datasets [``toy.dblp.v12.json``](data/raw/dblp/toy.dblp.v12.json) from [``dblp``](https://originalstatic.aminer.cn/misc/dblp.v12.7z), [[``toy.title.basics.tsv``](data/raw/imdb/toy.title.basics.tsv), [``toy.title.principals.tsv``](data/raw/imdb/toy.title.principals.tsv), [``toy.name.basics.tsv``](data/raw/imdb/toy.name.basics.tsv)] from [``imdb``](https://datasets.imdbws.com/) and [``toy.patent.tsv``](data/preprocessed/uspt/toy.patent.tsv) have been already provided.
 
-<p align="center"><img src='./src/cmn/dataset_hierarchy.png' width="300" ></p>
+<p align="center"><img src='dataset_hierarchy.png' width="300" ></p>
 
 Raw data will be preprocessed into two main ``sparse`` matrices each row of which represents: 
 
@@ -100,7 +100,7 @@ The sparse matrices and the indices will be persisted in [``data/preprocessed/{d
 
 > Our pipeline benefits from parallel generation of sparse matrices for teams that significantly reduces the preprocessing time as shown below:
 >
-> <p align="center"><img src="./data/speedup.jpg" width="200"><img src="./data/speedup_loglog.jpg" width="190"></p>
+> <p align="center"><img src="speedup.jpg" width="200"><img src="speedup_loglog.jpg" width="186"></p>
 
 
 Please note that the preprocessing step will be executed once. Subsequent runs load the persisted pickle files. In order to regenerate them, one should simply delete them. 
@@ -110,7 +110,7 @@ Please note that the preprocessing step will be executed once. Subsequent runs l
 While state-of-the-art neural team formation methods are able to efficiently analyze massive collections of experts to form effective collaborative teams, they largely ignore the fairness in recommended teams of experts. In `Adila`, we study the application of `fairness-aware` team formation algorithms to mitigate the potential popularity bias in the neural team formation models. We support two fairness notions namely, `equality of opportunity` and `demographic parity`. To achieve fairness, we utilize three deterministic greedy reranking algorithms (`det_greedy`, `det_cons`, `det_relaxed`) in addition to `fa*ir`, a probabilistic greedy reranking algorithm .
 
 
-<p align="center"><img src='./misc/gnn/gnn_pipeline.jpg' width="1000" ></p>
+<p align="center"><img src='gnn_pipeline.jpg' width="1000" ></p>
 
 #### **3.3. Neural Team Formation**
 
@@ -126,12 +126,12 @@ For neural networks, each model has been defined in [``./src/mdl/``](./src/mdl/)
 
 For example, for our feedforward baseline [``fnn``](./src/mdl/fnn.py), the model has been implemented in [``./src/mdl/fnn.py``](src/mdl/fnn.py). Model's hyperparameters such as the learning rate (``lr``) or the number of epochs (``e``) can be set in [``./src/param.py``](src/param.py).
 
-<p align="center"><img src='./misc/ntf_hierarchy.png' width="550" ></p>
+<p align="center"><img src='ntf_hierarchy.png' width="550" ></p>
   
 Currently, we possess neural models:
 1) Bayesian [``bnn``](./src/mdl/bnn.py) where model's parameter (weights) is assumed to be drawn from Gaussian (Normal) distribution and the task is to not to learn the weight but the mean (μ) and standard deviation (σ) of the distribution at each parameter.
 
-<p align="center"><img src='./src/mdl/bnn.png' width="350" ></p>
+<p align="center"><img src='bnn.png' width="350" ></p>
 
 2) non-Bayesian feedforward [``fnn``](./src/mdl/fnn.py) where the model's parameter (weights) is to be learnt.
 
@@ -169,7 +169,7 @@ Apart from that, we also have [``m2v``](./src/mdl/team2vec/m2v.py) which utilize
 The parameters for each model can be separately defined in [``./src/mdl/team2vec/params.py``](./src/mdl/team2vec/params.py). For instance, for model ``GraphSAGE`` (``gs``), we can set the 
 number of epochs (``e``) and the batch size (``b``) in the ``gnn.gs`` section of the [``params``](./src/mdl/team2vec/params.py) file.
 
-<p align="center"><img src='./misc/gnn/gnn_hierarchy.png' width="1000" ></p>
+<p align="center"><img src='gnn_hierarchy.png' width="1000" ></p>
 
 #### **3.7. Run**
 
@@ -226,10 +226,10 @@ For ease of summarization, we put the entire set of average results (over all fo
 | Full Results | [``./output/dblp.v12.json.filtered.mt120.ts3/``](./output/dblp.v12.json.filtered.mt120.ts3/), [``./output/title.basics.tsv.filtered.mt75.ts3/``](./output/title.basics.tsv.filtered.mt75.ts3/) |
 
 <p align="center">
-<img src='.//misc//gnn//fnn.dblp.PNG' >
-<img src='.//misc//gnn//bnn.dblp.PNG' >
-<img src='./misc/gnn/fnn.imdb.PNG' >
-<img src='./misc/gnn/bnn.imdb.PNG' >
+<img src='fnn.dblp.PNG' >
+<img src='bnn.dblp.PNG' >
+<img src='fnn.imdb.PNG' >
+<img src='bnn.imdb.PNG' >
 
 ## 5. Acknowledgement:
 We benefit from  bayesian-torch (https://github.com/IntelLabs/bayesian-torch), PyG (https://github.com/pyg-team/pytorch_geometric), [``pytrec_eval``](https://github.com/cvangysel/pytrec_eval), [``gensim``](https://radimrehurek.com/gensim/), [Josh Feldman's blog](https://joshfeldman.net/WeightUncertainty/) and other valuable libraries. We would like to thank the authors of these libraries and helpful resources.
