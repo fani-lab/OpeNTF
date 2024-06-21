@@ -107,8 +107,10 @@ Please note that the preprocessing step will be executed once. Subsequent runs l
 
 #### **3.2. Transfer Learning with GNN**
 
-While state-of-the-art neural team formation methods are able to efficiently analyze massive collections of experts to form effective collaborative teams, they largely ignore the fairness in recommended teams of experts. In `Adila`, we study the application of `fairness-aware` team formation algorithms to mitigate the potential popularity bias in the neural team formation models. We support two fairness notions namely, `equality of opportunity` and `demographic parity`. To achieve fairness, we utilize three deterministic greedy reranking algorithms (`det_greedy`, `det_cons`, `det_relaxed`) in addition to `fa*ir`, a probabilistic greedy reranking algorithm .
-
+Although we can successfully predict efficient teams with neural models trained on sparse matrices, previous experiments showed that applying transfer learning with generated skill embeddings 
+is more efficacious in predicting teams of experts. With this line of thought, we conducted thorough experiments to segregate the embedding generation methods, as well as compared 
+the results from each of the distinct methods (transfer or non-transfer learning) based on predefined metrics. Our experiments reveal that employing transfer learning with GNN produces the most
+effective team formation results. As demonstrated by the figure below, the gnn part encompasses learning vector representations through message passing strategies with the aid of the models.
 
 <p align="center"><img src='gnn_pipeline.jpg' width="1000" ></p>
 
