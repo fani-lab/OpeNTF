@@ -5,25 +5,25 @@ settings = {
             # ([('skill', '-', 'team'), ('member', '-', 'team')], 'stm'),
             # ([('skill', '-', 'member')], 'sm'),
         'dir': False,
-        'dup_edge': 'mean', #None: keep the duplicates, else: reduce by 'add', 'mean', 'min', 'max', 'mul'
+        'dup_edge': 'mean',         #None: keep the duplicates, else: reduce by 'add', 'mean', 'min', 'max', 'mul'
     },
     'model': {
-        'd' : 8, # embedding dim array
-        'b' : 128, # batch_size for loaders
-        'e' : 100, # num epochs
-        'ns' : 5, # number of negative samples
+        'd' : 8,                    # embedding dim array
+        'b' : 128,                  # batch_size for loaders
+        'e' : 100,                  # num epochs
+        'ns' : 5,                   # number of negative samples
         'lr': 0.001,
         'loader_shuffle': True,
         'num_workers': 0,
         'save_per_epoch': False,
-        'pt' : 0, # 1 -> use pretrained d2v skill vectors as initial node features of graph data
+        'pt' : 0,                   # 1 -> use pretrained d2v skill vectors as initial node features of graph data
         'w2v': {
             'd' : [8, 16, 32, 64, 128],
             'max_epochs' : 100,
-            'dm': 1,  # training algorithm. 1: distributed memory (PV-DM), 0: distributed bag of words (PV-DBOW)
-            'dbow_words': 1,  # 'train word-vectors in skip-gram fashion; 0: no (default), 1: yes
-            'window': 10,  # cooccurrence window
-            'embtype': 'skill',  # 'skill', 'member', 'joint', 'dt2v'
+            'dm': 1,                # training algorithm. 1: distributed memory (PV-DM), 0: distributed bag of words (PV-DBOW)
+            'dbow_words': 1,        # train word-vectors in skip-gram fashion; 0: no (default), 1: yes
+            'window': 10,           # cooccurrence window
+            'embtype': 'skill',     # embedding types : 'skill', 'member', 'joint', 'dt2v'
         },
         'gnn.n2v': {
             'walk_length': 5,
@@ -39,13 +39,13 @@ settings = {
             'q': 1.0,
         },
         'gnn.gs': {
-            'e' : 5,
-            'b' : 128,
-            'd' : 8,
-            'ns' : 2,
-            'h' : 2,
-            'nn' : [20, 10],
-            'graph_type' : 'stm',
+            'e' : 5,                # number of epochs
+            'b' : 128,              # batch size
+            'd' : 8,                # embedding dimension
+            'ns' : 2,               # number of negative samples
+            'h' : 2,                # number of attention heads (if applicable)
+            'nn' : [20, 10],        # number of neighbors in each hop ([20, 10] -> 20 neighbors in first hop, 10 neighbors in second hop)
+            'graph_type' : 'stm',   # graph type used (stm -> ste -> skill-team-expert)
         },
         'gnn.gin': {
             'e': 5,

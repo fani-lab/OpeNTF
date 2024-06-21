@@ -154,8 +154,20 @@ ii) Dense vector representation ([``team2vec``](src/mdl/team2vec/main.py)) chann
 For embedding generation models (All types of methods), each model has been defined in [``./src/mdl/team2vec/``](./src/mdl/team2vec/) under an organized hierarchy employing inheritance wherever applicable.
 
 For example, one of our GNN baselines, [``gat``](./src/mdl/team2vec/gat.py) has been implemented in [``./src/mdl/team2vec/gat.py``](./src/mdl/team2vec/gat.py). This class holds the message passing layer configuration for the ``gat`` model. 
-Similarly other GNN models have been defined in their respective distinct classes. The gnn model creation and training pipeline implemented in [``./src/mdl/team2vec/gnn.py``](./src/mdl/team2vec/gnn.py)
-instantiates each ???
+Similarly other gnn models have been defined in their respective distinct class files (e.g., ``gs.py``, ``gin.py``, ``gatv2`` etc.). The instance of gnn deploys an encoder for the selected model, which is a single class [``Encoder``](./src/mdl/team2vec/encoder.py) common to all the gnn methods. 
+The encoder expedites the message passing operation of a particular gnn model. By taking a graph data as input, the encoder encodes the node information as node embeddings that is needed for the next steps of training or inference. 
+This encoder in turn adds a decoder from the [``Decoder``](./src/mdl/team2vec/decoder.py) class to its pipeline, feeding the embeddings for link prediction inference.
+The decoder then decodes the embeddings of each source and target node of the training or validation edges and predicts the existence (``1``) or absence (``0``) of an edge between the nodes in question.
+On a bigger note, the gnn model creation and training pipeline implemented in [``./src/mdl/team2vec/gnn.py``](./src/mdl/team2vec/gnn.py)
+instantiates selected gnn models based on the argument provided. The workflow of [``gnn.py``](./src/mdl/team2vec/gnn.py) implements the abstract methods ``create`` and ``train`` from the super class 
+[``./src/mdl/team2vec/team2vec.py``](``./src/mdl/team2vec/team2vec.py``).The ``create`` method here converts the ``m-hot`` encodings (preprocessed) of the teams to a graph data containing edge type ``se`` (``skill-expert``) or ``ste`` (``skill-team-expert``).
+These graph types are interchangeably used in the form ``sm`` for ``se`` and ``stm`` for ``ste`` due to maintaining naming compatibility (``m -> member == e -> expert``) with previous OpeNTF deployment. ``team2vec`` is also inherited by the [``d2v``](``./src/mdl/team2vec/wnn.py``).  
+Due to the extension from the previous implementation of OpeNTF, we used d2v, w2v, wnn interchangabely to imply to one single type of model, Doc2Vec, which is located at [``./src/mdl/team2vec/wnn.py``](``./src/mdl/team2vec/wnn.py``)
+Apart from that, we also have [``m2v``](./src/mdl/team2vec/m2v.py) which utilizes the ``create`` function from [``gnn``](./src/mdl/team2vec/gnn.py) by inheritance and also overrides ``train`` for model specific changes. 
+
+
+The parameters for each model can be separately defined in [``./src/mdl/team2vec/params.py``](./src/mdl/team2vec/params.py). For instance, for model ``GraphSAGE`` (``gs``), we can set the 
+number of epochs (``e``) and the batch size (``b``) in the ``gnn.gs`` section of the [``params``](./src/mdl/team2vec/params.py) file.
 
 <p align="center"><img src='./misc/gnn/gnn_hierarchy.png' width="1000" ></p>
 
