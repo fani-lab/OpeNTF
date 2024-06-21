@@ -124,20 +124,7 @@ We randomly take ``85%`` of the dataset for the train-validation set and ``15%``
 
 #### **3.5. Model Architecture**
 
-For neural networks, each model has been defined in [``./src/mdl/``](./src/mdl/) under an inheritance hierarchy. They override abstract functions for ``learn`` and ``test`` steps.
-
-For example, for our feedforward baseline [``fnn``](./src/mdl/fnn.py), the model has been implemented in [``./src/mdl/fnn.py``](src/mdl/fnn.py). Model's hyperparameters such as the learning rate (``lr``) or the number of epochs (``e``) can be set in [``./src/param.py``](src/param.py).
-
-<p align="center"><img src='ntf_hierarchy.png' width="550" ></p>
-  
-Currently, we possess neural models:
-1) Bayesian [``bnn``](./src/mdl/bnn.py) where model's parameter (weights) is assumed to be drawn from Gaussian (Normal) distribution and the task is to not to learn the weight but the mean (μ) and standard deviation (σ) of the distribution at each parameter.
-
-<p align="center"><img src='bnn.png' width="350" ></p>
-
-2) non-Bayesian feedforward [``fnn``](./src/mdl/fnn.py) where the model's parameter (weights) is to be learnt.
-
-The input to the models is the vector representations for (_temporal_) skills and the output is the vector representation for members. In another word, given the input skills, the models predict the members from the pool of candidates. We support two vector representations:
+For applying transfer learning, the input to the existing neural models is the vector representations for (_temporal_) skills and the output is the vector representation for members. In another word, given the input skills as embedded vectors, the models predict the members from the pool of candidates. We support two vector representations:
 
 i) Sparse vector representation (occurrence or boolean vector): See preprocessing section above.
 
@@ -172,6 +159,22 @@ The parameters for each model can be separately defined in [``./src/mdl/team2vec
 number of epochs (``e``) and the batch size (``b``) in the ``gnn.gs`` section of the [``params``](./src/mdl/team2vec/params.py) file.
 
 <p align="center"><img src='gnn_hierarchy.png' width="1000" ></p>
+
+
+For neural networks, each model has been defined in [``./src/mdl/``](./src/mdl/) under an inheritance hierarchy. They override abstract functions for ``learn`` and ``test`` steps.
+
+For example, for our feedforward baseline [``fnn``](./src/mdl/fnn.py), the model has been implemented in [``./src/mdl/fnn.py``](src/mdl/fnn.py). Model's hyperparameters such as the learning rate (``lr``) or the number of epochs (``e``) can be set in [``./src/param.py``](src/param.py).
+
+<p align="center"><img src='ntf_hierarchy.png' width="350" ></p>
+  
+Currently, we possess neural models:
+1) Bayesian [``bnn``](./src/mdl/bnn.py) where model's parameter (weights) is assumed to be drawn from Gaussian (Normal) distribution and the task is to not to learn the weight but the mean (μ) and standard deviation (σ) of the distribution at each parameter.
+
+
+
+2) non-Bayesian feedforward [``fnn``](./src/mdl/fnn.py) where the model's parameter (weights) is to be learnt.
+
+
 
 #### **3.7. Run**
 
