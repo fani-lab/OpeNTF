@@ -33,7 +33,7 @@ class Gnn(Team2Vec):
             edges = []
             for i, row in enumerate(tqdm(teams, total=teams.shape[0])):
                 for t in itertools.combinations(row.nonzero()[1], 2): edges += [t]
-            edge_index = torch.tensor(edges, dtype=torch.long).t().contiguous() #[1,2][1,2] >> [1,1][2,2]
+            edge_index = torch.tensor(edges, dtype=torch.long).t().contiguous() #[1,2][1,3][2,4] >> [1,1,2][2,3,4]
             nodes = torch.tensor([[0]] * teams.shape[1], dtype=torch.float)
             self.data = Data(x=nodes, edge_index=edge_index, edge_attr=torch.tensor([1] * len(edges), dtype=torch.long))
         else:
@@ -43,11 +43,22 @@ class Gnn(Team2Vec):
             #edges
             for edge_type in self.settings['edge_types'][0]:
                 print(f'Adding edges of type {edge_type} ...')
-                teams = self.teamsvecs[edge_type[0]]
+                teams = self.teamsvecs[edge_type[0]] # take one part of an edge from here
                 edges = []
                 for i, row1 in enumerate(tqdm(teams, total=teams.shape[0])):
-                    row2 = self.teamsvecs[edge_type[2]][i] if edge_type[2] != 'team' else [i]
-                    for t in itertools.product(row1.nonzero()[1], row2.nonzero()[1] if edge_type[2] != 'team' else row2): edges += [t]
+                    row2 = self.teamsvecs[edge_type[2]][i] if edge_type[2] != 'team' else [i] # take the other part of the edge from here
+                    if edge_type[0] == edge_type[2]:
+                        for t in itertools.combinations(row1.nonzero()[1], 2): edges += [t] # now add edges from all members of part 1 to part 2 (in this case, both are the same, so we take combinations of 2)
+                    else:
+                        for t in itertools.product(row1.nonzero()[1], row2.nonzero()[1] if edge_type[2] != 'team' else row2): edges += [t] # now add edges from all members of part 1 to part 2
+
+                '''
+                For edge_type ('skill', 'to', 'skill') and edges = [(0, 0), (0, 1), (1, 0), (1, 1)] from the previous step for one single team, we are looking at two identical edges 
+                s-s (0,1)
+                s-s (1,0)
+                so we need to only consider combinations for the s-s or m-m edges. In this case, [(0, 0), (0, 1), (1, 0), (1, 1)] >> [(0, 0), (0, 1), (1, 1)] for one single team
+                '''
+
                 self.data[edge_type].edge_index = torch.tensor(edges, dtype=torch.long).t().contiguous()
                 self.data[edge_type].edge_attr = torch.tensor([1] * len(edges), dtype=torch.long)
                 node_types = node_types.union({edge_type[0], edge_type[2]})

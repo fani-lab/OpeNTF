@@ -166,7 +166,8 @@ if __name__ == "__main__":
     for teamsvecs in args.teamsvecs:
         args.output = teamsvecs
         # for edge_type in [([('skill', 'to', 'member')], 'sm')]:
-        for edge_type in [([('skill', 'to', 'member')], 'sm'), ([('skill', 'to', 'team'), ('member', 'to', 'team')], 'stm')]:
+        # for edge_type in [([('skill', 'to', 'member')], 'sm'), ([('skill', 'to', 'team'), ('member', 'to', 'team')], 'stm')]:
+        for edge_type in [([('skill', 'to', 'skill'), ('member', 'to', 'member'), ('skill', 'to', 'team'), ('member', 'to', 'team')], 'stm')]:
         # for edge_type in [([('skill', 'to', 'team'), ('member', 'to', 'team')], 'stm')]:
             for dir in [False]:
                 for dup in ['mean']:  # add', 'mean', 'min', 'max', 'mul']:
