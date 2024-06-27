@@ -1,9 +1,13 @@
 settings = {
     'graph':{
         'edge_types':
-            ('member', 'm'),
-            # ([('skill', '-', 'team'), ('member', '-', 'team')], 'stm'),
-            # ([('skill', '-', 'member')], 'sm'),
+            # ('member', 'm'),
+            # ([('skill', 'to', 'member')], 'sm'),
+            # ([('skill', 'to', 'skill'), ('member', 'to', 'member'), ('skill', 'to', 'member')], 'sm'), # sm strongly connected
+            # ([('skill', 'to', 'team'), ('member', 'to', 'team')], 'stm'),
+            # ([('skill', 'to', 'skill'), ('member', 'to', 'member'), ('skill', 'to', 'team'), ('member', 'to', 'team')], 'stm') # stm strongly connected,
+            # [([('skill', 'to', 'member')], 'sm'), ([('skill', 'to', 'team'), ('member', 'to', 'team')], 'stm')],
+            [([('skill', 'to', 'skill'), ('member', 'to', 'member'), ('skill', 'to', 'member')], 'sm'), ([('skill', 'to', 'skill'), ('member', 'to', 'member'), ('skill', 'to', 'team'), ('member', 'to', 'team')], 'stm')], # sm stm strongly connected
         'dir': False,
         'dup_edge': 'mean',         #None: keep the duplicates, else: reduce by 'add', 'mean', 'min', 'max', 'mul'
     },
@@ -18,7 +22,7 @@ settings = {
         'save_per_epoch': False,
         'pt' : 0,                   # 1 -> use pretrained d2v skill vectors as initial node features of graph data
         'w2v': {
-            'd' : [8, 16, 32, 64, 128],
+            'd' : 8,
             'max_epochs' : 100,
             'dm': 1,                # training algorithm. 1: distributed memory (PV-DM), 0: distributed bag of words (PV-DBOW)
             'dbow_words': 1,        # train word-vectors in skip-gram fashion; 0: no (default), 1: yes

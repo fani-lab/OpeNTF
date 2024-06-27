@@ -161,17 +161,18 @@ if __name__ == "__main__":
 
     # run(f'{args.teamsvecs}teamsvecs.pkl', f'{args.teamsvecs}indexes.pkl', args.model, f'{args.output}/{args.model.split(".")[0]}/')
 
-    # test_toys(args)
-
     for teamsvecs in args.teamsvecs:
         args.output = teamsvecs
+        edge_types = params.settings['graph']['edge_types'] # take the edge types defined in the params
         # for edge_type in [([('skill', 'to', 'member')], 'sm')]:
+        # for edge_type in [([('skill', 'to', 'skill'), ('member', 'to', 'member'), ('skill', 'to', 'member')], 'sm')]: # sm enhanced
         # for edge_type in [([('skill', 'to', 'member')], 'sm'), ([('skill', 'to', 'team'), ('member', 'to', 'team')], 'stm')]:
-        for edge_type in [([('skill', 'to', 'skill'), ('member', 'to', 'member'), ('skill', 'to', 'team'), ('member', 'to', 'team')], 'stm')]:
+        # for edge_type in [([('skill', 'to', 'skill'), ('member', 'to', 'member'), ('skill', 'to', 'team'), ('member', 'to', 'team')], 'stm')]: # stm enhanced
         # for edge_type in [([('skill', 'to', 'team'), ('member', 'to', 'team')], 'stm')]:
+        for edge_type in edge_types:
             for dir in [False]:
                 for dup in ['mean']:  # add', 'mean', 'min', 'max', 'mul']:
-                    params.settings['graph'] = {'edge_types': edge_type, 'dir': dir, 'dup_edge': dup}
+                    params.settings['graph'] = {'edge_types': edge_type, 'dir': dir, 'dup_edge': dup} # set the params with the current settings
                     params.settings['model'][args.model]['graph_type'] = edge_type[1]  # take the value from the current loop
 
                     # change the relevant parameter in the params file based on the gnn args
