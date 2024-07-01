@@ -10,6 +10,7 @@ function Home() {
 
   const onWindowLoaded = () => {
     const ids = [
+      "location",
       "abstract",
       "audience",
       "prereq",
@@ -72,6 +73,22 @@ function Home() {
 
   return (
     <div className="home-content">
+      <section id="section-location">
+        <span id="section-title-location" className="section-title">
+          Time and Location
+        </span>
+        <div className="section-body" style={{ textAlign: "center" }}>
+          <b>
+            11:00am-12:30pm (CEST) <br /> Thursday, June 4, 2024, Room 12
+          </b>{" "}
+          <br />
+          <b>
+            <a href="https://meet.google.com/ikh-fnin-dns">
+              https://meet.google.com/ikh-fnin-dns
+            </a>
+          </b>
+        </div>
+      </section>
       <section id="section-abstract">
         <span id="section-title-abstract" className="section-title">
           Abstract
