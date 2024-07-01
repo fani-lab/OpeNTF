@@ -12,7 +12,8 @@ function Sidebar() {
     }
     return <>
         <ul className="list-unstyled text-end side-menu">
-            <li onClick={menuClicked} id="abstract" className='active'>Abstract</li>
+        <li onClick={menuClicked} id="location" className='active'>Time and Location</li>
+            <li onClick={menuClicked} id="abstract">Abstract</li>
             <li onClick={menuClicked} id="audience">Target Audience</li>
             <li onClick={menuClicked} id="prereq">Prerequisite Knowledge</li>
             <li onClick={menuClicked} id="outline">Outline</li>
