@@ -70,6 +70,12 @@ class Gnn(Team2Vec):
             import torch_geometric.transforms as T
             transform = T.ToUndirected()
             self.data = transform(self.data)
+            # create reverse edges for s-s and m-m edge_types
+            for edge_type in self.data.edge_types:
+                if edge_type[0] == edge_type[2]:
+                    rev_edge_type = (edge_type[0], f'rev_{edge_type[1]}', edge_type[2])  # reverse the relation
+                    print(f'Creating {rev_edge_type} manually')
+                    self.data[rev_edge_type] = self.data[edge_type] # basically the same edge_index
 
         if self.settings['dup_edge']:
             print(f'To reduce duplicate edges by {self.settings["dup_edge"]} ...')
