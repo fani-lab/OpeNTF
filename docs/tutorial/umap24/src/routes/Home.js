@@ -73,7 +73,7 @@ function Home() {
 
   return (
     <div className="home-content">
-      <section id="section-location">
+      <section id="section-location" class="active">
         <span id="section-title-location" className="section-title">
           Time and Location
         </span>
