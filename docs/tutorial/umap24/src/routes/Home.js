@@ -79,7 +79,7 @@ function Home() {
         </span>
         <div className="section-body" style={{ textAlign: "center" }}>
           <b>
-            11:00am-12:30pm (CEST) <br /> Thursday, June 4, 2024, Room 12
+            11:00am-12:30pm (CEST) <br /> Thursday, July 4, 2024, Room 12
           </b>{" "}
           <br />
           <b>
