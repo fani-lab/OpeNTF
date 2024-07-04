@@ -19,7 +19,7 @@ settings = {
         # 'supervision_edge_types': [([('skill', 'to', 'skill'), ('member', 'to', 'member'), ('skill', 'to', 'member')], 'sm'), ([('skill', 'to', 'skill'), ('member', 'to', 'member'), ('skill', 'to', 'team'), ('member', 'to', 'team')], 'stm')], # sm stm strongly connected
         'supervision_edge_types': [([('skill', 'to', 'member')], 'sm.en'), ([('skill', 'to', 'team'), ('member', 'to', 'team')], 'stm.en')],
         'dir': False,
-        'dup_edge': 'mean',         #None: keep the duplicates, else: reduce by 'add', 'mean', 'min', 'max', 'mul'
+        'dup_edge': ['add', 'mean', 'min', 'max', 'mul'],         #None: keep the duplicates, else: reduce by 'add', 'mean', 'min', 'max', 'mul'
     },
     'model': {
         'd' : 8,                    # embedding dim array
@@ -60,6 +60,8 @@ settings = {
             'h' : 2,                # number of attention heads (if applicable)
             'nn' : [20, 10],        # number of neighbors in each hop ([20, 10] -> 20 neighbors in first hop, 10 neighbors in second hop)
             'graph_type' : 'stm',   # graph type used (stm -> ste -> skill-team-expert)
+            'agg' : 'mean',         # aggregation method used for merging multiple edges between the same source and destination node
+            'dir' : 'undir',        # whether the graph is directed
         },
         'gnn.gin': {
             'e': 5,
@@ -69,6 +71,8 @@ settings = {
             'h': 2,
             'nn': [20, 10],
             'graph_type': 'stm',
+            'agg': 'mean',
+            'dir': 'undir',
         },
         'gnn.gat': {
             'e': 5,
@@ -78,6 +82,8 @@ settings = {
             'h': 2,
             'nn': [20, 10],
             'graph_type': 'stm',
+            'agg': 'mean',
+            'dir': 'undir',
         },
         'gnn.gatv2': {
             'e': 5,
@@ -87,6 +93,8 @@ settings = {
             'h': 2,
             'nn': [20, 10],
             'graph_type': 'stm',
+            'agg': 'mean',
+            'dir': 'undir',
         },
         'gnn.han': {
             'e': 5,
@@ -96,6 +104,8 @@ settings = {
             'h': 2,
             'nn': [20, 10],
             'graph_type': 'stm',
+            'agg': 'mean',
+            'dir': 'undir',
         },
         'gnn.gine': {
             'e': 5,
@@ -105,6 +115,8 @@ settings = {
             'h': 2,
             'nn': [20, 10],
             'graph_type': 'stm',
+            'agg': 'mean',
+            'dir': 'undir',
         },
         'gnn.m2v': {
             'graph_type':'stm', # this value will be changed during runtime in each loop according to the graph_type and then be used in the embedding_output var

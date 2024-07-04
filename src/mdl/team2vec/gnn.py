@@ -106,10 +106,11 @@ class Gnn(Team2Vec):
         self.ns = self.settings['ns']
         self.nn = self.settings['nn']
         self.agg = self.settings['agg']
+        self.dir = self.settings['dir']
         self.graph_type = self.settings['graph_type']
 
         # e.g : domain = 'imdb/title.basics.tsv.filtered.mt5.ts2'
-        # self.filepath = f'../../data/preprocessed/{domain}/gnn/{graph_type}.undir.{agg}.data.pkl'
+        # self.filepath = f'../../data/preprocessed/{domain}/gnn/{graph_type}.{dir}.{agg}.data.pkl'
         self.model_output = emb_output
         if not os.path.isdir(self.model_output): os.makedirs(self.model_output)
         self.is_directed = self.data.is_directed()
@@ -143,7 +144,7 @@ class Gnn(Team2Vec):
             self.data.to(self.device)
             # for simplicity, we just pass seed_edge_type = edge_types[0]. This does not impact any output
             emb = self.model(self.data, self.edge_types[0], self.is_directed, emb=True)
-            embedding_output = f'{self.model_output}/{self.model_name}.{self.graph_type}.undir.{self.agg}.e{epochs}.ns{int(self.ns)}.b{self.b}.d{self.d}.emb.pt'
+            embedding_output = f'{self.model_output}/{self.model_name}.{self.graph_type}.{"dir" if self.dir else "undir"}.{self.agg}.e{epochs}.ns{int(self.ns)}.b{self.b}.d{self.d}.emb.pt'
             torch.save(emb, embedding_output, pickle_protocol=4)
             print(f'\nsaved embedding as : {embedding_output} ..............\n')
         # eval_batch(test_loader, is_directed)
