@@ -1,17 +1,23 @@
+'''
+During setting up the edge_types, if we want to include skill-skill or expert-expert connections,
+the edge_type identifier "sm" or "stm" will have to be included as "sm.en" or "stm.en" [en = enhanced]
+'''
+
+
 settings = {
     'graph':{
         'edge_types':
             # ('member', 'm'),
             # ([('skill', 'to', 'member')], 'sm'),
-            # ([('skill', 'to', 'skill'), ('member', 'to', 'member'), ('skill', 'to', 'member')], 'sm'), # sm strongly connected
+            # ([('skill', 'to', 'skill'), ('member', 'to', 'member'), ('skill', 'to', 'member')], 'sm'), # sm enhanced
             # ([('skill', 'to', 'team'), ('member', 'to', 'team')], 'stm'),
-            # ([('skill', 'to', 'skill'), ('member', 'to', 'member'), ('skill', 'to', 'team'), ('member', 'to', 'team')], 'stm') # stm strongly connected,
+            # ([('skill', 'to', 'skill'), ('member', 'to', 'member'), ('skill', 'to', 'team'), ('member', 'to', 'team')], 'stm') # stm enhanced,
             # [([('skill', 'to', 'member')], 'sm'), ([('skill', 'to', 'team'), ('member', 'to', 'team')], 'stm')],
-            [([('skill', 'to', 'skill'), ('member', 'to', 'member'), ('skill', 'to', 'member')], 'sm'), ([('skill', 'to', 'skill'), ('member', 'to', 'member'), ('skill', 'to', 'team'), ('member', 'to', 'team')], 'stm')], # sm stm strongly connected
+            [([('skill', 'to', 'skill'), ('member', 'to', 'member'), ('skill', 'to', 'member')], 'sm.en'), ([('skill', 'to', 'skill'), ('member', 'to', 'member'), ('skill', 'to', 'team'), ('member', 'to', 'team')], 'stm.en')], # sm stm strongly connected
 
         'custom_supervision' : True, # if false, it will take all the forward edge_types as supervision edges
         # 'supervision_edge_types': [([('skill', 'to', 'skill'), ('member', 'to', 'member'), ('skill', 'to', 'member')], 'sm'), ([('skill', 'to', 'skill'), ('member', 'to', 'member'), ('skill', 'to', 'team'), ('member', 'to', 'team')], 'stm')], # sm stm strongly connected
-        'supervision_edge_types': [([('skill', 'to', 'member')], 'sm'), ([('skill', 'to', 'team'), ('member', 'to', 'team')], 'stm')],
+        'supervision_edge_types': [([('skill', 'to', 'member')], 'sm.en'), ([('skill', 'to', 'team'), ('member', 'to', 'team')], 'stm.en')],
         'dir': False,
         'dup_edge': 'mean',         #None: keep the duplicates, else: reduce by 'add', 'mean', 'min', 'max', 'mul'
     },

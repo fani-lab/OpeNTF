@@ -12,6 +12,7 @@ from torch_geometric.loader import LinkNeighborLoader
 
 from mdl.earlystopping import EarlyStopping
 from team2vec import Team2Vec
+import params
 
 class Gnn(Team2Vec):
 
@@ -70,7 +71,6 @@ class Gnn(Team2Vec):
             print('To undirected graph ...')
             import torch_geometric.transforms as T
             transform = T.ToUndirected(reduce = self.settings['dup_edge']) # this will also aggregate the edge features
-            self.data = transform(self.data)
 
             # we will only create reverse edges if the graph is undirected
             # create reverse edges for s-s and m-m edge_types
@@ -82,6 +82,8 @@ class Gnn(Team2Vec):
                     self.data[rev_edge_type].edge_index = self.data[
                         edge_type].edge_index  # basically the same edge_index
                     self.data[rev_edge_type].edge_attr = self.data[edge_type].edge_attr  # basically the same edge_attr
+            # apply the final transform
+            self.data = transform(self.data)
 
         if self.settings['dup_edge'] and self.settings['dir']:
             print(f'To reduce duplicate edges by {self.settings["dup_edge"]} ...')
@@ -117,7 +119,9 @@ class Gnn(Team2Vec):
 
         # create separate loaders for separate seed edge_types
         self.train_loader, self.val_loader, self.test_loader = {}, {}, {}
-        for edge_type in self.settings['supervision_edge_types']:
+
+        # these settings are central settings set in main
+        for edge_type in params.settings['graph']['supervision_edge_types']:
             self.train_loader[edge_type] = self.create_mini_batch_loader(train_data, edge_type, 'train')
             self.val_loader[edge_type] = self.create_mini_batch_loader(val_data, edge_type, 'val')
             self.test_loader[edge_type] = self.create_mini_batch_loader(test_data, edge_type, 'test')
@@ -285,7 +289,7 @@ class Gnn(Team2Vec):
             total_examples = 0
             torch.cuda.empty_cache()
             # train for loaders of all edge_types, e.g : train_loader['skill','to','team'], train_loader['member','to','team']
-            for seed_edge_type in self.settings['supervision_edge_types']:
+            for seed_edge_type in params.settings['graph']['supervision_edge_types']:
                 print(f'epoch {epoch:03d} : batching for train_loader for seed_edge_type : {seed_edge_type}')
                 for sampled_data in loader[seed_edge_type]:
                     self.optimizer.zero_grad()
@@ -335,7 +339,7 @@ class Gnn(Team2Vec):
         ground_truths = []
         total_loss = 0
         total_examples = 0
-        for seed_edge_type in self.settings['supervision_edge_types']:
+        for seed_edge_type in params.settings['graph']['supervision_edge_types']:
             for sampled_data in loader[seed_edge_type]:
                 sampled_data.to(self.device)
                 tmp_pred = self.model(sampled_data, seed_edge_type, self.is_directed)
