@@ -61,7 +61,7 @@ settings = {
             'nn' : [20, 10],        # number of neighbors in each hop ([20, 10] -> 20 neighbors in first hop, 10 neighbors in second hop)
             'graph_type' : 'stm',   # graph type used (stm -> ste -> skill-team-expert)
             'agg' : 'mean',         # aggregation method used for merging multiple edges between the same source and destination node
-            'dir' : 'undir',        # whether the graph is directed
+            'dir' : False,          # whether the graph is directed
         },
         'gnn.gin': {
             'e': 5,
@@ -72,7 +72,7 @@ settings = {
             'nn': [20, 10],
             'graph_type': 'stm',
             'agg': 'mean',
-            'dir': 'undir',
+            'dir': False,
         },
         'gnn.gat': {
             'e': 5,
@@ -83,7 +83,7 @@ settings = {
             'nn': [20, 10],
             'graph_type': 'stm',
             'agg': 'mean',
-            'dir': 'undir',
+            'dir': False,
         },
         'gnn.gatv2': {
             'e': 5,
@@ -94,7 +94,7 @@ settings = {
             'nn': [20, 10],
             'graph_type': 'stm',
             'agg': 'mean',
-            'dir': 'undir',
+            'dir': False,
         },
         'gnn.han': {
             'e': 5,
@@ -105,7 +105,29 @@ settings = {
             'nn': [20, 10],
             'graph_type': 'stm',
             'agg': 'mean',
-            'dir': 'undir',
+            'dir': False,
+            'metapaths':{
+                'sm': [[('skill', 'to', 'member'), ('member', 'rev_to', 'skill')]],
+                'stm': [
+                    [('member', 'to', 'team'), ('team', 'rev_to', 'skill'), ('skill', 'to', 'team'), ('team', 'rev_to', 'member')],
+                    [('skill', 'to', 'team'), ('team', 'rev_to', 'member'), ('member', 'to', 'team'), ('team', 'rev_to', 'skill')],
+                    [('member', 'to', 'team'), ('team', 'rev_to', 'member')],
+                    [('skill', 'to', 'team'), ('team', 'rev_to', 'skill')],
+                ],
+                # added one extra e-e connection in the middle
+                'sm.en': [[('skill', 'to', 'skill'), ('skill', 'to', 'member'), ('member', 'to', 'member'), ('member', 'rev_to', 'skill'), ('skill', 'to', 'skill')]],
+                'stm.en': [
+                    [('member', 'to', 'team'), ('team', 'rev_to', 'skill'), ('skill', 'to', 'team'), ('team', 'rev_to', 'member')],
+                    [('skill', 'to', 'team'), ('team', 'rev_to', 'member'), ('member', 'to', 'team'), ('team', 'rev_to', 'skill')],
+                    [('member', 'to', 'team'), ('team', 'rev_to', 'member')],
+                    [('skill', 'to', 'team'), ('team', 'rev_to', 'skill')],
+                    # repeating the same set of metapaths with additional s-s or e-e connections
+                    [('member', 'to', 'member'), ('member', 'to', 'team'), ('team', 'rev_to', 'skill'), ('skill', 'to', 'team'), ('team', 'rev_to', 'member'), ('member', 'to', 'member')],
+                    [('skill', 'to', 'skill'), ('skill', 'to', 'team'), ('team', 'rev_to', 'member'), ('member', 'to', 'team'), ('team', 'rev_to', 'skill'), ('skill', 'to', 'skill')],
+                    [('member', 'to', 'member'), ('member', 'to', 'team'), ('team', 'rev_to', 'member'), ('member', 'to', 'member')],
+                    [('skill', 'to', 'skill'), ('skill', 'to', 'team'), ('team', 'rev_to', 'skill'), ('skill', 'to', 'skill')],
+                ]
+            }
         },
         'gnn.gine': {
             'e': 5,
@@ -116,7 +138,7 @@ settings = {
             'nn': [20, 10],
             'graph_type': 'stm',
             'agg': 'mean',
-            'dir': 'undir',
+            'dir': False,
         },
         'gnn.m2v': {
             'graph_type':'stm', # this value will be changed during runtime in each loop according to the graph_type and then be used in the embedding_output var
@@ -131,6 +153,20 @@ settings = {
                     ('skill','to','team'),
                     ('team', 'rev_to', 'member'),
                 ],
+
+                # experimental section
+                'sm.en' : [
+                    ('member','rev_to','skill'),
+                    ('skill', 'to', 'skill'),           # additional s-s connection
+                    ('skill', 'to', 'member'),
+                ],
+                'stm.en' : [
+                    ('member','to','team'),
+                    ('team', 'rev_to', 'skill'),
+                    ('skill', 'to', 'skill'),           # additional s-s connection
+                    ('skill','to','team'),
+                    ('team', 'rev_to', 'member'),
+                ],
             },
             'walk_length': 10,
             'context_size': 10,
@@ -141,17 +177,5 @@ settings = {
             'e': 100,
         },
     },
-    'data':{
-        'dblp':{},
-        'uspt':{},
-        'imdb':{},
-        'node_types': ['member'], #['id', 'skill', 'member'],
-    },
     'cmd' : ['graph', 'emb'],
-    'main':{
-        'model': 'm2v',
-        'domains': ['uspt','imdb','dblp'],
-        'node_types': ['id', 'skill', 'member'],
-        'edge_types': 'STE',
-    },
 }

@@ -108,6 +108,7 @@ class Gnn(Team2Vec):
         self.agg = self.settings['agg']
         self.dir = self.settings['dir']
         self.graph_type = self.settings['graph_type']
+        if self.model_name == 'han': self.metapaths = self.settings['metapaths'][self.graph_type]
 
         # e.g : domain = 'imdb/title.basics.tsv.filtered.mt5.ts2'
         # self.filepath = f'../../data/preprocessed/{domain}/gnn/{graph_type}.{dir}.{agg}.data.pkl'
@@ -236,6 +237,14 @@ class Gnn(Team2Vec):
         train_data.validate(raise_on_error=True)
         val_data.validate(raise_on_error=True)
         test_data.validate(raise_on_error=True)
+
+        # if han, add metapaths to the metadata
+        if self.model_name == 'han':
+            from torch_geometric.transforms import AddMetaPaths
+            train_data = AddMetaPaths(metapaths=self.metapaths, drop_orig_edge_types=False,
+                                      drop_unconnected_node_types=False)(train_data)
+            val_data = AddMetaPaths(metapaths=self.metapaths, drop_orig_edge_types=False,
+                                    drop_unconnected_node_types=False)(val_data)
 
         return train_data, val_data, test_data, edge_types, rev_edge_types
 
