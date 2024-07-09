@@ -117,7 +117,7 @@ class Gnn(Team2Vec):
         self.is_directed = self.data.is_directed()
 
         # initialize the model based on the param for training
-        train_data, val_data, test_data, self.edge_types, self.rev_edge_types = self.define_splits(self.data)
+        train_data, val_data, test_data, self.edge_types, self.rev_edge_types = self.define_splits_and_neg_sampling(self.data)
 
         # create separate loaders for separate seed edge_types
         self.train_loader, self.val_loader, self.test_loader = {}, {}, {}
@@ -233,6 +233,57 @@ class Gnn(Team2Vec):
         )
 
         train_data, val_data, test_data = transform(data)
+
+        train_data.validate(raise_on_error=True)
+        val_data.validate(raise_on_error=True)
+        test_data.validate(raise_on_error=True)
+
+        # if han, add metapaths to the metadata
+        if self.model_name == 'han':
+            from torch_geometric.transforms import AddMetaPaths
+            train_data = AddMetaPaths(metapaths=self.metapaths, drop_orig_edge_types=False,
+                                      drop_unconnected_node_types=False)(train_data)
+            val_data = AddMetaPaths(metapaths=self.metapaths, drop_orig_edge_types=False,
+                                    drop_unconnected_node_types=False)(val_data)
+
+        return train_data, val_data, test_data, edge_types, rev_edge_types
+
+    # separately handle the negative sampling part
+    def define_splits_and_neg_sampling(self, data):
+
+        if (type(data) == HeteroData):
+            num_edge_types = len(data.edge_types)
+
+            # directed graph means we dont have any reverse edges
+            if (data.is_directed()):
+                edge_types = data.edge_types
+                rev_edge_types = None
+            else:
+                edge_types = data.edge_types[:num_edge_types // 2]
+                rev_edge_types = data.edge_types[num_edge_types // 2:]
+        else:
+            edge_types = None
+            rev_edge_types = None
+
+        transform = T.RandomLinkSplit(
+            num_val=0.1,
+            num_test=0.0,
+            disjoint_train_ratio=0.3,
+            neg_sampling_ratio=0.0,             # leaving this for manual neg_sampling
+            add_negative_train_samples=False,
+            edge_types=edge_types,
+            rev_edge_types=rev_edge_types,
+        )
+
+        train_data, val_data, test_data = transform(data)
+
+        # handle neg_sampling manually
+        from torch_geometric.utils import negative_sampling
+        for data_type in [train_data, val_data]:
+            for edge_type in edge_types:
+                num_neg_samples = self.ns * data_type[edge_type].edge_label_index.shape[1] # here it is treated as an actual number instead of a ratio
+                data_type[edge_type].edge_label_index = torch.concat([data_type[edge_type].edge_label_index, negative_sampling(data_type[edge_type].edge_index, num_neg_samples=num_neg_samples, method='sparse')], dim = 1)
+                # data_type[edge_type].edge_label = torch.concat([data_type[edge_type].edge_label_index, negative_sampling(data_type[edge_type].edge_index, num_neg_samples=num_neg_samples, method='sparse')], dim = 1)
 
         train_data.validate(raise_on_error=True)
         val_data.validate(raise_on_error=True)
