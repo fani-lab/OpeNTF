@@ -283,6 +283,7 @@ class Gnn(Team2Vec):
             for edge_type in edge_types:
                 num_neg_samples = self.ns * data_type[edge_type].edge_label_index.shape[1] # here it is treated as an actual number instead of a ratio
                 data_type[edge_type].edge_label_index = torch.concat([data_type[edge_type].edge_label_index, negative_sampling(data_type[edge_type].edge_index, num_neg_samples=num_neg_samples, method='sparse')], dim = 1)
+                data_type[edge_type].edge_label = torch.concat([data_type[edge_type].edge_label, torch.zeros(num_neg_samples)], dim = 0)
                 # data_type[edge_type].edge_label = torch.concat([data_type[edge_type].edge_label_index, negative_sampling(data_type[edge_type].edge_index, num_neg_samples=num_neg_samples, method='sparse')], dim = 1)
 
         train_data.validate(raise_on_error=True)
