@@ -56,9 +56,9 @@ settings = {
             'e' : 5,                # number of epochs
             'b' : 128,              # batch size
             'd' : 8,                # embedding dimension
-            'ns' : 2,               # number of negative samples
+            'ns' : 5,               # number of negative samples
             'h' : 2,                # number of attention heads (if applicable)
-            'nn' : [20, 10],        # number of neighbors in each hop ([20, 10] -> 20 neighbors in first hop, 10 neighbors in second hop)
+            'nn' : [30, 20],        # number of neighbors in each hop ([20, 10] -> 20 neighbors in first hop, 10 neighbors in second hop)
             'graph_type' : 'stm',   # graph type used (stm -> ste -> skill-team-expert)
             'agg' : 'mean',         # aggregation method used for merging multiple edges between the same source and destination node
             'dir' : False,          # whether the graph is directed
@@ -67,9 +67,9 @@ settings = {
             'e': 5,
             'b': 128,
             'd': 8,
-            'ns': 2,
+            'ns' : 5,
             'h': 2,
-            'nn': [20, 10],
+            'nn': [30, 20],
             'graph_type': 'stm',
             'agg': 'mean',
             'dir': False,
@@ -78,9 +78,9 @@ settings = {
             'e': 5,
             'b': 128,
             'd': 8,
-            'ns': 2,
+            'ns' : 5,
             'h': 2,
-            'nn': [20, 10],
+            'nn': [30, 20],
             'graph_type': 'stm',
             'agg': 'mean',
             'dir': False,
@@ -89,9 +89,9 @@ settings = {
             'e': 5,
             'b': 128,
             'd': 8,
-            'ns': 2,
+            'ns' : 5,
             'h': 2,
-            'nn': [20, 10],
+            'nn': [30, 20],
             'graph_type': 'stm',
             'agg': 'mean',
             'dir': False,
@@ -100,9 +100,9 @@ settings = {
             'e': 5,
             'b': 128,
             'd': 8,
-            'ns': 2,
+            'ns' : 5,
             'h': 2,
-            'nn': [20, 10],
+            'nn': [30, 20],
             'graph_type': 'stm',
             'agg': 'mean',
             'dir': False,
@@ -133,9 +133,9 @@ settings = {
             'e': 5,
             'b': 128,
             'd': 8,
-            'ns': 2,
+            'ns' : 5,
             'h': 2,
-            'nn': [20, 10],
+            'nn': [30, 20],
             'graph_type': 'stm',
             'agg': 'mean',
             'dir': False,
@@ -171,7 +171,7 @@ settings = {
             'walk_length': 10,
             'context_size': 10,
             'walks_per_node': 20,
-            'ns' : 2,
+            'ns' : 5,
             'd': 8,
             'b': 128,
             'e': 100,

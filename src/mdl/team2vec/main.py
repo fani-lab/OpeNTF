@@ -18,7 +18,7 @@ def addargs(parser):
     # args for gnn methods
     gnn_args = parser.add_argument_group('Gnn Settings')
     gnn_args.add_argument('--agg', type=str, nargs = '+', required=False, help='The aggregation method used for the graph data; e.g : mean, none, max, min etc.')
-    gnn_args.add_argument('--d', type=int, required=False, help='Embedding dimension; e.g : 4, 8, 16, 32 etc.')
+    gnn_args.add_argument('--d', type=int, nargs='+', required=False, help='Embedding dimension; e.g : 4, 8, 16, 32 etc.')
     gnn_args.add_argument('--e', type=int, required=False, help='Train epochs ; e.g : 5, 100 etc.')
     gnn_args.add_argument('--ns', type=int, required=False, help='Train epochs ; e.g : 2, 3, 5 etc.')
     gnn_args.add_argument('--graph_type', type=str, required=False, help='Graph types used for the training; e.g : sm, stm etc.')
@@ -152,7 +152,7 @@ def test_toys(args):
 #python -u main.py -teamsvecs ./../../../data/preprocessed/dblp/toy.dblp.v12.json/ -model gnn.w2v --output ./../../../data/preprocessed/dblp/toy.dblp.v12.json/
 
 # with gnn args
-#python -u main.py -teamsvecs ./../../../data/preprocessed/dblp/toy.dblp.v12.json/ -model gnn.gs --graph_type stm --agg mean --ns 2 --e 100 --d 8
+#python -u main.py -teamsvecs ./../../../data/preprocessed/dblp/toy.dblp.v12.json/ -model gnn.gs --agg mean --e 100 --d 8
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Team Embedding')
@@ -167,6 +167,7 @@ if __name__ == "__main__":
         edge_types = params.settings['graph']['edge_types'] # take the edge types defined in the params
         supervision_edge_types = params.settings['graph']['supervision_edge_types'] if params.settings['graph']['custom_supervision'] else edge_types # if yes then apply the selected edge_types as supervision edges
         if args.agg is None: args.agg = params.settings['graph']['dup_edge']
+        if args.d is None: args.d = [params.settings['model'][args.model]['d']] # loop through all the d's
 
         # for edge_type in [([('skill', 'to', 'member')], 'sm')]:
         # for edge_type in [([('skill', 'to', 'skill'), ('member', 'to', 'member'), ('skill', 'to', 'member')], 'sm')]: # sm enhanced
@@ -177,24 +178,25 @@ if __name__ == "__main__":
             for dir in [False]:
                 # for dup in ['mean']:  # ['add', 'mean', 'min', 'max', 'mul']:
                 for agg in args.agg:  # ['add', 'mean', 'min', 'max', 'mul']: # merge strategy of duplicate edges
-                    supervision_edge_type = supervision_edge_types[id][0] # select the corresponding supervision edge_type from the list
-                    params.settings['graph'] = {
-                        # set the params with the current settings
-                        'edge_types': edge_type,
-                        'dir': dir,
-                        'dup_edge': agg, # merging strategy for duplicate edges
-                        'supervision_edge_types':supervision_edge_type
-                    }
-                    params.settings['model'][args.model]['graph_type'] = edge_type[1]  # take the value from the current loop
-                    params.settings['model'][args.model]['agg'] = agg # this is the same value as agg
-                    params.settings['model'][args.model]['dir'] = dir # this is the same value as dir
+                    for d in args.d:
+                        supervision_edge_type = supervision_edge_types[id][0] # select the corresponding supervision edge_type from the list
+                        params.settings['graph'] = {
+                            # set the params with the current settings
+                            'edge_types': edge_type,
+                            'dir': dir,
+                            'dup_edge': agg, # merging strategy for duplicate edges
+                            'supervision_edge_types':supervision_edge_type
+                        }
+                        params.settings['model'][args.model]['graph_type'] = edge_type[1]  # take the value from the current loop
+                        params.settings['model'][args.model]['agg'] = agg # this is the same value as agg
+                        params.settings['model'][args.model]['dir'] = dir # this is the same value as dir
+                        params.settings['model'][args.model]['d'] = d
 
-                    # change the relevant parameter in the params file based on the gnn args
-                    if args.e is not None: params.settings['model'][args.model]['e'] = args.e
-                    if args.d is not None: params.settings['model'][args.model]['d'] = args.d
-                    if args.ns is not None: params.settings['model'][args.model]['ns'] = args.ns
-                    if args.pt is not None: params.settings['model']['pt'] = args.pt
-                    if args.embtype is not None: params.settings['model'][args.model]['embtype'] = args.embtype
+                        # change the relevant parameter in the params file based on the gnn args
+                        if args.e is not None: params.settings['model'][args.model]['e'] = args.e
+                        if args.ns is not None: params.settings['model'][args.model]['ns'] = args.ns
+                        if args.pt is not None: params.settings['model']['pt'] = args.pt
+                        if args.embtype is not None: params.settings['model'][args.model]['embtype'] = args.embtype
 
-                    run(f'{teamsvecs}teamsvecs.pkl', f'{teamsvecs}indexes.pkl', args.model,
-                        f'{args.output}/{args.model.split(".")[0]}/', f'{args.output}/emb/')
+                        run(f'{teamsvecs}teamsvecs.pkl', f'{teamsvecs}indexes.pkl', args.model,
+                            f'{args.output}/{args.model.split(".")[0]}/', f'{args.output}/emb/')

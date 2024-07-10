@@ -117,7 +117,7 @@ class Gnn(Team2Vec):
         self.is_directed = self.data.is_directed()
 
         # initialize the model based on the param for training
-        train_data, val_data, test_data, self.edge_types, self.rev_edge_types = self.define_splits_and_neg_sampling(self.data)
+        train_data, val_data, test_data, self.edge_types, self.rev_edge_types = self.define_splits(self.data)
 
         # create separate loaders for separate seed edge_types
         self.train_loader, self.val_loader, self.test_loader = {}, {}, {}
@@ -126,7 +126,7 @@ class Gnn(Team2Vec):
         for edge_type in params.settings['graph']['supervision_edge_types']:
             self.train_loader[edge_type] = self.create_mini_batch_loader(train_data, edge_type, 'train')
             self.val_loader[edge_type] = self.create_mini_batch_loader(val_data, edge_type, 'val')
-            self.test_loader[edge_type] = self.create_mini_batch_loader(test_data, edge_type, 'test')
+            # self.test_loader[edge_type] = self.create_mini_batch_loader(test_data, edge_type, 'test') # we dont need a test loader as of now
 
         print(f"Device: '{self.device}'")
         torch.cuda.empty_cache()
@@ -226,8 +226,8 @@ class Gnn(Team2Vec):
             num_val=0.1,
             num_test=0.0,
             disjoint_train_ratio=0.3,
-            neg_sampling_ratio=self.ns,
-            add_negative_train_samples=True,
+            neg_sampling_ratio=0.0,             # we leave negative sampling to the mini_batch_loaders
+            add_negative_train_samples=False,
             edge_types=edge_types,
             rev_edge_types=rev_edge_types,
         )
@@ -340,15 +340,16 @@ class Gnn(Team2Vec):
         # we pick only a single edge_type to feed edge_label_index (need to verify this approach)
 
         # neg_sampling in val or test loader causes doubling the edge_label weight producing 2.0 instead of values 1.0 (need to test)
-        neg_sampling = self.ns if mode == 'train' else None
+        neg_sampling_ratio = self.ns                                  # updated after v5
         batch_size = self.b if mode == 'train' else (3 * self.b)
-        shuffle = True if mode == 'train' else False
+        shuffle = True
 
         print(f'mini batch loader for mode {mode}')
         mini_batch_loader = LinkNeighborLoader(
             data=split_data,
             num_neighbors=self.nn,
-            neg_sampling=None,  # prev : neg_sampling
+            neg_sampling='binary',
+            neg_sampling_ratio=neg_sampling_ratio,             # prev : neg_sampling = None
             edge_label_index=(seed_edge_type, split_data[seed_edge_type].edge_label_index),
             edge_label=split_data[seed_edge_type].edge_label,
             batch_size=batch_size,
