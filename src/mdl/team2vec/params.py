@@ -53,56 +53,56 @@ settings = {
             'q': 1.0,
         },
         'gnn.gs': {
-            'e' : 5,                # number of epochs
+            'e' : 100,                # number of epochs
             'b' : 128,              # batch size
             'd' : 8,                # embedding dimension
             'ns' : 5,               # number of negative samples
             'h' : 2,                # number of attention heads (if applicable)
-            'nn' : [30, 20],        # number of neighbors in each hop ([20, 10] -> 20 neighbors in first hop, 10 neighbors in second hop)
+            'nn' : [20, 10],        # number of neighbors in each hop ([20, 10] -> 20 neighbors in first hop, 10 neighbors in second hop)
             'graph_type' : 'stm',   # graph type used (stm -> ste -> skill-team-expert)
             'agg' : 'mean',         # aggregation method used for merging multiple edges between the same source and destination node
             'dir' : False,          # whether the graph is directed
         },
         'gnn.gin': {
-            'e': 5,
+            'e': 100,
             'b': 128,
             'd': 8,
             'ns' : 5,
             'h': 2,
-            'nn': [30, 20],
+            'nn': [20, 10],
             'graph_type': 'stm',
             'agg': 'mean',
             'dir': False,
         },
         'gnn.gat': {
-            'e': 5,
+            'e': 100,
             'b': 128,
             'd': 8,
             'ns' : 5,
             'h': 2,
-            'nn': [30, 20],
+            'nn': [20, 10],
             'graph_type': 'stm',
             'agg': 'mean',
             'dir': False,
         },
         'gnn.gatv2': {
-            'e': 5,
+            'e': 100,
             'b': 128,
             'd': 8,
             'ns' : 5,
             'h': 2,
-            'nn': [30, 20],
+            'nn': [20, 10],
             'graph_type': 'stm',
             'agg': 'mean',
             'dir': False,
         },
         'gnn.han': {
-            'e': 5,
+            'e': 100,
             'b': 128,
             'd': 8,
             'ns' : 5,
             'h': 2,
-            'nn': [30, 20],
+            'nn': [20, 10],
             'graph_type': 'stm',
             'agg': 'mean',
             'dir': False,
@@ -115,27 +115,28 @@ settings = {
                     [('skill', 'to', 'team'), ('team', 'rev_to', 'skill')],
                 ],
                 # added one extra e-e connection in the middle
-                'sm.en': [[('skill', 'to', 'skill'), ('skill', 'to', 'member'), ('member', 'to', 'member'), ('member', 'rev_to', 'skill'), ('skill', 'to', 'skill')]],
+                # 'sm.en': [[('skill', 'to', 'skill'), ('skill', 'to', 'member'), ('member', 'to', 'member'), ('member', 'rev_to', 'skill'), ('skill', 'to', 'skill')]],
+                'sm.en': [[('skill', 'to', 'skill'), ('skill', 'to', 'member'), ('member', 'rev_to', 'skill'), ('skill', 'to', 'skill')]],
                 'stm.en': [
                     [('member', 'to', 'team'), ('team', 'rev_to', 'skill'), ('skill', 'to', 'team'), ('team', 'rev_to', 'member')],
                     [('skill', 'to', 'team'), ('team', 'rev_to', 'member'), ('member', 'to', 'team'), ('team', 'rev_to', 'skill')],
                     [('member', 'to', 'team'), ('team', 'rev_to', 'member')],
                     [('skill', 'to', 'team'), ('team', 'rev_to', 'skill')],
                     # repeating the same set of metapaths with additional s-s or e-e connections
-                    [('member', 'to', 'member'), ('member', 'to', 'team'), ('team', 'rev_to', 'skill'), ('skill', 'to', 'team'), ('team', 'rev_to', 'member'), ('member', 'to', 'member')],
-                    [('skill', 'to', 'skill'), ('skill', 'to', 'team'), ('team', 'rev_to', 'member'), ('member', 'to', 'team'), ('team', 'rev_to', 'skill'), ('skill', 'to', 'skill')],
-                    [('member', 'to', 'member'), ('member', 'to', 'team'), ('team', 'rev_to', 'member'), ('member', 'to', 'member')],
-                    [('skill', 'to', 'skill'), ('skill', 'to', 'team'), ('team', 'rev_to', 'skill'), ('skill', 'to', 'skill')],
+                    # [('member', 'to', 'member'), ('member', 'to', 'team'), ('team', 'rev_to', 'skill'), ('skill', 'to', 'team'), ('team', 'rev_to', 'member'), ('member', 'to', 'member')],
+                    # [('skill', 'to', 'skill'), ('skill', 'to', 'team'), ('team', 'rev_to', 'member'), ('member', 'to', 'team'), ('team', 'rev_to', 'skill'), ('skill', 'to', 'skill')],
+                    # [('member', 'to', 'member'), ('member', 'to', 'team'), ('team', 'rev_to', 'member'), ('member', 'to', 'member')],
+                    # [('skill', 'to', 'skill'), ('skill', 'to', 'team'), ('team', 'rev_to', 'skill'), ('skill', 'to', 'skill')],
                 ]
             }
         },
         'gnn.gine': {
-            'e': 5,
+            'e': 100,
             'b': 128,
             'd': 8,
             'ns' : 5,
             'h': 2,
-            'nn': [30, 20],
+            'nn': [20, 10],
             'graph_type': 'stm',
             'agg': 'mean',
             'dir': False,
