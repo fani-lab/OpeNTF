@@ -277,14 +277,8 @@ class Gnn(Team2Vec):
 
         train_data, val_data, test_data = transform(data)
 
-        # handle neg_sampling manually
-        from torch_geometric.utils import negative_sampling
-        for data_type in [train_data, val_data]:
-            for edge_type in edge_types:
-                num_neg_samples = self.ns * data_type[edge_type].edge_label_index.shape[1] # here it is treated as an actual number instead of a ratio
-                data_type[edge_type].edge_label_index = torch.concat([data_type[edge_type].edge_label_index, negative_sampling(data_type[edge_type].edge_index, num_neg_samples=num_neg_samples, method='sparse')], dim = 1)
-                data_type[edge_type].edge_label = torch.concat([data_type[edge_type].edge_label, torch.zeros(num_neg_samples)], dim = 0)
-                # data_type[edge_type].edge_label = torch.concat([data_type[edge_type].edge_label_index, negative_sampling(data_type[edge_type].edge_index, num_neg_samples=num_neg_samples, method='sparse')], dim = 1)
+        # manual negative sampling
+        for data_type in [train_data, val_data]: self.manual_negative_sampling(data_type, edge_types, self.ns)
 
         train_data.validate(raise_on_error=True)
         val_data.validate(raise_on_error=True)
@@ -299,6 +293,32 @@ class Gnn(Team2Vec):
                                     drop_unconnected_node_types=False)(val_data)
 
         return train_data, val_data, test_data, edge_types, rev_edge_types
+
+    # Manual negative sampling
+    def manual_negative_sampling(self, data_type, edge_types, num_samples_ratio):
+        # handle neg_sampling manually
+        from torch_geometric.utils import negative_sampling
+
+        for edge_type in edge_types:
+            pos_edge_index = data_type[edge_type].edge_label_index
+            num_pos_samples = pos_edge_index.shape[1]
+            num_neg_samples = int(num_samples_ratio * num_pos_samples)
+
+            neg_edge_index = negative_sampling(
+                edge_index=data_type[edge_type].edge_index,
+                num_nodes=(data_type[edge_type[0]].num_nodes,data_type[edge_type[2]].num_nodes),  # Specify number of nodes if necessary
+                num_neg_samples=num_neg_samples,
+                method='sparse'
+            )
+
+            # Concatenate positive and negative edges
+            new_edge_label_index = torch.cat([pos_edge_index, neg_edge_index], dim=1)
+            new_edge_label = torch.cat([torch.ones(num_pos_samples), torch.zeros(num_neg_samples)], dim=0)
+
+            data_type[edge_type].edge_label_index = new_edge_label_index
+            data_type[edge_type].edge_label = new_edge_label
+
+        return data_type
 
     # d = dim
     # we pass only train_data for providing metadata to the model
@@ -328,7 +348,7 @@ class Gnn(Team2Vec):
         mini_batch_loader = LinkNeighborLoader(
             data=split_data,
             num_neighbors=self.nn,
-            neg_sampling_ratio=neg_sampling,  # prev : neg_sampling
+            neg_sampling=None,  # prev : neg_sampling
             edge_label_index=(seed_edge_type, split_data[seed_edge_type].edge_label_index),
             edge_label=split_data[seed_edge_type].edge_label,
             batch_size=batch_size,
