@@ -21,7 +21,7 @@ def addargs(parser):
     gnn_args.add_argument('--d', type=int, nargs='+', required=False, help='Embedding dimension; e.g : 4, 8, 16, 32 etc.')
     gnn_args.add_argument('--e', type=int, required=False, help='Train epochs ; e.g : 5, 100 etc.')
     gnn_args.add_argument('--ns', type=int, required=False, help='Train epochs ; e.g : 2, 3, 5 etc.')
-    gnn_args.add_argument('--graph_type', type=str, required=False, help='Graph types used for the training; e.g : sm, stm etc.')
+    gnn_args.add_argument('--graph_types',  type=str, nargs = '+', required=False, help='Graph types used for the training; e.g : sm, stm, sm.en, stm.en etc.') # including this will skip the training for any graph type from the mentioned edge types which are not in this list
     gnn_args.add_argument('--pt', type=int, required=False, help='If true, then takes similar sized d2v pretrained vectors as initial node features; e.g : for --d 8, will take the word vectors from skill.emb.d8.w1.dm1.mdl')
 
     # args for d2v
@@ -64,7 +64,7 @@ def run(teamsvecs_file, indexes_file, model, output, emb_output = None):
         if params.settings['model']['pt']:
             from gensim.models import Doc2Vec
             for node_type in t2v.data.node_types:
-                d2v_embtype = 'joint' if args.graph_type == 'stm' and node_type == 'team' else node_type
+                d2v_embtype = 'joint' if params.settings["graph"]["graph_types"] == 'stm' and node_type == 'team' else node_type
                 d2v_output = output.split('gnn')[0] + f'/w2v/{d2v_embtype}.emb.d{params.settings["model"][model]["d"]}.w1.dm1.mdl'
                 node_type_vecs = Doc2Vec.load(d2v_output).dv.vectors if d2v_embtype == 'joint' else Doc2Vec.load(d2v_output).wv.vectors # team vectors (dv) for 'team' nodes, else individual node vectors (wv)
                 t2v.data[node_type].x = torch.tensor(node_type_vecs)
@@ -179,15 +179,19 @@ if __name__ == "__main__":
                 # for dup in ['mean']:  # ['add', 'mean', 'min', 'max', 'mul']:
                 for agg in args.agg:  # ['add', 'mean', 'min', 'max', 'mul']: # merge strategy of duplicate edges
                     for d in args.d:
+                        if args.graph_types is not None and edge_type[1] not in args.graph_types:
+                            print(f"Skipping for graph type : {edge_type[1]}, ")
+                            continue
+
                         supervision_edge_type = supervision_edge_types[id][0] # select the corresponding supervision edge_type from the list
                         params.settings['graph'] = {
                             # set the params with the current settings
                             'edge_types': edge_type,
                             'dir': dir,
-                            'dup_edge': agg, # merging strategy for duplicate edges
-                            'supervision_edge_types':supervision_edge_type
+                            'dup_edge': agg,                                    # merging strategy for duplicate edges
+                            'supervision_edge_types':supervision_edge_type      # select one single supervision edge type for this loop
                         }
-                        params.settings['model'][args.model]['graph_type'] = edge_type[1]  # take the value from the current loop
+                        params.settings['model'][args.model]['graph_types'] = edge_type[1]  # take the value from the current loop
                         params.settings['model'][args.model]['agg'] = agg # this is the same value as agg
                         params.settings['model'][args.model]['dir'] = dir # this is the same value as dir
                         params.settings['model'][args.model]['d'] = d

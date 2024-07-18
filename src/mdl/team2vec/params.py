@@ -59,7 +59,7 @@ settings = {
             'ns' : 5,               # number of negative samples
             'h' : 2,                # number of attention heads (if applicable)
             'nn' : [20, 10],        # number of neighbors in each hop ([20, 10] -> 20 neighbors in first hop, 10 neighbors in second hop)
-            'graph_type' : 'stm',   # graph type used (stm -> ste -> skill-team-expert)
+            'graph_types' : 'stm',   # graph type used for a single run (stm -> ste -> skill-team-expert)
             'agg' : 'mean',         # aggregation method used for merging multiple edges between the same source and destination node
             'dir' : False,          # whether the graph is directed
         },
@@ -70,7 +70,7 @@ settings = {
             'ns' : 5,
             'h': 2,
             'nn': [20, 10],
-            'graph_type': 'stm',
+            'graph_types': 'stm',
             'agg': 'mean',
             'dir': False,
         },
@@ -81,7 +81,7 @@ settings = {
             'ns' : 5,
             'h': 2,
             'nn': [20, 10],
-            'graph_type': 'stm',
+            'graph_types': 'stm',
             'agg': 'mean',
             'dir': False,
         },
@@ -92,7 +92,7 @@ settings = {
             'ns' : 5,
             'h': 2,
             'nn': [20, 10],
-            'graph_type': 'stm',
+            'graph_types': 'stm',
             'agg': 'mean',
             'dir': False,
         },
@@ -103,7 +103,7 @@ settings = {
             'ns' : 5,
             'h': 2,
             'nn': [20, 10],
-            'graph_type': 'stm',
+            'graph_types': 'stm',
             'agg': 'mean',
             'dir': False,
             'metapaths':{
@@ -137,12 +137,12 @@ settings = {
             'ns' : 5,
             'h': 2,
             'nn': [20, 10],
-            'graph_type': 'stm',
+            'graph_types': 'stm',
             'agg': 'mean',
             'dir': False,
         },
         'gnn.m2v': {
-            'graph_type':'stm', # this value will be changed during runtime in each loop according to the graph_type and then be used in the embedding_output var
+            'graph_types':'stm', # this value will be changed during runtime in each loop according to the graph_type and then be used in the embedding_output var
             'metapath' : {
                 'sm' : [
                     ('member','rev_to','skill'),
