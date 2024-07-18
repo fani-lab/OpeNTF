@@ -107,7 +107,7 @@ class Gnn(Team2Vec):
         self.nn = self.settings['nn']
         self.agg = self.settings['agg']
         self.dir = self.settings['dir']
-        self.graph_type = self.settings['graph_type']
+        self.graph_type = self.settings['graph_types']
         if self.model_name == 'han': self.metapaths = self.settings['metapaths'][self.graph_type]
 
         # e.g : domain = 'imdb/title.basics.tsv.filtered.mt5.ts2'
