@@ -196,6 +196,27 @@ Arman Dashti<sup>1</sup>, [Hossein Fani](https://hosseinfani.github.io/)<sup>1,2
 
 ## 7. Citation:
 ```
+@inproceedings{DBLP:conf/ecir/FaniBDS24,
+  author       = {Hossein Fani and
+                  Reza Barzegar and
+                  Arman Dashti and
+                  Mahdis Saeedi},
+  title        = {A Streaming Approach to Neural Team Formation Training},
+  booktitle    = {Advances in Information Retrieval - 46th European Conference on Information Retrieval, {ECIR} 2024, Glasgow, UK, March 24-28, 2024, Proceedings, Part {I}},
+  series       = {Lecture Notes in Computer Science},
+  volume       = {14608},
+  pages        = {325--340},
+  publisher    = {Springer},
+  year         = {2024},
+  url          = {https://doi.org/10.1007/978-3-031-56027-9\_20},
+  doi          = {10.1007/978-3-031-56027-9\_20},
+  timestamp    = {Wed, 24 Apr 2024 14:55:54 +0200},
+  biburl       = {https://dblp.org/rec/conf/ecir/FaniBDS24.bib},
+  bibsource    = {dblp computer science bibliography, https://dblp.org}
+}
+```
+
+```
 @inproceedings{DBLP:conf/cikm/DashtiSF22,
   author    = {Arman Dashti and Saeed Samet and Hossein Fani},
   title     = {Effective Neural Team Formation via Negative Samples},
