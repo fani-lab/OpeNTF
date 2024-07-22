@@ -246,18 +246,18 @@ We benefit from [``pytrec_eval``](https://github.com/cvangysel/pytrec_eval), [``
 ## 7. Citation:
 ```
 @inproceedings{DBLP:conf/ecir/FaniBDS24,
-  author    = {Hossein Fani and Reza Barzegar and Arman Dashti and Mahdis Saeedi},
-  title     = {A Training Strategy for Future Collaborative Team Prediction},
-  booktitle = {Advances in Information Retrieval - 46th European Conference on Information Retrieval, {ECIR} 2024, Glasgow, Scotland, March 24th-28, 2024},
-  series    = {Lecture Notes in Computer Science},
-  volume    = {},
-  pages     = {},
-  publisher = {Springer},
-  year      = {2024},
-  url       = {https://doi.org/},
-  doi       = {},
-  biburl    = {},
-  bibsource = {dblp computer science bibliography, https://dblp.org}
+  author       = {Hossein Fani and Reza Barzegar and Arman Dashti and Mahdis Saeedi},
+  title        = {A Streaming Approach to Neural Team Formation Training},
+  booktitle    = {Advances in Information Retrieval - 46th European Conference on Information Retrieval, {ECIR} 2024, Glasgow, UK, March 24-28, 2024, Proceedings, Part {I}},
+  series       = {Lecture Notes in Computer Science},
+  volume       = {14608},
+  pages        = {325--340},
+  publisher    = {Springer},
+  year         = {2024},
+  url          = {https://doi.org/10.1007/978-3-031-56027-9\_20},
+  doi          = {10.1007/978-3-031-56027-9\_20},
+  biburl       = {https://dblp.org/rec/conf/ecir/FaniBDS24.bib},
+  bibsource    = {dblp computer science bibliography, https://dblp.org}
 }
   ```
 
