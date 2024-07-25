@@ -20,7 +20,7 @@ class LANT(torch.nn.Module):
     def __init__(self, in_channels, hidden_channels):
         super().__init__()
         self.conv = GATConv((-1, -1), hidden_channels, add_self_loops=False, heads = 2)
-        self.prelu = torch.nn.PReLU(hidden_channels)
+        self.prelu = torch.nn.PReLU(hidden_channels * 2)
 
     def forward(self, x, edge_index):
         x = self.conv(x, edge_index)
@@ -28,8 +28,18 @@ class LANT(torch.nn.Module):
         return x
 
 
-def corruption(x, edge_index):
-    return x[torch.randperm(x.size(0), device=x.device)], edge_index
+# def corruption(x, edge_index):
+#     return x[torch.randperm(x.size(0), device=x.device)], edge_index
+
+def corruption(x_dict, edge_index_dict):
+    corrupted_x_dict = {key: x[torch.randperm(x.size(0), device=x.device)] for key, x in x_dict.items()}
+    return corrupted_x_dict, edge_index_dict
+
+def summary(z_dict, *args, **kwargs):
+    # Compute the mean for each node type
+    summary_dict = {key: z.mean(dim=0, keepdim=True) for key, z in z_dict.items()}
+    # Aggregate the means
+    return torch.sigmoid(torch.cat(list(summary_dict.values()), dim=0).mean(dim=0))
 
 
 class LANTModel(torch.nn.Module):
@@ -39,7 +49,8 @@ class LANTModel(torch.nn.Module):
         self.dgi = DGI(
             hidden_channels=hidden_channels,
             encoder=to_hetero(LANT(hidden_channels, hidden_channels), metadata=data.metadata()),
-            summary=lambda z, *args, **kwargs: torch.sigmoid(z.mean(dim=0)),
+            summary=summary,
+            # summary=lambda z, *args, **kwargs: torch.sigmoid(z.mean(dim=0)),
             corruption=corruption
         )
 
@@ -52,8 +63,14 @@ class LANTModel(torch.nn.Module):
 if __name__ == '__main__':
     import pickle
     from torch_geometric.nn import to_hetero
-    # Example usage:
-    file = './../../../data/preprocessed/dblp/toy.dblp.v12.json/gnn/sm.en.undir.add.data.pkl'
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-file', type=str)
+    args = parser.parse_args()
+
+    file = args.file
+
     with open(file, 'rb') as f:
         data = pickle.load(f)
     model = LANTModel(hidden_channels=64)
