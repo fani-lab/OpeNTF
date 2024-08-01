@@ -158,13 +158,13 @@ settings = {
                 # experimental section
                 'sm.en' : [
                     ('member','rev_to','skill'),
-                    ('skill', 'to', 'skill'),           # additional s-s connection
+                    # ('skill', 'to', 'skill'),           # additional s-s connection
                     ('skill', 'to', 'member'),
                 ],
                 'stm.en' : [
                     ('member','to','team'),
                     ('team', 'rev_to', 'skill'),
-                    ('skill', 'to', 'skill'),           # additional s-s connection
+                    # ('skill', 'to', 'skill'),           # additional s-s connection
                     ('skill','to','team'),
                     ('team', 'rev_to', 'member'),
                 ],

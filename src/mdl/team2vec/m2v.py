@@ -19,9 +19,9 @@ class M2V(Gnn):
             'walk_length': settings['model']['gnn.m2v']['walk_length'],
             'context_size': settings['model']['gnn.m2v']['context_size'],
             'walks_per_node': settings['model']['gnn.m2v']['walks_per_node'],
-            'graph_type' : settings['model']['gnn.m2v']['graph_type']
+            'graph_types' : settings['model']['gnn.m2v']['graph_types']
         }
-        self.emb_output = emb_output + f'{self.model_name}.{self.settings["graph_type"]}.undir.mean.e{self.settings["e"]}.ns{self.settings["ns"]}.b{self.settings["b"]}.d{self.settings["d"]}'  # output path of emb files
+        self.emb_output = emb_output + f'{self.model_name}.{self.settings["graph_types"]}.undir.mean.e{self.settings["e"]}.ns{self.settings["ns"]}.b{self.settings["b"]}.d{self.settings["d"]}'  # output path of emb files
         if not os.path.exists(emb_output): os.makedirs(emb_output)
 
     def init(self):
