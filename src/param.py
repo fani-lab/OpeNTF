@@ -15,10 +15,10 @@ settings = {
                 'b': 128
             },
             'fnn':{
-                'l': [128],  # list of number of nodes in each layer
-                'lr': 0.0001,  # learning rate
-                'b': 2048,  # batch size
-                'e': 25,  # epoch
+                'l': [100],  # list of number of nodes in each layer
+                'lr': 0.01,  # learning rate
+                'b': 4096,  # batch size
+                'e': 20,  # epoch
                 'nns': 3,  # number of negative samples
                 'ns': 'uniform',  # 'none', 'uniform', 'unigram', 'unigram_b'
                 'weight': 5, # weight if ns == 'weighted'
@@ -36,10 +36,10 @@ settings = {
                 'loss': 'normal',  # 'SL'-> superloss, 'DP' -> Data Parameters, 'normal' -> Binary Cross Entropy
             },
             'bnn':{
-                'l': [128],  # list of number of nodes in each layer
+                'l': [100],  # list of number of nodes in each layer
                 'lr': 0.01,  # learning rate
-                'b': 2048,  # batch size
-                'e': 25,  # epoch
+                'b': 4096,  # batch size
+                'e': 20,  # epoch
                 'nns': 3,  # number of negative samples
                 'ns': 'uniform',  # 'uniform', 'unigram', 'unigram_b'
                 'weight': 5, # weight if ns == 'weighted'
