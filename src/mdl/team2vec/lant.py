@@ -11,22 +11,35 @@ from torch_geometric.nn import to_hetero
 from torch import Tensor
 from torch_geometric.data import Data, HeteroData
 from torch import nn as nn
-from torch_geometric.nn import DeepGraphInfomax as DGI, GATConv
+from torch_geometric.nn import DeepGraphInfomax as DGI, GATConv, GCNConv, SAGEConv
 from decoder import Decoder
 
 
 
 class LANT(torch.nn.Module):
-    def __init__(self, in_channels, hidden_channels):
+    def __init__(self, in_channels, hidden_channels, heads = 2):
         super().__init__()
-        self.conv = GATConv((-1, -1), hidden_channels, add_self_loops=False, heads = 2)
-        self.prelu = torch.nn.PReLU(hidden_channels * 2)
+        self.conv = GATConv((-1, -1), hidden_channels, add_self_loops=False, heads = heads)
+        self.prelu = torch.nn.PReLU(hidden_channels * heads)
+
 
     def forward(self, x, edge_index):
         x = self.conv(x, edge_index)
         x = self.prelu(x)
         return x
 
+
+class LANTbk(torch.nn.Module):
+    def __init__(self, in_channels, hidden_channels):
+        super().__init__()
+        self.conv = SAGEConv(in_channels, hidden_channels)
+        self.prelu = torch.nn.PReLU(hidden_channels)
+
+
+    def forward(self, x, edge_index):
+        x = self.conv(x, edge_index)
+        x = self.prelu(x)
+        return x
 
 # def corruption(x, edge_index):
 #     return x[torch.randperm(x.size(0), device=x.device)], edge_index
@@ -42,21 +55,75 @@ def summary(z_dict, *args, **kwargs):
     return torch.sigmoid(torch.cat(list(summary_dict.values()), dim=0).mean(dim=0))
 
 
+# to calculate the losses based on the fact of pos_z, neg_z and summary being dicts
+def calculate_loss(dgi, pos_z_dict, neg_z_dict, summary):
+    total_loss = 0.0
+
+    # Iterate through all node types
+    for node_type in pos_z_dict.keys():
+        pos_z = pos_z_dict[node_type]
+        neg_z = neg_z_dict[node_type]
+
+        # Calculate the loss for this node type
+        loss = dgi.loss(pos_z, neg_z, summary)
+        print(f'Loss for node_type {node_type}: {loss.item()}')
+
+        # Aggregate the losses, here we are summing them
+        total_loss += loss
+
+    # You might want to average the loss if you are using mini-batches
+    average_loss = total_loss / len(pos_z_dict)
+
+    return average_loss
+
 class LANTModel(torch.nn.Module):
-    def __init__(self, hidden_channels):
+    def __init__(self, hidden_channels, data):
         super().__init__()
-        self.hidden_channels = hidden_channels
+        self.heads = 2
+
+        '''
+        this section of linear transformation is needed to add random feature matrix to the initial nodes with 1 dimensional features
+        (as our data doesnt have its own node features. But the intricate part here is that we at first linear transform the node features
+        into our desired dimensions = hidden_channels. But then before feeding to the dgi encoder, we have to divide it by the number of 
+        attention heads of the GATConv layer. Because after feeding into the GAT encoder of the dgi, the output channels will multiply by 
+        the number of heads and so the initial dimension would be increased. To counter that, we do the early division by heads before 
+        feeding to the GAT encoder)
+        '''
+        if (type(data) == HeteroData):
+            self.node_lin = []
+            # self.node_emb = []
+            # for each node_type
+            node_types = data.node_types
+            # linear transformers and node embeddings based on the num_features and num_nodes of the node_types
+            # these two are generated such that both of them has the same shape and they can be added together
+            for i, node_type in enumerate(node_types):
+                if (data.is_cuda):
+                    self.node_lin.append(nn.Linear(data[node_type].num_features, hidden_channels).cuda())
+                    # self.node_emb.append(nn.Embedding(data[node_type].num_nodes, hidden_channels).cuda())
+                else:
+                    self.node_lin.append(nn.Linear(data[node_type].num_features, hidden_channels))
+                    # self.node_emb.append(nn.Embedding(data[node_type].num_nodes, hidden_channels))
+
+        self.hidden_channels = hidden_channels // self.heads # the attention heads cause the dimension to double inside the model
+
+        self.encoder = to_hetero(LANT(self.hidden_channels, self.hidden_channels, heads = self.heads), metadata=data.metadata())
+        # self.encoder = to_hetero(LANTbk(hidden_channels, hidden_channels), metadata=data.metadata())
+
         self.dgi = DGI(
-            hidden_channels=hidden_channels,
-            encoder=to_hetero(LANT(hidden_channels, hidden_channels), metadata=data.metadata()),
+            hidden_channels=self.hidden_channels * self.heads,
+            encoder=self.encoder,
             summary=summary,
-            # summary=lambda z, *args, **kwargs: torch.sigmoid(z.mean(dim=0)),
             corruption=corruption
         )
 
         # self.dgi = to_hetero(self.dgi, metadata=data.metadata())
 
     def forward(self, data):
+        self.x_dict = {}
+        if type(data) == HeteroData:
+            for i, node_type in enumerate(data.node_types):
+                self.x_dict[node_type] = self.node_lin[i](data[node_type].x)
+
         pos_z, neg_z, summary = self.dgi(data.x_dict, data.edge_index_dict)
         return pos_z, neg_z, summary
 
@@ -73,7 +140,7 @@ if __name__ == '__main__':
 
     with open(file, 'rb') as f:
         data = pickle.load(f)
-    model = LANTModel(hidden_channels=64)
+    model = LANTModel(hidden_channels=64, data = data)
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
     # Training loop
@@ -81,6 +148,7 @@ if __name__ == '__main__':
     for epoch in range(200):
         optimizer.zero_grad()
         pos_z, neg_z, summary = model(data)
-        loss = model.dgi.loss(pos_z, neg_z, summary)
+        loss = calculate_loss(model.dgi, pos_z, neg_z, summary)
         loss.backward()
+        print(f'e : {epoch}, l : {loss}')
         optimizer.step()
