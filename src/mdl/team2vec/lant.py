@@ -66,7 +66,7 @@ def calculate_loss(dgi, pos_z_dict, neg_z_dict, summary):
 
         # Calculate the loss for this node type
         loss = dgi.loss(pos_z, neg_z, summary)
-        print(f'Loss for node_type {node_type}: {loss.item()}')
+        # print(f'----Loss for node_type {node_type}: {loss.item()}')
 
         # Aggregate the losses, here we are summing them
         total_loss += loss
@@ -75,6 +75,12 @@ def calculate_loss(dgi, pos_z_dict, neg_z_dict, summary):
     average_loss = total_loss / len(pos_z_dict)
 
     return average_loss
+
+def initialize_weights(module):
+    if isinstance(module, torch.nn.Linear):
+        torch.nn.init.xavier_uniform_(module.weight)
+        if module.bias is not None:
+            torch.nn.init.zeros_(module.bias)
 
 class LANTModel(torch.nn.Module):
     def __init__(self, hidden_channels, data):
@@ -124,8 +130,21 @@ class LANTModel(torch.nn.Module):
             for i, node_type in enumerate(data.node_types):
                 self.x_dict[node_type] = self.node_lin[i](data[node_type].x)
 
-        pos_z, neg_z, summary = self.dgi(data.x_dict, data.edge_index_dict)
+        pos_z, neg_z, summary = self.dgi(self.x_dict, data.edge_index_dict)
         return pos_z, neg_z, summary
+
+
+def create_toy_data():
+    dummy_data = HeteroData()
+    dummy_data['team'].x = torch.randn(10, 64)  # Example dummy feature matrix
+    dummy_data['skill'].x = torch.randn(10, 64)
+    dummy_data['member'].x = torch.randn(10, 64)
+    dummy_data.edge_index_dict = {'team': torch.randint(0, 10, (2, 10)),
+                                  'skill': torch.randint(0, 10, (2, 10)),
+                                  'member': torch.randint(0, 10, (2, 10))}
+
+    return data
+
 
 if __name__ == '__main__':
     import pickle
@@ -140,15 +159,33 @@ if __name__ == '__main__':
 
     with open(file, 'rb') as f:
         data = pickle.load(f)
+
+    # data = create_toy_data()
+
     model = LANTModel(hidden_channels=64, data = data)
+    # model.apply(initialize_weights)
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
     # Training loop
     model.train()
-    for epoch in range(200):
+    losses = []
+    n_epochs = 200
+    for epoch in range(n_epochs):
         optimizer.zero_grad()
         pos_z, neg_z, summary = model(data)
+        # print(f"pos_z (team): {pos_z['team']}")
+        # print(f"neg_z (team): {neg_z['team']}")
+
         loss = calculate_loss(model.dgi, pos_z, neg_z, summary)
         loss.backward()
+        losses.append(loss.item())
         print(f'e : {epoch}, l : {loss}')
         optimizer.step()
+
+    import matplotlib.pyplot as plt
+    # Plotting the loss
+    plt.plot(range(n_epochs), losses)
+    plt.xlabel('Epoch')
+    plt.ylabel('Loss')
+    plt.title('Training Loss per Epoch')
+    plt.show()
