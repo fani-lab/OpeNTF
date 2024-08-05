@@ -28,8 +28,10 @@ from mdl.caser import Caser
 from mdl.rrn import Rrn
 from cmn.tools import generate_popular_and_nonpopular
 
-# Kap: Use 8th GPU
-os.environ["CUDA_VISIBLE_DEVICES"] = "7"
+# Kap: Use last GPU
+if torch.cuda.device_count() > 1:
+    last_gpu = torch.cuda.device_count() - 1
+    os.environ["CUDA_VISIBLE_DEVICES"] = str(last_gpu)
 
 
 def create_evaluation_splits(n_sample,
