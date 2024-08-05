@@ -16,35 +16,22 @@ settings = {
             },
             'fnn':{
                 'l': [100],  # list of number of nodes in each layer
-                'lr': 0.01,  # learning rate
-                'b': 4096,  # batch size
-                'e': 20,  # epoch
+                'lr': 0.001,  # learning rate
+                'b': 128,  # batch size
+                'e': 10,  # epoch
                 'nns': 3,  # number of negative samples
-                'ns': 'uniform',  # 'none', 'uniform', 'unigram', 'unigram_b'
-                'weight': 5, # weight if ns == 'weighted'
-                'loss': 'normal',  # 'SL'-> superloss, 'DP' -> Data Parameters, 'normal' -> Binary Cross Entropy 'pos-ce' -> positive ce, 'weighted' -> weighted ce
-            },
-            'bnn_old':{
-                'l': [100],  # list of number of nodes in each layer
-                'lr': 0.01,  # learning rate
-                'b': 4096,  # batch size
-                'e': 20,  # epoch
-                'nns': 3,  # number of negative samples
-                'ns': 'uniform',  # 'uniform', 'unigram', 'unigram_b'
-                'weight': 5, # weight if ns == 'weighted'
-                's': 1,  # # sample_elbo for bnn
-                'loss': 'normal',  # 'SL'-> superloss, 'DP' -> Data Parameters, 'normal' -> Binary Cross Entropy
+                'ns': 'none',  # 'none', 'uniform', 'unigram', 'unigram_b'
+                'loss': 'SL',  # 'SL'-> superloss, 'DP' -> Data Parameters, 'normal' -> Binary Cross Entropy
             },
             'bnn':{
-                'l': [100],  # list of number of nodes in each layer
-                'lr': 0.01,  # learning rate
-                'b': 4096,  # batch size
-                'e': 20,  # epoch
+                'l': [128],  # list of number of nodes in each layer
+                'lr': 0.1,  # learning rate
+                'b': 128,  # batch size
+                'e': 5,  # epoch
                 'nns': 3,  # number of negative samples
-                'ns': 'uniform',  # 'uniform', 'unigram', 'unigram_b'
-                'weight': 5, # weight if ns == 'weighted'
+                'ns': 'unigram_b',  # 'uniform', 'unigram', 'unigram_b'
                 's': 1,  # # sample_elbo for bnn
-                'loss': 'normal',  # 'SL'-> superloss, 'DP' -> Data Parameters, 'normal' -> Binary Cross Entropy
+                'loss': 'SL',  # 'SL'-> superloss, 'DP' -> Data Parameters, 'normal' -> Binary Cross Entropy
             },
             'nmt': {
                 'base_config': './mdl/nmt_config.yaml'
@@ -54,16 +41,13 @@ settings = {
                 'with_zero': True
             },
             'emb':{
-                'd': 128,# embedding dimension
+                'd': 100,# embedding dimension
                 'e': 100,# epoch
                 'dm': 1,# training algorithm. 1: distributed memory (PV-DM), 0: distributed bag of words (PV-DBOW)
-                'w': 1, #cooccurrence window
-                'b' : 128, # 0 means no batching
-                'ns' : 5,
+                'w': 1 #cooccurrence window
             }
         },
-        'cmd':['train', 'test', 'eval'],
-        # 'cmd': ['eval'],  # 'train', 'test', 'eval', 'plot', 'agg', 'fair'
+        'cmd': ['train', 'test', 'eval', 'fair'],  # 'train', 'test', 'eval', 'plot', 'agg', 'fair'
         'nfolds': 3,
         'train_test_split': 0.85,
         'step_ahead': 2,#for now, it means that whatever are in the last [step_ahead] time interval will be the test set!
