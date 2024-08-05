@@ -22,7 +22,3 @@ data/raw/dblp/dblp.v12.json
 *.rar
 *.mdl
 *.pt
-
-# large files list to ignore
-splits.json
-src-train.txt
