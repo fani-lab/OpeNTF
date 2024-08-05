@@ -1,14 +1,13 @@
-## RNN with Attention Configuration
-
 ## Where the samples will be written
-save_data: ../output/nmt/run/rnn
-
+save_data: ../output/nmt/run/example
 ## Where the vocab(s) will be written
-src_vocab: ../output/nmt/run/rnn.vocab.src
-tgt_vocab: ../output/nmt/run/rnn.vocab.tgt
-
+src_vocab: ../output/nmt/run/example.vocab.src
+tgt_vocab: /run/example.vocab.tgt
 # Prevent overwriting existing files in the folder
 overwrite: True
+
+# vocabulary size limit
+vocab_size: 30000
 
 # Corpus opts:
 data:
@@ -20,15 +19,17 @@ data:
         path_tgt: ../output/nmt/tgt-val.txt
 
 # Vocabulary files that were just created
-src_vocab: ../output/nmt/run/rnn.vocab.src
-tgt_vocab: ../output/nmt/run/rnn.vocab.tgt
+src_vocab: ../output/nmt/run/example.vocab.src
+tgt_vocab: ../output/nmt/run/example.vocab.tgt
+#src_embeddings: ../output/nmt/run/example.vocab.src.emb
+#tgt_embeddings: ../output/nmt/run/example.vocab.tgt.emb
 
 # Train on a single GPU
 world_size: 1
 gpu_ranks: [0]
 
 # Where to save the checkpoints
-save_model: ../output/nmt/run/rnn_model
+save_model: ../output/nmt/run/model
 save_checkpoint_steps: 500
 train_steps: 1000
 
@@ -45,6 +46,12 @@ encoder_type: rnn
 decoder_type: rnn
 rnn_type: LSTM
 
+# encoder_type: transformer
+# decoder_type: transformer
+# transformer_ff: 128
+# position_encoding: True
+# heads: 2
+
 optim: adam
 learning_rate: 0.001
 learning_rate_decay: 0.9
@@ -52,6 +59,9 @@ start_decay_steps: 50
 decay_steps: 50
 
 batch_size: 4
-dropout: 0.5
+# dropout: 0.5
 
-global_attention: mlp
+# copy_attn: 'true'
+# global_attention: mlp
+# reuse_copy_attn: 'true'
+# bridge: 'true'
