@@ -29,9 +29,16 @@ from mdl.rrn import Rrn
 from cmn.tools import generate_popular_and_nonpopular
 
 # Kap: Use last GPU
-if torch.cuda.device_count() > 1:
-    last_gpu = torch.cuda.device_count() - 1
-    os.environ["CUDA_VISIBLE_DEVICES"] = str(last_gpu)
+def get_last_gpu():
+    if torch.cuda.device_count() > 1:
+        gpu_count = torch.cuda.device_count()
+        last_gpu = torch.cuda.device_count() - 1
+        print(f"\nMultiple GPUs detected. Using the {gpu_count}th one.\n")
+        os.environ["CUDA_VISIBLE_DEVICES"] = str(last_gpu)
+    elif torch.cuda.device_count() == 1:
+        print("\nOnly one GPU detected. Using it.\n")
+    else:
+        print("\nNo GPU detected. Using CPU.\n")
 
 
 def create_evaluation_splits(n_sample,
@@ -256,7 +263,9 @@ def run(data_list, domain_list, fair, filter, future, model_list, output,
                         (vecs_['skill'],
                          lil_matrix(np.ones((vecs_['skill'].shape[0], 1))))))
 
-            # Kap: added to indicate if GPU is available
+            # Kap: added to indicate if GPU is available and to get the last GPU
+            get_last_gpu()
+            
             device = torch.device(
                 "cuda" if torch.cuda.is_available() else "cpu")
             print(f"Using device: {device}")
