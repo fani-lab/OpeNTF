@@ -3,8 +3,9 @@
 /venv
 /.idea/
 /src/tmp.py
-/output/*
-/data/raw/*
+/output
+/data/raw
+/runs
 
 *.pyc
 *.npz
