@@ -1,7 +1,0 @@
-OpenNMT-py
-torch-geometric
-pytrec_eval
-torch-scatter
-torch-sparse
-torch-cluster
-torch-spline-conv
