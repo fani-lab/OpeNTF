@@ -141,6 +141,17 @@ settings = {
             'agg': 'mean',
             'dir': False,
         },
+        'gnn.lant': {
+            'e': 100,
+            'b': 128,
+            'd': 8,
+            'ns' : 5,
+            'h': 2,
+            'nn': [20, 10],
+            'graph_types': 'stm',
+            'agg': 'mean',
+            'dir': False,
+        },
         'gnn.m2v': {
             'graph_types':'stm', # this value will be changed during runtime in each loop according to the graph_type and then be used in the embedding_output var
             'metapath' : {

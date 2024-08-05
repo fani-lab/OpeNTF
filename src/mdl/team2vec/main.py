@@ -120,7 +120,7 @@ def run(teamsvecs_file, indexes_file, model, output, emb_output = None):
             t2v.optimizer = torch.optim.Adam(t2v.model.parameters(), lr=params.settings['model']['lr'])
             t2v.model_name = 'gcn'
 
-        elif model in {"gnn.gs", "gnn.gin", "gnn.gat", "gnn.gatv2", "gnn.han", "gnn.gine"}:
+        elif model in {"gnn.gs", "gnn.gin", "gnn.gat", "gnn.gatv2", "gnn.han", "gnn.gine", "gnn.lant"}:
             t2v.settings = params.settings['model'][model]
             t2v.model_name = model.split(".")[1]
             t2v.init_model(emb_output)

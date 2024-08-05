@@ -12,6 +12,7 @@ from torch_geometric.loader import LinkNeighborLoader
 
 from mdl.earlystopping import EarlyStopping
 from team2vec import Team2Vec
+from lant_encoder import Encoder as LANT_Encoder
 import params
 
 class Gnn(Team2Vec):
@@ -135,14 +136,20 @@ class Gnn(Team2Vec):
         self.model, self.optimizer = self.create_gnn_model(train_data)
 
     def train(self, epochs, save_per_epoch=False):
-        self.learn(self.train_loader, epochs)
-        self.eval(self.val_loader)
+        if self.model_name == 'lant':
+            self.model.learn(self, epochs) # built-in validation inside lant_encoder class
+        else:
+            self.learn(self.train_loader, epochs)
+            self.eval(self.val_loader)
+
         print(f'-------------- ending eval --------------')
+
         # store the embeddings
         with torch.no_grad():
             for node_type in self.data.node_types:
                 self.data[node_type].n_id = torch.arange(self.data[node_type].x.shape[0])
             self.data.to(self.device)
+
             # for simplicity, we just pass seed_edge_type = edge_types[0]. This does not impact any output
             emb = self.model(self.data, self.edge_types[0], self.is_directed, emb=True)
             embedding_output = f'{self.model_output}/{self.model_name}.{self.graph_type}.{"dir" if self.dir else "undir"}.{self.agg}.e{epochs}.ns{int(self.ns)}.b{self.b}.d{self.d}.emb.pt'
@@ -152,43 +159,6 @@ class Gnn(Team2Vec):
         torch.cuda.empty_cache()
         # torch.save(self.model.state_dict(), f'{self.model_output}/gnn_model.pt', pickle_protocol=4)
         #to load later by: self.model.load_state_dict(torch.load(f'{self.output}/gnn_model.pt'))
-
-
-        # @Hossein Fani
-        # print(f'It took {time.time() - t_start_time} to train the model.')
-        # with open(f'{self.model_output}/train_valid_loss.json', 'w') as outfile: json.dump({'train': train_loss_values, 'valid': valid_loss_values}, outfile)
-        # plt.figure()
-        # plt.plot(train_loss_values, label='Training Loss')
-        # plt.plot(valid_loss_values, label='Validation Loss')
-        # plt.legend(loc='upper right')
-        # plt.title(f'Training and Validation Losses per Epoch')
-        # plt.savefig(f'{self.model_output}/train_valid_loss.png', dpi=100, bbox_inches='tight')
-        # plt.show()
-
-    @torch.no_grad()
-    def valid(self):
-        self.model.eval()
-        z = self.model()
-        #https://pytorch-geometric.readthedocs.io/en/latest/generated/torch_geometric.nn.models.Node2Vec.html
-        #TODO: the default test is LR on node labels, but we should bring it to team formation test
-        #acc = model.test(train_z=z[self.data.train_mask], train_y=data.y[self.data.train_mask], test_z=z[self.data.test_mask], test_y=data.y[self.data.test_mask], max_iter=150)
-        return 0# acc
-
-    @torch.no_grad()
-    def plot_points(self):
-        from sklearn.manifold import TSNE
-        self.model.eval()
-        z = self.model().cpu().numpy()
-        z = TSNE(n_components=2).fit_transform(z)
-        #y = data.y.cpu().numpy()
-
-        plt.figure(figsize=(8, 8))
-        # for i in range(dataset.num_classes):
-        #     plt.scatter(z[y == i, 0], z[y == i, 1], s=20, color=colors[i])
-        plt.scatter(z[:, 0], z[:, 1], s=20)
-        plt.axis('off')
-        plt.savefig(f'{self.output}/{self.model_name}/tsne.png', dpi=100, bbox_inches='tight')
-        plt.show()
 
     # made specifically for the gnn training
     def plot_graph(self, x, y, *args, xlabel='Epochs', ylabel='Loss', title='Loss vs Epochs', fig_output='plot.png'):
@@ -325,7 +295,10 @@ class Gnn(Team2Vec):
     def create_gnn_model(self, data):
 
         from encoder import Encoder as Encoder
-        model = Encoder(hidden_channels=self.d, data=data, model_name= self.model_name)
+        if self.model_name == 'lant':
+            model = LANT_Encoder(hidden_channels=self.d, data=data)
+        else:
+            model = Encoder(hidden_channels=self.d, data=data, model_name= self.model_name)
 
         print(model)
         print(f'\nDevice = {self.device}')
@@ -398,9 +371,9 @@ class Gnn(Team2Vec):
             loss_array.append(avg_loss)
 
             self.optimizer.zero_grad()
-            l1, l2 = self.eval(self.val_loader)
-            val_loss_array.append(l1)
-            val_auc_array.append(l2)
+            ls, auc = self.eval(self.val_loader)
+            val_loss_array.append(ls)
+            val_auc_array.append(auc)
 
             epochs_taken += 1
             earlystopping(val_loss_array[-1], self.model)
