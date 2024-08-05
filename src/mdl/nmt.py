@@ -68,8 +68,8 @@ class Nmt(Ntf):
 
             # old
             cli_cmd = f"onmt_build_vocab -config {fold_path}/config.yml -n_sample {len(input_data)}"
-            # Kap: new
-            # cli_cmd = f'onmt_build_vocab -config {fold_path}/config.yml -n_sample 30000'
+            # Kap: for debug
+            print(f"Executing command: {cli_cmd}")
             subprocess.Popen(shlex.split(cli_cmd)).wait()
 
         with open(f"{model_path}/src-test.txt", "w") as src_test:
