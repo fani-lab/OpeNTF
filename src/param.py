@@ -47,16 +47,7 @@ settings = {
                 'loss': 'normal',  # 'SL'-> superloss, 'DP' -> Data Parameters, 'normal' -> Binary Cross Entropy
             },
             'nmt': {
-                'base_config': './mdl/nmt_config_original.yaml'
-            },
-            'nmt_convs2s': {
-                'base_config': './mdl/nmt_config_convs2s.yaml'
-            },
-            'nmt_rnn': {
-                'base_config': './mdl/nmt_config_rnn.yaml'
-            },
-            'nmt_transformer': {
-                'base_config': './mdl/nmt_config_transformer.yaml'
+                'base_config': './mdl/nmt_config.yaml'
             },
             'caser': {},
             'rrn': {
