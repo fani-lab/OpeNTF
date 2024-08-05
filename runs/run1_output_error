@@ -1,0 +1,228 @@
+Corpus corpus_1's weight should be given. We default it to 1 for you.
+[2024-06-24 13:12:32,143 INFO] Counter vocab from 99375 samples.
+[2024-06-24 13:12:32,144 INFO] Build vocab on 99375 transformed examples/corpus.
+[2024-06-24 13:12:36,589 INFO] Counters src:24635
+[2024-06-24 13:12:36,592 INFO] Counters tgt:13556
+[2024-06-24 13:12:36,593 WARNING] path ./../output/dblp.v12.json.filtered.mt75.ts3/nmt/t99375.s29661.m14214.base_config./mdl/nmt_config.yaml/t99375.s29661.m14214.etLSTM.l128.wv128.lr0.001.b4.e1000/fold0/vocab.src exists, may overwrite...
+[2024-06-24 13:12:36,625 WARNING] path ./../output/dblp.v12.json.filtered.mt75.ts3/nmt/t99375.s29661.m14214.base_config./mdl/nmt_config.yaml/t99375.s29661.m14214.etLSTM.l128.wv128.lr0.001.b4.e1000/fold0/vocab.tgt exists, may overwrite...
+Corpus corpus_1's weight should be given. We default it to 1 for you.
+[2024-06-24 13:12:40,976 INFO] Counter vocab from 99375 samples.
+[2024-06-24 13:12:40,977 INFO] Build vocab on 99375 transformed examples/corpus.
+[2024-06-24 13:12:45,145 INFO] Counters src:24624
+[2024-06-24 13:12:45,147 INFO] Counters tgt:13583
+[2024-06-24 13:12:45,147 WARNING] path ./../output/dblp.v12.json.filtered.mt75.ts3/nmt/t99375.s29661.m14214.base_config./mdl/nmt_config.yaml/t99375.s29661.m14214.etLSTM.l128.wv128.lr0.001.b4.e1000/fold1/vocab.src exists, may overwrite...
+[2024-06-24 13:12:45,215 WARNING] path ./../output/dblp.v12.json.filtered.mt75.ts3/nmt/t99375.s29661.m14214.base_config./mdl/nmt_config.yaml/t99375.s29661.m14214.etLSTM.l128.wv128.lr0.001.b4.e1000/fold1/vocab.tgt exists, may overwrite...
+Corpus corpus_1's weight should be given. We default it to 1 for you.
+[2024-06-24 13:12:49,265 INFO] Counter vocab from 99375 samples.
+[2024-06-24 13:12:49,265 INFO] Build vocab on 99375 transformed examples/corpus.
+[2024-06-24 13:12:53,637 INFO] Counters src:24714
+[2024-06-24 13:12:53,638 INFO] Counters tgt:13564
+[2024-06-24 13:12:53,638 WARNING] path ./../output/dblp.v12.json.filtered.mt75.ts3/nmt/t99375.s29661.m14214.base_config./mdl/nmt_config.yaml/t99375.s29661.m14214.etLSTM.l128.wv128.lr0.001.b4.e1000/fold2/vocab.src exists, may overwrite...
+[2024-06-24 13:12:53,671 WARNING] path ./../output/dblp.v12.json.filtered.mt75.ts3/nmt/t99375.s29661.m14214.base_config./mdl/nmt_config.yaml/t99375.s29661.m14214.etLSTM.l128.wv128.lr0.001.b4.e1000/fold2/vocab.tgt exists, may overwrite...
+[2024-06-24 13:12:57,335 INFO] Missing transforms field for corpus_1 data, set to default: [].
+[2024-06-24 13:12:57,336 WARNING] Corpus corpus_1's weight should be given. We default it to 1 for you.
+[2024-06-24 13:12:57,336 INFO] Missing transforms field for valid data, set to default: [].
+[2024-06-24 13:12:57,336 INFO] Parsed 2 corpora from -data.
+[2024-06-24 13:12:57,336 INFO] Get special vocabs from Transforms: {'src': set(), 'tgt': set()}.
+[2024-06-24 13:12:57,336 INFO] Loading vocab from text file...
+[2024-06-24 13:12:57,337 INFO] Loading src vocabulary from ./../output/dblp.v12.json.filtered.mt75.ts3/nmt/t99375.s29661.m14214.base_config./mdl/nmt_config.yaml/t99375.s29661.m14214.etLSTM.l128.wv128.lr0.001.b4.e1000/fold0/vocab.src
+[2024-06-24 13:12:57,464 INFO] Loaded src vocab has 24635 tokens.
+[2024-06-24 13:12:57,488 INFO] Loading tgt vocabulary from ./../output/dblp.v12.json.filtered.mt75.ts3/nmt/t99375.s29661.m14214.base_config./mdl/nmt_config.yaml/t99375.s29661.m14214.etLSTM.l128.wv128.lr0.001.b4.e1000/fold0/vocab.tgt
+[2024-06-24 13:12:57,565 INFO] Loaded tgt vocab has 13556 tokens.
+[2024-06-24 13:12:57,574 INFO] Building fields with vocab in counters...
+[2024-06-24 13:12:57,610 INFO]  * tgt vocab size: 30000.
+[2024-06-24 13:12:57,723 INFO]  * src vocab size: 30000.
+[2024-06-24 13:12:57,726 INFO]  * src vocab size = 30000
+[2024-06-24 13:12:57,727 INFO]  * tgt vocab size = 30000
+[2024-06-24 13:12:57,729 INFO] Building model...
+c:\users\kap\miniconda3\envs\opentf_kapnmt\lib\site-packages\torch\nn\modules\rnn.py:83: UserWarning: dropout option adds dropout after all but last recurrent layer, so non-zero dropout expects num_layers greater than 1, but got dropout=0.3 and num_layers=1
+  warnings.warn("dropout option adds dropout after all but last "
+[2024-06-24 13:12:58,115 INFO] NMTModel(
+  (encoder): RNNEncoder(
+    (embeddings): Embeddings(
+      (make_embedding): Sequential(
+        (emb_luts): Elementwise(
+          (0): Embedding(30000, 128, padding_idx=1)
+        )
+      )
+    )
+    (rnn): LSTM(128, 128, dropout=0.3)
+  )
+  (decoder): InputFeedRNNDecoder(
+    (embeddings): Embeddings(
+      (make_embedding): Sequential(
+        (emb_luts): Elementwise(
+          (0): Embedding(30000, 128, padding_idx=1)
+        )
+      )
+    )
+    (dropout): Dropout(p=0.3, inplace=False)
+    (rnn): StackedLSTM(
+      (dropout): Dropout(p=0.3, inplace=False)
+      (layers): ModuleList(
+        (0): LSTMCell(256, 128)
+      )
+    )
+    (attn): GlobalAttention(
+      (linear_in): Linear(in_features=128, out_features=128, bias=False)
+      (linear_out): Linear(in_features=256, out_features=128, bias=False)
+    )
+  )
+  (generator): Sequential(
+    (0): Linear(in_features=128, out_features=30000, bias=True)
+    (1): Cast()
+    (2): LogSoftmax(dim=-1)
+  )
+)
+[2024-06-24 13:12:58,116 INFO] encoder: 3972096
+[2024-06-24 13:12:58,116 INFO] decoder: 7956784
+[2024-06-24 13:12:58,117 INFO] * number of parameters: 11928880
+[2024-06-24 13:12:59,288 INFO] Starting training on GPU: [0]
+[2024-06-24 13:12:59,289 INFO] Start training loop and validate every 1000 steps...
+[2024-06-24 13:12:59,289 INFO] corpus_1's transforms: TransformPipe()
+[2024-06-24 13:12:59,291 INFO] Weighted corpora loaded so far:
+			* corpus_1: 1
+[2024-06-24 13:13:12,875 INFO] Saving checkpoint ./../output/dblp.v12.json.filtered.mt75.ts3/nmt/t99375.s29661.m14214.base_config./mdl/nmt_config.yaml/t99375.s29661.m14214.etLSTM.l128.wv128.lr0.001.b4.e1000/fold0/model_step_500.pt
+[2024-06-24 13:13:26,582 INFO] Step 1000/ 1000; acc:  23.26; ppl: 2638.98; xent: 7.88; lr: 0.00012; 1424/629 tok/s;     27 sec
+[2024-06-24 13:13:26,584 INFO] valid's transforms: TransformPipe()
+[2024-06-24 13:13:38,621 INFO] Validation perplexity: 2024.6
+[2024-06-24 13:13:38,622 INFO] Validation accuracy: 23.4261
+[2024-06-24 13:13:38,851 INFO] Saving checkpoint ./../output/dblp.v12.json.filtered.mt75.ts3/nmt/t99375.s29661.m14214.base_config./mdl/nmt_config.yaml/t99375.s29661.m14214.etLSTM.l128.wv128.lr0.001.b4.e1000/fold0/model_step_1000.pt
+[2024-06-24 13:13:43,978 INFO] Missing transforms field for corpus_1 data, set to default: [].
+[2024-06-24 13:13:43,979 WARNING] Corpus corpus_1's weight should be given. We default it to 1 for you.
+[2024-06-24 13:13:43,979 INFO] Missing transforms field for valid data, set to default: [].
+[2024-06-24 13:13:43,979 INFO] Parsed 2 corpora from -data.
+[2024-06-24 13:13:43,981 INFO] Get special vocabs from Transforms: {'src': set(), 'tgt': set()}.
+[2024-06-24 13:13:43,981 INFO] Loading vocab from text file...
+[2024-06-24 13:13:43,981 INFO] Loading src vocabulary from ./../output/dblp.v12.json.filtered.mt75.ts3/nmt/t99375.s29661.m14214.base_config./mdl/nmt_config.yaml/t99375.s29661.m14214.etLSTM.l128.wv128.lr0.001.b4.e1000/fold1/vocab.src
+[2024-06-24 13:13:44,093 INFO] Loaded src vocab has 24624 tokens.
+[2024-06-24 13:13:44,125 INFO] Loading tgt vocabulary from ./../output/dblp.v12.json.filtered.mt75.ts3/nmt/t99375.s29661.m14214.base_config./mdl/nmt_config.yaml/t99375.s29661.m14214.etLSTM.l128.wv128.lr0.001.b4.e1000/fold1/vocab.tgt
+[2024-06-24 13:13:44,202 INFO] Loaded tgt vocab has 13583 tokens.
+[2024-06-24 13:13:44,217 INFO] Building fields with vocab in counters...
+[2024-06-24 13:13:44,259 INFO]  * tgt vocab size: 30000.
+[2024-06-24 13:13:44,356 INFO]  * src vocab size: 30000.
+[2024-06-24 13:13:44,358 INFO]  * src vocab size = 30000
+[2024-06-24 13:13:44,359 INFO]  * tgt vocab size = 30000
+[2024-06-24 13:13:44,361 INFO] Building model...
+c:\users\kap\miniconda3\envs\opentf_kapnmt\lib\site-packages\torch\nn\modules\rnn.py:83: UserWarning: dropout option adds dropout after all but last recurrent layer, so non-zero dropout expects num_layers greater than 1, but got dropout=0.3 and num_layers=1
+  warnings.warn("dropout option adds dropout after all but last "
+[2024-06-24 13:13:44,756 INFO] NMTModel(
+  (encoder): RNNEncoder(
+    (embeddings): Embeddings(
+      (make_embedding): Sequential(
+        (emb_luts): Elementwise(
+          (0): Embedding(30000, 128, padding_idx=1)
+        )
+      )
+    )
+    (rnn): LSTM(128, 128, dropout=0.3)
+  )
+  (decoder): InputFeedRNNDecoder(
+    (embeddings): Embeddings(
+      (make_embedding): Sequential(
+        (emb_luts): Elementwise(
+          (0): Embedding(30000, 128, padding_idx=1)
+        )
+      )
+    )
+    (dropout): Dropout(p=0.3, inplace=False)
+    (rnn): StackedLSTM(
+      (dropout): Dropout(p=0.3, inplace=False)
+      (layers): ModuleList(
+        (0): LSTMCell(256, 128)
+      )
+    )
+    (attn): GlobalAttention(
+      (linear_in): Linear(in_features=128, out_features=128, bias=False)
+      (linear_out): Linear(in_features=256, out_features=128, bias=False)
+    )
+  )
+  (generator): Sequential(
+    (0): Linear(in_features=128, out_features=30000, bias=True)
+    (1): Cast()
+    (2): LogSoftmax(dim=-1)
+  )
+)
+[2024-06-24 13:13:44,757 INFO] encoder: 3972096
+[2024-06-24 13:13:44,758 INFO] decoder: 7956784
+[2024-06-24 13:13:44,758 INFO] * number of parameters: 11928880
+[2024-06-24 13:13:45,958 INFO] Starting training on GPU: [0]
+[2024-06-24 13:13:45,959 INFO] Start training loop and validate every 1000 steps...
+[2024-06-24 13:13:45,960 INFO] corpus_1's transforms: TransformPipe()
+[2024-06-24 13:13:45,960 INFO] Weighted corpora loaded so far:
+			* corpus_1: 1
+[2024-06-24 13:13:59,474 INFO] Saving checkpoint ./../output/dblp.v12.json.filtered.mt75.ts3/nmt/t99375.s29661.m14214.base_config./mdl/nmt_config.yaml/t99375.s29661.m14214.etLSTM.l128.wv128.lr0.001.b4.e1000/fold1/model_step_500.pt
+[2024-06-24 13:14:12,936 INFO] Step 1000/ 1000; acc:  23.21; ppl: 2623.77; xent: 7.87; lr: 0.00012; 1443/638 tok/s;     27 sec
+[2024-06-24 13:14:12,937 INFO] valid's transforms: TransformPipe()
+[2024-06-24 13:14:24,983 INFO] Validation perplexity: 2025.04
+[2024-06-24 13:14:24,984 INFO] Validation accuracy: 23.398
+[2024-06-24 13:14:25,222 INFO] Saving checkpoint ./../output/dblp.v12.json.filtered.mt75.ts3/nmt/t99375.s29661.m14214.base_config./mdl/nmt_config.yaml/t99375.s29661.m14214.etLSTM.l128.wv128.lr0.001.b4.e1000/fold1/model_step_1000.pt
+[2024-06-24 13:14:29,664 INFO] Missing transforms field for corpus_1 data, set to default: [].
+[2024-06-24 13:14:29,665 WARNING] Corpus corpus_1's weight should be given. We default it to 1 for you.
+[2024-06-24 13:14:29,665 INFO] Missing transforms field for valid data, set to default: [].
+[2024-06-24 13:14:29,666 INFO] Parsed 2 corpora from -data.
+[2024-06-24 13:14:29,667 INFO] Get special vocabs from Transforms: {'src': set(), 'tgt': set()}.
+[2024-06-24 13:14:29,667 INFO] Loading vocab from text file...
+[2024-06-24 13:14:29,668 INFO] Loading src vocabulary from ./../output/dblp.v12.json.filtered.mt75.ts3/nmt/t99375.s29661.m14214.base_config./mdl/nmt_config.yaml/t99375.s29661.m14214.etLSTM.l128.wv128.lr0.001.b4.e1000/fold2/vocab.src
+[2024-06-24 13:14:29,745 INFO] Loaded src vocab has 24714 tokens.
+[2024-06-24 13:14:29,765 INFO] Loading tgt vocabulary from ./../output/dblp.v12.json.filtered.mt75.ts3/nmt/t99375.s29661.m14214.base_config./mdl/nmt_config.yaml/t99375.s29661.m14214.etLSTM.l128.wv128.lr0.001.b4.e1000/fold2/vocab.tgt
+[2024-06-24 13:14:29,828 INFO] Loaded tgt vocab has 13564 tokens.
+[2024-06-24 13:14:29,848 INFO] Building fields with vocab in counters...
+[2024-06-24 13:14:29,893 INFO]  * tgt vocab size: 30000.
+[2024-06-24 13:14:30,002 INFO]  * src vocab size: 30000.
+[2024-06-24 13:14:30,004 INFO]  * src vocab size = 30000
+[2024-06-24 13:14:30,004 INFO]  * tgt vocab size = 30000
+[2024-06-24 13:14:30,008 INFO] Building model...
+c:\users\kap\miniconda3\envs\opentf_kapnmt\lib\site-packages\torch\nn\modules\rnn.py:83: UserWarning: dropout option adds dropout after all but last recurrent layer, so non-zero dropout expects num_layers greater than 1, but got dropout=0.3 and num_layers=1
+  warnings.warn("dropout option adds dropout after all but last "
+[2024-06-24 13:14:30,403 INFO] NMTModel(
+  (encoder): RNNEncoder(
+    (embeddings): Embeddings(
+      (make_embedding): Sequential(
+        (emb_luts): Elementwise(
+          (0): Embedding(30000, 128, padding_idx=1)
+        )
+      )
+    )
+    (rnn): LSTM(128, 128, dropout=0.3)
+  )
+  (decoder): InputFeedRNNDecoder(
+    (embeddings): Embeddings(
+      (make_embedding): Sequential(
+        (emb_luts): Elementwise(
+          (0): Embedding(30000, 128, padding_idx=1)
+        )
+      )
+    )
+    (dropout): Dropout(p=0.3, inplace=False)
+    (rnn): StackedLSTM(
+      (dropout): Dropout(p=0.3, inplace=False)
+      (layers): ModuleList(
+        (0): LSTMCell(256, 128)
+      )
+    )
+    (attn): GlobalAttention(
+      (linear_in): Linear(in_features=128, out_features=128, bias=False)
+      (linear_out): Linear(in_features=256, out_features=128, bias=False)
+    )
+  )
+  (generator): Sequential(
+    (0): Linear(in_features=128, out_features=30000, bias=True)
+    (1): Cast()
+    (2): LogSoftmax(dim=-1)
+  )
+)
+[2024-06-24 13:14:30,404 INFO] encoder: 3972096
+[2024-06-24 13:14:30,405 INFO] decoder: 7956784
+[2024-06-24 13:14:30,405 INFO] * number of parameters: 11928880
+[2024-06-24 13:14:31,572 INFO] Starting training on GPU: [0]
+[2024-06-24 13:14:31,573 INFO] Start training loop and validate every 1000 steps...
+[2024-06-24 13:14:31,573 INFO] corpus_1's transforms: TransformPipe()
+[2024-06-24 13:14:31,574 INFO] Weighted corpora loaded so far:
+			* corpus_1: 1
+[2024-06-24 13:14:45,936 INFO] Saving checkpoint ./../output/dblp.v12.json.filtered.mt75.ts3/nmt/t99375.s29661.m14214.base_config./mdl/nmt_config.yaml/t99375.s29661.m14214.etLSTM.l128.wv128.lr0.001.b4.e1000/fold2/model_step_500.pt
+[2024-06-24 13:15:00,540 INFO] Step 1000/ 1000; acc:  23.37; ppl: 2598.62; xent: 7.86; lr: 0.00012; 1343/592 tok/s;     29 sec
+[2024-06-24 13:15:00,541 INFO] valid's transforms: TransformPipe()
+[2024-06-24 13:15:12,778 INFO] Validation perplexity: 1967.48
+[2024-06-24 13:15:12,779 INFO] Validation accuracy: 23.5025
+[2024-06-24 13:15:12,989 INFO] Saving checkpoint ./../output/dblp.v12.json.filtered.mt75.ts3/nmt/t99375.s29661.m14214.base_config./mdl/nmt_config.yaml/t99375.s29661.m14214.etLSTM.l128.wv128.lr0.001.b4.e1000/fold2/model_step_1000.pt

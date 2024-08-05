@@ -1,0 +1,64 @@
+## Where the samples will be written
+save_data: ../output/nmt/run/example
+## Where the vocab(s) will be written
+src_vocab: ../output/nmt/run/example.vocab.src
+tgt_vocab: /run/example.vocab.tgt
+# Prevent overwriting existing files in the folder
+overwrite: True
+
+# Corpus opts:
+data:
+    corpus_1:
+        path_src: ../output/nmt/src-train.txt
+        path_tgt: ../output/nmt/tgt-train.txt
+    valid:
+        path_src: ../output/nmt/src-val.txt
+        path_tgt: ../output/nmt/tgt-val.txt
+
+# Vocabulary files that were just created
+src_vocab: ../output/nmt/run/example.vocab.src
+tgt_vocab: ../output/nmt/run/example.vocab.tgt
+#src_embeddings: ../output/nmt/run/example.vocab.src.emb
+#tgt_embeddings: ../output/nmt/run/example.vocab.tgt.emb
+
+# Train on a single GPU
+world_size: 1
+gpu_ranks: [0]
+
+# Where to save the checkpoints
+save_model: ../output/nmt/run/model
+save_checkpoint_steps: 500
+train_steps: 1000
+
+keep_checkpoint: -1
+seed: 0
+valid_steps: 1000
+report_every: 1000
+
+word_vec_size: 128
+rnn_size: 128
+layers: 1
+
+encoder_type: rnn
+decoder_type: rnn
+rnn_type: LSTM
+
+# encoder_type: transformer
+# decoder_type: transformer
+# transformer_ff: 128
+# position_encoding: True
+# heads: 2
+
+optim: adam
+learning_rate: 0.001
+learning_rate_decay: 0.9
+start_decay_steps: 50
+decay_steps: 50
+
+batch_size: 4
+# dropout: 0.5
+
+# copy_attn: 'true'
+# global_attention: mlp
+# reuse_copy_attn: 'true'
+# bridge: 'true'
