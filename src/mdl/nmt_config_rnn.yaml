@@ -37,6 +37,7 @@ seed: 0
 valid_steps: 1000
 report_every: 1000
 
+# Model hyperparameters
 word_vec_size: 128
 rnn_size: 128
 layers: 1
@@ -50,7 +51,6 @@ learning_rate: 0.001
 learning_rate_decay: 0.9
 start_decay_steps: 50
 decay_steps: 50
-
 batch_size: 4
 dropout: 0.5
 
