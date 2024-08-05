@@ -140,6 +140,9 @@ def run(data_list, domain_list, fair, filter, future, model_list, output,
     if 'fnn_emb' in model_list: models['fnn_emb'] = Fnn()
     if 'bnn_emb' in model_list: models['bnn_emb'] = Bnn()
     if 'nmt' in model_list: models['nmt'] = Nmt()
+    if 'nmt_convs2s' in model_list: models['nmt_convs2s'] = Nmt()
+    if 'nmt_rnn' in model_list: models['nmt_rnn'] = Nmt()
+    if 'nmt_transformer' in model_list: models['nmt_transformer'] = Nmt()
 
     # streaming scenario (no vector for time)
     if 'tfnn' in model_list:
