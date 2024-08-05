@@ -14,13 +14,13 @@ dependencies:
   - torchvision
   - torchaudio
   - gensim
-  - pytorch-cuda=11.8
+  - pytorch-cuda=12.1
   - pip
   - pip:
-    - OpenNMT-py
-    - torch-geometric
-    - pytrec_eval
-    - torch-scatter
-    - torch-sparse
-    - torch-cluster
-    - torch-spline-conv
+      - OpenNMT-py
+      - torch-geometric
+      - pytrec_eval
+      - torch-scatter
+      - torch-sparse
+      - torch-cluster
+      - torch-spline-conv
