@@ -1,4 +1,4 @@
-name: opentf
+name: opentf_kapnmt
 channels:
   - pytorch
   - pyg
@@ -179,4 +179,4 @@ dependencies:
       - werkzeug==3.0.3
       - wrapt==1.16.0
       - zipp==3.18.2
-prefix: C:\Users\Kap\miniconda3\envs\opentf
+prefix: C:\Users\Kap\miniconda3\envs\opentf_kapnmt
