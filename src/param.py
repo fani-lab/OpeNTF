@@ -36,6 +36,15 @@ settings = {
             'nmt': {
                 'base_config': './mdl/nmt_config.yaml'
             },
+            'nmt_convs2s': {
+                'base_config': './mdl/nmt_config_convs2s.yaml'
+            },
+            'nmt_rnn': {
+                'base_config': './mdl/nmt_config_rnn.yaml'
+            },
+            'nmt_transformer': {
+                'base_config': './mdl/nmt_config_transformer.yaml'
+            },
             'caser': {},
             'rrn': {
                 'with_zero': True
