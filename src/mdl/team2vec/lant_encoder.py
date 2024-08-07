@@ -123,9 +123,8 @@ class Encoder(torch.nn.Module):
             print(f'e : {epoch}, l : {avg_epoch_loss}')
 
             gnn.optimizer.zero_grad()
-            ls, auc = self.eval(pos_z, val_loader_dict)
+            ls = self.eval(gnn, val_loader_dict)
             val_loss_array.append(ls)
-            val_auc_array.append(auc)
 
             epochs_taken += 1
             earlystopping(val_loss_array[-1], self)
@@ -136,15 +135,44 @@ class Encoder(torch.nn.Module):
         # plot the figure and save
         fig_output = f'{gnn.model_output}/{gnn.model_name}.{gnn.graph_type}.undir.{gnn.agg}.e{epochs}.ns{int(gnn.ns)}.b{gnn.b}.d{gnn.d}.png'
         gnn.plot_graph(torch.arange(1, epochs_taken + 1, 1), loss_array, val_loss_array, fig_output=fig_output)
-        fig_output = f'{gnn.model_output}/{gnn.model_name}.{gnn.graph_type}.undir.{gnn.agg}.e{epochs}.ns{int(gnn.ns)}.b{gnn.b}.d{gnn.d}.val_auc_per_epoch.png'
-        gnn.plot_graph(torch.arange(1, epochs_taken + 1, 1), val_auc_array, xlabel='Epochs', ylabel='Val AUC',
-                        title=f'Validation AUC vs Epochs for Embedding Generation', fig_output=fig_output)
+        # fig_output = f'{gnn.model_output}/{gnn.model_name}.{gnn.graph_type}.undir.{gnn.agg}.e{epochs}.ns{int(gnn.ns)}.b{gnn.b}.d{gnn.d}.val_auc_per_epoch.png'
+        # gnn.plot_graph(torch.arange(1, epochs_taken + 1, 1), val_auc_array, xlabel='Epochs', ylabel='Val AUC',
+        #                 title=f'Validation AUC vs Epochs for Embedding Generation', fig_output=fig_output)
         print(f'\nit took {(time.time() - start) / 60} mins || {(time.time() - start) / 3600} hours to train the model\n')
 
 
         torch.cuda.empty_cache()
 
-    def eval(self, pos_z_dict, val_loader_dict):
+    @torch.no_grad
+    def eval(self, gnn, val_loader_dict):
+        total_loss = 0.0
+        num_batches = 0
+
+        # Iterate over each edge type in the validation loader dictionary
+        for seed_edge_type, val_loader in val_loader_dict.items():
+            for sampled_data in val_loader:
+                sampled_data = sampled_data.to(self.device)
+
+                # Forward pass to get pos_z, neg_z, and summary
+                pos_z, neg_z, summary = self(sampled_data, seed_edge_type, gnn.is_directed)
+
+                # Calculate the mutual information loss
+                mi_loss = calculate_loss(gnn.model.dgi, pos_z, neg_z, summary)
+
+                total_loss += mi_loss.item()
+                num_batches += 1
+
+        # Calculate the average loss
+        average_loss = total_loss / num_batches
+
+        print(f'Validation Loss: {average_loss}')
+
+        return average_loss
+
+    # this eval performs validation incorporating link prediction
+    # index out of bounds issue occurs while performing dot product
+    @torch.no_grad
+    def eval_with_lp_loss(self, pos_z_dict, val_loader_dict):
         all_preds = []
         all_labels = []
         total_loss = 0.0
