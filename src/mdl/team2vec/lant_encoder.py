@@ -78,6 +78,7 @@ class Encoder(torch.nn.Module):
 
     # the gnn object can provide the class variables
     def learn(self, gnn, epochs):
+        self.device = gnn.device
         start = time.time()
         train_loader_dict = gnn.train_loader
         val_loader_dict = gnn.val_loader
@@ -94,6 +95,7 @@ class Encoder(torch.nn.Module):
             epoch_losses = []
             for seed_edge_type in params.settings['graph']['supervision_edge_types']:
                 for sampled_data in train_loader_dict[seed_edge_type]:
+                    sampled_data.to(self.device)
                     gnn.optimizer.zero_grad()
                     pos_z, neg_z, summary = self(sampled_data, seed_edge_type, gnn.is_directed) # the forward of this own model
                     # print(f"pos_z (team): {pos_z['team']}")
@@ -139,6 +141,9 @@ class Encoder(torch.nn.Module):
                         title=f'Validation AUC vs Epochs for Embedding Generation', fig_output=fig_output)
         print(f'\nit took {(time.time() - start) / 60} mins || {(time.time() - start) / 3600} hours to train the model\n')
 
+
+        torch.cuda.empty_cache()
+
     def eval(self, pos_z_dict, val_loader_dict):
         all_preds = []
         all_labels = []
@@ -148,6 +153,7 @@ class Encoder(torch.nn.Module):
         # Iterate over each edge type in the validation loader dictionary
         for seed_edge_type, val_loader in val_loader_dict.items():
             for sampled_data in val_loader:
+                sampled_data.to(self.device)
                 # Get the edge_label_index and edge_label for the current batch and current seed_edge_type
                 edge_label_index = sampled_data[seed_edge_type].edge_label_index
                 edge_label = sampled_data[seed_edge_type].edge_label
