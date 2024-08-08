@@ -38,18 +38,18 @@ valid_steps: 1000
 report_every: 1000
 
 # Model hyperparameters
-word_vec_size: 128
+word_vec_size: 256
 cnn_size: 512
-layers: 15
+layers: 10
 cnn_kernel_width: 3
 
 encoder_type: cnn
 decoder_type: cnn
 
 optim: adam
-learning_rate: 0.001
-learning_rate_decay: 0.9
-start_decay_steps: 50
-decay_steps: 50
-batch_size: 4
-dropout: 0.5
+learning_rate: 0.0005
+learning_rate_decay: 0.95
+start_decay_steps: 100
+decay_steps: 100
+batch_size: 16
+dropout: 0.4

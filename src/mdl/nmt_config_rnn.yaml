@@ -38,20 +38,18 @@ valid_steps: 1000
 report_every: 1000
 
 # Model hyperparameters
-word_vec_size: 128
-rnn_size: 128
-layers: 1
+word_vec_size: 256
+rnn_size: 512
+layers: 2
 
 encoder_type: rnn
 decoder_type: rnn
 rnn_type: LSTM
 
 optim: adam
-learning_rate: 0.001
-learning_rate_decay: 0.9
-start_decay_steps: 50
-decay_steps: 50
-batch_size: 4
-dropout: 0.5
-
-global_attention: mlp
+learning_rate: 0.0005
+learning_rate_decay: 0.95
+start_decay_steps: 100
+decay_steps: 100
+batch_size: 16
+dropout: 0.4
