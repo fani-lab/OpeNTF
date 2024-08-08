@@ -6,16 +6,18 @@ the edge_type identifier "sm" or "stm" will have to be included as "sm.en" or "s
 
 settings = {
     'graph':{
-        'edge_types':
-            # ('member', 'm'),
-            # ([('skill', 'to', 'member')], 'sm'),
-            # ([('skill', 'to', 'skill'), ('member', 'to', 'member'), ('skill', 'to', 'member')], 'sm'), # sm enhanced
-            # ([('skill', 'to', 'team'), ('member', 'to', 'team')], 'stm'),
+        'edge_types':                   # this is an array holding the edge_type info in the form [('edge_type1', 'edge_type1_code'), ('edge_type2', 'edge_type2_code') ... ]
+            # [('member', 'm')],
+            # [([('skill', 'to', 'member')], 'sm')],
+            # [([('skill', 'to', 'skill'), ('member', 'to', 'member'), ('skill', 'to', 'member')], 'sm')], # sm enhanced
+            # [([('skill', 'to', 'team'), ('member', 'to', 'team')], 'stm')],
+            [([('skill', 'to', 'team'), ('member', 'to', 'team'), ('loc', 'to', 'team')], 'stml')],
             # ([('skill', 'to', 'skill'), ('member', 'to', 'member'), ('skill', 'to', 'team'), ('member', 'to', 'team'), ('skill', 'to', 'member')], 'stm') # stm enhanced,
             # [([('skill', 'to', 'member')], 'sm'), ([('skill', 'to', 'team'), ('member', 'to', 'team')], 'stm')],
-            [([('skill', 'to', 'skill'), ('member', 'to', 'member'), ('skill', 'to', 'member')], 'sm.en'), ([('skill', 'to', 'skill'), ('member', 'to', 'member'), ('skill', 'to', 'team'), ('member', 'to', 'team'), ('skill','to','member')], 'stm.en')], # sm stm strongly connected
+            # [([('skill', 'to', 'member')], 'sm'), ([('skill', 'to', 'team'), ('member', 'to', 'team'), ('location', 'to', 'team')], 'stml')],
+            # [([('skill', 'to', 'skill'), ('member', 'to', 'member'), ('skill', 'to', 'member')], 'sm.en'), ([('skill', 'to', 'skill'), ('member', 'to', 'member'), ('skill', 'to', 'team'), ('member', 'to', 'team'), ('skill','to','member')], 'stm.en')], # sm stm strongly connected
 
-        'custom_supervision' : True, # if false, it will take all the forward edge_types as supervision edges
+        'custom_supervision' : False, # if false, it will take all the forward edge_types as supervision edges
         # 'supervision_edge_types': [([('skill', 'to', 'skill'), ('member', 'to', 'member'), ('skill', 'to', 'member')], 'sm'), ([('skill', 'to', 'skill'), ('member', 'to', 'member'), ('skill', 'to', 'team'), ('member', 'to', 'team'), ('skill', 'to', 'member')], 'stm')], # sm stm strongly connected
         'supervision_edge_types': [([('skill', 'to', 'member')], 'sm.en'), ([('skill', 'to', 'team'), ('member', 'to', 'team')], 'stm.en')],
         'dir': False,
