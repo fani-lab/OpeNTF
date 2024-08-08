@@ -1,0 +1,41 @@
+FROM nvidia/cuda:11.8.0-cudnn8-devel-ubuntu20.04
+
+# Install dependencies
+RUN apt-get update && apt-get install -y \
+    python3.8 \
+    python3-pip \
+    python3.8-dev \
+    build-essential \
+    wget \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set up Python environment
+RUN pip install --upgrade pip setuptools
+
+# Install Python packages
+RUN pip install \
+    numpy \
+    pandas \
+    scikit-learn \
+    scipy \
+    matplotlib \
+    gensim
+
+# Install PyTorch 2.3.0 with CUDA 11.8 support (wheels)
+RUN pip install torch==2.3.0 torchvision==0.18.0 torchaudio==2.3.0 --index-url https://download.pytorch.org/whl/cu118
+
+# Download and install torch-scatter, torch-sparse, torch-cluster, torch-spline-conv manually (wheels) for PyTorch 2.3.0
+RUN pip install torch-scatter==2.1.2+pt23cu118 -f https://data.pyg.org/whl/torch-2.3.0+cu118.html
+RUN pip install torch-sparse==0.6.18+pt23cu118 -f https://data.pyg.org/whl/torch-2.3.0+cu118.html
+RUN pip install torch-cluster==1.6.3+pt23cu118 -f https://data.pyg.org/whl/torch-2.3.0+cu118.html
+RUN pip install torch-spline-conv==1.2.2+pt23cu118 -f https://data.pyg.org/whl/torch-2.3.0+cu118.html
+
+# Install OpenNMT-py
+RUN pip install OpenNMT-py
+
+# Set the working directory
+WORKDIR /workspace
+
+# Copy your application code
+COPY . /workspace
