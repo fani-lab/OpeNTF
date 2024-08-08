@@ -11,7 +11,8 @@ settings = {
             # [([('skill', 'to', 'member')], 'sm')],
             # [([('skill', 'to', 'skill'), ('member', 'to', 'member'), ('skill', 'to', 'member')], 'sm')], # sm enhanced
             # [([('skill', 'to', 'team'), ('member', 'to', 'team')], 'stm')],
-            [([('skill', 'to', 'team'), ('member', 'to', 'team'), ('loc', 'to', 'team')], 'stml')],
+            # [([('skill', 'to', 'team'), ('member', 'to', 'team'), ('loc', 'to', 'team')], 'stml')],
+            [([('skill', 'to', 'member')], 'sm'), ([('skill', 'to', 'team'), ('member', 'to', 'team')], 'stm'), ([('skill', 'to', 'team'), ('member', 'to', 'team'), ('loc', 'to', 'team')], 'stml')],  # sm, stm, stml
             # ([('skill', 'to', 'skill'), ('member', 'to', 'member'), ('skill', 'to', 'team'), ('member', 'to', 'team'), ('skill', 'to', 'member')], 'stm') # stm enhanced,
             # [([('skill', 'to', 'member')], 'sm'), ([('skill', 'to', 'team'), ('member', 'to', 'team')], 'stm')],
             # [([('skill', 'to', 'member')], 'sm'), ([('skill', 'to', 'team'), ('member', 'to', 'team'), ('location', 'to', 'team')], 'stml')],
@@ -60,7 +61,7 @@ settings = {
             'd' : 8,                # embedding dimension
             'ns' : 5,               # number of negative samples
             'h' : 2,                # number of attention heads (if applicable)
-            'nn' : [20, 10],        # number of neighbors in each hop ([20, 10] -> 20 neighbors in first hop, 10 neighbors in second hop)
+            'nn' : [30, 20],        # number of neighbors in each hop ([20, 10] -> 20 neighbors in first hop, 10 neighbors in second hop)
             'graph_types' : 'stm',   # graph type used for a single run (stm -> ste -> skill-team-expert)
             'agg' : 'mean',         # aggregation method used for merging multiple edges between the same source and destination node
             'dir' : False,          # whether the graph is directed
@@ -71,7 +72,7 @@ settings = {
             'd': 8,
             'ns' : 5,
             'h': 2,
-            'nn': [20, 10],
+            'nn': [30, 20],
             'graph_types': 'stm',
             'agg': 'mean',
             'dir': False,
@@ -82,7 +83,7 @@ settings = {
             'd': 8,
             'ns' : 5,
             'h': 2,
-            'nn': [20, 10],
+            'nn': [30, 20],
             'graph_types': 'stm',
             'agg': 'mean',
             'dir': False,
@@ -104,7 +105,7 @@ settings = {
             'd': 8,
             'ns' : 5,
             'h': 2,
-            'nn': [20, 10],
+            'nn': [30, 20],
             'graph_types': 'stm',
             'agg': 'mean',
             'dir': False,
@@ -144,7 +145,7 @@ settings = {
             'd': 8,
             'ns' : 5,
             'h': 2,
-            'nn': [20, 10],
+            'nn': [30, 20],
             'graph_types': 'stm',
             'agg': 'mean',
             'dir': False,
@@ -155,7 +156,7 @@ settings = {
             'd': 8,
             'ns' : 5,
             'h': 2,
-            'nn': [20, 10],
+            'nn': [30, 20],
             'graph_types': 'stm',
             'agg': 'mean',
             'dir': False,
@@ -171,6 +172,12 @@ settings = {
                     ('member','to','team'),
                     ('team', 'rev_to', 'skill'),
                     ('skill','to','team'),
+                    ('team', 'rev_to', 'member'),
+                ],
+                'stml' : [
+                    ('member','to','team'),
+                    ('team', 'rev_to', 'loc'),
+                    ('loc','to','team'),
                     ('team', 'rev_to', 'member'),
                 ],
 
