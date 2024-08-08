@@ -42,16 +42,16 @@ word_vec_size: 512
 hidden_size: 512
 transformer_ff: 2048
 heads: 8
-layers: 6
+layers: 6  # Transformers often use 6 or more layers effectively
 
 encoder_type: transformer
 decoder_type: transformer
 position_encoding: True
 
 optim: adam
-learning_rate: 0.001
-learning_rate_decay: 0.9
-start_decay_steps: 50
-decay_steps: 50
-batch_size: 4
-dropout: 0.5
+learning_rate: 0.0005  # Reduced learning rate for stability
+learning_rate_decay: 0.95  # Slower decay
+start_decay_steps: 100  # Delay decay start
+decay_steps: 100  # Decay less frequently
+batch_size: 16  # Increased batch size for better gradient estimates
+dropout: 0.3  # Slightly lower dropout rate to retain more information
