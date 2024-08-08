@@ -116,6 +116,12 @@ settings = {
                     [('member', 'to', 'team'), ('team', 'rev_to', 'member')],
                     [('skill', 'to', 'team'), ('team', 'rev_to', 'skill')],
                 ],
+                'stml': [
+                    [('member', 'to', 'team'), ('team', 'rev_to', 'loc'), ('loc', 'to', 'team'), ('team', 'rev_to', 'member')],
+                    [('skill', 'to', 'team'), ('team', 'rev_to', 'member'), ('member', 'to', 'team'), ('team', 'rev_to', 'skill')],
+                    [('member', 'to', 'team'), ('team', 'rev_to', 'member')],
+                    [('skill', 'to', 'team'), ('team', 'rev_to', 'skill')],
+                ],
                 # added one extra e-e connection in the middle
                 # 'sm.en': [[('skill', 'to', 'skill'), ('skill', 'to', 'member'), ('member', 'to', 'member'), ('member', 'rev_to', 'skill'), ('skill', 'to', 'skill')]],
                 'sm.en': [[('skill', 'to', 'skill'), ('skill', 'to', 'member'), ('member', 'rev_to', 'skill'), ('skill', 'to', 'skill')]],
