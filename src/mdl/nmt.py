@@ -14,6 +14,7 @@ from sklearn.metrics import make_scorer
 
 
 class Nmt(Ntf):
+
     def __init__(self):
         super(Ntf, self).__init__()
 
@@ -91,95 +92,10 @@ class Nmt(Ntf):
 
         return model_path
 
-    def learn(self, splits, indexes, vecs, settings, param, output):
-        # Ensure 'train' key exists in settings
-        if "train" not in settings:
-            settings["train"] = {}
-
-        # Define the hyperparameter grid
-        param_grid = {
-            "learning_rate": [0.001, 0.01, 0.1],
-            "batch_size": [4, 8, 16],
-            "dropout": [0.3, 0.5, 0.7],
-        }
-
-        # Create a scorer function
-
-    def scorer(true, pred):
-        scores = []
-        for t, p in zip(true, pred):
-            if len(p) == 0:
-                scores.append(float("inf"))  # Penalize empty predictions
-            else:
-                try:
-                    # Ensure the true index is within the valid range for pred
-                    if t < len(p):
-                        scores.append(-np.mean(np.log([p[int(t)]])))
-                    else:
-                        logging.error(
-                            f"IndexError: true={t}, pred={p} (true index out of range)"
-                        )
-                        scores.append(float("inf"))  # Penalize out-of-range indices
-                except IndexError:
-                    logging.error(f"IndexError: true={t}, pred={p}")
-                    scores.append(float("inf"))
-        return np.mean(scores)
-
-        # Iterate through the hyperparameter grid
-        best_score = float("inf")
-        best_params = None
-        for params in ParameterGrid(param_grid):
-            logging.info(f"Training with params: {params}")
-            settings["train"]["learning_rate"] = params["learning_rate"]
-            settings["train"]["batch_size"] = params["batch_size"]
-            settings["train"]["dropout"] = params["dropout"]
-
-            for foldidx in splits["folds"].keys():
-                cli_cmd = f"onmt_train -config {output}/fold{foldidx}/config.yml"
-                subprocess.Popen(shlex.split(cli_cmd)).wait()
-
-                # Evaluate on validation set
-                val_cmd = f"onmt_translate -model {output}/fold{foldidx}/model_step_{settings['train_steps']}.pt -src {output}/fold{foldidx}/src-valid.txt -output {output}/fold{foldidx}/pred.txt -gpu 0"
-                subprocess.Popen(shlex.split(val_cmd)).wait()
-
-                # Calculate the score
-                with open(f"{output}/fold{foldidx}/pred.txt") as f:
-                    preds = [line.strip() for line in f]
-                preds = [
-                    [float(y[1:]) for y in x.split()] for x in preds
-                ]  # Extract numeric part
-
-                # Debugging: print out types and sample data
-                logging.info(
-                    f"Type of splits['folds'][foldidx]['valid']: {type(splits['folds'][foldidx]['valid'])}"
-                )
-                logging.info(
-                    f"Sample data from splits['folds'][foldidx]['valid']: {splits['folds'][foldidx]['valid'][:5]}"
-                )
-
-                # Ensure valid data is in list format
-                if isinstance(splits["folds"][foldidx]["valid"], np.ndarray):
-                    valid_data = splits["folds"][foldidx]["valid"].tolist()
-                elif isinstance(splits["folds"][foldidx]["valid"], list):
-                    valid_data = splits["folds"][foldidx]["valid"]
-                else:
-                    logging.error(
-                        f"Unexpected type for splits['folds'][foldidx]['valid']: {type(splits['folds'][foldidx]['valid'])}"
-                    )
-                    continue
-
-                true = [
-                    int(y[1:]) if isinstance(y, str) and y.startswith("m") else int(y)
-                    for y in valid_data
-                ]
-
-                score = scorer(true, preds)
-
-                if score < best_score:
-                    best_score = score
-                    best_params = params
-
-        logging.info(f"Best params: {best_params}, Best score: {best_score}")
+    def learn(self, splits, path):
+        for foldidx in splits["folds"].keys():
+            cli_cmd = f"onmt_train -config {path}/fold{foldidx}/config.yml"
+            subprocess.Popen(shlex.split(cli_cmd)).wait()
 
     # todo: per_trainstep => per_epoch
     # todo: eval on prediction files
@@ -305,7 +221,7 @@ class Nmt(Ntf):
             model_path = self.build_vocab(
                 input_data, output_data, splits, base_config, model_path
             )
-            self.learn(splits, indexes, vecs, base_config, None, model_path)
+            self.learn(splits, model_path)
         if "test" in cmd:
             self.test(splits, model_path, per_epoch=True)
         if "eval" in cmd:
