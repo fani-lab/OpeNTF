@@ -49,13 +49,13 @@ class Encoder(torch.nn.Module):
                     self.node_lin.append(nn.Linear(data[node_type].num_features, hidden_channels))
                     self.node_emb.append(nn.Embedding(data[node_type].num_nodes, hidden_channels))
 
-        self.hidden_channels = hidden_channels // self.heads # the attention heads cause the dimension to double inside the model
+        # self.hidden_channels = hidden_channels // self.heads # the attention heads cause the dimension to double inside the model
 
-        self.encoder = to_hetero(LANT(self.hidden_channels, self.hidden_channels, heads = self.heads), metadata=data.metadata())
+        self.encoder = to_hetero(LANT(hidden_channels, hidden_channels, heads = self.heads), metadata=data.metadata())
         # self.encoder = to_hetero(LANTbk(hidden_channels, hidden_channels), metadata=data.metadata())
 
         self.dgi = DGI(
-            hidden_channels=self.hidden_channels * self.heads,
+            hidden_channels=hidden_channels,
             encoder=self.encoder,
             summary=summary_function,
             corruption=corruption
