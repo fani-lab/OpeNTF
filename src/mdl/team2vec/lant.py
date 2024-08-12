@@ -18,7 +18,7 @@ from sklearn.metrics import roc_auc_score
 
 
 class LANT(torch.nn.Module):
-    def __init__(self, in_channels, hidden_channels, heads = 2):
+    def __init__(self, in_channels, hidden_channels, heads = 4):
         super().__init__()
         self.conv1 = GATConv((-1, -1), hidden_channels, add_self_loops=False, heads = heads)
         self.conv2 = GATConv((-1, -1), hidden_channels, add_self_loops=False, heads = 1)
