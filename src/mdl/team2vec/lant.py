@@ -21,16 +21,12 @@ class LANT(torch.nn.Module):
     def __init__(self, in_channels, hidden_channels, heads = 2):
         super().__init__()
         self.conv1 = GATConv((-1, -1), hidden_channels, add_self_loops=False, heads = heads)
-        self.conv2 = GATConv((-1, -1), hidden_channels, add_self_loops=False, heads = heads)
-        self.conv3 = GATConv((-1, -1), hidden_channels, add_self_loops=False, heads = heads)
-        self.conv4 = GATConv((-1, -1), hidden_channels, add_self_loops=False, heads = 1)
+        self.conv2 = GATConv((-1, -1), hidden_channels, add_self_loops=False, heads = 1)
         self.prelu = torch.nn.PReLU(hidden_channels)
 
     def forward(self, x, edge_index):
-        x = F.relu(self.conv1(x, edge_index))
-        x = F.relu(self.conv2(x, edge_index))
-        x = F.relu(self.conv3(x, edge_index))
-        x = self.conv4(x, edge_index)
+        x = self.conv1(x, edge_index)
+        x = self.conv2(x, edge_index)
         x = self.prelu(x)
         return x
 
