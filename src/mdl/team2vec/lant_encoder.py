@@ -24,7 +24,7 @@ This is functionally a bit different from the Encoder class of encoder.py
 class Encoder(torch.nn.Module):
     def __init__(self, hidden_channels, data):
         super().__init__()
-        self.heads = 2
+        self.heads = 4
 
         '''
         this section of linear transformation is needed to add random feature matrix to the initial nodes with 1 dimensional features
