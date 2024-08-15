@@ -1,0 +1,38 @@
+# Use the base Ubuntu 20.04 image
+FROM ubuntu:20.04
+
+# Add label to the image and version to the image
+LABEL maintainer="thangk@uwindsor.ca"
+LABEL version="1.0"
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+# Install necessary dependencies and tools
+RUN apt-get update && apt-get install -y \
+    wget \
+    curl \
+    build-essential \
+    libxml2 \
+    && rm -rf /var/lib/apt/lists/*
+
+
+# Install CUDA 11.1 and cuDNN 8
+RUN wget https://developer.download.nvidia.com/compute/cuda/11.1.0/local_installers/cuda_11.1.0_455.23.05_linux.run \
+    && sh cuda_11.1.0_455.23.05_linux.run --silent --toolkit \
+    && rm cuda_11.1.0_455.23.05_linux.run
+
+# Install cuDNN 8
+RUN wget https://developer.download.nvidia.com/compute/redist/cudnn/v8.0.5/cudnn-11.1-linux-x64-v8.0.5.39.tgz \
+    && tar -xzvf cudnn-11.1-linux-x64-v8.0.5.39.tgz -C /usr/local \
+    && rm cudnn-11.1-linux-x64-v8.0.5.39.tgz \
+    && ldconfig
+
+# Set environment variables for CUDA
+ENV PATH=/usr/local/cuda-11.1/bin${PATH:+:${PATH}} \
+    LD_LIBRARY_PATH=/usr/local/cuda-11.1/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
+
+# Set the working directory
+WORKDIR /workspace
+
+# Set entrypoint
+ENTRYPOINT ["/bin/bash"]
