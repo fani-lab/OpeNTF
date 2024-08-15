@@ -162,7 +162,6 @@ class Nmt(Ntf):
                 # tgt_csv = pd.read_csv(f'{path}/tgt-test.txt', header=None)
 
                 Y_ = np.zeros((test_size, member_count))
-                # Y = np.zeros((test_size, member_count))
                 for i in range(test_size):
                     yhat_list = (
                         (pred_csv.iloc[i])[0]
