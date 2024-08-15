@@ -15,6 +15,7 @@ data:
     corpus_1:
         path_src: ../output/nmt/src-train.txt
         path_tgt: ../output/nmt/tgt-train.txt
+        weight: 1
     valid:
         path_src: ../output/nmt/src-val.txt
         path_tgt: ../output/nmt/tgt-val.txt
