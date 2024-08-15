@@ -1,26 +1,25 @@
-name: opentf_kapnmt
+name: kapnmt
 channels:
   - conda-forge
   - pytorch
   - nvidia
 dependencies:
-  - python=3.11.9
+  - python=3.9.19
   - numpy
-  - pandas
+  - pandas<2.1
   - scikit-learn
   - scipy
   - matplotlib
-  - pytorch
-  - torchvision
-  - torchaudio
-  - gensim
-  - pytorch-cuda=12.1
+  - pytorch=1.10.2
+  - torchvision=0.11.3
+  - torchaudio=0.10.2
+  - gensim<4
+  - pytorch-cuda=11.7
   - pip
   - pip:
-      - OpenNMT-py
-      - torch-geometric
-      - pytrec_eval
       - torch-scatter
       - torch-sparse
       - torch-cluster
       - torch-spline-conv
+      - torch-geometric
+      - pytrec_eval
