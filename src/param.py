@@ -39,11 +39,83 @@ settings = {
             'nmt_convs2s': {
                 'base_config': './mdl/nmt_config_convs2s.yaml'
             },
+            'nmt_convs2s_etcnn.l1024.wv256.lr0.0005.b16.do0.4': {
+                'base_config': './mdl/nmt_config_convs2s_etcnn.l1024.wv256.lr0.0005.b16.do0.4.yaml'
+            },
+            'nmt_convs2s_etcnn.l512.wv512.lr0.0005.b16.do0.4': {
+                'base_config': './mdl/nmt_config_convs2s_etcnn.l512.wv512.lr0.0005.b16.do0.4.yaml'
+            },
+            'nmt_convs2s_etcnn.l512.wv256.lr0.0005.b32.do0.4': {
+                'base_config': './mdl/nmt_config_convs2s_etcnn.l512.wv256.lr0.0005.b32.do0.4.yaml'
+            },
+            'nmt_convs2s_etcnn.l512.wv256.lr0.0005.b16.do0.2': {
+                'base_config': './mdl/nmt_config_convs2s_etcnn.l512.wv256.lr0.0005.b16.do0.2.yaml'
+            },
+            'nmt_convs2s_etcnn.l512.wv256.lr0.0001.b16.do0.4': {
+                'base_config': './mdl/nmt_config_convs2s_etcnn.l512.wv256.lr0.0001.b16.do0.4.yaml'
+            },
+            'nmt_convs2s_etcnn.l512.wv256.lr0.001.b16.do0.4': {
+                'base_config': './mdl/nmt_config_convs2s_etcnn.l512.wv256.lr0.001.b16.do0.4.yaml'
+            },
+            'nmt_convs2s_etcnn.l128.wv4096.lr0.0005.b64.do0.8': {
+                'base_config': './mdl/nmt_config_convs2s_etcnn.l128.wv4096.lr0.0005.b64.do0.8.yaml'
+            },
+            'nmt_convs2s_etcnn.l128.wv512.lr0.0005.b64.do0.8': {
+                'base_config': './mdl/nmt_config_convs2s_etcnn.l128.wv512.lr0.0005.b64.do0.8.yaml'
+            },
+            'nmt_convs2s_etcnn.l128.wv256.lr0.0005.b64.do0.8': {
+                'base_config': './mdl/nmt_config_convs2s_etcnn.l128.wv256.lr0.0005.b64.do0.8.yaml'
+            },
+            'nmt_convs2s_etcnn.l128.wv128.lr0.0005.b64.do0.8': {
+                'base_config': './mdl/nmt_config_convs2s_etcnn.l128.wv128.lr0.0005.b64.do0.8.yaml'
+            },
+            # nmt_convs2s_etcnn.l64.wv1024.lr0.0005.b32.do0.4
+            # nmt_convs2s_etcnn.l128.wv1024.lr0.0005.b32.do0.4
+            # nmt_convs2s_etcnn.l256.wv1024.lr0.0005.b32.do0.4
+            # nmt_convs2s_etcnn.l512.wv1024.lr0.0005.b32.do0.4
+            'nmt_convs2s_etcnn.l64.wv1024.lr0.0005.b32.do0.4': {
+                'base_config': './mdl/nmt_config_convs2s_etcnn.l64.wv1024.lr0.0005.b32.do0.4.yaml'
+            },
+            'nmt_convs2s_etcnn.l128.wv1024.lr0.0005.b32.do0.4': {
+                'base_config': './mdl/nmt_config_convs2s_etcnn.l128.wv1024.lr0.0005.b32.do0.4.yaml'
+            },
+            'nmt_convs2s_etcnn.l256.wv1024.lr0.0005.b32.do0.4': {
+                'base_config': './mdl/nmt_config_convs2s_etcnn.l256.wv1024.lr0.0005.b32.do0.4.yaml'
+            },
+            'nmt_convs2s_etcnn.l512.wv1024.lr0.0005.b32.do0.4': {
+                'base_config': './mdl/nmt_config_convs2s_etcnn.l512.wv1024.lr0.0005.b32.do0.4.yaml'
+            },
+
+            # nmt_convs2s_etcnn.l128.wv6144.lr0.0005.b64.do0.8
+            # nmt_convs2s_etcnn.l128.wv8192.lr0.0005.b64.do0.8
+            # nmt_convs2s_etcnn.l128.wv10240.lr0.0005.b64.do0.8
+            # nmt_convs2s_etcnn.l128.wv12288.lr0.0005.b64.do0.8
+            'nmt_convs2s_etcnn.l128.wv6144.lr0.0005.b64.do0.8': {
+                'base_config': './mdl/nmt_config_convs2s_etcnn.l128.wv6144.lr0.0005.b64.do0.8.yaml'
+            },
+            'nmt_convs2s_etcnn.l128.wv8192.lr0.0005.b64.do0.8': {
+                'base_config': './mdl/nmt_config_convs2s_etcnn.l128.wv8192.lr0.0005.b64.do0.8.yaml'
+            },
+            'nmt_convs2s_etcnn.l128.wv10240.lr0.0005.b64.do0.8': {
+                'base_config': './mdl/nmt_config_convs2s_etcnn.l128.wv10240.lr0.0005.b64.do0.8.yaml'
+            },
+            'nmt_convs2s_etcnn.l128.wv12288.lr0.0005.b64.do0.8': {
+                'base_config': './mdl/nmt_config_convs2s_etcnn.l128.wv12288.lr0.0005.b64.do0.8.yaml'
+            },
+
+
+
+
+
+
             'nmt_rnn': {
                 'base_config': './mdl/nmt_config_rnn.yaml'
             },
             'nmt_transformer': {
                 'base_config': './mdl/nmt_config_transformer.yaml'
+            },
+            'nmt_transformer_model1': {
+                'base_config': './mdl/nmt_config_transformer_model1.yaml'
             },
             'caser': {},
             'rrn': {
