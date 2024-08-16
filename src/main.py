@@ -34,10 +34,10 @@ def get_last_gpu():
     if torch.cuda.device_count() > 1:
         gpu_count = torch.cuda.device_count()
         last_gpu = torch.cuda.device_count() - 1
-        print(f"\nMultiple GPUs detected. Using the {gpu_count}th one.\n")
+        print(f"\nMultiple GPUs detected. Using the {gpu_count}th one (if CUDA is available).\n")
         os.environ["CUDA_VISIBLE_DEVICES"] = str(last_gpu)
     elif torch.cuda.device_count() == 1:
-        print("\nOnly one GPU detected. Using it.\n")
+        print("\nOnly one GPU detected. Using it (if CUDA is available).\n")
     else:
         print("\nNo GPU detected. Using CPU.\n")
 
@@ -176,6 +176,44 @@ def run(
         models["nmt_rnn"] = Nmt()
     if "nmt_transformer" in model_list:
         models["nmt_transformer"] = Nmt()
+    if "nmt_transformer_model1" in model_list:
+        models["nmt_transformer_model1"] = Nmt()
+    if "nmt_convs2s_etcnn.l1024.wv256.lr0.0005.b16.do0.4" in model_list:
+        models["nmt_convs2s_etcnn.l1024.wv256.lr0.0005.b16.do0.4"] = Nmt()
+    if "nmt_convs2s_etcnn.l512.wv512.lr0.0005.b16.do0.4" in model_list:
+        models["nmt_convs2s_etcnn.l512.wv512.lr0.0005.b16.do0.4"] = Nmt()
+    if "nmt_convs2s_etcnn.l512.wv256.lr0.0005.b32.do0.4" in model_list:
+        models["nmt_convs2s_etcnn.l512.wv256.lr0.0005.b32.do0.4"] = Nmt()
+    if "nmt_convs2s_etcnn.l512.wv256.lr0.0005.b16.do0.2" in model_list: 
+        models["nmt_convs2s_etcnn.l512.wv256.lr0.0005.b16.do0.2"] = Nmt()
+    if "nmt_convs2s_etcnn.l512.wv256.lr0.0001.b16.do0.4" in model_list: 
+        models["nmt_convs2s_etcnn.l512.wv256.lr0.0001.b16.do0.4"] = Nmt()
+    if "nmt_convs2s_etcnn.l512.wv256.lr0.001.b16.do0.4" in model_list: 
+        models["nmt_convs2s_etcnn.l512.wv256.lr0.001.b16.do0.4"] = Nmt()
+    if "nmt_convs2s_etcnn.l128.wv4096.lr0.0005.b64.do0.8" in model_list:
+        models["nmt_convs2s_etcnn.l128.wv4096.lr0.0005.b64.do0.8"] = Nmt()
+    if "nmt_convs2s_etcnn.l128.wv512.lr0.0005.b64.do0.8" in model_list:
+        models["nmt_convs2s_etcnn.l128.wv512.lr0.0005.b64.do0.8"] = Nmt()
+    if "nmt_convs2s_etcnn.l128.wv256.lr0.0005.b64.do0.8" in model_list:
+        models["nmt_convs2s_etcnn.l128.wv256.lr0.0005.b64.do0.8"] = Nmt()
+    if "nmt_convs2s_etcnn.l128.wv128.lr0.0005.b64.do0.8" in model_list:
+        models["nmt_convs2s_etcnn.l128.wv128.lr0.0005.b64.do0.8"] = Nmt()
+    if "nmt_convs2s_etcnn.l64.wv1024.lr0.0005.b32.do0.4" in model_list:
+        models["nmt_convs2s_etcnn.l64.wv1024.lr0.0005.b32.do0.4"] = Nmt()
+    if "nmt_convs2s_etcnn.l128.wv1024.lr0.0005.b32.do0.4" in model_list:
+        models["nmt_convs2s_etcnn.l128.wv1024.lr0.0005.b32.do0.4"] = Nmt()
+    if "nmt_convs2s_etcnn.l256.wv1024.lr0.0005.b32.do0.4" in model_list:
+        models["nmt_convs2s_etcnn.l256.wv1024.lr0.0005.b32.do0.4"] = Nmt()
+    if "nmt_convs2s_etcnn.l512.wv1024.lr0.0005.b32.do0.4" in model_list:
+        models["nmt_convs2s_etcnn.l512.wv1024.lr0.0005.b32.do0.4"] = Nmt()
+    if "nmt_convs2s_etcnn.l128.wv6144.lr0.0005.b64.do0.8" in model_list:
+        models["nmt_convs2s_etcnn.l128.wv6144.lr0.0005.b64.do0.8"] = Nmt()
+    if "nmt_convs2s_etcnn.l128.wv8192.lr0.0005.b64.do0.8" in model_list:
+        models["nmt_convs2s_etcnn.l128.wv8192.lr0.0005.b64.do0.8"] = Nmt()
+    if "nmt_convs2s_etcnn.l128.wv10240.lr0.0005.b64.do0.8" in model_list:
+        models["nmt_convs2s_etcnn.l128.wv10240.lr0.0005.b64.do0.8"] = Nmt()
+    if "nmt_convs2s_etcnn.l128.wv12288.lr0.0005.b64.do0.8" in model_list:
+        models["nmt_convs2s_etcnn.l128.wv12288.lr0.0005.b64.do0.8"] = Nmt()
 
     # streaming scenario (no vector for time)
     if "tfnn" in model_list:
