@@ -69,9 +69,11 @@ class Nmt(Ntf):
             settings["tgt_vocab"] = f"{fold_path}/vocab.tgt"
             settings["save_data"] = f"{fold_path}/"
             settings["save_model"] = f"{fold_path}/model"
-            settings["world_size"] = 1
-            settings["gpu_ranks"] = [0] if torch.cuda.is_available() else []
-            settings["save_checkpoint_steps"] = 500
+
+            # Kap: these are set in the config file
+            # settings["world_size"] = 1
+            # settings["gpu_ranks"] = [0] if torch.cuda.is_available() else []
+            # settings["save_checkpoint_steps"] = 500
 
             with open(f"{fold_path}/config.yml", "w") as outfile:
                 yaml.safe_dump(settings, outfile)
@@ -190,6 +192,9 @@ class Nmt(Ntf):
         )
 
     def run(self, splits, vecs, indexes, output, settings, cmd, *args, **kwargs):
+
+        
+
         with open(settings["base_config"]) as infile:
             base_config = yaml.safe_load(infile)
 
