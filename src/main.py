@@ -29,13 +29,15 @@ from mdl.rrn import Rrn
 from cmn.tools import generate_popular_and_nonpopular
 
 
-# Kap: Use last GPU
-def get_last_gpu():
+# Kap: 0-based indexing (0-7) ie. "0,1,2,3,4,5,6,7"
+GPUS_TO_USE = "6"
+
+
+# Kap: Set GPUs to use
+def set_gpus():
     if torch.cuda.device_count() > 1:
-        gpu_count = torch.cuda.device_count()
-        last_gpu = torch.cuda.device_count() - 1
-        print(f"\nMultiple GPUs detected. Using the {gpu_count}th one (if CUDA is available).\n")
-        os.environ["CUDA_VISIBLE_DEVICES"] = str(last_gpu)
+        print(f"\nMultiple GPUs detected. Using GPUs: {GPUS_TO_USE} .\n")
+        os.environ["CUDA_VISIBLE_DEVICES"] = GPUS_TO_USE
     elif torch.cuda.device_count() == 1:
         print("\nOnly one GPU detected. Using it (if CUDA is available).\n")
     else:
@@ -128,7 +130,7 @@ def aggregate(output):
 
 
 def run(
-    data_list, domain_list, fair, filter, future, model_list, output, exp_id, settings
+    data_list, domain_list, fair, filter, future, model_list, variant, output, exp_id, settings
 ):
     filter_str = (
         f".filtered.mt{settings['data']['filter']['min_nteam']}.ts{settings['data']['filter']['min_team_size']}"
@@ -168,52 +170,14 @@ def run(
         models["fnn_emb"] = Fnn()
     if "bnn_emb" in model_list:
         models["bnn_emb"] = Bnn()
-    if "nmt" in model_list:
-        models["nmt"] = Nmt()
-    if "nmt_convs2s" in model_list:
-        models["nmt_convs2s"] = Nmt()
-    if "nmt_rnn" in model_list:
-        models["nmt_rnn"] = Nmt()
-    if "nmt_transformer" in model_list:
-        models["nmt_transformer"] = Nmt()
-    if "nmt_transformer_model1" in model_list:
-        models["nmt_transformer_model1"] = Nmt()
-    if "nmt_convs2s_etcnn.l1024.wv256.lr0.0005.b16.do0.4" in model_list:
-        models["nmt_convs2s_etcnn.l1024.wv256.lr0.0005.b16.do0.4"] = Nmt()
-    if "nmt_convs2s_etcnn.l512.wv512.lr0.0005.b16.do0.4" in model_list:
-        models["nmt_convs2s_etcnn.l512.wv512.lr0.0005.b16.do0.4"] = Nmt()
-    if "nmt_convs2s_etcnn.l512.wv256.lr0.0005.b32.do0.4" in model_list:
-        models["nmt_convs2s_etcnn.l512.wv256.lr0.0005.b32.do0.4"] = Nmt()
-    if "nmt_convs2s_etcnn.l512.wv256.lr0.0005.b16.do0.2" in model_list: 
-        models["nmt_convs2s_etcnn.l512.wv256.lr0.0005.b16.do0.2"] = Nmt()
-    if "nmt_convs2s_etcnn.l512.wv256.lr0.0001.b16.do0.4" in model_list: 
-        models["nmt_convs2s_etcnn.l512.wv256.lr0.0001.b16.do0.4"] = Nmt()
-    if "nmt_convs2s_etcnn.l512.wv256.lr0.001.b16.do0.4" in model_list: 
-        models["nmt_convs2s_etcnn.l512.wv256.lr0.001.b16.do0.4"] = Nmt()
-    if "nmt_convs2s_etcnn.l128.wv4096.lr0.0005.b64.do0.8" in model_list:
-        models["nmt_convs2s_etcnn.l128.wv4096.lr0.0005.b64.do0.8"] = Nmt()
-    if "nmt_convs2s_etcnn.l128.wv512.lr0.0005.b64.do0.8" in model_list:
-        models["nmt_convs2s_etcnn.l128.wv512.lr0.0005.b64.do0.8"] = Nmt()
-    if "nmt_convs2s_etcnn.l128.wv256.lr0.0005.b64.do0.8" in model_list:
-        models["nmt_convs2s_etcnn.l128.wv256.lr0.0005.b64.do0.8"] = Nmt()
-    if "nmt_convs2s_etcnn.l128.wv128.lr0.0005.b64.do0.8" in model_list:
-        models["nmt_convs2s_etcnn.l128.wv128.lr0.0005.b64.do0.8"] = Nmt()
-    if "nmt_convs2s_etcnn.l64.wv1024.lr0.0005.b32.do0.4" in model_list:
-        models["nmt_convs2s_etcnn.l64.wv1024.lr0.0005.b32.do0.4"] = Nmt()
-    if "nmt_convs2s_etcnn.l128.wv1024.lr0.0005.b32.do0.4" in model_list:
-        models["nmt_convs2s_etcnn.l128.wv1024.lr0.0005.b32.do0.4"] = Nmt()
-    if "nmt_convs2s_etcnn.l256.wv1024.lr0.0005.b32.do0.4" in model_list:
-        models["nmt_convs2s_etcnn.l256.wv1024.lr0.0005.b32.do0.4"] = Nmt()
-    if "nmt_convs2s_etcnn.l512.wv1024.lr0.0005.b32.do0.4" in model_list:
-        models["nmt_convs2s_etcnn.l512.wv1024.lr0.0005.b32.do0.4"] = Nmt()
-    if "nmt_convs2s_etcnn.l128.wv6144.lr0.0005.b64.do0.8" in model_list:
-        models["nmt_convs2s_etcnn.l128.wv6144.lr0.0005.b64.do0.8"] = Nmt()
-    if "nmt_convs2s_etcnn.l128.wv8192.lr0.0005.b64.do0.8" in model_list:
-        models["nmt_convs2s_etcnn.l128.wv8192.lr0.0005.b64.do0.8"] = Nmt()
-    if "nmt_convs2s_etcnn.l128.wv10240.lr0.0005.b64.do0.8" in model_list:
-        models["nmt_convs2s_etcnn.l128.wv10240.lr0.0005.b64.do0.8"] = Nmt()
-    if "nmt_convs2s_etcnn.l128.wv12288.lr0.0005.b64.do0.8" in model_list:
-        models["nmt_convs2s_etcnn.l128.wv12288.lr0.0005.b64.do0.8"] = Nmt()
+
+    # Kap: handle the NMT models and the variants
+    for model_name in model_list:
+        if model_name.startswith("nmt") and variant is not None:
+            models[f"{model_name}-{variant}"] = Nmt()
+        elif model_name.startswith("nmt"):
+            models[model_name] = Nmt()
+
 
     # streaming scenario (no vector for time)
     if "tfnn" in model_list:
@@ -364,10 +328,7 @@ def run(
                 )
 
             # Kap: added to indicate if GPU is available and to get the last GPU
-            get_last_gpu()
-
-            device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-            print(f"Using device: {device}")
+            set_gpus()
 
             baseline_name = (
                 m_name.lstrip("t")
@@ -378,10 +339,10 @@ def run(
             print(f"Running for (dataset, model): ({d_name}, {m_name}) ... ")
 
             output_path = f"{output}{os.path.split(datapath)[-1]}{filter_str}/{m_name}/t{vecs_['skill'].shape[0]}.s{vecs_['skill'].shape[1]}.m{vecs_['member'].shape[1]}.{'.'.join([k + str(v).replace(' ', '') for k, v in settings['model']['baseline'][baseline_name].items() if v])}"
+            
             if not os.path.isdir(output_path):
                 os.makedirs(output_path)
             copyfile("./param.py", f"{output_path}/param.py")
-            # make_popular_and_nonpopular_matrix(vecs_, data_list[0])
 
             m_obj.run(
                 splits,
@@ -441,6 +402,16 @@ def addargs(parser):
         default=[],
         required=True,
         help="a list of neural models (eg. -model random fnn bnn fnn_emb bnn_emb nmt)",
+    )
+
+    variant = parser.add_argument_group("variant")
+    variant.add_argument(
+        "-variant",
+        "--variant",
+        type=str.lower,
+        default=None,
+        required=False,
+        help="a neural model variant (eg. -variant model1)",
     )
 
     output = parser.add_argument_group("output")
@@ -520,6 +491,7 @@ if __name__ == "__main__":
         filter=args.filter,
         future=args.future,
         model_list=args.model_list,
+        variant=args.variant,
         output=args.output,
         exp_id=args.exp_id,
         settings=param.settings,

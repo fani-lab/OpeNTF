@@ -21,6 +21,7 @@
 *.rar
 *.mdl
 *.pt
+.nfs*
 
 # large files list to ignore
 splits.json
