@@ -32,15 +32,15 @@ nmt_transformer=${models[2]}
 # ------------------------------------------------------------------------------
 
 # Run number
-run_num=18
+run_num=19
 
 # Array of hyperparameters
 # Add hyperparameters here in the array ie. variants=("1" "2" "3")
-variants=("imdb1")
+variants=("gith1")
 
 # Select dataset
-dataset=$imdb
-dataset_path=$imdb_path
+dataset=$gith
+dataset_path=$gith_path
 is_toy=false
 
 # Select model
