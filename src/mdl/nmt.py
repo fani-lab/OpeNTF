@@ -5,6 +5,7 @@ import shlex
 import numpy as np
 import pandas as pd
 import torch
+from shutil import copyfile
 
 from tqdm import tqdm
 from eval.metric import *
@@ -193,9 +194,16 @@ class Nmt(Ntf):
 
     def run(self, splits, vecs, indexes, output, settings, cmd, *args, **kwargs):
 
-        
+        model_name = kwargs.get("model_name")
+        variant_name = kwargs.get("variant_name")
+        combined_name = f"{model_name}-{variant_name}" if variant_name else model_name
 
-        with open(settings["base_config"]) as infile:
+        current_path = os.path.dirname(os.path.abspath(__file__))
+        adjusted_model_path = os.path.join(
+            current_path, "nmt_models", f"{combined_name}.yaml"
+        )
+
+        with open(adjusted_model_path) as infile:
             base_config = yaml.safe_load(infile)
 
         encoder_type = base_config["encoder_type"]
@@ -214,9 +222,22 @@ class Nmt(Ntf):
         elif encoder_type == "transformer":
             layer_size = base_config["transformer_ff"]
 
-        model_path = f"{output}/t{team_count}.s{skill_count}.m{member_count}.et{encoder_type}.l{layer_size}.wv{word_vec_size}.lr{learning_rate}.b{batch_size}.e{epochs}"
-        if not os.path.isdir(output):
-            os.makedirs(output)
+        # Kap: removed unnecessary folder nesting, now it's model/variant
+        temp_output = output.split("/")[0:-1]
+        new_output = "/".join(temp_output)
+
+        model_path = f"{new_output}/t{team_count}.s{skill_count}.m{member_count}.et{encoder_type}.l{layer_size}.wv{word_vec_size}.lr{learning_rate}.b{batch_size}.e{epochs}"
+
+       
+
+        if not os.path.isdir(model_path):
+            os.makedirs(model_path)
+
+        # take out last folder name
+        param_path = current_path.split("/")[0:-1]
+        param_path = "/".join(param_path)
+
+        copyfile(f"{param_path}/param.py", f"{model_path}/param.py")
 
         y_test = vecs["member"][splits["test"]]
 
