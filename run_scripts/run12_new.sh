@@ -32,16 +32,16 @@ nmt_transformer=${models[2]}
 # ------------------------------------------------------------------------------
 
 # Run number
-run_num=11
+run_num=12
 
 # Array of hyperparameters
 # Add hyperparameters here in the array ie. hyp_num=("1" "2" "3")
 hyp_num=("model2")
 
 # Select dataset
-dataset=$dblp
-dataset_path=$dblp_toy_path
-is_toy=true
+dataset=$imdb
+dataset_path=$imdb_path
+is_toy=false
 
 # Select model
 model=$nmt_transformer
@@ -51,11 +51,15 @@ model=$nmt_transformer
 # ------------------------------------------------------------------------------
 
 
-# Ensure the directories exist
-cd ..
-mkdir -p run_logs
+# Log file for all run times
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+times_dir="${SCRIPT_DIR}/../run_times"
+logs_dir="${SCRIPT_DIR}/../run_logs"
 
-cd src
+# Ensure the directories exist
+mkdir -p ../run_logs
+
+cd ../src
 
 # Loop over the output names
 for i in "${!hyp_num[@]}"; do

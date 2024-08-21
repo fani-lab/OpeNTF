@@ -32,16 +32,16 @@ nmt_transformer=${models[2]}
 # ------------------------------------------------------------------------------
 
 # Run number
-run_num=11
+run_num=16
 
 # Array of hyperparameters
-# Add hyperparameters here in the array ie. hyp_num=("1" "2" "3")
-hyp_num=("model2")
+# Add hyperparameters here in the array ie. variants=("1" "2" "3")
+variants=("model3")
 
 # Select dataset
-dataset=$dblp
-dataset_path=$dblp_toy_path
-is_toy=true
+dataset=$imdb
+dataset_path=$imdb_path
+is_toy=false
 
 # Select model
 model=$nmt_transformer
@@ -51,28 +51,33 @@ model=$nmt_transformer
 # ------------------------------------------------------------------------------
 
 
-# Ensure the directories exist
-cd ..
-mkdir -p run_logs
+# Log file for all run times
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+times_dir="${SCRIPT_DIR}/../run_times"
+logs_dir="${SCRIPT_DIR}/../run_logs"
 
-cd src
+# Ensure the directories exist
+mkdir -p ../run_logs
+
+cd ../src
 
 # Loop over the output names
-for i in "${!hyp_num[@]}"; do
+for i in "${!variants[@]}"; do
+  # Check if ${variants[$i]} is an empty string
+  if [ -z "${variants[$i]}" ]; then
+    dash=""
+    with_variant_msg="."
+  else
+    dash="-"
+    with_variant_msg=" , variant: ${variants[$i]})."
+  fi
+
   echo ""
-  echo "Processing with hyperparameter $((i+1)): '${hyp_num[$i]}'"
+  echo "Processing model ${model}${with_variant_msg}"
 
   # Get the start time
   start_time=$(date +%s)
 
-  # Check if ${hyp_num[$i]} is an empty string
-  if [ -z "${hyp_num[$i]}" ]; then
-    dash=""
-    with_hyp_msg=""
-  else
-    dash="_"
-    with_hyp_msg=" with hyperparam ${hyp_num[$i]}"
-  fi
 
   if [ $is_toy = true ]; then
     is_toy_msg="_toy"
@@ -85,13 +90,14 @@ for i in "${!hyp_num[@]}"; do
   nohup python3 -u main.py \
     -data $dataset_path \
     -domain $dataset \
-    -model $model${dash}${hyp_num[$i]} \
-    > "../run_logs/run${run_num}${is_toy_msg}_${dataset}_${model}${dash}${hyp_num[$i]}.log" 2> "../run_logs/run${run_num}${is_toy_msg}_${dataset}_${model}${dash}${hyp_num[$i]}_errors.log" &
+    -model $model \
+    -variant "${variants[$i]}" \
+    > "../run_logs/run${run_num}${is_toy_msg}_${dataset}_${model}${dash}${variants[$i]}.log" 2> "../run_logs/run${run_num}${is_toy_msg}_${dataset}_${model}${dash}${variants[$i]}_errors.log" &
   
   pid=$!
 
   echo ""
-  echo "Started process $pid for run ${run_num}${with_hyp_msg}"
+  echo "Started process $pid for run ${run_num}. Model: ${model}${with_variant_msg}"
   echo ""
 
   # Wait for the process to complete
@@ -111,6 +117,7 @@ for i in "${!hyp_num[@]}"; do
   # Format the elapsed time as Xh Xm Xs
   formatted_time="${hours}h ${minutes}m ${seconds}s"
   
-  echo "Process for run ${run_num}${with_hyp_msg} completed. Duration: $formatted_time."
+  echo "Process for run ${run_num} completed. Model: ${model}${with_variant_msg}."
+  echo "Duration: $formatted_time."
   echo ""
 done
