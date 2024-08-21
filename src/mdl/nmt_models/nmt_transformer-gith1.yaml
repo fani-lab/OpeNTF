@@ -28,12 +28,12 @@ data:
 # General opts
 save_model: ../output/nmt/run/transformer_model
 save_checkpoint_steps: 5000
-warmup_steps: 8000
+warmup_steps: 4000
 valid_steps: 5000
 train_steps: 200000
 
 # Batching
-bucket_size: 5000
+bucket_size: 10000
 world_size: 1
 gpu_ranks: [0]
 num_workers: 8
