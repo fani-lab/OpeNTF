@@ -206,11 +206,6 @@ class Nmt(Ntf):
         with open(adjusted_model_path) as infile:
             base_config = yaml.safe_load(infile)
 
-        encoder_type = base_config["encoder_type"]
-        learning_rate = base_config["learning_rate"]
-        word_vec_size = base_config["word_vec_size"]
-        batch_size = base_config["batch_size"]
-        epochs = base_config["train_steps"]
         team_count = vecs["skill"].shape[0]
         skill_count = vecs["skill"].shape[1]
         member_count = vecs["member"].shape[1]
@@ -227,8 +222,6 @@ class Nmt(Ntf):
         new_output = "/".join(temp_output)
 
         model_path = f"{new_output}/t{team_count}.s{skill_count}.m{member_count}.et{encoder_type}.l{layer_size}.wv{word_vec_size}.lr{learning_rate}.b{batch_size}.e{epochs}"
-
-       
 
         if not os.path.isdir(model_path):
             os.makedirs(model_path)
