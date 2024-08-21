@@ -30,7 +30,7 @@ from cmn.tools import generate_popular_and_nonpopular
 
 
 # Kap: 0-based indexing (0-7) ie. "0,1,2,3,4,5,6,7"
-GPUS_TO_USE = "6"
+GPUS_TO_USE = "7"
 
 
 # Kap: Set GPUs to use
@@ -130,7 +130,16 @@ def aggregate(output):
 
 
 def run(
-    data_list, domain_list, fair, filter, future, model_list, variant, output, exp_id, settings
+    data_list,
+    domain_list,
+    fair,
+    filter,
+    future,
+    model_list,
+    variant,
+    output,
+    exp_id,
+    settings,
 ):
     filter_str = (
         f".filtered.mt{settings['data']['filter']['min_nteam']}.ts{settings['data']['filter']['min_team_size']}"
@@ -173,7 +182,7 @@ def run(
 
     # Kap: handle the NMT models and the variants
     for model_name in model_list:
-        if model_name.startswith("nmt") and variant is not None:
+        if model_name.startswith("nmt") and variant != "":
             models[f"{model_name}-{variant}"] = Nmt()
         elif model_name.startswith("nmt"):
             models[model_name] = Nmt()
@@ -299,6 +308,7 @@ def run(
             step_ahead=settings["model"]["step_ahead"],
         )
 
+
         for m_name, m_obj in models.items():
             vecs_ = vecs.copy()
             if m_name.find("_emb") > 0:
@@ -336,22 +346,30 @@ def run(
                 .replace("_dt2v", "")
                 .replace("_a1", "")
             )
+
+            device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+            print(f"Using device: {device}")
             print(f"Running for (dataset, model): ({d_name}, {m_name}) ... ")
 
-            output_path = f"{output}{os.path.split(datapath)[-1]}{filter_str}/{m_name}/t{vecs_['skill'].shape[0]}.s{vecs_['skill'].shape[1]}.m{vecs_['member'].shape[1]}.{'.'.join([k + str(v).replace(' ', '') for k, v in settings['model']['baseline'][baseline_name].items() if v])}"
-            
-            if not os.path.isdir(output_path):
-                os.makedirs(output_path)
-            copyfile("./param.py", f"{output_path}/param.py")
+            output_path = f"{output}{os.path.split(datapath)[-1]}{filter_str}/{m_name}/t{vecs_['skill'].shape[0]}.s{vecs_['skill'].shape[1]}.m{vecs_['member'].shape[1]}.{baseline_name}"
+
+
+            # Kap: don't copy if model name starts with "nmt", I have a handler in nmt.py
+            if not m_name.startswith("nmt"):
+                if not os.path.isdir(output_path):
+                    os.makedirs(output_path)
+                copyfile("./param.py", f"{output_path}/param.py")
 
             m_obj.run(
                 splits,
                 vecs_,
                 indexes,
                 f"{output_path}",
-                settings["model"]["baseline"][baseline_name],
+                baseline_name,
                 settings["model"]["cmd"],
                 settings["fair"],
+                model_name=baseline_name.split("-")[0],
+                variant_name=variant,
                 merge_skills=False,
             )
     if "agg" in settings["model"]["cmd"]:
