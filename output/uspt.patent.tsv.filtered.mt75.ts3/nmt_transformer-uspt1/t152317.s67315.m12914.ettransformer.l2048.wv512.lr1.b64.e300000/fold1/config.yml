@@ -1,0 +1,56 @@
+accum_count:
+- 1
+adam_beta2: 0.998
+attention_dropout:
+- 0.3
+batch_size: 64
+batch_type: tokens
+beam_size: 5
+bucket_size: 20000
+data:
+  corpus_1:
+    path_src: ./../output/uspt.patent.tsv.filtered.mt75.ts3/nmt_transformer-uspt1/t152317.s67315.m12914.ettransformer.l2048.wv512.lr1.b64.e300000/fold1/src-train.txt
+    path_tgt: ./../output/uspt.patent.tsv.filtered.mt75.ts3/nmt_transformer-uspt1/t152317.s67315.m12914.ettransformer.l2048.wv512.lr1.b64.e300000/fold1/tgt-train.txt
+    weight: 1
+  valid:
+    path_src: ./../output/uspt.patent.tsv.filtered.mt75.ts3/nmt_transformer-uspt1/t152317.s67315.m12914.ettransformer.l2048.wv512.lr1.b64.e300000/fold1/src-valid.txt
+    path_tgt: ./../output/uspt.patent.tsv.filtered.mt75.ts3/nmt_transformer-uspt1/t152317.s67315.m12914.ettransformer.l2048.wv512.lr1.b64.e300000/fold1/tgt-valid.txt
+dec_layers: 6
+decay_method: noam
+decay_steps: 20000
+decoder_type: transformer
+dropout:
+- 0.3
+enc_layers: 6
+encoder_type: transformer
+gpu_ranks:
+- 0
+heads: 8
+hidden_size: 512
+label_smoothing: 0.05
+learning_rate: 1
+learning_rate_decay: 0.95
+length_penalty: 1.0
+max_grad_norm: 5
+max_relative_positions: 10
+model_dtype: fp16
+normalization: tokens
+num_workers: 4
+optim: adam
+overwrite: true
+param_init: 0
+param_init_glorot: true
+position_encoding: true
+save_checkpoint_steps: 7500
+save_data: ./../output/uspt.patent.tsv.filtered.mt75.ts3/nmt_transformer-uspt1/t152317.s67315.m12914.ettransformer.l2048.wv512.lr1.b64.e300000/fold1/
+save_model: ./../output/uspt.patent.tsv.filtered.mt75.ts3/nmt_transformer-uspt1/t152317.s67315.m12914.ettransformer.l2048.wv512.lr1.b64.e300000/fold1/model
+src_vocab: ./../output/uspt.patent.tsv.filtered.mt75.ts3/nmt_transformer-uspt1/t152317.s67315.m12914.ettransformer.l2048.wv512.lr1.b64.e300000/fold1/vocab.src
+tgt_vocab: ./../output/uspt.patent.tsv.filtered.mt75.ts3/nmt_transformer-uspt1/t152317.s67315.m12914.ettransformer.l2048.wv512.lr1.b64.e300000/fold1/vocab.tgt
+train_steps: 300000
+transformer_ff: 2048
+valid_batch_size: 128
+valid_steps: 7500
+warmup_steps: 8000
+weight_decay: 0.0001
+word_vec_size: 512
+world_size: 1

@@ -3,7 +3,6 @@
 /venv
 /.idea/
 /src/tmp.py
-/output
 /data/raw
 /runs
 
@@ -14,7 +13,6 @@
 *.tgt
 *.pkl
 *.png
-*.log
 *.pred
 *.7z
 *.npy

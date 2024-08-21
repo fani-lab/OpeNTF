@@ -1,0 +1,56 @@
+accum_count:
+- 1
+adam_beta2: 0.998
+attention_dropout:
+- 0.3
+batch_size: 8
+batch_type: tokens
+beam_size: 5
+bucket_size: 100
+data:
+  corpus_1:
+    path_src: ./../output/toy.dblp.v12.json/nmt_transformer-toy/t31.s10.m13.ettransformer.l1024.wv256.lr2.b8.e20000/fold1/src-train.txt
+    path_tgt: ./../output/toy.dblp.v12.json/nmt_transformer-toy/t31.s10.m13.ettransformer.l1024.wv256.lr2.b8.e20000/fold1/tgt-train.txt
+    weight: 1
+  valid:
+    path_src: ./../output/toy.dblp.v12.json/nmt_transformer-toy/t31.s10.m13.ettransformer.l1024.wv256.lr2.b8.e20000/fold1/src-valid.txt
+    path_tgt: ./../output/toy.dblp.v12.json/nmt_transformer-toy/t31.s10.m13.ettransformer.l1024.wv256.lr2.b8.e20000/fold1/tgt-valid.txt
+dec_layers: 2
+decay_method: noam
+decay_steps: 5000
+decoder_type: transformer
+dropout:
+- 0.3
+enc_layers: 2
+encoder_type: transformer
+gpu_ranks:
+- 0
+heads: 2
+hidden_size: 256
+label_smoothing: 0.05
+learning_rate: 2
+learning_rate_decay: 0.95
+length_penalty: 1.0
+max_grad_norm: 5
+max_relative_positions: 10
+model_dtype: fp16
+normalization: tokens
+num_workers: 4
+optim: adam
+overwrite: true
+param_init: 0
+param_init_glorot: true
+position_encoding: true
+save_checkpoint_steps: 1000
+save_data: ./../output/toy.dblp.v12.json/nmt_transformer-toy/t31.s10.m13.ettransformer.l1024.wv256.lr2.b8.e20000/fold1/
+save_model: ./../output/toy.dblp.v12.json/nmt_transformer-toy/t31.s10.m13.ettransformer.l1024.wv256.lr2.b8.e20000/fold1/model
+src_vocab: ./../output/toy.dblp.v12.json/nmt_transformer-toy/t31.s10.m13.ettransformer.l1024.wv256.lr2.b8.e20000/fold1/vocab.src
+tgt_vocab: ./../output/toy.dblp.v12.json/nmt_transformer-toy/t31.s10.m13.ettransformer.l1024.wv256.lr2.b8.e20000/fold1/vocab.tgt
+train_steps: 20000
+transformer_ff: 1024
+valid_batch_size: 16
+valid_steps: 1000
+warmup_steps: 500
+weight_decay: 0.0001
+word_vec_size: 256
+world_size: 1
