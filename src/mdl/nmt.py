@@ -206,6 +206,12 @@ class Nmt(Ntf):
         with open(adjusted_model_path) as infile:
             base_config = yaml.safe_load(infile)
 
+        encoder_type = base_config["encoder_type"]
+        learning_rate = base_config["learning_rate"]
+        word_vec_size = base_config["word_vec_size"]
+        batch_size = base_config["batch_size"]
+        epochs = base_config["train_steps"]
+
         team_count = vecs["skill"].shape[0]
         skill_count = vecs["skill"].shape[1]
         member_count = vecs["member"].shape[1]
