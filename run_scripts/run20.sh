@@ -36,11 +36,11 @@ run_num=20
 
 # Array of hyperparameters
 # Add hyperparameters here in the array ie. variants=("1" "2" "3")
-variants=("dblp1")
+variants=("uspt1")
 
 # Select dataset
-dataset=$dblp
-dataset_path=$dblp_path
+dataset=$uspt
+dataset_path=$uspt_path
 is_toy=false
 
 # Select model
