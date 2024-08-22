@@ -23,3 +23,5 @@
 
 # large files list to ignore
 splits.json
+error.log
+output.log
