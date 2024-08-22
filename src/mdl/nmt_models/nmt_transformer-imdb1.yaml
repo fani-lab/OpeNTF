@@ -33,7 +33,7 @@ valid_steps: 5000
 train_steps: 200000
 
 # Batching
-bucket_size: 5000
+bucket_size: 10000
 world_size: 1
 gpu_ranks: [0]
 num_workers: 8
