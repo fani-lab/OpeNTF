@@ -3,7 +3,6 @@
 /venv
 /.idea/
 /src/tmp.py
-/output
 /data/raw
 /runs
 
@@ -14,7 +13,6 @@
 *.tgt
 *.pkl
 *.png
-*.log
 *.pred
 *.7z
 *.npy
@@ -25,5 +23,3 @@
 
 # large files list to ignore
 splits.json
-src-train.txt
-data/preprocessed/dblp/toy.dblp.v12.json/splits.json
