@@ -19,6 +19,13 @@ class Nmt(Ntf):
     def __init__(self):
         super(Ntf, self).__init__()
 
+    def convert_steps_to_epochs(self, train_steps, train_batch_size, sample_size):
+        # Kap
+        # formula:
+        # steps per epoch = train_steps / train_batch_size
+        # num of epochs = sample_size / steps per epoch
+        return int(sample_size / (train_steps / train_batch_size))
+
     def prepare_data(self, vecs):
         input_data = []
         output_data = []
@@ -222,6 +229,8 @@ class Nmt(Ntf):
             layer_size = base_config["rnn_size"]
         elif encoder_type == "transformer":
             layer_size = base_config["transformer_ff"]
+            # Kap: convert steps to epochs
+            epochs = self.convert_steps_to_epochs(base_config["train_steps"], batch_size, team_count)
 
         # Kap: removed unnecessary folder nesting, now it's model/variant
         temp_output = output.split("/")[0:-1]
