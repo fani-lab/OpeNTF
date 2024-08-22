@@ -1,0 +1,56 @@
+accum_count:
+- 1
+adam_beta2: 0.998
+attention_dropout:
+- 0.3
+batch_size: 64
+batch_type: tokens
+beam_size: 5
+bucket_size: 15000
+data:
+  corpus_1:
+    path_src: ./../output/dblp.v12.json.filtered.mt75.ts3/nmt_transformer-dblp1/t99375.s29661.m14214.ettransformer.l2048.wv512.lr1.b64.e250000/fold2/src-train.txt
+    path_tgt: ./../output/dblp.v12.json.filtered.mt75.ts3/nmt_transformer-dblp1/t99375.s29661.m14214.ettransformer.l2048.wv512.lr1.b64.e250000/fold2/tgt-train.txt
+    weight: 1
+  valid:
+    path_src: ./../output/dblp.v12.json.filtered.mt75.ts3/nmt_transformer-dblp1/t99375.s29661.m14214.ettransformer.l2048.wv512.lr1.b64.e250000/fold2/src-valid.txt
+    path_tgt: ./../output/dblp.v12.json.filtered.mt75.ts3/nmt_transformer-dblp1/t99375.s29661.m14214.ettransformer.l2048.wv512.lr1.b64.e250000/fold2/tgt-valid.txt
+dec_layers: 6
+decay_method: noam
+decay_steps: 15000
+decoder_type: transformer
+dropout:
+- 0.3
+enc_layers: 6
+encoder_type: transformer
+gpu_ranks:
+- 0
+heads: 8
+hidden_size: 512
+label_smoothing: 0.05
+learning_rate: 1
+learning_rate_decay: 0.95
+length_penalty: 1.0
+max_grad_norm: 5
+max_relative_positions: 10
+model_dtype: fp16
+normalization: tokens
+num_workers: 8
+optim: adam
+overwrite: true
+param_init: 0
+param_init_glorot: true
+position_encoding: true
+save_checkpoint_steps: 6250
+save_data: ./../output/dblp.v12.json.filtered.mt75.ts3/nmt_transformer-dblp1/t99375.s29661.m14214.ettransformer.l2048.wv512.lr1.b64.e250000/fold2/
+save_model: ./../output/dblp.v12.json.filtered.mt75.ts3/nmt_transformer-dblp1/t99375.s29661.m14214.ettransformer.l2048.wv512.lr1.b64.e250000/fold2/model
+src_vocab: ./../output/dblp.v12.json.filtered.mt75.ts3/nmt_transformer-dblp1/t99375.s29661.m14214.ettransformer.l2048.wv512.lr1.b64.e250000/fold2/vocab.src
+tgt_vocab: ./../output/dblp.v12.json.filtered.mt75.ts3/nmt_transformer-dblp1/t99375.s29661.m14214.ettransformer.l2048.wv512.lr1.b64.e250000/fold2/vocab.tgt
+train_steps: 250000
+transformer_ff: 2048
+valid_batch_size: 128
+valid_steps: 6250
+warmup_steps: 6000
+weight_decay: 0.0001
+word_vec_size: 512
+world_size: 1
