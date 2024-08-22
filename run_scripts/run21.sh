@@ -32,7 +32,7 @@ nmt_transformer=${models[2]}
 # ------------------------------------------------------------------------------
 
 # Run number
-run_num=20
+run_num=21
 
 # Array of hyperparameters
 # Add hyperparameters here in the array ie. variants=("1" "2" "3")

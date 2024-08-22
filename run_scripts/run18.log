@@ -1,0 +1,10 @@
+nohup: ignoring input
+
+Processing model nmt_transformer , variant: imdb1).
+Running: nohup python3 -u main.py ...
+
+Started process 152 for run 18. Model: nmt_transformer , variant: imdb1).
+
+Process for run 18 completed. Model: nmt_transformer , variant: imdb1)..
+Duration: 15h 21m 38s.
+

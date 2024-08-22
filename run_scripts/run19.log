@@ -1,0 +1,10 @@
+nohup: ignoring input
+
+Processing model nmt_transformer, variant: gith1.
+Running: nohup python3 -u main.py ...
+
+Started process 4612 for run 19. Model: nmt_transformer, variant: gith1.
+
+Process for run 19 completed. Model: nmt_transformer, variant: gith1..
+Duration: 17h 8m 16s.
+
