@@ -5,6 +5,9 @@
 /src/tmp.py
 /data/raw
 /runs
+/output/**/fold*
+/output/**/*-test.txt
+/run_logs
 
 *.pyc
 *.npz
