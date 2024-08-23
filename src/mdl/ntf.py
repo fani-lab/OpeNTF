@@ -20,7 +20,8 @@ class Ntf(nn.Module):
     def evaluate(self, model_path, splits, vecs, on_train_valid_set=False, per_instance=False, per_epoch=False):
         print(f'\n.............. starting eval .................\n')
         if not os.path.isdir(model_path): raise Exception("The predictions do not exist!")
-        y_test = vecs['member'][splits['test']]
+        y_test = vecs['member'][splits['test']] # the actual y
+
         for pred_set in (['test', 'train', 'valid'] if on_train_valid_set else ['test']):
             fold_mean = pd.DataFrame()
             if per_instance: fold_mean_per_instance = pd.DataFrame()
@@ -39,6 +40,8 @@ class Ntf(nn.Module):
                     else:
                         Y = y_test
                     Y_ = torch.load(f'{model_path}/f{foldidx}.{pred_set}.{epoch}pred')
+                    calculate_skill_coverage(vecs, Y, Y_)
+
                     df, df_mean, (fpr, tpr) = calculate_metrics(Y, Y_, per_instance)
                     if per_instance: df.to_csv(f'{model_path}/f{foldidx}.{pred_set}.{epoch}pred.eval.per_instance.csv', float_format='%.15f')
                     print(f'Saving file per fold as : f{foldidx}.{pred_set}.{epoch}pred.eval.mean.csv')

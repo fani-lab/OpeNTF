@@ -34,3 +34,13 @@ def calculate_auc_roc(Y, Y_):
     fpr, tpr, _ = roc_curve(Y.toarray().ravel(), Y_.ravel())
     return auc, fpr, tpr
 
+def calculate_skill_coverage(vecs, Y, Y_):
+
+    predicted_skills = np.dot(Y_, vecs['es_vecs']) # skill occurrence matrix of predicted members of shape (1 * |s|)
+    actual_skills = np.dot(Y, vecs['es_vecs']) # skills of actual members of shape (1 * |s|)
+
+    n_skills = (actual_skills >= 1).astype(int).sum() # total number of skills of the actual members
+    n_skills_covered = ((predicted_skills & actual_skills) >= 1).astype(int).sum() # total number of skills common between actual and predicted members
+    skill_coverage = (n_skills_covered / n_skills) * 100
+
+    return skill_coverage

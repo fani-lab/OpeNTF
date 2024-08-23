@@ -229,6 +229,40 @@ class Team(object):
 
         return teams
 
+    '''
+    a 1-hot vector containing skills that each member has in total
+    by transposing 'member' and then doing dot product with 'skill'
+    gives us the co-occurrence matrix of member vs skills. In this way
+    we get the number of times member x co-occurs with skill y. Then,
+    each row of the es_vecs will give us all the skills a member has
+    if the matrix is like this :
+     
+    0 4 2
+    0 0 1
+    2 1 0
+    0 5 0
+    
+    then, the skills of the members are 
+    
+    e0 -> s1, s2
+    e1 -> s2
+    e2 -> s0, s1
+    e3 -> s2
+    
+    '''
+    @classmethod
+    def generate_es_vectors(cls, teamsvecs, output):
+        filepath = f'{output}/es_vecs.pkl'
+
+        es_vecs = {}
+        es_vecs['skill'] = scipy.sparse._lil.lil_matrix(np.dot(teamsvecs['member'].transpose(), teamsvecs['skill']))
+
+        with open(filepath, 'wb') as f:
+            pickle.dump(es_vecs, f)
+            print(f'saved es_vecs to {filepath}')
+
+        return es_vecs
+
     @classmethod
     def get_stats(cls, teamsvecs, obj, output, cache=True, plot=False, plot_title=None):
         try:

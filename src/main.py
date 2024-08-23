@@ -141,6 +141,9 @@ def run(data_list, domain_list, fair, filter, future, model_list, output, exp_id
         datapath = data_list[domain_list.index(d_name)]
         prep_output = f'./../data/preprocessed/{d_name}/{os.path.split(datapath)[-1]}'
         vecs, indexes = d_cls.generate_sparse_vectors(datapath, f'{prep_output}{filter_str}', filter, settings['data'])
+        es_vecs = d_cls.generate_es_vectors(vecs, f'{prep_output}{filter_str}') # after we have a sparse vector, we create es_vecs from that
+        vecs['skill_main'] = vecs['skill'] # we need 1-hot skills for calculating skill coverage
+        vecs['es_vecs'] = es_vecs['skill'] # all skills per member in this matrix
 
         year_idx = []
         for i in range(1, len(indexes['i2y'])):
