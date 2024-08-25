@@ -51,14 +51,16 @@ def run(teamsvecs_file, indexes_file, model, output):
         if model == "w2v":
             import wnn
 
-            settings = {
-                "embedding_dim": params.settings["model"]["embedding_dim"],
-                "max_epochs": params.settings["model"]["max_epochs"],
-                "dm": params.settings["model"][model]["dm"],
-                "dbow_words": params.settings["model"][model]["dbow_words"],
-                "window": params.settings["model"][model]["dbow_words"],
-                "embtype": params.settings["model"][model]["embtype"],
-            }
+            settings = {'d': params.settings['model']['d'],
+                        'e': params.settings['model']['e'],
+                        'dm': params.settings['model'][model]['dm'],
+                        'dbow_words': params.settings['model'][model]['dbow_words'],
+                        'window': params.settings['model'][model]['dbow_words'],
+                        'embtype': params.settings['model'][model]['embtype'],
+                        'max_e': params.settings['model'][model]['max_e'],
+                        'embedding_dim' : params.settings['model'][model]['embedding_dim'],
+                        'max_epochs' : params.settings['model'][model]['max_epochs']
+                        }
 
             output_ = output + f'{settings["embtype"]}.'
             wnn.run(

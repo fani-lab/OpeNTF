@@ -6,19 +6,25 @@ settings = {
         "dir": False,
         "dup_edge": None,  # None: keep the duplicates, else: reduce by 'add', 'mean', 'min', 'max', 'mul'
     },
-    "model": {
-        "max_epochs": 10,  # number of epochs to run, changed to 10 from 100 : Kap
-        "embedding_dim": 5,
-        "lr": 0.01,
-        "batch_size": 5,
-        "loader_shuffle": True,
-        "num_workers": 0,
-        "save_per_epoch": False,
-        "w2v": {
-            "dm": 1,  # training algorithm. 1: distributed memory (PV-DM), 0: distributed bag of words (PV-DBOW)
-            "dbow_words": 1,  # 'train word-vectors in skip-gram fashion; 0: no (default), 1: yes
-            "window": 2,  # cooccurrence window
-            "embtype": "joint",  # 'member', 'joint', 'dt2v'
+
+    'model': {
+        'd' : 4, # embedding dim
+        'b' : 128, # batch_size for loaders
+        'e' : 100, # num epochs
+        'ns' : 5, # number of negative samples
+        'lr': 0.001,
+        'loader_shuffle': True,
+        'num_workers': 0,
+        'save_per_epoch': False,
+        'w2v': {
+            'max_epochs' : 1000,
+            'dm': 1,  # training algorithm. 1: distributed memory (PV-DM), 0: distributed bag of words (PV-DBOW)
+            'dbow_words': 0,  # 'train word-vectors in skip-gram fashion; 0: no (default), 1: yes
+            'window': 2,  # cooccurrence window
+            'embtype': 'joint',  # 'member', 'joint', 'dt2v'
+            'max_e': 1000, # max epochs for training
+            'embedding_dim' : 8, # the dimension for the w2v embeddings
+
         },
         "gnn.n2v": {
             "walk_length": 5,

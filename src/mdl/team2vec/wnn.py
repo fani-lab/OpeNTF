@@ -51,7 +51,7 @@ class Wnn(Team2Vec):
         output = self.output + f'emb.d{self.settings["embedding_dim"]}.w{self.settings["window"]}.dm{self.settings["dm"]}'
         try:
             print(f"Loading the embedding model {output}  ...")
-            self.model = gensim.models.Doc2Vec.load(f'{self.output}.mdl')
+            self.model = gensim.models.Doc2Vec.load(f'{output}.mdl')
             return self.model
         except FileNotFoundError:
             print(f"File not found! Learning {output}.mdl embeddings from scratch ...")
@@ -62,8 +62,8 @@ class Wnn(Team2Vec):
                                                dbow_words=self.settings["dbow_words"],
                                                min_alpha=0.025,
                                                min_count=0,
-                                               seed=0,
-                                               workers=multiprocessing.cpu_count())
+                                               seed=0)
+                                               # workers=multiprocessing.cpu_count())
 
             if not self.data: 
                 self.init()
