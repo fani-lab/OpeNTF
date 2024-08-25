@@ -1,23 +1,25 @@
-name: opentf
+name: kapnmt
 channels:
-  - defaults
   - conda-forge
+  - pytorch
+  - nvidia
 dependencies:
-  - python=3.8
-  - pip=21.1.2
-  - pytorch>=1.9.0
+  - python=3.9.19
+  - numpy
+  - pandas<2.1
+  - scikit-learn
+  - scipy
+  - matplotlib
+  - pytorch=1.10.2
+  - torchvision=0.11.3
+  - torchaudio=0.10.2
+  - gensim<4
+  - pytorch-cuda=11.7
+  - pip
   - pip:
-    - matplotlib==3.4.2
-    - scipy==1.9.3
-    - numpy==1.20.3
-    - tqdm==4.60.0
-    - PyYAML==5.4
-    - scikit_learn==0.24.2
-    - OpenNMT-py==2.2.0
-    - pandas==1.3.3
-    - pytrec-eval-terrier==0.5.2
-    - gensim==3.8.3
-    - python-dateutil==2.8.2
-    - reranking==0.3.6 # required by Adila submodule
-
-  #schedule
+      - torch-scatter
+      - torch-sparse
+      - torch-cluster
+      - torch-spline-conv
+      - torch-geometric
+      - pytrec_eval

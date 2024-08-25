@@ -48,29 +48,20 @@ class Fnn(Ntf):
             if isinstance(m, nn.Linear):
                 nn.init.xavier_uniform_(m.weight)
 
-    def cross_entropy(self, y_, y, ns, nns, unigram, weight):
+    def cross_entropy(self, y_, y, ns, nns, unigram):
         if ns == "uniform": return self.ns_uniform(y_, y, nns)
         if ns == "unigram" or ns.startswith("temporal_unigram"): return self.ns_unigram(y_, y, unigram, nns)
         if ns == "unigram_b": return self.ns_unigram_mini_batch(y_, y, nns)
         if ns == "inverse_unigram" or ns.startswith("temporal_inverse_unigram"): return self.ns_inverse_unigram(y_, y, unigram, nns)
         if ns == "inverse_unigram_b": return self.ns_inverse_unigram_mini_batch(y_, y, nns)
         # return self.weighted(y_, y)
-        if ns == "weighted": return self.weighted(y_, y, weight)
-        if ns == "pos-ce": return self.weighted2(y_, y) # positive cross-entropy
         cri = nn.BCELoss()
         return cri(y_.squeeze(1), y.squeeze(1))
 
     def weighted(self, logits, targets, pos_weight=2.5):
         targets = targets.squeeze(1)
         logits = logits.squeeze(1)
-        return (-targets * torch.log(logits) * pos_weight + (1 - targets) * - torch.log(1 - logits)).sum() # we both reward the TP and penalize the FP
-
-    # we only consider the loss on TP (the members which should be part of the final team)
-    def weighted2(self, logits, targets):
-        targets = targets.squeeze(1)
-        logits = logits.squeeze(1)
-        return (-targets * torch.log(logits)).sum()
-
+        return (-targets * torch.log(logits) * pos_weight + (1 - targets) * - torch.log(1 - logits)).sum()
 
     def ns_uniform(self, logits, targets, neg_samples=5):
         targets = targets.squeeze(1)
@@ -147,7 +138,6 @@ class Fnn(Ntf):
         return (-targets * torch.log(logits) - random_samples * torch.log(1 - logits)).sum()
 
     def learn(self, splits, indexes, vecs, params, prev_model, output):
-        print(f'\n.............. starting learn .................\n')
         loss_type = params['loss']
 
         learning_rate = params['lr']
@@ -155,7 +145,6 @@ class Fnn(Ntf):
         num_epochs = params['e']
         nns = params['nns']
         ns = params['ns']
-        weight = params['weight'] # if the ns == weighted
         input_size = vecs['skill'].shape[1]
         output_size = len(indexes['i2c'])
         # output_size = vecs['member'].shape[1]
@@ -234,7 +223,7 @@ class Fnn(Ntf):
 
                             y_ = self.forward(X)
 
-                            if loss_type == 'normal': loss = self.cross_entropy(y_, y, ns, nns, unigram, weight)
+                            if loss_type == 'normal': loss = self.cross_entropy(y_, y, ns, nns, unigram)
                             elif loss_type == 'SL': loss = criterion(y_.squeeze(1), y.squeeze(1), index)
                             elif loss_type == 'DP':
                                 data_parameter_minibatch = torch.exp(class_parameters).view(1, -1)
@@ -250,7 +239,7 @@ class Fnn(Ntf):
                         else:  # valid
                             self.train(False)  # Set model to valid mode
                             y_ = self.forward(X)
-                            if loss_type == 'normal' or loss_type == 'DP': loss = self.cross_entropy(y_, y, ns, nns, unigram, weight)
+                            if loss_type == 'normal' or loss_type == 'DP': loss = self.cross_entropy(y_, y, ns, nns, unigram)
                             else: loss = criterion(y_.squeeze(), y.squeeze(), index)
                             valid_running_loss += loss.item()
 
@@ -267,7 +256,7 @@ class Fnn(Ntf):
                           f', Running Loss {phase} {train_loss_values[-1] if phase == "train" else valid_loss_values[-1]}'
                           f", Time {time.time() - fold_time}, Overall {time.time() - start_time} "
                           )
-                # torch.save(self.state_dict(), f"{output}/state_dict_model.f{foldidx}.e{epoch}.pt", pickle_protocol=4)
+                torch.save(self.state_dict(), f"{output}/state_dict_model.f{foldidx}.e{epoch}.pt", pickle_protocol=4)
                 scheduler.step(valid_running_loss / X_valid.shape[0])
                 earlystopping(valid_loss_values[-1], self)
                 if earlystopping.early_stop:
@@ -276,7 +265,7 @@ class Fnn(Ntf):
 
             model_path = f"{output}/state_dict_model.f{foldidx}.pt"
 
-            # torch.save(self.state_dict(), model_path, pickle_protocol=4)
+            torch.save(self.state_dict(), model_path, pickle_protocol=4)
             train_valid_loss[foldidx]['train'] = train_loss_values
             train_valid_loss[foldidx]['valid'] = valid_loss_values
 
@@ -290,11 +279,9 @@ class Fnn(Ntf):
                 plt.legend(loc='upper right')
                 plt.title(f'Training and Validation Loss for fold #{foldidx}')
                 plt.savefig(f'{output}/f{foldidx}.train_valid_loss.png', dpi=100, bbox_inches='tight')
-                # plt.show() # temporarily turning this off, to better automate in bash environment
-        print(f'\n.............. ending learn .................\n')
+                plt.show()
 
     def test(self, model_path, splits, indexes, vecs, params, on_train_valid_set=False, per_epoch=False, merge_skills=False):
-        print(f'\n.............. starting test .................\n')
         if not os.path.isdir(model_path): raise Exception("The model does not exist!")
         # input_size = len(indexes['i2s'])
         input_size = vecs['skill'].shape[1]
@@ -341,4 +328,3 @@ class Fnn(Ntf):
                     epoch = epoch.replace(f'f{foldidx}.', '')
                     torch.save(y_pred, f'{model_path}/f{foldidx}.{pred_set}.{epoch}pred', pickle_protocol=4)
 
-        print(f'\n.............. ending test .................\n')

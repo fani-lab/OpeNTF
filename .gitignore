@@ -2,7 +2,10 @@
 /.vscode
 /venv
 /.idea/
-/data/raw/dblp.v12.json
+/src/tmp.py
+/data/raw
+/runs
+
 *.pyc
 *.npz
 *.pt
@@ -10,12 +13,15 @@
 *.tgt
 *.pkl
 *.png
-src/tmp.py
-*.log
 *.pred
-output/toy.dblp.v12.json/nmt/
 *.7z
-data/raw/dblp/dblp.v12.json
 *.npy
 *.rar
 *.mdl
+*.pt
+.nfs*
+
+# large files list to ignore
+splits.json
+src-train.txt
+data/preprocessed/dblp/toy.dblp.v12.json/splits.json

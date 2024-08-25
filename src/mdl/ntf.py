@@ -18,7 +18,6 @@ class Ntf(nn.Module):
     def test(self, model_path, splits, indexes, vecs, params, on_train_valid_set=False, per_epoch=False, merge_skills=False): pass
 
     def evaluate(self, model_path, splits, vecs, on_train_valid_set=False, per_instance=False, per_epoch=False):
-        print(f'\n.............. starting eval .................\n')
         if not os.path.isdir(model_path): raise Exception("The predictions do not exist!")
         y_test = vecs['member'][splits['test']]
         for pred_set in (['test', 'train', 'valid'] if on_train_valid_set else ['test']):
@@ -41,7 +40,6 @@ class Ntf(nn.Module):
                     Y_ = torch.load(f'{model_path}/f{foldidx}.{pred_set}.{epoch}pred')
                     df, df_mean, (fpr, tpr) = calculate_metrics(Y, Y_, per_instance)
                     if per_instance: df.to_csv(f'{model_path}/f{foldidx}.{pred_set}.{epoch}pred.eval.per_instance.csv', float_format='%.15f')
-                    print(f'Saving file per fold as : f{foldidx}.{pred_set}.{epoch}pred.eval.mean.csv')
                     df_mean.to_csv(f'{model_path}/f{foldidx}.{pred_set}.{epoch}pred.eval.mean.csv')
                     with open(f'{model_path}/f{foldidx}.{pred_set}.{epoch}pred.eval.roc.pkl', 'wb') as outfile:
                         pickle.dump((fpr, tpr), outfile)
@@ -50,10 +48,8 @@ class Ntf(nn.Module):
                 # the last row is a list of roc values
                 mean_std['mean'] = fold_mean.mean(axis=1)
                 mean_std['std'] = fold_mean.std(axis=1)
-                print(f'Saving mean evaluation file over nfolds as : {pred_set}.{epoch}pred.eval.mean.csv')
                 mean_std.to_csv(f'{model_path}/{pred_set}.{epoch}pred.eval.mean.csv')
                 if per_instance: fold_mean_per_instance.truediv(len(splits['folds'].keys())).to_csv(f'{model_path}/{pred_set}.{epoch}pred.eval.per_instance_mean.csv')
-        print(f'\n.............. ending eval .................\n')
 
     def fair(self, model_path, teamsvecs, splits, settings):
         from Adila.src import main as adila
@@ -131,11 +127,11 @@ class Ntf(nn.Module):
             plt.show()
 
     def run(self, splits, vecs, indexes, output, settings, cmd, fair_settings, merge_skills):
-        # output = f"{output}/t{vecs['skill'].shape[0]}.s{vecs['skill'].shape[1]}.m{vecs['member'].shape[1]}.{'.'.join([k + str(v).replace(' ', '') for k, v in settings.items() if v])}"
+        output = f"{output}/t{vecs['skill'].shape[0]}.s{vecs['skill'].shape[1]}.m{vecs['member'].shape[1]}.{'.'.join([k + str(v).replace(' ', '') for k, v in settings.items() if v])}"
         if not os.path.isdir(output): os.makedirs(output)
 
         on_train_valid_set = False #random baseline cannot join this.
-        per_instance = False
+        per_instance = True
         per_epoch = False
 
         if 'train' in cmd: self.learn(splits, indexes, vecs, settings, None, output)
