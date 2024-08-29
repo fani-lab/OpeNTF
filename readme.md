@@ -88,7 +88,7 @@ please note that &Phi; refers to the difficulty level of each expert (class).
 
 Raw dataset, e.g., scholarly papers from AMiner's citation network dataset of [``dblp``](https://originalstatic.aminer.cn/misc/dblp.v12.7z), movies from [``imdb``](https://datasets.imdbws.com/), or US patents from [``uspt``](https://patentsview.org/download/data-download-tables) were assumed to be populated in [``data/raw``](data/raw). For the sake of integration test, tiny-size toy example datasets [``toy.dblp.v12.json``](data/raw/dblp/toy.dblp.v12.json) from [``dblp``](https://originalstatic.aminer.cn/misc/dblp.v12.7z), [[``toy.title.basics.tsv``](data/raw/imdb/toy.title.basics.tsv), [``toy.title.principals.tsv``](data/raw/imdb/toy.title.principals.tsv), [``toy.name.basics.tsv``](data/raw/imdb/toy.name.basics.tsv)] from [``imdb``](https://datasets.imdbws.com/) and [``toy.patent.tsv``](data/preprocessed/uspt/toy.patent.tsv) have been already provided.
 
-<p align="center"><img src='./src/cmn/dataset_hierarchy.png' width="300" ></p>
+<p align="center"><img src='./dataset_hierarchy.png' width="300" ></p>
 
 Raw data will be preprocessed into two main ``sparse`` matrices each row of which represents: 
 
@@ -102,7 +102,7 @@ The sparse matrices and the indices will be persisted in [``data/preprocessed/{d
 
 > Our pipeline benefits from parallel generation of sparse matrices for teams that significantly reduces the preprocessing time as shown below:
 > 
-> <p align="center"><img src="./data/speedup.jpg" width="200"><img src="./data/speedup_loglog.jpg" width="190"></p>
+> <p align="center"><img src="./speedup.jpg" width="200"><img src="./speedup_loglog.jpg" width="190"></p>
 
 
 Please note that the preprocessing step will be executed once. Subsequent runs load the persisted pickle files. In order to regenerate them, one should simply delete them. 
@@ -120,7 +120,7 @@ For example, for our feedforward baseline [``fnn``](./src/mdl/fnn.py), the model
 Currently, we support neural models:
 1) Bayesian [``bnn``](./src/mdl/bnn.py) where model's parameter (weights) is assumed to be drawn from Gaussian (Normal) distribution and the task is to not to learn the weight but the mean (μ) and standard deviation (σ) of the distribution at each parameter.
 
-<p align="center"><img src='./src/mdl/bnn.png' width="350" ></p>
+<p align="center"><img src='./mdl/bnn.png' width="350" ></p>
 
 2) non-Bayesian feedforward [``fnn``](./src/mdl/fnn.py) where the model's parameter (weights) is to be learnt.
 
