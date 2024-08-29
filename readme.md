@@ -73,14 +73,14 @@ To include a Curriculum Learning strategy, there is a parameter for a model to s
 To have a better understanding of our proposed loss-based curriculum learning strategy, we compare the flow of calculating training loss using normal cross entropy and our proposed loss function in (parametric curriculum).
 please note that &Phi; refers to the difficulty level of each expert (class).
 
-<p align="center"><img src='./CL flow 1.png' width="300" ></p>
-<p align="center"><img src='./CL flow 2.png' width="300" ></p>
-<p align="center"><img src='./CL flow 3.png' width="800" ></p>
-<p align="center"><img src='./CL flow 4.png' width="800" ></p>
-<p align="center"><img src='./CL flow 5.png' width="800" ></p>
-<p align="center"><img src='./CL flow 6.png' width="800" ></p>
-<p align="center"><img src='./CL flow 7.png' width="800" ></p>
-<p align="center"><img src='./CL flow 8.png' width="800" ></p>
+<p align="center"><img src='CL flow 1.png' width="300" ></p>
+<p align="center"><img src='CL flow 2.png' width="300" ></p>
+<p align="center"><img src='CL flow 3.png' width="800" ></p>
+<p align="center"><img src='CL flow 4.png' width="800" ></p>
+<p align="center"><img src='CL flow 5.png' width="800" ></p>
+<p align="center"><img src='CL flow 6.png' width="800" ></p>
+<p align="center"><img src='CL flow 7.png' width="800" ></p>
+<p align="center"><img src='CL flow 8.png' width="800" ></p>
 
 
 
