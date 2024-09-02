@@ -40,7 +40,8 @@ class Ntf(nn.Module):
                     else:
                         Y = y_test
                     Y_ = torch.load(f'{model_path}/f{foldidx}.{pred_set}.{epoch}pred')
-                    calculate_skill_coverage(vecs, Y, Y_)
+                    skill_coverage = calculate_skill_coverage(vecs, Y, Y_, [2, 5, 10]) # dict of skill_coverages for list of k's
+                    df_skc = pd.DataFrame.from_dict(skill_coverage, orient='index', columns=['mean']) # skill_coverage (top_k) per fold
 
                     df, df_mean, (fpr, tpr) = calculate_metrics(Y, Y_, per_instance)
                     if per_instance: df.to_csv(f'{model_path}/f{foldidx}.{pred_set}.{epoch}pred.eval.per_instance.csv', float_format='%.15f')
@@ -48,6 +49,8 @@ class Ntf(nn.Module):
                     df_mean.to_csv(f'{model_path}/f{foldidx}.{pred_set}.{epoch}pred.eval.mean.csv')
                     with open(f'{model_path}/f{foldidx}.{pred_set}.{epoch}pred.eval.roc.pkl', 'wb') as outfile:
                         pickle.dump((fpr, tpr), outfile)
+
+                    df_mean = pd.concat([df_mean, df_skc], axis = 0) # concat df_skc to the last row of df_mean
                     fold_mean = pd.concat([fold_mean, df_mean], axis=1)
                     if per_instance: fold_mean_per_instance = fold_mean_per_instance.add(df, fill_value=0)
                 # the last row is a list of roc values

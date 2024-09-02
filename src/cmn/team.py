@@ -253,15 +253,21 @@ class Team(object):
     @classmethod
     def generate_es_vectors(cls, teamsvecs, output):
         filepath = f'{output}/es_vecs.pkl'
+        try :
+            with open(filepath, 'rb') as f:
+                es_vecs = pickle.load(f)
+                print(f'loaded expert-skill co-occurrence matrix es_vecs')
+            return es_vecs
 
-        es_vecs = {}
-        es_vecs['skill'] = scipy.sparse._lil.lil_matrix(np.dot(teamsvecs['member'].transpose(), teamsvecs['skill']))
+        except FileNotFoundError as e:
+            print(f'{filepath} was not found, generating expert-skill co-occurrence matrix es_vecs ...')
+            es_vecs = {}
+            es_vecs['skill'] = scipy.sparse._lil.lil_matrix(np.dot(teamsvecs['member'].transpose(), teamsvecs['skill']))
 
-        with open(filepath, 'wb') as f:
-            pickle.dump(es_vecs, f)
-            print(f'saved es_vecs to {filepath}')
-
-        return es_vecs
+            with open(filepath, 'wb') as f:
+                pickle.dump(es_vecs, f)
+                print(f'saved es_vecs to {filepath}')
+            return es_vecs
 
     @classmethod
     def get_stats(cls, teamsvecs, obj, output, cache=True, plot=False, plot_title=None):
