@@ -23,6 +23,7 @@
 *.mdl
 *.pt
 .nfs*
+*.log
 
 # large files list to ignore
 splits.json

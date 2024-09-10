@@ -194,13 +194,13 @@ class Nmt(Ntf):
 
     def run(self, splits, vecs, indexes, output, settings, cmd, *args, **kwargs):
 
+        gpus = kwargs.get("gpus")
+
         model_name = kwargs.get("model_name")
-        variant_name = kwargs.get("variant_name")
-        combined_name = f"{model_name}-{variant_name}" if variant_name else model_name
 
         current_path = os.path.dirname(os.path.abspath(__file__))
         adjusted_model_path = os.path.join(
-            current_path, "nmt_models", f"{combined_name}.yaml"
+            current_path, "nmt_models", f"{model_name}.yaml"
         )
 
         with open(adjusted_model_path) as infile:
@@ -225,9 +225,10 @@ class Nmt(Ntf):
 
         # Kap: removed unnecessary folder nesting, now it's model/variant
         temp_output = output.split("/")[0:-1]
-        new_output = "/".join(temp_output)
+        temp_output2 = temp_output[0:-1]
+        new_output = "/".join(temp_output2)
 
-        model_path = f"{new_output}/t{team_count}.s{skill_count}.m{member_count}.et{encoder_type}.l{layer_size}.wv{word_vec_size}.lr{learning_rate}.b{batch_size}.e{epochs}"
+        model_path = f"{new_output}/{model_name}.l{layer_size}.wv{word_vec_size}.lr{learning_rate}.b{batch_size}.e{epochs}"
 
         if not os.path.isdir(model_path):
             os.makedirs(model_path)
