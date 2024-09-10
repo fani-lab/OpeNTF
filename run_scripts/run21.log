@@ -1,7 +1,0 @@
-nohup: ignoring input
-
-Processing model nmt_transformer , variant: dblp1).
-Running: nohup python3 -u main.py ...
-
-Started process 249745 for run 21. Model: nmt_transformer , variant: dblp1).
-

@@ -1,9 +1,0 @@
-Loading sparse matrices from ./../data/preprocessed/gith/gith.data.csv.filtered.mt75.ts3/teamsvecs.pkl ...
-Loading indexes pickle from ./../data/preprocessed/gith/gith.data.csv.filtered.mt75.ts3/indexes.pkl ...
-It took 0.021286725997924805 seconds to load from the pickles.
-It took 0.45355844497680664 seconds to load the sparse matrices.
-
-Multiple GPUs detected. Using GPUs: 6 .
-
-Using device: cuda
-Running for (dataset, model): (gith, nmt_transformer_model2) ... 

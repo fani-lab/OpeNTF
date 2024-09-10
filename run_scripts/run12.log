@@ -1,9 +1,0 @@
-nohup: ignoring input
-
-Processing with hyperparameter 1: 'model2'
-Running: nohup python3 -u main.py ...
-
-Started process 140698 for run 12 with hyperparam model2
-
-Process for run 12 with hyperparam model2 completed. Duration: 50h 13m 51s.
-
