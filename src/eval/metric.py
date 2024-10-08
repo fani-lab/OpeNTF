@@ -5,6 +5,7 @@ from sklearn.metrics import roc_curve
 import pytrec_eval
 import json
 import pandas as pd
+from tqdm import tqdm
 
 def calculate_metrics(Y, Y_, per_instance=False, metrics={'P_2,5,10', 'recall_2,5,10', 'ndcg_cut_2,5,10', 'map_cut_2,5,10'}):
     # eval_met = dict(zip(metrics, [None]*len(metrics)))
@@ -35,7 +36,9 @@ def calculate_auc_roc(Y, Y_):
     return auc, fpr, tpr
 
 # calculate skill_coverage for k = [2, 5, 10] for example
-def calculate_skill_coverage(vecs, Y, Y_, top_k):
+def calculate_skill_coverage(vecs, actual_skills, Y_, top_k):
+
+    print(f"Calculating Skill Coverage for {Y_.shape[0]} predictions")
 
     if not isinstance(vecs['es_vecs'], np.ndarray):
         vecs['es_vecs'] = np.where(np.asarray(vecs['es_vecs'].todense()) > 0, 1, 0)
@@ -44,32 +47,31 @@ def calculate_skill_coverage(vecs, Y, Y_, top_k):
 
     # we have to calculate skill_coverage for each value in the list top_k (2, 5 and 10 for example)
     for k in top_k:
+        print(f"---- Calculating skc for k = {k}")
         Y_ = top_k_y_[k] # the 1-hot converted matrix for top k recommendations
 
-        predicted_skills = np.where(np.dot(Y_, vecs['es_vecs']).astype(int) > 0, 1, 0) # skill occurrence matrix of predicted members of shape (1 * |s|) for each row
-        actual_skills = np.where(np.dot(np.asarray(Y.todense()), vecs['es_vecs']).astype(int) > 1, 1, 0) # skills of actual members of shape (1 * |s|) for each row
-
-        n_skills = [(row > 0).astype(int).sum() for row in actual_skills] # total number of skills of the actual members
-
-        skills_overlap = ((predicted_skills & actual_skills) > 0).astype(int) # overlap of skills in each row between predicted and actual
-
-        n_skills_covered = [row.sum() for row in skills_overlap] # total number of skills common between actual and predicted members for each prediction row
-        skill_coverage[f'skc_{k}'] = np.average([(n_skills_covered[i] / n_skills[i]) for i in range(len(n_skills))]) # avg coverage over all the predicted rows
+        predicted_skills = np.where(np.dot(Y_, vecs['es_vecs']).astype(int) > 0, 1, 0)                                  # skill occurrence matrix of predicted members of shape (1 * |s|) for each row
+        skills_overlap = ((predicted_skills & actual_skills) > 0).astype(int)                                           # overlap of skills in each row between predicted and actual
+        skill_coverage[f'skc_{k}'] = np.average([r1.sum()/r2.sum() for r1,r2 in zip(skills_overlap,actual_skills)])     # avg coverage over all the predicted rows
+        print(f"---- Calculated skc for k = {k}")
 
     return skill_coverage
 
 # convert the top k expert prediction probabilities into 1-hot occurrences
 # here top_k is a list of k's
 def convert_to_one_hot(y_, top_k):
+    print("Converting the prediction probabilities to 1-hot predictions")
     top_k_matrices = {}
 
     for k in top_k:
+        print(f"-------- Converting for k = {k}")
         result = np.zeros_like(y_)
 
-        for i in range(y_.shape[0]):
+        for i in tqdm(range(y_.shape[0])):
             top_k_indices = np.argsort(y_[i])[-k:] # get the indices of the top k values
             result[i, top_k_indices] = 1 # set the top k values to 1
 
         top_k_matrices[k] = result
+        print(f"-------- Converted for k = {k}\n")
 
     return top_k_matrices # |test_instances| * |num_test_instance_experts| for each k in top_k

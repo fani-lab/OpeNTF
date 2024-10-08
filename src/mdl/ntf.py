@@ -40,7 +40,9 @@ class Ntf(nn.Module):
                     else:
                         Y = y_test
                     Y_ = torch.load(f'{model_path}/f{foldidx}.{pred_set}.{epoch}pred')
-                    skill_coverage = calculate_skill_coverage(vecs, Y, Y_, [2, 5, 10]) # dict of skill_coverages for list of k's
+
+                    actual_skills = vecs['skill'][splits['test']].todense() # taking the skills from the test teams
+                    skill_coverage = calculate_skill_coverage(vecs, actual_skills, Y_, [2, 5, 10]) # dict of skill_coverages for list of k's
                     df_skc = pd.DataFrame.from_dict(skill_coverage, orient='index', columns=['mean']) # skill_coverage (top_k) per fold
 
                     df, df_mean, (fpr, tpr) = calculate_metrics(Y, Y_, per_instance)
