@@ -161,45 +161,20 @@ def run(data_list, domain_list, fair, filter, future, model_list, output, exp_id
             if args.emb_d: param.settings["model"]["baseline"]["emb"]["d"] = args.emb_d
             if args.emb_e: param.settings["model"]["baseline"]["emb"]["e"] = args.emb_e
             if args.cmd: param.settings["model"]['cmd'] = args.cmd
-            if args.emb_random is not None: param.settings["model"]["baseline"]["emb"]["random"] = args.emb_random
 
             emb_e = param.settings["model"]["baseline"]["emb"]["e"]
             emb_ns = param.settings["model"]["baseline"]["emb"]["ns"]
             emb_d = param.settings["model"]["baseline"]["emb"]["d"]
             emb_b = param.settings["model"]["baseline"]["emb"]["b"]
-            emb_random = param.settings["model"]["baseline"]["emb"]["random"]
 
-            # vector, embedding dot product here
+            # this string is needed to be appended to the output path of the final prediction results of fnn or bnn
+            emb_settings_str = f'{args.emb_model}.{args.emb_graph_type}.undir.{args.emb_agg}.e{emb_e}.ns{emb_ns}.b{emb_b}.d{emb_d}'
+            emb_filepath = f'{prep_output}{filter_str}/emb/{emb_settings_str}.emb.pt'
 
-            # emb_random = 1 -> random gnn embedding
-            # emb_random = 2 -> random sparse matrix (0,1) of shape (number_of_skills * dimension of embedding)
-            # emb_random = 3 -> random sparse matrix (0,1) of the same shape as vecs['skill']
-            if(emb_random): # generate a random emb_skill of the same shape and feed it
-                if(emb_random == 1):
-                    emb_skill_shape = (vecs['skill'].shape[1], emb_d) # this matrix gets multiplied with vecs['skill']
-                elif(emb_random == 2):
-                    emb_skill_shape = (vecs['skill'].shape[0], emb_d) # this matrix does not get multiplied with vecs['skill']
-                elif(emb_random == 3):
-                    emb_skill_shape = vecs['skill'].shape # this matrix does not get multiplied with vecs['skill']
-                for i in range(5):
-                    emb_skill = torch.rand(emb_skill_shape)
-                if (emb_random > 1): emb_skill = (emb_skill > 0.5).int() # convert the random decimals to zeros and ones
-                # r is for referring to random
-                emb_settings_str = f'emb.random{emb_random}.d{emb_d}'
-            else:
-                # this string is needed to be appended to the output path of the final prediction results of fnn or bnn
-                emb_settings_str = f'{args.emb_model}.{args.emb_graph_type}.undir.{args.emb_agg}.e{emb_e}.ns{emb_ns}.b{emb_b}.d{emb_d}'
-                emb_filepath = f'{prep_output}{filter_str}/emb/{emb_settings_str}.emb.pt'
+            # skip loading embedding or replacing emb with actual vecs if we only need evaluation
+            if args.cmd != ['eval']:
+                from scipy import sparse
                 emb_skill = torch.load(emb_filepath, map_location=torch.device('cpu'))['skill'].detach().numpy()
-
-            from scipy import sparse
-            if(emb_random > 1):
-                # replace the actual rows with random rows from emb_skill for only the indices in train and valid splits
-                for phase in splits['folds'][0]: # 'train' and 'valid' phases
-                    for row_idx in splits['folds'][0][phase]:
-                        vecs['skill'][row_idx] = sparse._lil.lil_matrix(emb_skill[row_idx])
-            else:
-                # need to review this section
                 vecs['skill'] = sparse._lil.lil_matrix(torch.tensor(vecs['skill'] * emb_skill))
 
 
@@ -229,9 +204,9 @@ def run(data_list, domain_list, fair, filter, future, model_list, output, exp_id
             print(f'Running for (dataset, model): ({d_name}, {m_name}) ... ')
 
             if(args.emb_model or args.t2v_new):
-                output_path = f"{output}{os.path.split(datapath)[-1]}{filter_str}/{m_name}/{emb_settings_str}/t{vecs_['skill'].shape[0]}.s{vecs_['skill'].shape[1]}.m{vecs_['member'].shape[1]}.{'.'.join([k + str(v).replace(' ', '') for k, v in settings['model']['baseline'][baseline_name].items() if v])}"
+                output_path = f"{output}{os.path.split(datapath)[-1]}{filter_str}/{m_name}/{emb_settings_str}/t{vecs_['skill'].shape[0]}.s{vecs_['skill'].shape[1] if args.emb_d is None else args.emb_d}.m{vecs_['member'].shape[1]}.{'.'.join([k + str(v).replace(' ', '') for k, v in settings['model']['baseline'][baseline_name].items() if v])}"
             else:
-                output_path = f"{output}{os.path.split(datapath)[-1]}{filter_str}/{m_name}/t{vecs_['skill'].shape[0]}.s{vecs_['skill'].shape[1]}.m{vecs_['member'].shape[1]}.{'.'.join([k + str(v).replace(' ', '') for k, v in settings['model']['baseline'][baseline_name].items() if v])}"
+                output_path = f"{output}{os.path.split(datapath)[-1]}{filter_str}/{m_name}/t{vecs_['skill'].shape[0]}.s{vecs_['skill'].shape[1] if args.emb_d is None else args.emb_d}.m{vecs_['member'].shape[1]}.{'.'.join([k + str(v).replace(' ', '') for k, v in settings['model']['baseline'][baseline_name].items() if v])}"
             if not os.path.isdir(output_path): os.makedirs(output_path)
             copyfile('./param.py', f'{output_path}/param.py')
             # make_popular_and_nonpopular_matrix(vecs_, data_list[0])
