@@ -3,6 +3,8 @@
 /venv
 /.idea/
 /data/raw/dblp.v12.json
+/data/preprocessed/dblp/dblp.v12.json.filtered.mt120.ts3/*
+/data/preprocessed/imdb/title.basics.tsv.filtered.mt75.ts3/*
 *.pyc
 *.npz
 *.pt
