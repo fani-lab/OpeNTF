@@ -3,11 +3,6 @@ import torch
 import numpy as np
 
 random.seed(0)
-torch.manual_seed(0)
-torch.cuda.manual_seed_all(0)
-
-np.random.seed(0)
-
 settings = {
     'model':{
         'baseline': {
@@ -15,14 +10,14 @@ settings = {
                 'b': 128
             },
             'fnn':{
-                'l': [100],  # list of number of nodes in each layer
-                'lr': 0.01,  # learning rate
-                'b': 4096,  # batch size
-                'e': 20,  # epoch
+                'b': 2048,  # batch size
+                'e': 25,  # epoch
+                'l': [128],  # list of number of nodes in each layer
+                'loss': 'normal', # 'SL'-> superloss, 'DP' -> Data Parameters, 'normal' -> Binary Cross Entropy 'pos-ce' -> positive ce, 'weighted' -> weighted ce
+                'lr': 0.0001,  # learning rate
                 'nns': 3,  # number of negative samples
                 'ns': 'uniform',  # 'none', 'uniform', 'unigram', 'unigram_b'
-                'weight': 5, # weight if ns == 'weighted'
-                'loss': 'normal',  # 'SL'-> superloss, 'DP' -> Data Parameters, 'normal' -> Binary Cross Entropy 'pos-ce' -> positive ce, 'weighted' -> weighted ce
+                'weight': 2.5, # weight if ns == 'weighted'
             },
             'bnn_old':{
                 'l': [128],  # list of number of nodes in each layer
@@ -36,15 +31,15 @@ settings = {
                 'loss': 'normal',  # 'SL'-> superloss, 'DP' -> Data Parameters, 'normal' -> Binary Cross Entropy
             },
             'bnn':{
-                'l': [100],  # list of number of nodes in each layer
+                'b': 2048,  # batch size
+                'e': 25,  # epoch
+                'l': [128],  # list of number of nodes in each layer
+                'loss': 'normal',  # 'SL'-> superloss, 'DP' -> Data Parameters, 'normal' -> Binary Cross Entropy
                 'lr': 0.01,  # learning rate
-                'b': 4096,  # batch size
-                'e': 20,  # epoch
                 'nns': 3,  # number of negative samples
                 'ns': 'uniform',  # 'uniform', 'unigram', 'unigram_b'
-                'weight': 5, # weight if ns == 'weighted'
                 's': 1,  # # sample_elbo for bnn
-                'loss': 'normal',  # 'SL'-> superloss, 'DP' -> Data Parameters, 'normal' -> Binary Cross Entropy
+                'weight': 2.5, # weight if ns == 'weighted'
             },
             'nmt': {
                 'base_config': './mdl/nmt_config.yaml'
@@ -93,3 +88,8 @@ settings = {
               'core': -1,
               'attribute': ['gender', 'popularity']},
 }
+torch.manual_seed(0)
+torch.cuda.manual_seed_all(0)
+
+np.random.seed(0)
+
