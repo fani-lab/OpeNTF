@@ -153,6 +153,7 @@ We used [``pytrec_eval``](https://github.com/cvangysel/pytrec_eval) to evaluate 
 
 **Benchmarks at Scale**
 
+
 |             | % precision |        | %recall |        |  %ndcg |        |  %map  |        |         |
 |-------------|:-----------:|:------:|:-------:|:------:|:------:|:------:|:------:|:------:|---------|
 |             |     @ 2     |  @ 10  |   @ 2   |  @ 10  |   @ 2  |  @ 10  |   @ 2  |  @ 10  |  aucroc |
@@ -188,6 +189,7 @@ We used [``pytrec_eval``](https://github.com/cvangysel/pytrec_eval) to evaluate 
 |  bnn-gnn-pc |    0.0293   | 0.0247 |  0.0180 | 0.0773 | 0.0284 | 0.0526 | 0.0126 | 0.0254 | 50.0863 |
 | bnn-gnn-std |    0.0310   | 0.0309 |  0.0195 | 0.0960 | 0.0308 | 0.0624 | 0.0144 | 0.0278 | 49.9071 |
 
+
 Full predictions of all models on test and training sets and the values of evaluation metrics are available in a rar file and will be delivered upon request! 
 
 
@@ -196,4 +198,59 @@ Full predictions of all models on test and training sets and the values of evalu
 ## 5. Acknowledgement:
 We benefit from [``pytrec_eval``](https://github.com/cvangysel/pytrec_eval), [``gensim``](https://radimrehurek.com/gensim/), [Josh Feldman's blog](https://joshfeldman.net/WeightUncertainty/), and other libraries. We would like to thank the authors of these libraries and helpful resources.
   
+
+## 6. License:
+©2024. This work is licensed under a [CC BY-NC-SA 4.0](license.txt) license.
+
+## 7. Citation:
+```
+@inproceedings{DBLP:conf/ecir/FaniBDS24,
+  author       = {Hossein Fani and Reza Barzegar and Arman Dashti and Mahdis Saeedi},
+  title        = {A Streaming Approach to Neural Team Formation Training},
+  booktitle    = {Advances in Information Retrieval - 46th European Conference on Information Retrieval, {ECIR} 2024, Glasgow, UK, March 24-28, 2024, Proceedings, Part {I}},
+  series       = {Lecture Notes in Computer Science},
+  volume       = {14608},
+  pages        = {325--340},
+  publisher    = {Springer},
+  year         = {2024},
+  url          = {https://doi.org/10.1007/978-3-031-56027-9\_20},
+  doi          = {10.1007/978-3-031-56027-9\_20},
+  biburl       = {https://dblp.org/rec/conf/ecir/FaniBDS24.bib},
+  bibsource    = {dblp computer science bibliography, https://dblp.org}
+}
+  ```
+
+```
+@inproceedings{DBLP:conf/cikm/DashtiSF22,
+  author    = {Arman Dashti and Saeed Samet and Hossein Fani},
+  title     = {Effective Neural Team Formation via Negative Samples},
+  booktitle = {Proceedings of the 31st {ACM} International Conference on Information {\&} Knowledge Management, Atlanta, GA, USA, October 17-21, 2022},
+  pages     = {3908--3912},
+  publisher = {{ACM}},
+  year      = {2022},
+  url       = {https://doi.org/10.1145/3511808.3557590},
+  doi       = {10.1145/3511808.3557590},
+  biburl    = {https://dblp.org/rec/conf/cikm/DashtiSF22.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+  ```
+  ```
+@inproceedings{DBLP:conf/cikm/DashtiSPF22,
+  author    = {Arman Dashti and Karan Saxena and Dhwani Patel and Hossein Fani},
+  title     = {OpeNTF: {A} Benchmark Library for Neural Team Formation},
+  booktitle = {Proceedings of the 31st {ACM} International Conference on Information {\&} Knowledge Management, Atlanta, GA, USA, October 17-21, 2022},
+  pages     = {3913--3917},
+  publisher = {{ACM}},
+  year      = {2022},
+  url       = {https://doi.org/10.1145/3511808.3557526},
+  doi       = {10.1145/3511808.3557526},
+  biburl    = {https://dblp.org/rec/conf/cikm/DashtiSPF22.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+```
+
+## 8. Awards:
+
+> [CAD$300, Gold medalist, UWill Discover, 2022](https://scholar.uwindsor.ca/uwilldiscover/2022/2022Day3/30/)
+
 
