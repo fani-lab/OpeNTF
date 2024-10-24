@@ -1,5 +1,5 @@
-# ``OpeNTF``: An Open-Source Neural Team Formation Benchmark Library 
-Team formation involves selecting a team of skillful experts who will, more likely than not, accomplish a task. Researchers have proposed a rich body of computational methods to automate the traditionally tedious and error-prone manual process. We previously released OpeNTF, an open-source framework hosting canonical neural models as the cutting-edge class of approaches, along with large-scale training datasets from varying domains. In this paper, we contribute OpeNTF2 that extends the initial release in two prime directions. (1) The first of its kind in neural team formation, we integrated `debiasing reranking algorithms` to mitigate the `popularity` and `gender` disparities in the neural models’ team recommendations based on two alternative notions of fairness: equality of opportunity and demographic parity. (2) We further contribute a `temporal` training strategy for neural models’ training to capture the evolution of experts’ skills and collaboration ties over time, as opposed to randomly shuffled training datasets. OpeNTF2 is a forward-looking effort to automate team formation via fairness-aware and time-sensitive methods. AI-ML-based solutions are increasingly impacting how resources are allocated to various groups in society, and ensuring fairness and time are systematically considered is key.
+# ``OpeNTF``: An Open-Source Neural Team Formation via Adaptive Loss-based Curricula
+Team formation involves selecting a team of skillful experts who will, more likely than not, accomplish a task. Researchers have proposed a rich body of computational methods to automate the traditionally tedious and error-prone manual process. We previously released OpeNTF, an open-source framework hosting canonical neural models as the cutting-edge class of approaches, along with large-scale training datasets from varying domains. In this repo, we extend OpeNTF with `curriculum learning` training strategy for neural models' training to capture the difficulty level of experts to learn easy popular experts first, then moving toward hard nonpopular experts, as opposed to randomly shuffled training datasets. 
 
 <table border=0>
 <tr>
@@ -9,26 +9,13 @@ Team formation involves selecting a team of skillful experts who will, more like
 - [1. Setup](#1-setup)
 - [2. Quickstart](#2-quickstart)
 - [3. Features](#3-features)
-  * [`Fairness aware Team Formation`](#31-adila-fairness-aware-team-formation)
+  * [`Dynamic Loss-based Curriculum Learning`](#31-Dynamic-Loss-based-Curriculum-Learning)
   * [`Datasets and Parallel Preprocessing`](#32-datasets-and-parallel-preprocessing)
-  * [`Non-Temporal Neural Team Formation`](#33-non-temporal-neural-team-formation)
-  * [`Temporal Neural Team Prediction`](#34-temporal-neural-team-prediction)
   * [`Model Architecture`](#35-model-architecture)
-  * [`Negative Sampling Strategies`](#36-negative-sampling-strategies)
   * [`Run`](#37-run)
 - [4. Results](#4-results)
 - [5. Acknowledgement](#5-acknowledgement)
-- [6. License](#6-license)
-- [7. Citation](#7-citation)
-- [8. Awards](#8-awards)
 
-
-
-</td>
-<td><img src='./misc/adila_flow_.png' width="600" align="right"" /></td>
-<!-- <td><img src='./src/mdl/team_inheritance_hierarchy.png' width="90%%" /></td> -->
-</tr>
-</table>
 
 
 ## 1. [Setup](https://colab.research.google.com/github/fani-lab/OpeNTF/blob/main/quickstart.ipynb)
@@ -38,16 +25,16 @@ torch>=1.9.0
 pytrec-eval-terrier==0.5.2
 gensim==3.8.3
 ```
-By ``pip``, clone the codebase and install required packages:
+By ``pip``, clone the codebase and install the required packages:
 ```sh
-git clone --recursive https://github.com/Fani-Lab/opentf
+git clone --recursive https://github.com/[anonymous]
 cd opentf
 pip install -r requirements.txt
 ```
 By [``conda``](https://www.anaconda.com/products/individual):
 
 ```sh
-git clone --recursive https://github.com/Fani-Lab/opentf
+git clone --recursive https://github.com/[anonymous]
 cd opentf
 conda env create -f environment.yml
 conda activate opentf
@@ -69,27 +56,39 @@ python -u main.py -data ../data/raw/dblp/toy.dblp.v12.json -domain dblp -model f
 The above run, loads and preprocesses a tiny-size toy example dataset [``toy.dblp.v12.json``](data/raw/dblp/toy.dblp.v12.json) from [``dblp``](https://originalstatic.aminer.cn/misc/dblp.v12.7z) followed by _n_-fold train-evaluation on a training split and final test on the test set for ``feedforward`` and ``Bayesian`` neural models using default hyperparameters from [``./src/param.py``](./src/param.py). Then, the predictions will be passed through the `det_greedy` reranking fairness algorithm to mitigate popularity bias in teams with default `k_max`, `np_ratio` fromn [``./src/param.py``](./src/param.py).
 
 ```
-python -u main.py -data ../data/raw/dblp/toy.dblp.v12.json -domain dblp -model tbnn tbnn_dt2v_emb
+python -u main.py -data ../data/raw/dblp/toy.dblp.v12.json -domain dblp -model bnn bnn_emb
 ```
 
-This script loads and preprocesses the same dataset [``toy.dblp.v12.json``](data/raw/dblp/toy.dblp.v12.json) from [``dblp``](https://originalstatic.aminer.cn/misc/dblp.v12.7z), takes the teams from the the last year as the test set and trains the ``Bayesian`` neural model following our proposed streaming training strategy as explained in ``3.2.2. Temporal Neural Team Formation`` with two different input representations _i_) sparse vector represntation and _ii_) temporal skill vector represntation using default hyperparameters from [``./src/param.py``](./src/param.py).
+This script loads and preprocesses the same dataset [``toy.dblp.v12.json``](data/raw/dblp/toy.dblp.v12.json) from [``dblp``](https://originalstatic.aminer.cn/misc/dblp.v12.7z), takes the teams from the the last year as the test set and trains the ``Bayesian`` neural model
 
 ## 3. Features
-#### **3.1. [`Adila`](https://github.com/fani-lab/Adila): Fairness aware Team Formation**
 
-While state-of-the-art neural team formation methods are able to efficiently analyze massive collections of experts to form effective collaborative teams, they largely ignore the fairness in recommended teams of experts. In `Adila`, we study the application of `fairness-aware` team formation algorithms to mitigate the potential popularity bias in the neural team formation models. We support two fairness notions namely, `equality of opportunity` and `demographic parity`. To achieve fairness, we utilize three deterministic greedy reranking algorithms (`det_greedy`, `det_cons`, `det_relaxed`) in addition to `fa*ir`, a probabilistic greedy reranking algorithm . 
+#### **3.1. Dynamic Loss-based Curriculum Learning** 
+inspired by the curriculum learning in education that adopts the human learning pace through gradual progress from _easy_ to _hard_ topics, we propose to leverage curriculum-based learning strategies that provide an order between experts from the easy popular experts to the hard nonpopular ones to overcome the neural models' performance drain caused by learning strategies that are disregardful of experts' different difficulty levels. In a curriculum, training samples are ordered based on their level of difficulty (complexity) either statically _prior_ to learning, or dynamically _during_ learning procedure. 
+For instance, for team recommendation, a long-standing well-experienced expert who has been in many successful teams would be easier to learn from, compared to an early career expert. A dynamic curriculum identifies easy samples from difficult ones by considering the effect of the samples on the learning progress of a model during learning epochs. For instance, if the model's objective function produces large (small) loss values in several epochs for a sample expert, the model would consider the expert as difficult (easy). 
+
+To include a Curriculum Learning strategy, there is a parameter for a model to set in [``./src/param.py``](src/param.py):
+- ``CL``: the curriculum learning strategy which can be ``SL`` (non parametric curriculum), ``DP`` (parametric curriculum), ``normal``(no curriculum learning).
+
+To have a better understanding of our proposed loss-based curriculum learning strategy, we compare the flow of calculating training loss using normal cross entropy and our proposed loss function in (parametric curriculum).
+please note that &Phi; refers to the difficulty level of each expert (class).
+
+<p align="center"><img src='CL flow 1.png' width="300" ></p>
+<p align="center"><img src='CL flow 2.png' width="300" ></p>
+<p align="center"><img src='CL flow 3.png' width="800" ></p>
+<p align="center"><img src='CL flow 4.png' width="800" ></p>
+<p align="center"><img src='CL flow 5.png' width="800" ></p>
+<p align="center"><img src='CL flow 6.png' width="800" ></p>
+<p align="center"><img src='CL flow 7.png' width="800" ></p>
+<p align="center"><img src='CL flow 8.png' width="800" ></p>
 
 
-<p align="center"><img src='./misc/adila_flow.png' width="1000" ></p>
 
-
-For further details and demo, please visit [Adila's submodule](https://github.com/fani-lab/Adila).
-
-#### **3.2. Datasets and Parallel Preprocessing**
+#### **3.3. Datasets and Parallel Preprocessing**
 
 Raw dataset, e.g., scholarly papers from AMiner's citation network dataset of [``dblp``](https://originalstatic.aminer.cn/misc/dblp.v12.7z), movies from [``imdb``](https://datasets.imdbws.com/), or US patents from [``uspt``](https://patentsview.org/download/data-download-tables) were assumed to be populated in [``data/raw``](data/raw). For the sake of integration test, tiny-size toy example datasets [``toy.dblp.v12.json``](data/raw/dblp/toy.dblp.v12.json) from [``dblp``](https://originalstatic.aminer.cn/misc/dblp.v12.7z), [[``toy.title.basics.tsv``](data/raw/imdb/toy.title.basics.tsv), [``toy.title.principals.tsv``](data/raw/imdb/toy.title.principals.tsv), [``toy.name.basics.tsv``](data/raw/imdb/toy.name.basics.tsv)] from [``imdb``](https://datasets.imdbws.com/) and [``toy.patent.tsv``](data/preprocessed/uspt/toy.patent.tsv) have been already provided.
 
-<p align="center"><img src='./src/cmn/dataset_hierarchy.png' width="300" ></p>
+<p align="center"><img src='./dataset_hierarchy.png' width="300" ></p>
 
 Raw data will be preprocessed into two main ``sparse`` matrices each row of which represents: 
 
@@ -103,25 +102,13 @@ The sparse matrices and the indices will be persisted in [``data/preprocessed/{d
 
 > Our pipeline benefits from parallel generation of sparse matrices for teams that significantly reduces the preprocessing time as shown below:
 > 
-> <p align="center"><img src="./data/speedup.jpg" width="200"><img src="./data/speedup_loglog.jpg" width="190"></p>
+> <p align="center"><img src="./speedup.jpg" width="200"><img src="./speedup_loglog.jpg" width="190"></p>
 
 
 Please note that the preprocessing step will be executed once. Subsequent runs load the persisted pickle files. In order to regenerate them, one should simply delete them. 
 
 
-#### **3.3. Non-Temporal Neural Team Formation**
-
-We randomly take ``85%`` of the dataset for the train-validation set and ``15%`` as the test set, i.e., the model never sees these instances during training or model tuning. You can change ``train_test_split`` parameter in [``./src/param.py``](./src/param.py).
-
-#### **3.4. Temporal Neural Team Prediction**
-
-Previous works in team formation presumed that teams follow the i.i.d property and hence when training their models they followed the bag of teams approach, where they train and validate their models on a shuffled dataset of teams. Moreover, they were interpolative and did not try to predict _future_ successful teams. In this work, we aim at extrapolating and predicting _future_ teams of experts. We sort the teams by time intervals and train a neural model incrementally  through the ordered collection of teams in [C<sub>0</sub>, ..C<sub>t</sub>, ..C<sub>T</sub>]. As can be seen in Figure below, after random initialization of skills’ and experts’ embeddings at t=0, we start training the model on the teams in the first time interval C<sub>0</sub> for a number of epochs, then we continue with training  on the second time interval C<sub>1</sub> using the learned embeddings from the previous time interval and so forth until we finish the training on the last training time interval C<sub>t=T</sub>. We believe that using this approach, will help the model understand how experts’ skills and collaborative ties evolve through time and the final embeddings are their optimum representation in the latent space to predict _future_ successful teams at time interval C<sub>t=T+1</sub>.
-
-<p align="center"><img src='./src/mdl/tntf.png' width="600"></p>
-
-
-
-#### **3.5. Model Architecture**
+#### **3.6. Model Architecture**
 
 Each model has been defined in [``./src/mdl/``](./src/mdl/) under an inheritance hierarchy. They override abstract functions for ``train``, ``test``, ``eval``, and ``plot`` steps.
 
@@ -133,7 +120,7 @@ For example, for our feedforward baseline [``fnn``](./src/mdl/fnn.py), the model
 Currently, we support neural models:
 1) Bayesian [``bnn``](./src/mdl/bnn.py) where model's parameter (weights) is assumed to be drawn from Gaussian (Normal) distribution and the task is to not to learn the weight but the mean (μ) and standard deviation (σ) of the distribution at each parameter.
 
-<p align="center"><img src='./src/mdl/bnn.png' width="350" ></p>
+<p align="center"><img src='./mdl/bnn.png' width="350" ></p>
 
 2) non-Bayesian feedforward [``fnn``](./src/mdl/fnn.py) where the model's parameter (weights) is to be learnt.
 
@@ -143,94 +130,65 @@ i) Sparse vector representation (occurrence or boolean vector): See preprocessin
 
 ii) Dense vector representation ([``team2vec``](src/mdl/team2vec/team2doc2vec.py)): Inspired by paragraph vectors by [Le and Mikolov](https://cs.stanford.edu/~quocle/paragraph_vector.pdf), we consider a team as a document and skills as the document words (``embtype == 'skill'``). Using distributed memory model, we map skills into a real-valued embedding space. Likewise and separately, we consider members as the document words and map members into real-valued vectors (``embtype == 'member'``). We also consider mapping skills and members into the same embedding space (``embtype == 'joint'``). Our embedding method benefits from [``gensim``](https://radimrehurek.com/gensim/) library.
 
-iii) Temporal skill vector represntation ([``team2vec``](src/mdl/team2vec/team2doc2vec.py)): Inspired by [Hamilton et al.](https://aclanthology.org/P16-1141/), we also incorporate time information into the underlying neural model besides utilizing our proposed streaming training strategy. We used the distributed memory model of Doc2Vec to generate the real-valued joint embeddings of the subset of skills and time intervals, where the skills and time intervals are the words of the document (``embtype == 'dt2v'``).
+3) In OpeNTF, The ``Nmt`` wrapper class is designed to make use of advanced transformer models and encoder-decoder models that include multiple ``LSTM`` or ``GRU`` cells, as well as various attention mechanisms. ``Nmt`` is responsible for preparing the necessary input and output elements and invokes the executables of ``opennmt-py`` by creating a new process using Python's ``subprocess`` module. Additionally, because the ``Nmt`` wrapper class inherits from ``Ntf``, these models can also take advantage of temporal training strategies through ``tNtf``.
 
-3) In OpeNTF2, The ``Nmt`` wrapper class is designed to make use of advanced transformer models and encoder-decoder models that include multiple ``LSTM`` or ``GRU`` cells, as well as various attention mechanisms. ``Nmt`` is responsible for preparing the necessary input and output elements and invokes the executables of ``opennmt-py`` by creating a new process using Python's ``subprocess`` module. Additionally, because the ``Nmt`` wrapper class inherits from ``Ntf``, these models can also take advantage of temporal training strategies through ``tNtf``.
-
-#### **3.6. Negative Sampling Strategies**
-
-As known, employing ``unsuccessful`` teams convey complementary negative signals to the model to alleviate the long-tail problem. Most real-world training datasets in the team formation domain, however, do not have explicit unsuccessful teams (e.g., collections of rejected papers.) In the absence of unsuccessful training instances, we proposed negative sampling strategies based on the ``closed-world`` assumption where no currently known successful group of experts for the required skills is assumed to be unsuccessful.  We study the effect of ``three`` different negative sampling strategies: two based on static distributions, and one based on adaptive noise distribution:
-
-1) Uniform distribution (``uniform``), where subsets of experts are randomly chosen with the ``same probability`` as unsuccessful teams from the uniform distribution over all subsets of experts.
-
-2) Unigram distribution (``unigram``), where subsets of experts are chosen regarding ``their frequency`` in all previous successful teams. Intuitively, teams of experts that have been more successful but for other skill subsets will be given a higher probability and chosen more frequently as a negative sample to dampen the effect of popularity bias.
-
-3) Smoothed unigram distribution in each training minibatch (``unigram_b``), where we employed the ``add-1 or Laplace smoothing`` when computing the unigram distribution of the experts but in each training minibatch. Minibatch stochastic gradient descent is the _de facto_ method for neural models where the data is split into batches of data, each of which is sent to the model for the partial calculation to speed up training while maintaining high accuracy. 
-
-To include a negative sampling strategy, there are two parameters for a model to set in [``./src/param.py``](src/param.py):
-- ``ns``: the negative sampling strategy which can be ``uniform``, ``unigram``, ``unigram_b`` or ``None``(no negative sampling).
-- ``nns``: number of negative samples
-
-#### **3.7. Run**
+#### **3.8. Run**
 
 The pipeline accepts three required list of values:
 1) ``-data``: list of path to the raw datafiles, e.g., ``-data ./../data/raw/dblp/dblp.v12.json``, or the main file of a dataset, e.g., ``-data ./../data/raw/imdb/title.basics.tsv``
 2) ``-domain``: list of domains of the raw data files that could be ``dblp``, ``imdb``, or `uspt`; e.g., ``-domain dblp imdb``.
-3) ``-model``: list of baseline models that could be ``fnn``, ``fnn_emb``, ``bnn``, ``bnn_emb``, ``tfnn``, ``tfnn_emb``, ``tfnn_dt2v_emb``, ``tbnn``, ``tbnn_emb``, ``tbnn_dt2v_emb``, ``random``; e.g., ``-model random fnn bnn tfnn tbnn tfnn_dt2v_emb tbnn_dt2v_emb``.
+3) ``-model``: list of baseline models that could be ``fnn``, ``fnn_emb``, ``bnn``, ``bnn_emb``, ``random``; e.g., ``-model random fnn bnn ``.
 
 Here is a brief explanation of the models:
 - ``fnn``, ``bnn``, ``fnn_emb``, ``bnn_emb``: follows the standard machine learning training procedure.
-- ``tfnn``, ``tbnn``, ``tfnn_emb``, ``tbnn_emb``: follows our proposed streaming training strategy without adding temporal information to the input of the models.
-- ``tfnn_dt2v_emb``, ``tbnn_dt2v_emb``: follows our proposed streaming training strategy and employs temporal skills as input of the models.
-
+  
 ## 4. Results
 
 We used [``pytrec_eval``](https://github.com/cvangysel/pytrec_eval) to evaluate the performance of models on the test set as well as on their own train sets (should overfit) and validation sets. We report the predictions, evaluation metrics on each test instance, and average on all test instances in ``./output/{dataset name}/{model name}/{model's running setting}/``.  For example:
 
 1) ``f0.test.pred`` is the predictions per test instance for a model which is trained folds [1,2,3,4] and validated on fold [0].
 2) ``f0.test.pred.eval.csv`` is the values of evaluation metrics for the predictions per test instance
-3) ``f0.test.pred.eval.mean.csv`` is the average of values for evaluation metrics over all test instances.
+3) ``f0.test.pred.eval.mean.csv`` is the average of values for evaluation metrics overall test instances.
 4) ``test.pred.eval.mean.csv`` is the average of values for evaluation metrics over all _n_ fold models.
 
 **Benchmarks at Scale**
 
-**1. Fair Team Formation Results**
-||min. #member's team: 75, min team size: 3, epochs: 20, learning rate: 0.1, hidden layer: [1, 100d], minibatch: 4096, #negative samples: 3|
-|--------|------|
-|Datasets|[dblp.v12](https://originalstatic.aminer.cn/misc/dblp.v12.7z), [imdb](https://imdb.com/interfaces/), [uspt](https://patentsview.org/download/data-download-tables) (running ...)|
-|Metrics|ndkl, map@2,5,10, ndcg@2,5,10, auc|
-|Sensitive Attributes| popularity, gender(running ...)|
-|Baselines|{bnn, random}×{sparse, emb}×{unigram_b}|
-|Results|for further details and results, please visit [Adila's submodule](https://github.com/fani-lab/Adila)|
 
-Average performance of 5-fold neural models on the test set of the `imdb`, `dblp` and `uspt` datasets. For the metrics: `ndkl`, lower values are better (↓); `skew`, values closer to 0 are better (→0); and `map` and `ndcg`, higher values are better (↑).
-<hr>
-imdb dataset
-<p align="center"><img src='./misc/fair_imdb.png'></p>
-<hr>
-dblp table
-<p align="center"><img src='./misc/fair_dblp.png'></p>
-<hr>
-uspt table
-<p align="center"><img src='./misc/fair_uspt.png'></p>
+|             | % precision |        | %recall |        |  %ndcg |        |  %map  |        |         |
+|-------------|:-----------:|:------:|:-------:|:------:|:------:|:------:|:------:|:------:|---------|
+|             |     @ 2     |  @ 10  |   @ 2   |  @ 10  |   @ 2  |  @ 10  |   @ 2  |  @ 10  |  aucroc |
+|             |             |        |         |  imdb  |        |        |        |        |         |
+|    random   |    0.1700   | 0.1800 |  0.0800 | 0.4500 | 0.1700 | 0.3100 | 0.0600 | 0.1200 | 49.8800 |
+|   fnn-std   |    0.9526   | 0.7750 |  0.4090 | 1.7625 | 0.9684 | 1.3405 | 0.3249 | 0.5839 | 58.9675 |
+|    fnn-pc   |    0.9240   | 0.6878 |  0.3927 | 1.5619 | 0.9205 | 1.2018 | 0.3096 | 0.5329 | 54.8621 |
+|   fnn-npc   |    0.9915   | 0.8840 |  0.4415 | 2.0059 | 1.0056 | 1.5104 | 0.3595 | 0.6820 | 63.0213 |
+| fnn-gnn-std |    0.7319   | 0.6582 |  0.3376 | 1.5096 | 0.7449 | 1.1390 | 0.2645 | 0.5111 | 62.3177 |
+|  fnn-gnn-pc |    0.6645   | 0.6214 |  0.2991 | 1.3973 | 0.6645 | 1.0456 | 0.2277 | 0.4565 | 64.7053 |
+| fnn-gnn-npc |    0.8150   | 0.7408 |  0.3555 | 1.6556 | 0.8162 | 1.2426 | 0.2686 | 0.5317 | 66.7753 |
+|   bnn-std   |    0.2544   | 0.2481 |  0.1284 | 0.6062 | 0.2626 | 0.4375 | 0.1016 | 0.1859 | 49.7615 |
+|    bnn-pc   |    0.1791   | 0.2149 |  0.0899 | 0.5177 | 0.1785 | 0.3553 | 0.0680 | 0.1431 | 50.1223 |
+|   bnn-npc   |    0.2076   | 0.1983 |  0.0986 | 0.4871 | 0.2088 | 0.3488 | 0.0747 | 0.1462 | 49.9923 |
+| bnn-gnn-std |    0.1973   | 0.2030 |  0.1005 | 0.5029 | 0.2008 | 0.3557 | 0.0772 | 0.1495 | 50.0626 |
+|  bnn-gnn-pc |    0.1661   | 0.2424 |  0.0809 | 0.5944 | 0.1614 | 0.3922 | 0.0587 | 0.1508 | 50.0527 |
+| bnn-gnn-std |    0.1869   | 0.1900 |  0.0988 | 0.4896 | 0.1869 | 0.3393 | 0.0733 | 0.1424 | 49.9541 |
+|             |             |        |         |        |        |        |        |        |         |
+|             |  %precision |        | %recall |        |  %ndcg |        |  %map  |        |         |
+|             |     @ 2     |  @ 10  |   @ 2   |  @ 10  |   @ 2  |  @ 10  |   @ 2  |  @ 10  |  aucroc |
+|             |             |        |         |  dblp  |        |        |        |        |         |
+|    random   |    0.0100   | 0.0200 |  0.0100 | 0.0600 | 0.0200 | 0.0400 | 0.0100 | 0.0200 | 49.9200 |
+|   fnn-std   |    0.2994   | 0.1799 |  0.1742 | 0.5300 | 0.2988 | 0.4024 | 0.1300 | 0.2049 | 68.3604 |
+|    fnn-pc   |    0.2407   | 0.1751 |  0.1403 | 0.5134 | 0.2568 | 0.3884 | 0.1157 | 0.1981 | 61.4063 |
+|   fnn-npc   |    0.5031   | 0.3633 |  0.2929 | 1.0643 | 0.5062 | 0.7770 | 0.2220 | 0.3798 | 71.4635 |
+| fnn-gnn-std |    0.3975   | 0.2252 |  0.2318 | 0.6450 | 0.3967 | 0.5400 | 0.1745 | 0.2895 | 74.7247 |
+|  fnn-gnn-pc |    0.4721   | 0.2007 |  0.2712 | 0.5822 | 0.4795 | 0.5182 | 0.2094 | 0.2840 | 75.9575 |
+| fnn-gnn-npc |    0.5182   | 0.3792 |  0.2991 | 1.0912 | 0.5269 | 0.8005 | 0.2277 | 0.3898 | 74.6674 |
+|   bnn-std   |    0.0285   | 0.0272 |  0.0179 | 0.0856 | 0.0289 | 0.0586 | 0.0138 | 0.0288 | 50.0227 |
+|    bnn-pc   |    0.0268   | 0.0300 |  0.0166 | 0.0954 | 0.0003 | 0.0630 | 0.0133 | 0.0306 | 50.0703 |
+|   bnn-npc   |    0.0369   | 0.0223 |  0.0233 | 0.0698 | 0.0388 | 0.0534 | 0.0188 | 0.0278 | 50.0220 |
+| bnn-gnn-std |    0.0210   | 0.0263 |  0.0120 | 0.0811 | 0.0215 | 0.0509 | 0.0096 | 0.0217 | 50.0061 |
+|  bnn-gnn-pc |    0.0293   | 0.0247 |  0.0180 | 0.0773 | 0.0284 | 0.0526 | 0.0126 | 0.0254 | 50.0863 |
+| bnn-gnn-std |    0.0310   | 0.0309 |  0.0195 | 0.0960 | 0.0308 | 0.0624 | 0.0144 | 0.0278 | 49.9071 |
 
-**2. Non-Temporal Neural Team Formation**
-
-||min. #member's team: 75, min team size: 3, epochs: 20, learning rate: 0.1, hidden layer: [1, 100d], minibatch: 4096, #negative samples: 3|
-|--------|------|
-|Datasets|[dblp.v12](https://originalstatic.aminer.cn/misc/dblp.v12.7z), [imdb](https://imdb.com/interfaces/), [uspt](https://patentsview.org/download/data-download-tables)|
-|Metrics|recall@2,5,10, map@2,5,10, ndcg@2,5,10, p@2,5,10, auc|
-|Baselines|{fnn,bnn}×{sparse, emb}×{none, uniform, unigram, unigram_b}|
-|Results|[``./output/dblp.v12.json.filtered.mt75.ts3/``](./output/dblp.v12.json.filtered.mt75.ts3/), [``./output/title.basics.tsv.filtered.mt75.ts3/``](./output/title.basics.tsv.filtered.mt75.ts3/)|
-
-<p align="center">
-<img src='https://user-images.githubusercontent.com/8619934/154041216-c80cccfb-70a2-4831-8781-cdb4718fb00e.png' >
-<img src='https://user-images.githubusercontent.com/8619934/154041087-e4d99b1e-eb6b-456a-837b-840e4bd5090a.png' >
-
-Full predictions of all models on test and training sets and the values of evaluation metrics, per instance and average, are available in a rar file of size ``74.8GB`` and will be delivered upon request! 
-
-**3. Temporal Neural Team Prediction**
-
-We kick-started our experiments based on the best results from the non-temporal neural team formation experiments.
-
-||min. #member's team: 75, min team size: 3, epochs: 20, learning rate: 0.1, hidden layer: [1, 128d], minibatch: 128, #negative samples: 3|
-|--------|------|
-|Datasets|[dblp.v12](https://originalstatic.aminer.cn/misc/dblp.v12.7z), [imdb](https://imdb.com/interfaces/), [uspt](https://patentsview.org/download/data-download-tables), [gith](https://codelabs.developers.google.com/codelabs/bigquery-github#0)|
-|Metrics|recall@2,5,10, map@2,5,10, ndcg@2,5,10, p@2,5,10, auc|
-|Baselines|{bnn, tbnn}×{sparse, emb, dt2v_emb}×{unigram_b},{[rrn](https://dl.acm.org/doi/10.1145/3018661.3018689)}|
-|Results|[``./output/dblp.v12.json.filtered.mt75.ts3/``](./output/dblp.v12.json.filtered.mt75.ts3/), [``./output/title.basics.tsv.filtered.mt75.ts3/``](./output/title.basics.tsv.filtered.mt75.ts3/), [``./output/patent.tsv.filtered.mt75.ts3/``](./output/patent.tsv.filtered.mt75.ts3/)|
-
-<p align="center"><img src='./misc/temporal_results.png'></p>
 
 Full predictions of all models on test and training sets and the values of evaluation metrics are available in a rar file and will be delivered upon request! 
 
@@ -240,6 +198,7 @@ Full predictions of all models on test and training sets and the values of evalu
 ## 5. Acknowledgement:
 We benefit from [``pytrec_eval``](https://github.com/cvangysel/pytrec_eval), [``gensim``](https://radimrehurek.com/gensim/), [Josh Feldman's blog](https://joshfeldman.net/WeightUncertainty/), and other libraries. We would like to thank the authors of these libraries and helpful resources.
   
+
 ## 6. License:
 ©2024. This work is licensed under a [CC BY-NC-SA 4.0](license.txt) license.
 
@@ -294,4 +253,4 @@ We benefit from [``pytrec_eval``](https://github.com/cvangysel/pytrec_eval), [``
 
 > [CAD$300, Gold medalist, UWill Discover, 2022](https://scholar.uwindsor.ca/uwilldiscover/2022/2022Day3/30/)
 
-> CAD$300, Best Research, Demo Day, School of Computer Science, University of Windsor, 2022. 
+
