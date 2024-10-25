@@ -35,13 +35,14 @@ from cmn.tools import generate_popular_and_nonpopular
 
 # Kap: Set GPUs to use
 def set_gpus(gpus):
-    if torch.cuda.device_count() > 1:
-        print(f"\nMultiple GPUs detected. Using GPUs: {gpus} .\n")
+    num_gpus = torch.cuda.device_count()
+    if num_gpus > 1:
+        print(f"\n{num_gpus} GPUs detected. Using GPUs: {gpus} .\n")
         os.environ["CUDA_VISIBLE_DEVICES"] = gpus
     elif torch.cuda.device_count() == 1:
         print("\nOnly one GPU detected. Using it (if CUDA is available).\n")
     else:
-        print("\nNo GPU detected. Using CPU.\n")
+        print("\nNo GPUs detected. Using CPU.\n")
 
 
 def create_evaluation_splits(

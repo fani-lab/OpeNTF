@@ -1,0 +1,58 @@
+## ConvS2S with Attention Configuration for gith
+
+save_data: ../output/nmt/run/convs2s
+save_model: ../output/nmt/run/convs2s_model
+src_vocab: ../output/nmt/run/convs2s.vocab.src
+tgt_vocab: ../output/nmt/run/convs2s.vocab.tgt
+overwrite: True
+data:
+  corpus_1:
+    path_src: ../output/nmt/src-train.txt
+    path_tgt: ../output/nmt/tgt-train.txt
+    weight: 1
+  valid:
+    path_src: ../output/nmt/src-val.txt
+    path_tgt: ../output/nmt/tgt-val.txt
+
+# -------------------------------------------
+# Configuration for training
+# -------------------------------------------
+
+# Common hyperparameters
+# General opts
+keep_checkpoint: -1
+seed: 0
+train_steps: 7170 # sample size of 45888
+save_checkpoint_steps: 717
+valid_steps: 717
+report_every: 717
+
+# Batching
+world_size: 2
+gpu_ranks: [0, 1]
+num_workers: 4
+batch_type: "tokens"
+batch_size: 128
+bucket_size: 512
+valid_batch_size: 256
+accum_count: [1]
+accum_steps: [0]
+
+# Optimization
+model_dtype: "fp16"
+optim: adam
+weight_decay: 0.0001
+learning_rate: 0.0010
+adam_beta1: 0.9
+adam_beta2: 0.98
+
+# --------------------------------------------
+
+# Architecture specific hyperparameters
+encoder_type: cnn
+decoder_type: cnn
+cnn_kernel_width: 3
+layers: 4
+word_vec_size: 128
+cnn_size: 128
+dropout: 0.4

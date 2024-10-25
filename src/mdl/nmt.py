@@ -103,7 +103,10 @@ class Nmt(Ntf):
     # todo: per_trainstep => per_epoch
     # todo: eval on prediction files
 
-    def test(self, splits, path, per_epoch):
+    def test(self, splits, path, per_epoch, **kwargs):
+
+        gpus = kwargs.get("gpus")
+
         for foldidx in splits["folds"].keys():
             fold_path = f"{path}/fold{foldidx}"
             if len(splits["folds"][foldidx]["train"]) == 0:
@@ -124,7 +127,7 @@ class Nmt(Ntf):
                 cli_cmd += f"-model {model} "
                 cli_cmd += f"-src {path}/src-test.txt "
                 cli_cmd += f"-output {pred_path} "
-                cli_cmd += "-gpu 0 " if torch.cuda.is_available() else ""
+                cli_cmd += f"-gpu 0 " if torch.cuda.is_available() else ""
                 cli_cmd += "--min_length 2 "
                 cli_cmd += "-verbose "
                 print(f"Executing command: {cli_cmd}")
@@ -210,11 +213,14 @@ class Nmt(Ntf):
         learning_rate = base_config["learning_rate"]
         word_vec_size = base_config["word_vec_size"]
         batch_size = base_config["batch_size"]
-        epochs = base_config["train_steps"]
+        train_steps = base_config["train_steps"]
 
         team_count = vecs["skill"].shape[0]
         skill_count = vecs["skill"].shape[1]
         member_count = vecs["member"].shape[1]
+
+        # Kap: convert steps to epochs, round to integer
+        epochs = round((train_steps * batch_size) / team_count)
 
         if encoder_type == "cnn":
             layer_size = base_config["cnn_size"]
@@ -248,7 +254,7 @@ class Nmt(Ntf):
             )
             self.learn(splits, model_path)
         if "test" in cmd:
-            self.test(splits, model_path, per_epoch=True)
+            self.test(splits, model_path, per_epoch=True, gpus=gpus)
         if "eval" in cmd:
             self.eval(splits, model_path, member_count, y_test, per_epoch=True)
         if "plot" in cmd:
