@@ -3,7 +3,7 @@
 /venv
 /.idea/
 /src/tmp.py
-/data/raw
+/data
 /runs
 /output/**/fold*
 /output/**/*-test.txt
@@ -24,6 +24,7 @@
 *.pt
 .nfs*
 *.log
+*.pkl
 
 # large files list to ignore
 splits.json
