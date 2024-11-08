@@ -1,9 +1,0 @@
-Loading sparse matrices from ./../data/preprocessed/imdb/imdb.title.basics.tsv.filtered.mt75.ts3/teamsvecs.pkl ...
-Loading indexes pickle from ./../data/preprocessed/imdb/imdb.title.basics.tsv.filtered.mt75.ts3/indexes.pkl ...
-It took 0.011964797973632812 seconds to load from the pickles.
-It took 0.19189453125 seconds to load the sparse matrices.
-
-8 GPUs detected. Using GPUs: 6,7 .
-
-Using device: cuda
-Running for (dataset, model): (imdb, nmt_imdb_transformer-jax2) ... 

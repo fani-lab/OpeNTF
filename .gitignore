@@ -10,7 +10,7 @@ output/**/fold*
 
 src/tmp.py
 
-run_logs/*errors.log
+run_logs
 
 *.pyc
 *.npz
