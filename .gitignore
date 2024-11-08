@@ -2,12 +2,12 @@
 /.vscode
 /venv
 /.idea/
-
-/data/preprocessed
-/data/raw
+/src/tmp.py
+/data
+/runs
 /output/**/fold*
-/output/**/*-test.txt
 /run_logs
+/baseline/caser_pytorch/datasets
 
 *.pyc
 *.npz
@@ -23,7 +23,9 @@
 *.mdl
 *.pt
 .nfs*
-*.pkl
+*.log
+*.json
+*.txt
 
 # large files list to ignore
 splits.json
