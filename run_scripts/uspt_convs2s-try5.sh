@@ -1,12 +1,18 @@
 #!/bin/bash
 
-# Script vesrion: 1.1
+template_version=1.3
+script_name=$(basename "$0" .sh)
+
+# Ensure the script runs in the background with nohup and redirects output to a log file
+if [[ "$1" != "--nohup" ]]; then
+  nohup "$0" --nohup "$@" > "${script_name}.log" 2>&1 &
+  exit
+fi
 
 set -e  # Exit on any error
 
 # COMMAND TO RUN:
-# ./run6.sh > run6.log 2>&1 &
-
+# ./scriptname.sh
 
 # ------------------------------------------------------------------------------
 # CONFIGURATIONS
@@ -27,19 +33,29 @@ dataset_paths["gith"]="../data/preprocessed/gith/gith.data.csv.filtered.mt75.ts3
 dataset_paths["imdb"]="../data/preprocessed/imdb/imdb.title.basics.tsv.filtered.mt75.ts3"
 dataset_paths["uspt"]="../data/preprocessed/uspt/uspt.patent.tsv.filtered.mt75.ts3"
 
-script_name=$(basename "$0" .sh)
+
 
 # Log file for all run times
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 times_dir="${SCRIPT_DIR}/../run_times"
 logs_dir="${SCRIPT_DIR}/../run_logs"
 
+# get length of models array
+num_models=${#models[@]}
+
+# get length of datasets array
+num_datasets=${#datasets[@]}
+
+# total jobs to run
+jobs=$((num_models * num_datasets))
+job_num=1
+
 # Ensure the directories exist
 mkdir -p ../run_logs
-
 cd ../src
-
-echo "Script: ${script_name}."
+echo -e "Template\t: v${template_version}"
+echo -e "Script\t\t: ${script_name}.sh"
+echo -e "Jobs\t\t: ${jobs}"
 
 # loop over models and each model over datasets
 for model in "${models[@]}"; do
@@ -52,7 +68,7 @@ for model in "${models[@]}"; do
     echo ""
     # Get the start time
     start_time=$(date +%s)
-    start_time_est=$(date -u -d "-3 hours -33 minutes EST" +"%Y-%m-%d %H:%M:%S")
+    start_time_est=$(date -u -d "-3 hours -33 minutes" +"%Y-%m-%d %H:%M:%S")
     
     # Run the command with nohup and capture its PID
     nohup python3 -u main.py \
@@ -64,8 +80,8 @@ for model in "${models[@]}"; do
     
     pid=$!
     
-    echo "Process $pid. Model: ${current_model}. Dataset: ${current_dataset}."
-    echo -e "\tStarted at: ${start_time_est}"
+    echo "[Job $job_num/$jobs] Process $pid. Model: ${current_model}. Dataset: ${current_dataset}."
+    echo -e "\tStarted at\t: ${start_time_est} EST"
     
     # Wait for the process to complete
     wait $pid
@@ -73,7 +89,7 @@ for model in "${models[@]}"; do
     # Get the end time
     end_time=$(date +%s)
     end_time_est=$(date -u -d "-3 hours -33 minutes" +"%Y-%m-%d %H:%M:%S")
-     echo -e "\tEnded at: ${end_time_est} EST"
+     echo -e "\tEnded at\t: ${end_time_est} EST"
     
     # Calculate the elapsed time in seconds
     elapsed_time=$(($end_time - $start_time))
@@ -86,7 +102,12 @@ for model in "${models[@]}"; do
     # Format the elapsed time as Xh Xm Xs
     formatted_time="${hours}h ${minutes}m ${seconds}s"
 
-    echo "Elapsed time: ${formatted_time} ($in_minutes mins)."
-    echo ""
+    in_minutes=$(($elapsed_time / 60))
+    job_num=$((job_num + 1))
+
+    echo -e "\tElapsed\t\t: ${formatted_time} ($in_minutes mins)."
   done
 done
+
+echo ""
+echo "All ${jobs} jobs completed."

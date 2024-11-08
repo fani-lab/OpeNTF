@@ -239,7 +239,7 @@ class Nmt(Ntf):
         if not os.path.isdir(model_path):
             os.makedirs(model_path)
 
-        # take out last folder name
+        # Kap: take out last folder name (to avoid many folder layers)
         param_path = current_path.split("/")[0:-1]
         param_path = "/".join(param_path)
 
