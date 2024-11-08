@@ -11,6 +11,7 @@ output/**/fold*
 src/tmp.py
 
 run_logs
+baseline/caser_pytorch/datasets
 
 *.pyc
 *.npz
