@@ -1,0 +1,6 @@
+Template	: v1.4
+Script		: 1.4_abs_imdb_heads.sh
+Jobs		: 15
+
+[Job 1/15] Process 3732480. Model: imdb_transformer-abs_heads02. Dataset: imdb.
+	Started at	: 2024-11-08 14:46:42 EST
