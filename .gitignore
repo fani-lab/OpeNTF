@@ -5,10 +5,12 @@
 
 
 data/raw
-output/toy.dblp.v12.json/nmt/
+output/toy.dblp.v12.json
 output/**/fold*
 
 src/tmp.py
+
+run_logs/*errors.log
 
 *.pyc
 *.npz
@@ -17,9 +19,10 @@ src/tmp.py
 *.tgt
 *.pkl
 *.png
-*.log
+# *.log
 *.pred
 *.7z
 *.npy
 *.rar
 *.mdl
+*.json
