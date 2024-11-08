@@ -2,9 +2,9 @@
 /.vscode
 /venv
 /.idea/
-/src/tmp.py
-/data
-/runs
+
+/data/preprocessed
+/data/raw
 /output/**/fold*
 /output/**/*-test.txt
 /run_logs
@@ -23,7 +23,6 @@
 *.mdl
 *.pt
 .nfs*
-*.log
 *.pkl
 
 # large files list to ignore
