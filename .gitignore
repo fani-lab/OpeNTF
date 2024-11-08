@@ -2,12 +2,13 @@
 /.vscode
 /venv
 /.idea/
-/src/tmp.py
-/data
-/runs
-/output/**/fold*
-/run_logs
-/baseline/caser_pytorch/datasets
+
+
+data/raw
+output/toy.dblp.v12.json/nmt/
+output/**/fold*
+
+src/tmp.py
 
 *.pyc
 *.npz
@@ -16,18 +17,9 @@
 *.tgt
 *.pkl
 *.png
+*.log
 *.pred
 *.7z
 *.npy
 *.rar
 *.mdl
-*.pt
-.nfs*
-*.log
-*.json
-*.txt
-
-# large files list to ignore
-splits.json
-error.log
-output.log
