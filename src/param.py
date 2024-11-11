@@ -47,7 +47,7 @@ settings = {
                 'w': 1 #cooccurrence window
             }
         },
-        'cmd': ['train', 'test', 'eval', 'fair'],  # 'train', 'test', 'eval', 'plot', 'agg', 'fair'
+        'cmd': ['train', 'test', 'eval'],  # 'train', 'test', 'eval', 'plot', 'agg', 'fair'
         'nfolds': 3,
         'train_test_split': 0.85,
         'step_ahead': 2,#for now, it means that whatever are in the last [step_ahead] time interval will be the test set!
