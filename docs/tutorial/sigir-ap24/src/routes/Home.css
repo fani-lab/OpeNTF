@@ -22,7 +22,7 @@ section:not(:first-child) {
 }
 
 section.active .section-body {
-  transition: 0.5s all ease;
+  /*transition: 0.5s all ease;*/
   border-left: 2px double;
   border-color: #1d824c;
   padding-left: 1.5em;
@@ -61,7 +61,7 @@ section .section-date {
 
 section .presenter span {
   clear: both;
-  display: block;
+  display: block; 
   width: 100%;
 }
 

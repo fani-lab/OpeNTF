@@ -6,7 +6,7 @@ function Menu() {
           <div className="text-center">
             <span className="fw-bold small title-text text-uppercase">
               <a className="plain-link" href="https://www.um.org/umap2024/">
-                UMAP 2024
+                SIGIR-AP 2024
               </a>
             </span>
           </div>
