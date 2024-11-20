@@ -18,8 +18,8 @@ set -e  # Exit on any error
 # CONFIGURATIONS
 # ------------------------------------------------------------------------------
 
-# 12,13,14,21,23,24,31 etc until 44, increments of 1
-models=("transformer-abs_heads08" "transformer-abs_heads16" "transformer-abs_heads32")
+# go upto 0.20, increments of 0.05
+models=("transformer-abs_lsmoothing0.10" "transformer-abs_lsmoothing0.15" "transformer-abs_lsmoothing0.20")
 datasets=("imdb")
 gpus="6,7"
 

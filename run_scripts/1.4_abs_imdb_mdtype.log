@@ -1,0 +1,11 @@
+Template	: v1.4
+Script		: 1.4_abs_imdb_mdtype.sh
+Jobs		: 2
+
+[Job 1/2] Process 1843398. Model: imdb_transformer-abs_mdtype32. Dataset: imdb.
+	Started at	: 2024-11-12 03:14:43 EST
+	Ended at	: 2024-11-12 04:20:55 EST
+	Elapsed		: 1h 6m 12s (66 mins).
+
+[Job 2/2] Process 1891006. Model: imdb_transformer-abs_mdtype64. Dataset: imdb.
+	Started at	: 2024-11-12 04:20:55 EST

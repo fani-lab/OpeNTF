@@ -18,8 +18,8 @@ set -e  # Exit on any error
 # CONFIGURATIONS
 # ------------------------------------------------------------------------------
 
-# 12,13,14,21,23,24,31 etc until 44, increments of 1
-models=("transformer-abs_heads08" "transformer-abs_heads16" "transformer-abs_heads32")
+# go upto 10, increments of 1
+models=("transformer-abs_beamsize01" "transformer-abs_beamsize02" "transformer-abs_beamsize03" "transformer-abs_beamsize04" "transformer-abs_beamsize06" "transformer-abs_beamsize07" "transformer-abs_beamsize08" "transformer-abs_beamsize09" "transformer-abs_beamsize10")
 datasets=("imdb")
 gpus="6,7"
 
@@ -114,6 +114,6 @@ echo ""
 echo "All ${jobs} jobs completed."
 
 # run another .sh file
-# echo ""
-# echo "Running the next .sh file..."
-# ./abs_imdb_wvsize.sh
+echo ""
+echo "Running the next .sh file: 1.4_abs_imdb_lenpenalty.sh"
+./1.4_abs_imdb_lenpenalty.sh
