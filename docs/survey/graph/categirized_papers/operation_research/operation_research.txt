@@ -1,9 +1,0 @@
-45--2010 Forming reasonably optimal groups (FROG).pdf
-52--2019 Application of Genetic Algorithms to the Multiple team formation problem.pdf
-53--2016 Top-k Team Recommendation in Spatial.pdf
-57--2014 Neuro Role and member selection in team formation using resource estimation for large-scale multi-agent systems.pdf
-61--2012 Online Team Formation in Social Networks.pdf
-66--2011 WWW Demo T-recs team recommendation system through expertise and cohesiveness.pdf
-68--2010 RecSys Breaking out of the box of recommendations from items to packages.pdf
-74--2019 Optimized group formation for solving collaborative.pdf
-81--2010 Composing Near-Optimal Expert Teams  A Trade-Off between Skills and Connectivity.pdf

@@ -1,4 +1,0 @@
-15--2011 Discovering Top-k Teams of Experts.pdf
-39--2009 OR ESA A team formation model based on knowledge and collaboration.pdf
-55--2016 Forming Grouped Teams with Efficient.pdf
-

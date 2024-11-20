@@ -1,8 +1,0 @@
-13--2012 Workshop Teamfinder A co-clustering based framework for finding an effective team of experts in social networks.pdf
-14--2009 Finding a Team of Experts in Social Networks.pdf
-15--2011 Discovering Top-k Teams of Experts.pdf
-47--P-2017 SNA EDBT Authority-based Team Discovery in Social Networks(related to 6).pdf
-49--Efficient Bi-objective Team Formation 2012 (related to 6).pdf
-64--2012 Capacitated Team Formation Problem on Social Networks.pdf
-7--2020 SNA J Using machine learning to predict links and improve Steiner tree solutions to team formation problems-a cross company study.pdf
-
