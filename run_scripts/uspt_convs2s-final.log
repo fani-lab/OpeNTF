@@ -1,0 +1,10 @@
+Template	: v1.3
+Script		: uspt_convs2s-final.sh
+Jobs		: 1
+
+[Job 1/1] Process 473307. Model: uspt_convs2s-final. Dataset: uspt.
+	Started at	: 2024-10-25 16:02:54 EST
+	Ended at	: 2024-10-27 09:36:51 EST
+	Elapsed		: 41h 33m 57s (2493 mins).
+
+All 1 jobs completed.

@@ -1,0 +1,25 @@
+Template	: v1.3
+Script		: all_transformer_b8e1.sh
+Jobs		: 4
+
+[Job 1/4] Process 2012444. Model: imdb_transformer-b8e1. Dataset: imdb.
+	Started at	: 2024-10-28 03:47:27 EST
+	Ended at	: 2024-10-28 05:11:33 EST
+	Elapsed		: 1h 24m 6s (84 mins).
+
+[Job 2/4] Process 2028384. Model: gith_transformer-b8e1. Dataset: gith.
+	Started at	: 2024-10-28 05:11:33 EST
+	Ended at	: 2024-10-28 06:34:08 EST
+	Elapsed		: 1h 22m 35s (82 mins).
+
+[Job 3/4] Process 2043118. Model: dblp_transformer-b8e1. Dataset: dblp.
+	Started at	: 2024-10-28 06:34:08 EST
+	Ended at	: 2024-10-29 01:01:22 EST
+	Elapsed		: 18h 27m 14s (1107 mins).
+
+[Job 4/4] Process 2059058. Model: uspt_transformer-b8e1. Dataset: uspt.
+	Started at	: 2024-10-29 01:01:22 EST
+	Ended at	: 2024-10-30 02:29:54 EST
+	Elapsed		: 25h 28m 32s (1528 mins).
+
+All 4 jobs completed.

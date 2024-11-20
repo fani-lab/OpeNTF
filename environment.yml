@@ -1,0 +1,25 @@
+name: kapnmt
+channels:
+  - conda-forge
+  - pytorch
+  - nvidia
+dependencies:
+  - python=3.9.19
+  - numpy
+  - pandas<2.1
+  - scikit-learn
+  - scipy
+  - matplotlib
+  - pytorch=1.10.2
+  - torchvision=0.11.3
+  - torchaudio=0.10.2
+  - gensim<4
+  - pytorch-cuda=11.7
+  - pip
+  - pip:
+      - torch-scatter
+      - torch-sparse
+      - torch-cluster
+      - torch-spline-conv
+      - torch-geometric
+      - pytrec_eval

@@ -1,0 +1,5 @@
+15--2011 Discovering Top-k Teams of Experts.pdf
+20--2018Graph Pattern Matching for Dynamic Team Formation.pdf
+22--2015 Replacing the Irreplaceable Fast Algorithms for Team Member.pdf
+53--2016 Top-k Team Recommendation in Spatial.pdf
+

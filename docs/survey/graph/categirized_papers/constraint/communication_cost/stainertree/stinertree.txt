@@ -1,0 +1,6 @@
+14--2009 Finding a Team of Experts in Social Networks.pdf
+38--2010 Team Formation for Generalized Tasks.pdf
+61--2012 Online Team Formation in Social Networks.pdf
+64--2012 Capacitated Team Formation Problem on Social Networks.pdf
+7--2020 SNA J Using machine learning to predict links and improve Steiner tree solutions to team formation problems-a cross company study.pdf
+

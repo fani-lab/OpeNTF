@@ -1,0 +1,6 @@
+23--2018 A Multi-objective Formulation of the Team Formation Problem.pdf
+38--2010 Team Formation for Generalized Tasks.pdf
+54--2017 TeamGen An Interactive Team Formation System Based.pdf
+63--2012 Multi-skill Collaborative Teams based on Densest Subgraphs.pdf
+77--2013 Towards Realistic Team Formation in Social Networks.pdf
+
