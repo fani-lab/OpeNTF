@@ -18,7 +18,7 @@ baseline/caser_pytorch/datasets
 *.pt
 *.src
 *.tgt
-*.pkl
+# *.pkl
 *.png
 # *.log
 *.pred
