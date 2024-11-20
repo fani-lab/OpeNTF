@@ -1,6 +1,14 @@
+# (UPDATE IN PROGRESS)
 # `OpeNTF`: Team Recommendation via Translation Approach
 
 This readme is specifically for the neural machine translation models, specically, the models supported by the OpenNMT-py framework. In this readme, you'd be able to setup and run the dataset using either the existing NMT models or a model of your own.
+
+## 0. Overview Workflow
+This repository utilizes the following workflow:
+
+1. Create a new model from an existing NMT model template from `src/mdl/nmt_models/_template_x.yml` folder. `x` is the model type (e.g., transformer, convs2s, rnn)
+2. After creating a model off of the template (ie. `my_transformer_model.yml`), edit the model config file to adjust the hyperparameters and other settings you wish to modify such as data paths.
+3. To be continued...
 
 ## 1. Setup
 
@@ -8,7 +16,7 @@ For the most convenience, this setup is heavily reliant on usage of Docker. Ther
 
 **Step 1.** Download and install Docker from here: [Get Docker | Docker Docs](https://docs.docker.com/get-started/get-docker/)
 
-**Step 2.** Pull a ready-made image I've prepared from the Docker Hub. It's about 26 GB.
+**Step 2.** Pull a ready-made image we've prepared from the Docker Hub. It's about 26 GB.
 
 In a terminal, run the following command:
 
