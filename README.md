@@ -10,7 +10,7 @@ This repository utilizes the following workflow:
    1. `_transformer_template.yml`
    2. `_rnn_template.yml`
    3. `_cnn_template.yml`
-3. Edit the model config file to adjust the hyperparameters and other settings you wish to modify such as data paths. Give your model a unique and meaningful name (ie. `my_transformer_model_1.yml`).
+3. Edit your newly duplicated model config file to adjust the hyperparameters and other settings you wish to modify, such as data paths. Give your model file a unique and meaningful name (ie. `my_transformer_model_1.yml`).
 4. **[UP TO HERE]** To be continued...
 
 ## 1. Setup
