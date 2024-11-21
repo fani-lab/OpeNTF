@@ -6,9 +6,12 @@ This readme is specifically for the neural machine translation models, specicall
 ## 0. Workflow Overview
 This repository utilizes the following workflow:
 
-1. Create a new model from an existing NMT model template from `src/mdl/nmt_models/_template_x.yml` folder. `x` is the model type (e.g., transformer, convs2s, rnn)
-2. After creating a model off of the template (ie. `my_transformer_model.yml`), edit the model config file to adjust the hyperparameters and other settings you wish to modify such as data paths.
-3. To be continued...
+1. Create a new model by duplicating one of the three templates available in `src/mdl/nmt_models/` folder:
+   1. `_transformer_template.yml`
+   2. `_rnn_template.yml`
+   3. `_cnn_template.yml`
+3. Edit the model config file to adjust the hyperparameters and other settings you wish to modify such as data paths. Give your model a unique and meaningful name (ie. `my_transformer_model_1.yml`).
+4. **[UP TO HERE]** To be continued...
 
 ## 1. Setup
 
