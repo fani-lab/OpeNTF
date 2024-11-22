@@ -103,7 +103,9 @@ nmt_host@759fe234ae0f:/OpeNTF/run_scripts# ./mycnn_model.sh
 - If the bash script doesn't run, check its permissions and ensure it's executable.
 example:
 
-> nmt_host@759fe234ae0f:/OpeNTF/run_scripts# chmod +x mycnn_model.sh
+```
+nmt_host@759fe234ae0f:/OpeNTF/run_scripts# chmod +x mycnn_model.sh
+```
 
 
 **Misc:** 
