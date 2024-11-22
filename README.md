@@ -105,3 +105,7 @@ nmt_host@759fe234ae0f:/OpeNTF/run_scripts# chmod +x mycnn_model.sh
 **Misc:** 
 - process logs are stored in `/OpeNTF/run_logs` folder
 - results are stored in `/OpeNTF/output` folder
+
+## 5. Automating multiple models
+
+**Step 1.** As you may have noticed, use of multiple models, yes you can create multiple model files and mention them in the bash script as instructed in.
