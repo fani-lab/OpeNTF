@@ -1,7 +1,6 @@
-# (UPDATE IN PROGRESS)
 # `OpeNTF`: Team Recommendation via Translation Approach
 
-This readme is specifically for the neural machine translation models, specically, the models supported by the OpenNMT-py framework. In this readme, you'd be able to setup and run the dataset using either the existing NMT models or a model of your own.
+This readme is specifically for the neural machine translation models, specifically, the models supported by the OpenNMT-py framework. In this readme, you'd be able to setup and run the dataset using either the existing NMT models or a model of your own.
 
 ## 0. Workflow Overview
 This repository utilizes the following workflow:
@@ -10,7 +9,7 @@ This repository utilizes the following workflow:
    1. `_transformer_template.yml`
    2. `_rnn_template.yml`
    3. `_cnn_template.yml`
-3. Edit your newly duplicated model config file to adjust the hyperparameters and other settings you wish to modify, such as data paths. Give your model file a unique and meaningful name (ie. `my_transformer_model_1.yml`).
+3. Edit your newly duplicated model config file to adjust the hyperparameters and settings you wish to modify, such as data paths. Give your model file a unique and meaningful name (i.e. `my_transformer_model_1.yml`).
 4. Download a ready-made docker image.
 5. Create a new docker container from the image.
 6. Start and connect to the docker container.
@@ -21,7 +20,7 @@ This repository utilizes the following workflow:
 
 ## 1. Setup docker
 
-For the most convenience, this setup is heavily reliant on usage of Docker. Therefore,
+For the most convenience, this setup is heavily reliant on the usage of Docker. Therefore,
 
 **Step 1.** Download and install Docker from here: [Get Docker | Docker Docs](https://docs.docker.com/get-started/get-docker/)
 
@@ -55,7 +54,7 @@ Feel free to run the following two commands to see if the container has access t
 Check 1: `root@759fe234ae0f:/OpeNTF# nvidia-smi`
 Check 2: `root@759fe234ae0f:/OpeNTF# nvcc --version`
 
-If both return proper results and not errors, you're good to run the models.
+If both return proper results and no errors, you're good to run the models.
 
 ## 2. Create a new NMT model from a template
 
@@ -65,7 +64,7 @@ If both return proper results and not errors, you're good to run the models.
 - `_template_cnn.yml`
 > example: `nmt_mycnn_model.yaml`
 
-**Step 2.** Modify the hyperparameters and other settings you wish to modify such as data paths. Such as the training steps, batch size, etc.
+**Step 2.** Modify the hyperparameters and other settings you wish to modify, such as data paths, such as training steps, batch size, etc.
 
 
 
@@ -88,11 +87,11 @@ models=("mode1" "model2")
 datasets=("imdb dblp")
 gpus="6,7"
 ```
-In this example, this script will run two models (`mode1` and `model2`) on two datasets (`imdb` and `dblp`) using GPUs `6` and `7`. So `model1` will be run on `imdb` and `dblp` datasets and `model2` will also run on both same datasets.
+In this example, this script will run two models (`mode1` and `model2`) on two datasets (`imdb` and `dblp`) using GPUs `6` and `7`. So `model1` will be run on `imdb` and `dblp` datasets and `model2` will also run on both same datasets. Note: If you don't have a dedicated GPU, your CPU will be used, and if you have only one, then it'll default to be used instead of the 6th and 7th, as in the example.
 
 ## 3. Run the bash script
 
-**Step 1.** Navigate to scripts folder (`/run_scripts`) while inside the docker and run the bash script:
+**Step 1.** Navigate to the scripts folder (`/run_scripts`) while inside the docker and run the bash script:
 
 example:
 ```
@@ -100,8 +99,8 @@ nmt_host@759fe234ae0f:/OpeNTF# cd /run_scripts
 nmt_host@759fe234ae0f:/OpeNTF/run_scripts# ./mycnn_model.sh
 ```
 
-**Possilble issues and fixes:**
-- If the bash script doesn't run, check its permissions and make sure it's executable.
+**Possible issues and fixes:**
+- If the bash script doesn't run, check its permissions and ensure it's executable.
 example:
 
 > nmt_host@759fe234ae0f:/OpeNTF/run_scripts# chmod +x mycnn_model.sh
