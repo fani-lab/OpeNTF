@@ -5,14 +5,8 @@ This readme is specifically for the neural machine translation models, specifica
 ## 0. Workflow Overview
 This repository utilizes the following workflow:
 
-1. Create a new model by duplicating one of the three templates available in `src/mdl/nmt_models/` folder:
-   1. `_transformer_template.yml`
-   2. `_rnn_template.yml`
-   3. `_cnn_template.yml`
-3. Edit your newly duplicated model config file to adjust the hyperparameters and settings you wish to modify, such as data paths. Give your model file a unique and meaningful name (i.e. `my_transformer_model_1.yml`).
-4. Download a ready-made docker image.
-5. Create a new docker container from the image.
-6. Start and connect to the docker container.
+1. Set up and run docker.
+5. Create and run new docker container from our image.
 7. Create a new NMT model config file from a template.
 8. Create a new bash script to automate the test from a template.
 9. Run your bash script.
