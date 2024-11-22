@@ -83,7 +83,7 @@ gpus="6,7"
 ```
 In this example, this script will run two models (`mode1` and `model2`) on two datasets (`imdb` and `dblp`) using GPUs `6` and `7`. So `model1` will be run on `imdb` and `dblp` datasets and `model2` will also run on both same datasets. Note: If you don't have a dedicated GPU, your CPU will be used, and if you have only one, then it'll default to be used instead of the 6th and 7th, as in the example.
 
-## 3. Run the bash script
+## 4. Run the bash script
 
 **Step 1.** Navigate to the scripts folder (`/run_scripts`) while inside the docker and run the bash script:
 
