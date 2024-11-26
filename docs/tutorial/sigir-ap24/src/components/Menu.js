@@ -5,19 +5,19 @@ function Menu() {
         <div className="center-block title-box">
           <div className="text-center">
             <span className="fw-bold small title-text text-uppercase">
-              <a className="plain-link" href="https://www.um.org/umap2024/">
+              <a className="plain-link" href="https://www.sigir-ap.org/sigir-ap-2024/">
                 SIGIR-AP 2024
               </a>
             </span>
           </div>
           <div className="text-center">
             <span className="fs-1 title-text text-uppercase">
-              Collaborative Team Recommendation For Skilled Users
+              Paradigm Shifts in Team Recommendation:
             </span>
           </div>
           <div className="text-center">
-            <span className="fw-bold small title-text text-uppercase">
-              Objectives, Techniques, and New Perspectives
+            <span className="fw-bold title-text text-uppercase">
+              From Historical Subgraph Optimization to Emerging Graph Neural Network
             </span>
           </div>
         </div>

@@ -15,8 +15,8 @@ body {
 }
 
 .top-menu {
-  height: 20rem;
-  background-image: url("./img/banner-background_sigir-ap24-reduced.jpg");
+  height: 40rem;
+  background-image: url("./img/mount_fuji_1.jpg");
   background-position: center top;
   background-size: cover;
 }

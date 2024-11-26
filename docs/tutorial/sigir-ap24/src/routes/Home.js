@@ -79,14 +79,9 @@ function Home() {
         </span>
         <div className="section-body" style={{ textAlign: "center" }}>
           <b>
-            11:00am-12:30pm (CEST) <br /> Thursday, July 4, 2024, Room 12
+            9:00 AM - 12:15 PM (GMT +9) <br /> Monday, December 9, 2024, Room 3
           </b>{" "}
           <br />
-          <b>
-            <a href="https://meet.google.com/ikh-fnin-dns">
-              https://meet.google.com/ikh-fnin-dns
-            </a>
-          </b>
         </div>
       </section>
       <section id="section-abstract">
