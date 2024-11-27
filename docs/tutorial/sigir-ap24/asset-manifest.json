@@ -1,12 +1,12 @@
 {
   "files": {
-    "main.css": "/OpeNTF/tutorial/sigir-ap24/static/css/main.88e6149f.css",
-    "main.js": "/OpeNTF/tutorial/sigir-ap24/static/js/main.bef97131.js",
+    "main.css": "/OpeNTF/tutorial/sigir-ap24/static/css/main.bf80a343.css",
+    "main.js": "/OpeNTF/tutorial/sigir-ap24/static/js/main.b1a868ad.js",
     "static/js/787.85b43d0b.chunk.js": "/OpeNTF/tutorial/sigir-ap24/static/js/787.85b43d0b.chunk.js",
+    "static/media/mount_fuji_1.jpg": "/OpeNTF/tutorial/sigir-ap24/static/media/mount_fuji_1.47dda23496144309f241.jpg",
     "static/media/taxonomy.jpg": "/OpeNTF/tutorial/sigir-ap24/static/media/taxonomy.112cb6d1e28b8085b5cf.jpg",
     "static/media/flow.jpg": "/OpeNTF/tutorial/sigir-ap24/static/media/flow.21a1e81cc70c7b8d9519.jpg",
     "static/media/cardinal.jpg": "/OpeNTF/tutorial/sigir-ap24/static/media/cardinal.66374144ce33d753b188.jpg",
-    "static/media/banner-background_sigir-ap24-reduced.jpg": "/OpeNTF/tutorial/sigir-ap24/static/media/banner-background_sigir-ap24-reduced.558a3c44943452274a0f.jpg",
     "static/media/flow-t.jpg": "/OpeNTF/tutorial/sigir-ap24/static/media/flow-t.d74b6d7d81298fc229c8.jpg",
     "static/media/bootstrap-icons.woff?": "/OpeNTF/tutorial/sigir-ap24/static/media/bootstrap-icons.c1d7432ee75fa194e499.woff",
     "static/media/sloth.jpg": "/OpeNTF/tutorial/sigir-ap24/static/media/sloth.0ede921fd4a80af5cc4b.jpg",
@@ -17,12 +17,12 @@
     "static/media/hossein.jpg": "/OpeNTF/tutorial/sigir-ap24/static/media/hossein.350d7ec41a3ffd457f06.jpg",
     "static/media/flamingo.jpg": "/OpeNTF/tutorial/sigir-ap24/static/media/flamingo.2f6ab400c29b7751b012.jpg",
     "index.html": "/OpeNTF/tutorial/sigir-ap24/index.html",
-    "main.88e6149f.css.map": "/OpeNTF/tutorial/sigir-ap24/static/css/main.88e6149f.css.map",
-    "main.bef97131.js.map": "/OpeNTF/tutorial/sigir-ap24/static/js/main.bef97131.js.map",
+    "main.bf80a343.css.map": "/OpeNTF/tutorial/sigir-ap24/static/css/main.bf80a343.css.map",
+    "main.b1a868ad.js.map": "/OpeNTF/tutorial/sigir-ap24/static/js/main.b1a868ad.js.map",
     "787.85b43d0b.chunk.js.map": "/OpeNTF/tutorial/sigir-ap24/static/js/787.85b43d0b.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.88e6149f.css",
-    "static/js/main.bef97131.js"
+    "static/css/main.bf80a343.css",
+    "static/js/main.b1a868ad.js"
   ]
 }
