@@ -387,14 +387,6 @@ function Home() {
               <span className="fw-bold text-uppercase h6">Reading List</span>
               <ul>
                 <li>
-                  <a href="https://hosseinfani.github.io/res/papers/2024_WISE_Skill_Vector_Representation_Learning_for_Collaborative_Team_Recommendation__A_Comparative_Study.pdf">
-                    Skill Vector Representation Learning for
-                    Collaborative Team Recommendation: A
-                    Comparative Study
-                  </a>{" "}
-                  (Jamil et al., 2024)
-                </li>
-                <li>
                   <a href="https://link.springer.com/chapter/10.1007/978-3-031-56027-9_20">
                     A Streaming Approach to Neural Team Formation Training
                   </a>{" "}
