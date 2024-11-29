@@ -266,6 +266,9 @@ def addargs(parser):
 
 # python -u main.py -data ../data/raw/imdb/toy.title.basics.tsv -domain imdb -model random --emb_model gs --emb_graph_type stm --emb_agg mean
 
+# sample run for fnn on gat model embeddings on specific settings (updated command on Nov 28, 2024)
+# python -u main.py -data ../data/raw/dblp/toy.dblp.v12.json -domain dblp -model fnn --emb_model gat --emb_graph_type stml --emb_agg mean --emb_e 5 --emb_d 8 --emb_ns 2
+
 # To run on compute canada servers you can use the following command: (time is in minutes)
 #sbatch --account=def-hfani --mem=96000MB --time=2880 cc.sh
 
