@@ -11,7 +11,7 @@ section.active {
 }
 
 section.active .section-title {
-  color: #1d824c;
+  color: #790396;
   font-weight: 600;
   text-transform: uppercase;
   font-size: larger;
@@ -24,7 +24,7 @@ section:not(:first-child) {
 section.active .section-body {
   /*transition: 0.5s all ease;*/
   border-left: 2px double;
-  border-color: #1d824c;
+  border-color: #790396;
   padding-left: 1.5em;
 }
 
@@ -38,7 +38,7 @@ section.active .section-list {
 
 section.active .section-list li::before {
   content: "●";
-  color: #1d824c;
+  color: #790396;
   padding-right: 0.7rem;
 }
 
@@ -72,12 +72,12 @@ section .presenter {
 }
 
 section .presenter:not(:last-child) {
-  border-right: 1px solid #1d824c;
+  border-right: 1px solid #790396;
 }
 
 .email-link,
 .external-link {
-  color: #1d824c;
+  color: #790396;
   text-decoration: none;
   /* font-size: small; */
 }
@@ -86,7 +86,7 @@ section .presenter:not(:last-child) {
 .external-link:hover,
 .email-link:active,
 .external-link:active {
-  color: #1d824c;
+  color: #790396;
   text-decoration: underline;
 }
 
@@ -95,7 +95,7 @@ section .outline-topic {
 }
 
 section .outline-topic:not(:last-child) {
-  border-bottom: #1d824c 1px solid;
+  border-bottom: #790396 1px solid;
 }
 
 section .topic-item {
@@ -108,12 +108,12 @@ img {
 }
 
 a {
-  color: #1d824c;
+  color: #790396;
   text-decoration: none;
 }
 
 a:hover {
-  color: #1d824c;
+  color: #790396;
   text-decoration: underline;
 }
 
@@ -132,7 +132,7 @@ a:hover {
 
 .footnote:hover {
   font-size: larger;
-  color: #1d824c;
+  color: #790396;
   padding: none;
 }
 
