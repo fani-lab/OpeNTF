@@ -496,28 +496,28 @@ function Home() {
             </span>
             <div className="topic-item">
               <span className="fw-bold">
-                <a href="https://github.com/fani-lab/Adila">
-                  <i>Adila</i>
-                </a>
-                : Fair and Diverse Team Recommendation
+                Fair and Diverse Team Recommendation
               </span>
               <span className="d-block w-100 justify-paragraph">
                 The primary focus of existing team recommendation methods is the
                 maximization of the success rate for the recommended teams,
                 largely ignoring diversity in the recommended users. In our
-                tutorial, we introduce notions of fairness and{" "}
-                <a href="https://github.com/fani-lab/Adila">
-                  <i>Adila</i>
+                tutorial, we introduce notions of fairness, that enables further added in-processing 
+                <a href="https://github.com/fani-lab/OpeNTF/tree/vivaFemme-bias24">
+                  <i> (Vivafemme) </i>
                 </a>
-                , that enables further post-processing reranking refinements to
+                and post-processing reranking 
+                <a href="https://github.com/fani-lab/Adila">
+                  <i> (Adila) </i>
+                </a> refinements to
                 reassure the desired fair outcome and explore the synergistic
                 trade-offs between notions of fairness and success rate for the
                 proposed solutions.
               </span>
               <img
-                src={require("../img/flow.jpg")}
-                alt="Adila's pipeline architecture."
-                height="300"
+                src={require("../img/vivafemme.jpg")}
+                alt="Vivafemme's pipeline architecture."
+                height="500"
               />
               <p>
                 {" "}
@@ -594,6 +594,20 @@ function Home() {
                   (Cummings et al., 2008)
                 </li>
               </ul>
+            </div>
+          </div>
+          <div className="outline-topic">
+            <span className="section-date">Duration : TBA</span>
+            <span className="fw-bold text-uppercase h5">
+              Applications
+            </span>
+            <div className="topic-item">
+              <span className="fw-bold">
+                Section : TBA
+              </span>
+              <span className="d-block w-100 justify-paragraph">
+                The details of this setion will be available soon.
+              </span>
             </div>
           </div>
         </div>

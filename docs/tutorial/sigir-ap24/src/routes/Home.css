@@ -159,3 +159,7 @@ a:hover {
   width: 150px;
   object-fit: fill;
 }
+
+#section-location {
+    color: #790396;
+}
