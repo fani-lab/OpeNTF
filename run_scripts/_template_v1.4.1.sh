@@ -1,6 +1,6 @@
 #!/bin/bash
 
-template_version=1.4
+template_version=1.4.1
 script_name=$(basename "$0" .sh)
 
 # Ensure the script runs in the background with nohup and redirects output to a log file
@@ -18,8 +18,8 @@ set -e  # Exit on any error
 # CONFIGURATIONS
 # ------------------------------------------------------------------------------
 
-models=("mode1" "model2")
-datasets=("imdb dblp")
+models=("mode1")
+datasets=("dblp")
 gpus="6,7"
 
 # ------------------------------------------------------------------------------
@@ -65,6 +65,13 @@ for model in "${models[@]}"; do
     current_dataset_path="${dataset_paths[$current_dataset]}"
     current_model="${current_dataset}_${model}"
 
+    # if current_dataset has "toy_" prefix, then take out the prefix and assign the dataset name to domain variable
+    if [[ $current_dataset == *"toy_"* ]]; then
+      domain=${current_dataset#"toy_"}
+    else
+      domain=$current_dataset
+    fi
+
     echo ""
     # Get the start time
     start_time=$(date +%s)
@@ -73,7 +80,7 @@ for model in "${models[@]}"; do
     # Run the command with nohup and capture its PID
     nohup python3 -u main.py \
       -data $current_dataset_path \
-      -domain $current_dataset \
+      -domain $domain \
       -model "nmt_${current_model}" \
       -gpus $gpus \
       > "../run_logs/${current_model}.log" 2> "../run_logs/${current_model}_errors.log" &
