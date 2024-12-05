@@ -307,7 +307,7 @@ function Home() {
             </div>
           </div>
           <div className="outline-topic">
-            <span className="section-date">35 minutes</span>
+            <span className="section-date">55 minutes</span>
             <span className="fw-bold text-uppercase h5">
               Learning-based Heuristics
             </span>
@@ -504,7 +504,7 @@ function Home() {
                 largely ignoring diversity in the recommended users. In our
                 tutorial, we introduce notions of fairness, that enables further added in-processing 
                 <a href="https://github.com/fani-lab/OpeNTF/tree/vivaFemme-bias24">
-                  <i> (Vivafemme) </i>
+                  <i> (<img src={require("../img/vf_logo.png")} width="80"/>) </i>
                 </a>
                 and post-processing reranking 
                 <a href="https://github.com/fani-lab/Adila">
@@ -597,16 +597,37 @@ function Home() {
             </div>
           </div>
           <div className="outline-topic">
-            <span className="section-date">Duration : TBA</span>
+            <span className="section-date">20 minutes</span>
             <span className="fw-bold text-uppercase h5">
               Applications
             </span>
             <div className="topic-item">
-              <span className="fw-bold">
-                Section : TBA
-              </span>
+              In this section, we highlight the practical significance of team recommendation by explaining its seemingly unrelated yet highly valuable applications in education,
+                 research, and healthcare, in addition to its common use cases.
               <span className="d-block w-100 justify-paragraph">
-                The details of this setion will be available soon.
+                <ul>
+                  <li>
+                    <b> Group Learning: </b>
+                    Team recommendation finds immediate application in group-based learning environments. 
+                    In online classes, where physical presence and interaction are absent, team recommendation connects students to share ideas and build relationships. 
+                    This not only enhances their social skills but also combats the isolation that can sometimes accompany remote learning. 
+                    Via working in teams, students are exposed to varying viewpoints, backgrounds, and problem-solving approaches.
+                  </li>
+                  <li>
+                    <b> Reviewer Assignment: </b> 
+                    Another immediate application of team recommendation is in peer-review assignments where a group of reviewers 
+                    are paired with manuscripts within the reviewers' expertise for high-quality reviews while managing conflicts of interests. 
+                    Like team recommendation, herein, research topics (skills) and reviewers (experts) are mapped into a 
+                    latent space and, given a manuscript about a subset of research topics, team recommendation aims to recommend 
+                    reviewers with top-k closest vectors to the vectors of the research.
+                  </li>
+                  <li>
+                    <b> Palliative Care: </b> 
+                    Another application of team recommendation is in healthcare, which assigns a team of caregivers to patients who 
+                    seek help for their daily activities due to disease or disorders. The challenge lies in optimally assigning care 
+                    providers in teams to address patients' needs while considering factors such as communication, distance, and contract costs.
+                  </li>
+                </ul>
               </span>
             </div>
           </div>
@@ -693,7 +714,7 @@ function Home() {
           <div class="p-2">
             <a
               target="_blank"
-              href="https://hosseinfani.github.io/res/papers/2024_UMAP_Collaborative_Team_Recommendation_for_Skilled_Users_Objectives_Techniques_and_New_Perspectives.pdf"
+              href="https://hosseinfani.github.io/res/papers/2024_SIGIRAP_Paradigm_Shifts_in_Team_Recommendation_From_Historical_Subgraph_Optimization_to_Emerging_Graph_Neural_Network.pdf"
             >
               Full Outline
             </a>
