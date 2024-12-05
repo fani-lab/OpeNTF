@@ -504,9 +504,14 @@ function Home() {
                 largely ignoring diversity in the recommended users. In our
                 tutorial, we introduce notions of fairness, that enables further added in-processing 
                 <a href="https://github.com/fani-lab/OpeNTF/tree/vivaFemme-bias24">
-                  <i> (<img src={require("../img/vf_logo.png")} width="80"/>) </i>
-                </a>
-                and post-processing reranking 
+                  <i> (<img
+                    src={require("../img/vf_logo.png")}
+                    alt="Vivafemme"
+                    width="90"
+                    />) {" "}
+                  </i> 
+                </a> 
+                 and post-processing reranking 
                 <a href="https://github.com/fani-lab/Adila">
                   <i> (Adila) </i>
                 </a> refinements to
@@ -522,8 +527,8 @@ function Home() {
               <p>
                 {" "}
                 Figure 4.{" "}
-                <a href="https://github.com/fani-lab/Adila">
-                  <i>Adila</i>
+                <a href="https://github.com/fani-lab/OpeNTF/tree/vivaFemme-bias24">
+                  <i>Vivafemme</i>
                 </a>
                 's pipeline architecture.
               </p>
