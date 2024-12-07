@@ -504,12 +504,11 @@ function Home() {
                 largely ignoring diversity in the recommended users. In our
                 tutorial, we introduce notions of fairness, that enables further added in-processing 
                 <a href="https://github.com/fani-lab/OpeNTF/tree/vivaFemme-bias24">
-                  <i> (<img
+                  {" "}(<img
                     src={require("../img/vf_logo.png")}
                     alt="Vivafemme"
-                    width="90"
+                    width="100"
                     />) {" "}
-                  </i> 
                 </a> 
                  and post-processing reranking 
                 <a href="https://github.com/fani-lab/Adila">
