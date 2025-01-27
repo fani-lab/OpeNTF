@@ -1,9 +1,0 @@
-Loading sparse matrices from ./../data/preprocessed/uspt/uspt.patent.tsv.filtered.mt75.ts3/teamsvecs.pkl ...
-Loading indexes pickle from ./../data/preprocessed/uspt/uspt.patent.tsv.filtered.mt75.ts3/indexes.pkl ...
-It took 0.19184637069702148 seconds to load from the pickles.
-It took 2.0656073093414307 seconds to load the sparse matrices.
-
-Only one GPU detected. Using it (if CUDA is available).
-
-Using device: cuda
-Running for (dataset, model): (uspt, nmt_transformer-uspt1) ... 

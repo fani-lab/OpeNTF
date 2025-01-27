@@ -1,7 +1,0 @@
-
-Processing model nmt_transformer , variant: model3).
-Running: nohup python3 -u main.py ...
-
-Started process 3414 for run 16. Model: nmt_transformer , variant: model3).
-
-./run16.sh: line 104:  3414 Killed                  nohup python3 -u main.py -data $dataset_path -domain $dataset -model $model -variant "${variants[$i]}" > "../run_logs/run${run_num}${is_toy_msg}_${dataset}_${model}${dash}${variants[$i]}.log" 2> "../run_logs/run${run_num}${is_toy_msg}_${dataset}_${model}${dash}${variants[$i]}_errors.log"

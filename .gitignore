@@ -2,26 +2,28 @@
 /.vscode
 /venv
 /.idea/
-/src/tmp.py
-/data/raw
-/runs
+
+
+data/raw
+output/toy.dblp.v12.json
+output/**/fold*
+
+src/tmp.py
+
+run_logs/*.log
+baseline/caser_pytorch/datasets
 
 *.pyc
 *.npz
 *.pt
 *.src
 *.tgt
-*.pkl
+# *.pkl
 *.png
+# *.log
 *.pred
 *.7z
 *.npy
 *.rar
 *.mdl
-*.pt
-.nfs*
-
-# large files list to ignore
-splits.json
-src-train.txt
-data/preprocessed/dblp/toy.dblp.v12.json/splits.json
+*.json

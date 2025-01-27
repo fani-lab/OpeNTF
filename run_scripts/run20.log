@@ -1,7 +1,0 @@
-nohup: ignoring input
-
-Processing model nmt_transformer , variant: uspt1).
-Running: nohup python3 -u main.py ...
-
-Started process 18015 for run 20. Model: nmt_transformer , variant: uspt1).
-
