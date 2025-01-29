@@ -1,0 +1,15 @@
+Template	: v1.3
+Script		: imdb_transformer-top1to2.sh
+Jobs		: 2
+
+[Job 1/2] Process 1917221. Model: imdb_transformer-top1. Dataset: imdb.
+	Started at	: 2024-10-24 11:22:29 EST
+	Ended at	: 2024-10-24 12:38:14 EST
+	Elapsed		: 1h 15m 45s (75 mins).
+
+[Job 2/2] Process 1964829. Model: imdb_transformer-top2. Dataset: imdb.
+	Started at	: 2024-10-24 12:38:14 EST
+	Ended at	: 2024-10-24 13:53:50 EST
+	Elapsed		: 1h 15m 36s (75 mins).
+
+All 2 jobs completed.

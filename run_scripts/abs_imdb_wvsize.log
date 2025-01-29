@@ -1,0 +1,25 @@
+Template	: v1.4
+Script		: abs_imdb_wvsize.sh
+Jobs		: 4
+
+[Job 1/4] Process 3369983. Model: imdb_transformer-abs-wv256s. Dataset: imdb.
+	Started at	: 2024-11-04 14:08:23 EST
+	Ended at	: 2024-11-04 15:17:20 EST
+	Elapsed		: 1h 8m 57s (68 mins).
+
+[Job 2/4] Process 3417591. Model: imdb_transformer-abs-wv512s. Dataset: imdb.
+	Started at	: 2024-11-04 15:17:20 EST
+	Ended at	: 2024-11-04 16:28:10 EST
+	Elapsed		: 1h 10m 50s (70 mins).
+
+[Job 3/4] Process 3465199. Model: imdb_transformer-abs-wv256as. Dataset: imdb.
+	Started at	: 2024-11-04 16:28:10 EST
+	Ended at	: 2024-11-04 17:35:47 EST
+	Elapsed		: 1h 7m 37s (67 mins).
+
+[Job 4/4] Process 3512807. Model: imdb_transformer-abs-wv512as. Dataset: imdb.
+	Started at	: 2024-11-04 17:35:47 EST
+	Ended at	: 2024-11-04 18:41:38 EST
+	Elapsed		: 1h 5m 51s (65 mins).
+
+All 4 jobs completed.

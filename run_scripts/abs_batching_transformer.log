@@ -1,0 +1,30 @@
+Template	: v1.3
+Script		: abs_batching_transformer.sh
+Jobs		: 5
+
+[Job 1/5] Process 2075622. Model: imdb_transformer-abs-batching-8. Dataset: imdb.
+	Started at	: 2024-10-31 04:07:41 EST
+	Ended at	: 2024-10-31 05:17:59 EST
+	Elapsed		: 1h 10m 18s (70 mins).
+
+[Job 2/5] Process 2123230. Model: imdb_transformer-abs-batching-16. Dataset: imdb.
+	Started at	: 2024-10-31 05:17:59 EST
+	Ended at	: 2024-10-31 06:34:03 EST
+	Elapsed		: 1h 16m 4s (76 mins).
+
+[Job 3/5] Process 2170838. Model: imdb_transformer-abs-batching-32. Dataset: imdb.
+	Started at	: 2024-10-31 06:34:03 EST
+	Ended at	: 2024-10-31 07:44:47 EST
+	Elapsed		: 1h 10m 44s (70 mins).
+
+[Job 4/5] Process 2218446. Model: imdb_transformer-abs-batching-64. Dataset: imdb.
+	Started at	: 2024-10-31 07:44:47 EST
+	Ended at	: 2024-10-31 08:43:37 EST
+	Elapsed		: 0h 58m 50s (58 mins).
+
+[Job 5/5] Process 2266054. Model: imdb_transformer-abs-batching-128. Dataset: imdb.
+	Started at	: 2024-10-31 08:43:37 EST
+	Ended at	: 2024-10-31 09:40:59 EST
+	Elapsed		: 0h 57m 22s (57 mins).
+
+All 5 jobs completed.

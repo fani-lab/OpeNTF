@@ -1,0 +1,52 @@
+## RNN with Attention Configuration for imdb
+
+save_data: ../output/nmt/run/rnn
+save_model: ../output/nmt/run/rnn_model
+src_vocab: ../output/nmt/run/rnn.vocab.src
+tgt_vocab: ../output/nmt/run/rnn.vocab.tgt
+overwrite: True
+data:
+  corpus_1:
+    path_src: ../output/nmt/src-train.txt
+    path_tgt: ../output/nmt/tgt-train.txt
+    weight: 1
+  valid:
+    path_src: ../output/nmt/src-val.txt
+    path_tgt: ../output/nmt/tgt-val.txt
+
+# -------------------------------------------
+# Configuration for training
+# -------------------------------------------
+
+# Common hyperparameters
+# General opts
+keep_checkpoint: -1
+seed: 0
+train_steps: 4007 # sample size of 32059
+save_checkpoint_steps: 401
+valid_steps: 401
+report_every: 401
+
+# Batching
+world_size: 2
+gpu_ranks: [0, 1]
+batch_size: 8
+valid_batch_size: 256
+
+# Optimization
+model_dtype: "fp16"
+optim: adam
+learning_rate: 0.0013
+learning_rate_decay: 0.90
+start_decay_steps: 50
+
+# --------------------------------------------
+
+# Architecture specific hyperparameters
+encoder_type: rnn
+decoder_type: rnn
+rnn_type: LSTM
+layers: 1
+word_vec_size: 128
+rnn_size: 512
+dropout: 0.4

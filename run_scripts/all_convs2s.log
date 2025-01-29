@@ -1,0 +1,27 @@
+nohup: ignoring input
+Script: all_convs2s.
+
+Started process 1553239 for model: imdb_convs2s on dataset: imdb.
+
+Process completed for model: imdb_convs2s on dataset: imdb.
+Elapsed time: 1h 14m 27s (74 mins).
+
+Script: all_convs2s.
+
+Started process 1579679 for model: gith_convs2s on dataset: gith.
+
+Process completed for model: gith_convs2s on dataset: gith.
+Elapsed time: 1h 45m 1s (105 mins).
+
+Script: all_convs2s.
+
+Started process 1606117 for model: dblp_convs2s on dataset: dblp.
+
+Process completed for model: dblp_convs2s on dataset: dblp.
+Elapsed time: 17h 18m 48s (1038 mins).
+
+Script: all_convs2s.
+
+Started process 1632558 for model: uspt_convs2s on dataset: uspt.
+
+./all_convs2s.sh: line 67: 1632558 Killed                  nohup python3 -u main.py -data $current_dataset_path -domain $current_dataset -model "nmt_${current_model}" -gpus $gpus > "../run_logs/${current_model}.log" 2> "../run_logs/${current_model}_errors.log"
