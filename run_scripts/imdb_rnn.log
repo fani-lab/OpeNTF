@@ -1,8 +1,0 @@
-nohup: ignoring input
-Script: imdb_rnn.
-
-Process 290135. Model: imdb_rnn-fp32. Dataset: imdb.
-	Started at: 2024-10-06 11:11:39
-	Ended at: 2024-10-06 07:59:30 EST
-Elapsed time: 1h 47m 51s ( mins).
-

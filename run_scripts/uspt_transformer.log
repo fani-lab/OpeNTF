@@ -1,9 +1,0 @@
-nohup: ignoring input
-Script: uspt_transformer.
-
-Process 180535. Model: uspt_transformer. Dataset: uspt.
-	Started at: 2024-10-06 10:49:29
-	Ended at: 2024-10-07 21:58:34 EST
-Elapsed time: 40h 9m 5s ( mins).
-
-./uspt_transformer.sh: line 91: syntax error near unexpected token `)'

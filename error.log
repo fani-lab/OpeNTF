@@ -1,4 +1,0 @@
-ERROR: Invalid requirement: 'torch-scatte\nr': Expected end or semicolon (after name and no valid version specifier)
-    torch-scatte
-r
-                ^

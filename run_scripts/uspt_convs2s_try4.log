@@ -1,5 +1,0 @@
-Script: uspt_convs2s_try4.sh
-
-Process 1778050. Model: uspt_convs2s-try3. Dataset: uspt.
-	Started at	: 2024-10-18 17:19:00 EST
-./uspt_convs2s_try4.sh: line 75: 1778050 Killed                  nohup python3 -u main.py -data $current_dataset_path -domain $current_dataset -model "nmt_${current_model}" -gpus $gpus > "../run_logs/${current_model}.log" 2> "../run_logs/${current_model}_errors.log"
