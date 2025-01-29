@@ -1,0 +1,7 @@
+Template	: v1.3
+Script		: uspt_convs2s-try5.sh
+Jobs		: 1
+
+[Job 1/1] Process 449360. Model: uspt_convs2s-try5. Dataset: uspt.
+	Started at	: 2024-10-25 00:30:37 EST
+./uspt_convs2s-try5.sh: line 87: 449360 Killed                  nohup python3 -u main.py -data $current_dataset_path -domain $current_dataset -model "nmt_${current_model}" -gpus $gpus > "../run_logs/${current_model}.log" 2> "../run_logs/${current_model}_errors.log"

@@ -1,0 +1,50 @@
+Template	: v1.4
+Script		: 1.4_abs_imdb_max_rel.sh
+Jobs		: 9
+
+[Job 1/9] Process 3607803. Model: imdb_transformer-abs_max_rel02. Dataset: imdb.
+	Started at	: 2024-11-04 20:06:07 EST
+	Ended at	: 2024-11-04 21:14:39 EST
+	Elapsed		: 1h 8m 32s (68 mins).
+
+[Job 2/9] Process 3655411. Model: imdb_transformer-abs_max_rel04. Dataset: imdb.
+	Started at	: 2024-11-04 21:14:39 EST
+	Ended at	: 2024-11-04 22:24:20 EST
+	Elapsed		: 1h 9m 41s (69 mins).
+
+[Job 3/9] Process 3703019. Model: imdb_transformer-abs_max_rel06. Dataset: imdb.
+	Started at	: 2024-11-04 22:24:20 EST
+	Ended at	: 2024-11-04 23:28:18 EST
+	Elapsed		: 1h 3m 58s (63 mins).
+
+[Job 4/9] Process 3750627. Model: imdb_transformer-abs_max_rel08. Dataset: imdb.
+	Started at	: 2024-11-04 23:28:18 EST
+	Ended at	: 2024-11-05 00:26:40 EST
+	Elapsed		: 0h 58m 22s (58 mins).
+
+[Job 5/9] Process 3798235. Model: imdb_transformer-abs_max_rel12. Dataset: imdb.
+	Started at	: 2024-11-05 00:26:40 EST
+	Ended at	: 2024-11-05 01:39:56 EST
+	Elapsed		: 1h 13m 16s (73 mins).
+
+[Job 6/9] Process 3845843. Model: imdb_transformer-abs_max_rel14. Dataset: imdb.
+	Started at	: 2024-11-05 01:39:56 EST
+	Ended at	: 2024-11-05 02:52:05 EST
+	Elapsed		: 1h 12m 9s (72 mins).
+
+[Job 7/9] Process 3893451. Model: imdb_transformer-abs_max_rel16. Dataset: imdb.
+	Started at	: 2024-11-05 02:52:05 EST
+	Ended at	: 2024-11-05 03:55:11 EST
+	Elapsed		: 1h 3m 6s (63 mins).
+
+[Job 8/9] Process 3941059. Model: imdb_transformer-abs_max_rel18. Dataset: imdb.
+	Started at	: 2024-11-05 03:55:11 EST
+	Ended at	: 2024-11-05 05:08:05 EST
+	Elapsed		: 1h 12m 54s (72 mins).
+
+[Job 9/9] Process 3988667. Model: imdb_transformer-abs_max_rel20. Dataset: imdb.
+	Started at	: 2024-11-05 05:08:05 EST
+	Ended at	: 2024-11-05 06:14:51 EST
+	Elapsed		: 1h 6m 46s (66 mins).
+
+All 9 jobs completed.

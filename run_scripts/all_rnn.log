@@ -1,0 +1,29 @@
+nohup: ignoring input
+Script: all_rnn.
+
+Started process 189162 for model: imdb_rnn on dataset: imdb.
+
+Process completed for model: imdb_rnn on dataset: imdb.
+Elapsed time: 1h 41m 49s (101 mins).
+
+Script: all_rnn.
+
+Started process 215366 for model: gith_rnn on dataset: gith.
+
+Process completed for model: gith_rnn on dataset: gith.
+Elapsed time: 6h 17m 29s (377 mins).
+
+Script: all_rnn.
+
+Started process 241570 for model: dblp_rnn on dataset: dblp.
+
+Process completed for model: dblp_rnn on dataset: dblp.
+Elapsed time: 20h 34m 47s (1234 mins).
+
+Script: all_rnn.
+
+Started process 267780 for model: uspt_rnn on dataset: uspt.
+
+Process completed for model: uspt_rnn on dataset: uspt.
+Elapsed time: 23h 2m 40s (1382 mins).
+

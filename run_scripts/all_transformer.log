@@ -1,0 +1,26 @@
+nohup: ignoring input
+Script: all_transformer.
+
+Started process 97332 for model: imdb_transformer on dataset: imdb.
+
+Process completed for model: imdb_transformer on dataset: imdb.
+Elapsed time: 1h 34m 20s (94 mins).
+
+Script: all_transformer.
+
+Started process 123770 for model: gith_transformer on dataset: gith.
+
+Process completed for model: gith_transformer on dataset: gith.
+Elapsed time: 2h 59m 15s (179 mins).
+
+Script: all_transformer.
+
+Started process 150208 for model: dblp_transformer on dataset: dblp.
+
+Process completed for model: dblp_transformer on dataset: dblp.
+Elapsed time: 19h 18m 18s (1158 mins).
+
+Script: all_transformer.
+
+Started process 176649 for model: uspt_transformer on dataset: uspt.
+

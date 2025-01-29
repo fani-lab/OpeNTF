@@ -1,0 +1,52 @@
+## ConvS2S with Attention Configuration for imdb
+
+save_data: ../output/nmt/run/convs2s
+save_model: ../output/nmt/run/convs2s_model
+src_vocab: ../output/nmt/run/convs2s.vocab.src
+tgt_vocab: ../output/nmt/run/convs2s.vocab.tgt
+overwrite: True
+data:
+  corpus_1:
+    path_src: ../output/nmt/src-train.txt
+    path_tgt: ../output/nmt/tgt-train.txt
+    weight: 1
+  valid:
+    path_src: ../output/nmt/src-val.txt
+    path_tgt: ../output/nmt/tgt-val.txt
+
+# -------------------------------------------
+# Configuration for training
+# -------------------------------------------
+
+# Common hyperparameters
+# General opts
+keep_checkpoint: -1
+seed: 0
+train_steps: 4007 # sample size of 32059
+save_checkpoint_steps: 401
+valid_steps: 401
+report_every: 401
+
+# Batching
+world_size: 2
+gpu_ranks: [0, 1]
+batch_size: 8
+valid_batch_size: 256
+
+# Optimization
+model_dtype: "fp16"
+optim: adam
+learning_rate: 0.0013
+learning_rate_decay: 0.90
+start_decay_steps: 50
+
+# --------------------------------------------
+
+# Architecture specific hyperparameters
+encoder_type: cnn
+decoder_type: cnn
+layers: 4
+cnn_kernel_width: 3
+word_vec_size: 512
+cnn_size: 128
+dropout: 0.4
