@@ -268,10 +268,6 @@ def run(
             settings["model"]["baseline"]["rrn"]["with_zero"],
             settings["model"]["step_ahead"],
         )
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/nmt_needsfix
     if "np_ratio" in fair:
         settings["fair"]["np_ratio"] = fair["np_ratio"]
     if "fairness" in fair:

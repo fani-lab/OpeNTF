@@ -1,0 +1,21 @@
+Template	: v1.4.1
+Script		: 1.4.1-all_transformer_b128e20.sh
+Jobs		: 4
+
+[Job 1/4] Process 22219. Model: imdb_transformer-b128e20. Dataset: imdb.
+	Started at	: 2025-01-29 17:54:52 EST
+	Ended at	: 2025-01-29 19:10:17 EST
+	Elapsed		: 1h 15m 25s (75 mins).
+
+[Job 2/4] Process 76329. Model: gith_transformer-b128e20. Dataset: gith.
+	Started at	: 2025-01-29 19:10:17 EST
+	Ended at	: 2025-01-29 21:30:44 EST
+	Elapsed		: 2h 20m 27s (140 mins).
+
+[Job 3/4] Process 175685. Model: dblp_transformer-b128e20. Dataset: dblp.
+	Started at	: 2025-01-29 21:30:44 EST
+	Ended at	: 2025-01-30 16:17:27 EST
+	Elapsed		: 18h 46m 43s (1126 mins).
+
+[Job 4/4] Process 464951. Model: uspt_transformer-b128e20. Dataset: uspt.
+	Started at	: 2025-01-30 16:17:27 EST

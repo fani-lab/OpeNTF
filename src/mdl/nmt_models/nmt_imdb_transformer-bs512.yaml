@@ -14,34 +14,29 @@ data:
     path_src: ../output/nmt/src-val.txt
     path_tgt: ../output/nmt/tgt-val.txt
 
-# -------------------------------------------
-# Configuration for training
-# -------------------------------------------
-
 # Common hyperparameters
-# General opts
 keep_checkpoint: -1
 seed: 0
-train_steps: 4007 # sample size of 32059
-save_checkpoint_steps: 400
-valid_steps: 400
-warmup_steps: 400
-report_every: 400
+train_steps: 5009
+save_checkpoint_steps: 501
+valid_steps: 501
+warmup_steps: 501
+report_every: 501
 
 # Batching
 world_size: 2
 gpu_ranks: [0, 1]
-batch_size: 8
-valid_batch_size: 32
+batch_size: 128
+bucket_size: 512
+valid_batch_size: 128
 
 # Optimization
 model_dtype: "fp16"
 optim: adam
+weight_decay: 0.0001
 learning_rate: 0.0013
-learning_rate_decay: 0.90
-start_decay_steps: 50
-
-# --------------------------------------------
+adam_beta1: 0.9
+adam_beta2: 0.98
 
 # Architecture specific hyperparameters
 encoder_type: transformer
@@ -55,4 +50,4 @@ attention_dropout: [0.2]
 
 enc_layers: 4
 dec_layers: 4
-heads: 4
+heads: 4 
