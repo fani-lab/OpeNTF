@@ -1,0 +1,6 @@
+Template	: v1.4.1
+Script		: 1.4.1-uspt_transformer_final.sh
+Jobs		: 1
+
+[Job 1/1] Process 785334. Model: uspt_transformer-final. Dataset: uspt.
+	Started at	: 2025-02-03 04:26:06 EST

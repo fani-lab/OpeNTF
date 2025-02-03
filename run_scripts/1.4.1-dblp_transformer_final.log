@@ -1,0 +1,6 @@
+Template	: v1.4.1
+Script		: 1.4.1-dblp_transformer_final.sh
+Jobs		: 1
+
+[Job 1/1] Process 820388. Model: dblp_transformer-final. Dataset: dblp.
+	Started at	: 2025-02-03 04:25:17 EST
