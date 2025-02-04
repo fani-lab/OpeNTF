@@ -1,9 +1,9 @@
-## Transformer with Attention Configuration for imdb
+## ConvS2S Configuration for imdb
 
-save_data: ../output/nmt/run/transformer
-save_model: ../output/nmt/run/transformer_model
-src_vocab: ../output/nmt/run/transformer.vocab.src
-tgt_vocab: ../output/nmt/run/transformer.vocab.tgt
+save_data: ../output/nmt/run/convs2s
+save_model: ../output/nmt/run/convs2s_model
+src_vocab: ../output/nmt/run/convs2s.vocab.src
+tgt_vocab: ../output/nmt/run/convs2s.vocab.tgt
 overwrite: True
 data:
   corpus_1:
@@ -20,7 +20,6 @@ seed: 0
 train_steps: 5009
 save_checkpoint_steps: 501
 valid_steps: 501
-warmup_steps: 501
 report_every: 501
 
 # Batching
@@ -40,16 +39,12 @@ adam_beta1: 0.9
 adam_beta2: 0.98
 
 # Architecture specific hyperparameters
-encoder_type: transformer
-decoder_type: transformer
-position_encoding: true
-hidden_size: 128
+encoder_type: cnn
+decoder_type: cnn
+cnn_size: 128 # same as hidden size
 word_vec_size: 128
-transformer_ff: 512
 
-dropout: [0.2]
-attention_dropout: [0.2]
-
-enc_layers: 4
-dec_layers: 4
-heads: 4 
+# ConvS2S specific parameters
+cnn_kernel_width: 3
+layers: 4  # Same number as transformer layers
+dropout: 0.2

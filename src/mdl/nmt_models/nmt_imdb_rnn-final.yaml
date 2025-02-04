@@ -1,9 +1,9 @@
-## Transformer with Attention Configuration for imdb
+## RNN Configuration for imdb
 
-save_data: ../output/nmt/run/transformer
-save_model: ../output/nmt/run/transformer_model
-src_vocab: ../output/nmt/run/transformer.vocab.src
-tgt_vocab: ../output/nmt/run/transformer.vocab.tgt
+save_data: ../output/nmt/run/rnn
+save_model: ../output/nmt/run/rnn_model
+src_vocab: ../output/nmt/run/rnn.vocab.src
+tgt_vocab: ../output/nmt/run/rnn.vocab.tgt
 overwrite: True
 data:
   corpus_1:
@@ -40,16 +40,14 @@ adam_beta1: 0.9
 adam_beta2: 0.98
 
 # Architecture specific hyperparameters
-encoder_type: transformer
-decoder_type: transformer
-position_encoding: true
-hidden_size: 128
+encoder_type: rnn
+decoder_type: rnn
+rnn_type: LSTM
+rnn_size: 128
 word_vec_size: 128
-transformer_ff: 512
+input_feed: 1
 
-dropout: [0.2]
-attention_dropout: [0.2]
+dropout: 0.2
 
 enc_layers: 4
-dec_layers: 4
-heads: 4 
+dec_layers: 4 
