@@ -43,7 +43,6 @@ encoder_type: rnn
 decoder_type: rnn
 rnn_type: LSTM
 rnn_size: 128
-hidden_size: 128
 word_vec_size: 128
 input_feed: 1
 
