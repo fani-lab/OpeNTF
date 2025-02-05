@@ -2,5 +2,5 @@ Template	: v1.4.1
 Script		: 1.4.1-gith_convs2s_final.sh
 Jobs		: 1
 
-[Job 1/1] Process 5196. Model: gith_convs2s-final. Dataset: gith.
-	Started at	: 2025-02-04 15:05:39 EST
+[Job 1/1] Process 49756. Model: gith_convs2s-final. Dataset: gith.
+	Started at	: 2025-02-05 04:57:28 EST
