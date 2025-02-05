@@ -30,7 +30,7 @@ report_every: 1553
 # Batching
 world_size: 2
 gpu_ranks: [0, 1]
-num_workers: 4
+num_workers: 8
 batch_size: 128
 bucket_size: 832
 valid_batch_size: 128

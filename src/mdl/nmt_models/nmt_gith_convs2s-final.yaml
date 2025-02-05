@@ -26,7 +26,7 @@ report_every: 717
 # Batching
 world_size: 2
 gpu_ranks: [0, 1]
-num_workers: 4
+num_workers: 8
 batch_size: 128
 bucket_size: 832
 valid_batch_size: 128
@@ -47,5 +47,5 @@ word_vec_size: 128
 
 # ConvS2S specific parameters
 cnn_kernel_width: 3
-layers: 6  # Same number as transformer layers
+layers: 4  # Same number as transformer layers
 dropout: 0.2
