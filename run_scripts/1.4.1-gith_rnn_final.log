@@ -1,0 +1,10 @@
+Template	: v1.4.1
+Script		: 1.4.1-gith_rnn_final.sh
+Jobs		: 1
+
+[Job 1/1] Process 2162. Model: gith_rnn-final. Dataset: gith.
+	Started at	: 2025-02-04 15:45:44 EST
+	Ended at	: 2025-02-05 00:34:20 EST
+	Elapsed		: 8h 48m 36s (528 mins).
+
+All 1 jobs completed.

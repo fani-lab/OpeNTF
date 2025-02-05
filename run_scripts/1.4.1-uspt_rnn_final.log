@@ -1,0 +1,6 @@
+Template	: v1.4.1
+Script		: 1.4.1-uspt_rnn_final.sh
+Jobs		: 1
+
+[Job 1/1] Process 2367. Model: uspt_rnn-final. Dataset: uspt.
+	Started at	: 2025-02-04 15:46:32 EST

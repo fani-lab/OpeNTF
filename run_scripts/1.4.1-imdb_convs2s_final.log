@@ -4,3 +4,7 @@ Jobs		: 1
 
 [Job 1/1] Process 347305. Model: imdb_convs2s-final. Dataset: imdb.
 	Started at	: 2025-02-04 14:44:03 EST
+	Ended at	: 2025-02-04 18:45:37 EST
+	Elapsed		: 4h 1m 34s (241 mins).
+
+All 1 jobs completed.
