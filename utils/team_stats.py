@@ -2,6 +2,12 @@ import pickle
 import os
 import numpy as np
 from pathlib import Path
+import argparse
+import warnings
+
+# Suppress the deprecation warning about sparse matrices
+warnings.filterwarnings('ignore', category=DeprecationWarning, 
+                       message='Please use.*sparse` namespace')
 
 def analyze_teams(teamsvecs):
     # Initialize counters
@@ -113,24 +119,32 @@ def analyze_teams(teamsvecs):
     }
 
 def main():
+    # Set up argument parser
+    parser = argparse.ArgumentParser(description='Analyze team statistics from teamsvecs data')
+    parser.add_argument('dataset', type=str, help='Dataset name (e.g., dblp)')
+    parser.add_argument('input_folder', type=str, help='Input folder name (e.g., dblp.v12.json.filtered.mt75.ts3)')
+    
+    args = parser.parse_args()
+    
     # Get the directory of the current script
     script_dir = Path(__file__).parent.absolute()
+    preprocessed_dir = script_dir.parent / 'data' / 'preprocessed'
     
-    # Load teamsvecs.pkl from the same directory
-    teams_file = script_dir / 'teamsvecs.pkl'
+    # Load teamsvecs.pkl from the input folder
+    teams_file = preprocessed_dir / args.dataset /  args.input_folder / 'teamsvecs.pkl'
     
     try:
         with open(teams_file, 'rb') as f:
             teamsvecs = pickle.load(f)
     except FileNotFoundError:
-        print(f"Error: Could not find teamsvecs.pkl in {script_dir}")
+        print(f"Error: Could not find {teams_file}")
         return
     
     # Analyze the data
     stats = analyze_teams(teamsvecs)
     
-    # Create output file
-    output_file = script_dir / 'teams_stat.csv'
+    # Create output file in the input folder
+    output_file = teams_file.parent / f'{args.dataset}_team_stats.csv'
     
     with open(output_file, 'w') as f:
         # Write summary stats
