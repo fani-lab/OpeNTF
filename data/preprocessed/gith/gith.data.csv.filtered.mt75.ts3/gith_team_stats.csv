@@ -1,6 +1,15 @@
-stats,#teams,#skills,#experts,#zero_skill_teams,#zero_expert_teams,#min_skills,#max_skills,#min_experts,#max_experts,#min_exp_team,#max_exp_team,#dup_teams
-summary,45888,20,1217,7709,0,0,17,3,30,1,9977,40238
-
+,dataset,#teams,#skills,#experts
+,GITH,45888,20,1217
+,,,,
+,#zero_skill_teams,#zero_expert_teams,#dup_teams,#unique_teams
+,7709 (16.8% of teams),0 (0.0% of teams),36820 (80.2% of teams),9068 (19.8% of teams)
+,,,,
+,#min_team_experts,#max_team_experts,#min_team_skill,#max_team_skill
+,3 (13896 teams~30.3%),30 (2770 teams~6.0%),0 (7709 teams~16.8%),17 (1 teams~0.0%)
+,,,
+,#min_exp_team,#max_exp_team,#mt_75,#ts_3
+,1 (18 experts~1.5%),9977 (1 experts~0.1%),837 (68.8%),45888 (100.0%)
+,,,
 dup_index,#skills,#experts,skills,experts
 0,1,3,[s0],[m0-m1-m2]
 0,2,4,[s0-s1],[m0-m3-m4-m5]
