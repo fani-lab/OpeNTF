@@ -19,13 +19,6 @@ class Nmt(Ntf):
     def __init__(self):
         super(Ntf, self).__init__()
 
-    def convert_steps_to_epochs(self, train_steps, train_batch_size, sample_size):
-        # Kap
-        # formula:
-        # steps per epoch = train_steps / train_batch_size
-        # num of epochs = sample_size / steps per epoch
-        return int(sample_size / (train_steps / train_batch_size))
-
     def prepare_data(self, vecs):
         input_data = []
         output_data = []
@@ -110,7 +103,10 @@ class Nmt(Ntf):
     # todo: per_trainstep => per_epoch
     # todo: eval on prediction files
 
-    def test(self, splits, path, per_epoch):
+    def test(self, splits, path, per_epoch, **kwargs):
+
+        gpus = kwargs.get("gpus")
+
         for foldidx in splits["folds"].keys():
             fold_path = f"{path}/fold{foldidx}"
             if len(splits["folds"][foldidx]["train"]) == 0:
@@ -131,7 +127,7 @@ class Nmt(Ntf):
                 cli_cmd += f"-model {model} "
                 cli_cmd += f"-src {path}/src-test.txt "
                 cli_cmd += f"-output {pred_path} "
-                cli_cmd += "-gpu 0 " if torch.cuda.is_available() else ""
+                cli_cmd += f"-gpu 0 " if torch.cuda.is_available() else ""
                 cli_cmd += "--min_length 2 "
                 cli_cmd += "-verbose "
                 print(f"Executing command: {cli_cmd}")
@@ -201,13 +197,13 @@ class Nmt(Ntf):
 
     def run(self, splits, vecs, indexes, output, settings, cmd, *args, **kwargs):
 
+        gpus = kwargs.get("gpus")
+
         model_name = kwargs.get("model_name")
-        variant_name = kwargs.get("variant_name")
-        combined_name = f"{model_name}-{variant_name}" if variant_name else model_name
 
         current_path = os.path.dirname(os.path.abspath(__file__))
         adjusted_model_path = os.path.join(
-            current_path, "nmt_models", f"{combined_name}.yaml"
+            current_path, "nmt_models", f"{model_name}.yaml"
         )
 
         with open(adjusted_model_path) as infile:
@@ -217,11 +213,14 @@ class Nmt(Ntf):
         learning_rate = base_config["learning_rate"]
         word_vec_size = base_config["word_vec_size"]
         batch_size = base_config["batch_size"]
-        epochs = base_config["train_steps"]
+        train_steps = base_config["train_steps"]
 
         team_count = vecs["skill"].shape[0]
         skill_count = vecs["skill"].shape[1]
         member_count = vecs["member"].shape[1]
+
+        # Kap: convert steps to epochs, round to integer
+        epochs = round((train_steps * batch_size) / team_count)
 
         if encoder_type == "cnn":
             layer_size = base_config["cnn_size"]
@@ -229,19 +228,18 @@ class Nmt(Ntf):
             layer_size = base_config["rnn_size"]
         elif encoder_type == "transformer":
             layer_size = base_config["transformer_ff"]
-            # Kap: convert steps to epochs
-            epochs = self.convert_steps_to_epochs(base_config["train_steps"], batch_size, team_count)
 
         # Kap: removed unnecessary folder nesting, now it's model/variant
         temp_output = output.split("/")[0:-1]
-        new_output = "/".join(temp_output)
+        temp_output2 = temp_output[0:-1]
+        new_output = "/".join(temp_output2)
 
-        model_path = f"{new_output}/t{team_count}.s{skill_count}.m{member_count}.et{encoder_type}.l{layer_size}.wv{word_vec_size}.lr{learning_rate}.b{batch_size}.e{epochs}"
+        model_path = f"{new_output}/{model_name}.l{layer_size}.wv{word_vec_size}.lr{learning_rate}.b{batch_size}.e{epochs}"
 
         if not os.path.isdir(model_path):
             os.makedirs(model_path)
 
-        # take out last folder name
+        # Kap: take out last folder name (to avoid many folder layers)
         param_path = current_path.split("/")[0:-1]
         param_path = "/".join(param_path)
 
@@ -256,7 +254,7 @@ class Nmt(Ntf):
             )
             self.learn(splits, model_path)
         if "test" in cmd:
-            self.test(splits, model_path, per_epoch=True)
+            self.test(splits, model_path, per_epoch=True, gpus=gpus)
         if "eval" in cmd:
             self.eval(splits, model_path, member_count, y_test, per_epoch=True)
         if "plot" in cmd:

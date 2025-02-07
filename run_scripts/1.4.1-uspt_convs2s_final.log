@@ -1,0 +1,6 @@
+Template	: v1.4.1
+Script		: 1.4.1-uspt_convs2s_final.sh
+Jobs		: 1
+
+[Job 1/1] Process 410033. Model: uspt_convs2s-final. Dataset: uspt.
+	Started at	: 2025-02-05 05:06:43 EST

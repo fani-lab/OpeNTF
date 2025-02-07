@@ -1,0 +1,10 @@
+Template	: v1.4.1
+Script		: 1.4.1-uspt_rnn_final.sh
+Jobs		: 1
+
+[Job 1/1] Process 2367. Model: uspt_rnn-final. Dataset: uspt.
+	Started at	: 2025-02-04 15:46:32 EST
+	Ended at	: 2025-02-06 14:19:44 EST
+	Elapsed		: 46h 33m 12s (2793 mins).
+
+All 1 jobs completed.

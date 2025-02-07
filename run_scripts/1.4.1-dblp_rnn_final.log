@@ -1,0 +1,10 @@
+Template	: v1.4.1
+Script		: 1.4.1-dblp_rnn_final.sh
+Jobs		: 1
+
+[Job 1/1] Process 2181. Model: dblp_rnn-final. Dataset: dblp.
+	Started at	: 2025-02-04 15:46:04 EST
+	Ended at	: 2025-02-05 21:30:50 EST
+	Elapsed		: 29h 44m 46s (1784 mins).
+
+All 1 jobs completed.

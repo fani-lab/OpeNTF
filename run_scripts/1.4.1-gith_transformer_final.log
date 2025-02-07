@@ -1,0 +1,10 @@
+Template	: v1.4.1
+Script		: 1.4.1-gith_transformer_final.sh
+Jobs		: 1
+
+[Job 1/1] Process 832746. Model: gith_transformer-final. Dataset: gith.
+	Started at	: 2025-02-03 04:24:46 EST
+	Ended at	: 2025-02-03 06:50:28 EST
+	Elapsed		: 2h 25m 42s (145 mins).
+
+All 1 jobs completed.

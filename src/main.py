@@ -30,18 +30,19 @@ from cmn.tools import generate_popular_and_nonpopular
 
 
 # Kap: 0-based indexing (0-7) ie. "0,1,2,3,4,5,6,7"
-GPUS_TO_USE = "7"
+# GPUS_TO_USE = "6,7"
 
 
 # Kap: Set GPUs to use
-def set_gpus():
-    if torch.cuda.device_count() > 1:
-        print(f"\nMultiple GPUs detected. Using GPUs: {GPUS_TO_USE} .\n")
-        os.environ["CUDA_VISIBLE_DEVICES"] = GPUS_TO_USE
+def set_gpus(gpus):
+    num_gpus = torch.cuda.device_count()
+    if num_gpus > 1:
+        print(f"\n{num_gpus} GPUs detected. Using GPUs: {gpus} .\n")
+        os.environ["CUDA_VISIBLE_DEVICES"] = gpus
     elif torch.cuda.device_count() == 1:
         print("\nOnly one GPU detected. Using it (if CUDA is available).\n")
     else:
-        print("\nNo GPU detected. Using CPU.\n")
+        print("\nNo GPUs detected. Using CPU.\n")
 
 
 def create_evaluation_splits(
@@ -136,7 +137,7 @@ def run(
     filter,
     future,
     model_list,
-    variant,
+    gpus,
     output,
     exp_id,
     settings,
@@ -182,10 +183,9 @@ def run(
 
     # Kap: handle the NMT models and the variants
     for model_name in model_list:
-        if model_name.startswith("nmt") and variant != "":
-            models[f"{model_name}-{variant}"] = Nmt()
-        elif model_name.startswith("nmt"):
+        if model_name.startswith("nmt"):
             models[model_name] = Nmt()
+            
 
 
     # streaming scenario (no vector for time)
@@ -268,7 +268,6 @@ def run(
             settings["model"]["baseline"]["rrn"]["with_zero"],
             settings["model"]["step_ahead"],
         )
-
     if "np_ratio" in fair:
         settings["fair"]["np_ratio"] = fair["np_ratio"]
     if "fairness" in fair:
@@ -338,7 +337,7 @@ def run(
                 )
 
             # Kap: added to indicate if GPU is available and to get the last GPU
-            set_gpus()
+            set_gpus(gpus)
 
             baseline_name = (
                 m_name.lstrip("t")
@@ -368,8 +367,8 @@ def run(
                 baseline_name,
                 settings["model"]["cmd"],
                 settings["fair"],
-                model_name=baseline_name.split("-")[0],
-                variant_name=variant,
+                model_name=baseline_name,
+                gpus=gpus,
                 merge_skills=False,
             )
     if "agg" in settings["model"]["cmd"]:
@@ -422,14 +421,14 @@ def addargs(parser):
         help="a list of neural models (eg. -model random fnn bnn fnn_emb bnn_emb nmt)",
     )
 
-    variant = parser.add_argument_group("variant")
-    variant.add_argument(
-        "-variant",
-        "--variant",
-        type=str.lower,
-        default=None,
+    gpus = parser.add_argument_group("gpus")
+    gpus.add_argument(
+        "-gpus",
+        "--gpus",
+        type=str,
+        default="7", # Kap: 7th is my default, change to reflec which GPUs you're assigned
         required=False,
-        help="a neural model variant (eg. -variant model1)",
+        help="gpus to use (eg. -gpus 6,7)",
     )
 
     output = parser.add_argument_group("output")
@@ -509,7 +508,7 @@ if __name__ == "__main__":
         filter=args.filter,
         future=args.future,
         model_list=args.model_list,
-        variant=args.variant,
+        gpus=args.gpus,
         output=args.output,
         exp_id=args.exp_id,
         settings=param.settings,

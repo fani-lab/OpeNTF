@@ -1,0 +1,61 @@
+## Transformer with Attention Configuration for dblp
+
+save_data: ../output/nmt/run/transformer
+save_model: ../output/nmt/run/transformer_model
+src_vocab: ../output/nmt/run/transformer.vocab.src
+tgt_vocab: ../output/nmt/run/transformer.vocab.tgt
+overwrite: True
+data:
+  corpus_1:
+    path_src: ../output/nmt/src-train.txt
+    path_tgt: ../output/nmt/tgt-train.txt
+    weight: 1
+  valid:
+    path_src: ../output/nmt/src-val.txt
+    path_tgt: ../output/nmt/tgt-val.txt
+
+# -------------------------------------------
+# Configuration for training
+# -------------------------------------------
+
+# Common hyperparameters
+# General opts
+keep_checkpoint: -1
+seed: 0
+train_steps: 15527 # sample size of 99375
+save_checkpoint_steps: 1553
+valid_steps: 1553
+report_every: 1553
+
+# Batching
+world_size: 2
+gpu_ranks: [0, 1]
+num_workers: 4
+batch_size: 128
+bucket_size: 832
+valid_batch_size: 128
+
+# Optimization
+model_dtype: "fp16"
+optim: adam
+weight_decay: 0.0001
+learning_rate: 0.0007
+adam_beta1: 0.9
+adam_beta2: 0.98
+
+# --------------------------------------------
+
+# Architecture specific hyperparameters
+encoder_type: transformer
+decoder_type: transformer
+position_encoding: true
+hidden_size: 128
+word_vec_size: 128
+transformer_ff: 512
+
+dropout: 0.2
+attention_dropout: 0.2
+
+enc_layers: 8
+dec_layers: 8
+heads: 8

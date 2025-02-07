@@ -1,0 +1,10 @@
+Template	: v1.4.1
+Script		: 1.4.1-imdb_transformer_final.sh
+Jobs		: 1
+
+[Job 1/1] Process 4156261. Model: imdb_transformer-final. Dataset: imdb.
+	Started at	: 2025-02-03 14:46:23 EST
+	Ended at	: 2025-02-03 16:06:49 EST
+	Elapsed		: 1h 20m 26s (80 mins).
+
+All 1 jobs completed.

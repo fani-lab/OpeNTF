@@ -1,0 +1,6 @@
+Template	: v1.4.1
+Script		: 1.4.1-dblp_convs2s_final.sh
+Jobs		: 1
+
+[Job 1/1] Process 5918. Model: dblp_convs2s-final. Dataset: dblp.
+	Started at	: 2025-02-04 15:07:17 EST

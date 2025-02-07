@@ -1,0 +1,62 @@
+## Transformer with Attention Configuration for gith
+
+save_data: ../output/nmt/run/transformer
+save_model: ../output/nmt/run/transformer_model
+src_vocab: ../output/nmt/run/transformer.vocab.src
+tgt_vocab: ../output/nmt/run/transformer.vocab.tgt
+overwrite: True
+data:
+  corpus_1:
+    path_src: ../output/nmt/src-train.txt
+    path_tgt: ../output/nmt/tgt-train.txt
+    weight: 1
+  valid:
+    path_src: ../output/nmt/src-val.txt
+    path_tgt: ../output/nmt/tgt-val.txt
+
+# -------------------------------------------
+# Configuration for training
+# -------------------------------------------
+
+# Common hyperparameters
+# General opts
+keep_checkpoint: -1
+seed: 0
+train_steps: 7170 # sample size of 45888
+save_checkpoint_steps: 717
+valid_steps: 717
+report_every: 717
+
+# Batching
+world_size: 2
+gpu_ranks: [0, 1]
+num_workers: 4
+batch_type: "tokens"
+batch_size: 128
+bucket_size: 16
+valid_batch_size: 128
+
+# Optimization
+model_dtype: "fp16"
+optim: adam
+weight_decay: 0.0001
+learning_rate: 0.0010
+adam_beta1: 0.9
+adam_beta2: 0.98
+
+# --------------------------------------------
+
+# Architecture specific hyperparameters
+encoder_type: transformer
+decoder_type: transformer
+position_encoding: true
+hidden_size: 128
+word_vec_size: 128
+transformer_ff: 512
+
+dropout: 0.2
+attention_dropout: 0.2
+
+enc_layers: 6
+dec_layers: 6
+heads: 8

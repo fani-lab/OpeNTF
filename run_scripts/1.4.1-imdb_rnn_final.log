@@ -1,0 +1,10 @@
+Template	: v1.4.1
+Script		: 1.4.1-imdb_rnn_final.sh
+Jobs		: 1
+
+[Job 1/1] Process 2088. Model: imdb_rnn-final. Dataset: imdb.
+	Started at	: 2025-02-04 15:45:05 EST
+	Ended at	: 2025-02-04 23:18:24 EST
+	Elapsed		: 7h 33m 19s (453 mins).
+
+All 1 jobs completed.

@@ -1,8 +1,0 @@
-Models: dict_keys(['nmt_transformer'])
-Loading sparse matrices from ./../data/preprocessed/imdb/imdb.title.basics.tsv.filtered.mt75.ts3/teamsvecs.pkl ...
-Loading indexes pickle from ./../data/preprocessed/imdb/imdb.title.basics.tsv.filtered.mt75.ts3/indexes.pkl ...
-It took 0.2423415184020996 seconds to load from the pickles.
-It took 1.781355857849121 seconds to load the sparse matrices.
-
-Only one GPU detected. Using it (if CUDA is available).
-
