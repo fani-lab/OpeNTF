@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/OpeNTF/tutorial/sigir-ap24/static/css/main.9f402899.css",
-    "main.js": "/OpeNTF/tutorial/sigir-ap24/static/js/main.a83fb97b.js",
+    "main.js": "/OpeNTF/tutorial/sigir-ap24/static/js/main.b9597e80.js",
     "static/js/787.85b43d0b.chunk.js": "/OpeNTF/tutorial/sigir-ap24/static/js/787.85b43d0b.chunk.js",
     "static/media/mount_fuji_1.jpg": "/OpeNTF/tutorial/sigir-ap24/static/media/mount_fuji_1.47dda23496144309f241.jpg",
     "static/media/vivafemme.jpg": "/OpeNTF/tutorial/sigir-ap24/static/media/vivafemme.63a4bcf87ffb259610f1.jpg",
@@ -18,11 +18,11 @@
     "static/media/flamingo.jpg": "/OpeNTF/tutorial/sigir-ap24/static/media/flamingo.2f6ab400c29b7751b012.jpg",
     "index.html": "/OpeNTF/tutorial/sigir-ap24/index.html",
     "main.9f402899.css.map": "/OpeNTF/tutorial/sigir-ap24/static/css/main.9f402899.css.map",
-    "main.a83fb97b.js.map": "/OpeNTF/tutorial/sigir-ap24/static/js/main.a83fb97b.js.map",
+    "main.b9597e80.js.map": "/OpeNTF/tutorial/sigir-ap24/static/js/main.b9597e80.js.map",
     "787.85b43d0b.chunk.js.map": "/OpeNTF/tutorial/sigir-ap24/static/js/787.85b43d0b.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.9f402899.css",
-    "static/js/main.a83fb97b.js"
+    "static/js/main.b9597e80.js"
   ]
 }
