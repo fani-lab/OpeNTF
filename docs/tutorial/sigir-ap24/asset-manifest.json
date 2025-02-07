@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/OpeNTF/tutorial/sigir-ap24/static/css/main.9f402899.css",
-    "main.js": "/OpeNTF/tutorial/sigir-ap24/static/js/main.6832cf34.js",
+    "main.js": "/OpeNTF/tutorial/sigir-ap24/static/js/main.a83fb97b.js",
     "static/js/787.85b43d0b.chunk.js": "/OpeNTF/tutorial/sigir-ap24/static/js/787.85b43d0b.chunk.js",
     "static/media/mount_fuji_1.jpg": "/OpeNTF/tutorial/sigir-ap24/static/media/mount_fuji_1.47dda23496144309f241.jpg",
     "static/media/vivafemme.jpg": "/OpeNTF/tutorial/sigir-ap24/static/media/vivafemme.63a4bcf87ffb259610f1.jpg",
@@ -11,7 +11,6 @@
     "static/media/bootstrap-icons.woff?": "/OpeNTF/tutorial/sigir-ap24/static/media/bootstrap-icons.c1d7432ee75fa194e499.woff",
     "static/media/sloth.jpg": "/OpeNTF/tutorial/sigir-ap24/static/media/sloth.0ede921fd4a80af5cc4b.jpg",
     "static/media/bootstrap-icons.woff2?": "/OpeNTF/tutorial/sigir-ap24/static/media/bootstrap-icons.a13b815539b49de48d23.woff2",
-    "static/media/vf_logo.png": "/OpeNTF/tutorial/sigir-ap24/static/media/vf_logo.f5ac786a249095662a0f.png",
     "static/media/bnn.jpg": "/OpeNTF/tutorial/sigir-ap24/static/media/bnn.a23ef36c3343a47487f8.jpg",
     "static/media/christine.jpg": "/OpeNTF/tutorial/sigir-ap24/static/media/christine.1bd12cefdd4501ac22c1.jpg",
     "static/media/mahdis.jpg": "/OpeNTF/tutorial/sigir-ap24/static/media/mahdis.13c2be48ca1acc39d57c.jpg",
@@ -19,11 +18,11 @@
     "static/media/flamingo.jpg": "/OpeNTF/tutorial/sigir-ap24/static/media/flamingo.2f6ab400c29b7751b012.jpg",
     "index.html": "/OpeNTF/tutorial/sigir-ap24/index.html",
     "main.9f402899.css.map": "/OpeNTF/tutorial/sigir-ap24/static/css/main.9f402899.css.map",
-    "main.6832cf34.js.map": "/OpeNTF/tutorial/sigir-ap24/static/js/main.6832cf34.js.map",
+    "main.a83fb97b.js.map": "/OpeNTF/tutorial/sigir-ap24/static/js/main.a83fb97b.js.map",
     "787.85b43d0b.chunk.js.map": "/OpeNTF/tutorial/sigir-ap24/static/js/787.85b43d0b.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.9f402899.css",
-    "static/js/main.6832cf34.js"
+    "static/js/main.a83fb97b.js"
   ]
 }
