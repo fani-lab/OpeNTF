@@ -1,25 +1,27 @@
-name: kapnmt
+name: nmtenv
 channels:
-  - conda-forge
   - pytorch
-  - nvidia
+  - pyg
+  - conda-forge
+  - defaults
 dependencies:
-  - python=3.9.19
+  - python=3.8
+  - pip
   - numpy
-  - pandas<2.1
+  - pandas
   - scikit-learn
   - scipy
   - matplotlib
-  - pytorch=1.10.2
-  - torchvision=0.11.3
-  - torchaudio=0.10.2
-  - gensim<4
-  - pytorch-cuda=11.7
-  - pip
+  - gensim
+  - pytorch=1.10.1
+  - torchvision
+  - torchaudio
+  - cudatoolkit=11.1
   - pip:
-      - torch-scatter
-      - torch-sparse
-      - torch-cluster
-      - torch-spline-conv
-      - torch-geometric
-      - pytrec_eval
+    - OpenNMT-py==3.0.4
+    - pytrec_eval
+    - torch-scatter==2.0.9
+    - torch-sparse==0.6.12
+    - torch-cluster==1.6.0
+    - torch-spline-conv==1.2.1
+    - torch-geometric
