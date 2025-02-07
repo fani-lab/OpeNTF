@@ -31,12 +31,8 @@ class Nmt(Ntf):
             ]
             if skills:
                 input_data.append(skills)
-            else:
-                input_data.append(["empty_skill"])  # or handle appropriately
             if members:
                 output_data.append(members)
-            else:
-                output_data.append(["empty_member"])  # or handle appropriately
         return input_data, output_data
 
     def build_vocab(self, input_data, output_data, splits, settings, model_path):
