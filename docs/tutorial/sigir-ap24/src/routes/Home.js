@@ -720,13 +720,13 @@ function Home() {
             </a>
           </div>
           <div class="p-2">
-            <a href="javascript:void(0)" style={{ cursor: "default" }}>
-              Presentation Slides (Upcoming)
+            <a href="https://hosseinfani.github.io/res/slides/2024_SIGIRAP_Paradigm_Shifts_in_Team_Recommendation_From_Historical_Subgraph_Optimization_to_Emerging_Graph_Neural_Network.pdf" style={{ cursor: "default" }}>
+              Presentation Slides
             </a>
           </div>
           <div class="p-2">
-            <a href="javascript:void(0)" style={{ cursor: "default" }}>
-              Presentation Video (Upcoming)
+            <a href="https://www.youtube.com/playlist?list=PLKFWrqRN8VmSOQA74QRJRwwYDyp1YNZE-" style={{ cursor: "default" }}>
+              Presentation Video
             </a>
           </div>
         </div>
