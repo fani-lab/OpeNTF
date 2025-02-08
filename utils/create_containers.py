@@ -3,14 +3,15 @@
 import sys
 import subprocess
 import os
+import argparse
 
-def create_docker_container(container_name, hostname):
+def create_docker_container(container_name, hostname, version="latest"):
     """
     Create a Docker container with specified name and hostname
     """
 
     mount_dir = "OpeNTF"
-    image_name = "kmthang/opennmt:3.0.4-torch1.10.1"
+    image_name = f"kmthang/opennmt:{version}"
 
     current_dir = os.getcwd()
     command = [
@@ -37,17 +38,32 @@ def create_docker_container(container_name, hostname):
     return True
 
 def main():
-    # Check if we have the correct number of arguments
-    if len(sys.argv) < 2:
-        print("Usage: python3 create_containers.py container1 container2 container3 ...")
-        sys.exit(1)
+    # Create argument parser
+    parser = argparse.ArgumentParser(
+        description='Create Docker containers for OpenNMT',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog='''
+Examples:
+  Create containers with latest image:
+    python3 create_containers.py c1 c2 c3
+
+  Create containers with specific version:
+    python3 create_containers.py --v 1.0 c1 c2 c3
+
+Note:
+  - Each container will be created with GPU support enabled
+  - Current directory will be mounted to /OpeNTF in each container
+  - Container names will be used as their hostnames
+''')
+    parser.add_argument('--v', default='latest', help='Image version (default: latest)')
+    parser.add_argument('containers', nargs='+', help='One or more container names to create')
     
-    # Get container names from command line arguments
-    container_names = sys.argv[1:]
+    # Parse arguments
+    args = parser.parse_args()
     
     # Create containers
-    for container_name in container_names:
-        success = create_docker_container(container_name, container_name)
+    for container_name in args.containers:
+        success = create_docker_container(container_name, container_name, args.v)
         if not success:
             print(f"Failed to create container {container_name}")
             continue
