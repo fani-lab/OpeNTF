@@ -101,8 +101,8 @@ def analyze_teams(teamsvecs, mt_threshold=75, ts_threshold=3):
     mt_75_experts = sum(1 for count in expert_team_counts if count >= mt_threshold)
     mt_75_percent = (mt_75_experts / num_experts) * 100 if num_experts > 0 else 0
 
-    # Calculate teams with ts_threshold or more skills
-    ts_3_teams = sum(1 for skills in skills_per_team if skills >= ts_threshold)
+    # Calculate teams with ts_threshold or more experts (changed from skills to experts)
+    ts_3_teams = sum(1 for experts in experts_per_team if experts >= ts_threshold)
     ts_3_percent = (ts_3_teams / num_teams) * 100 if num_teams > 0 else 0
 
     # Track which experts have min/max team participation
