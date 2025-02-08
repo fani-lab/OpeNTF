@@ -37,13 +37,25 @@ class Nmt(Ntf):
 
     def build_vocab(self, input_data, output_data, splits, settings, model_path):
         endl = "\n"
+        
+        # Create mapping between original and filtered indices
+        valid_indices = [i for i, x in enumerate(input_data) if x]
+        index_map = {old: new for new, old in enumerate(valid_indices)}
+        
+        # Filter and join the data
         input_data = np.array(
-            ["{}{}".format(_, endl) for _ in [" ".join(_) for _ in input_data] if _]
+            ["{}{}".format(" ".join(_), endl) for _ in input_data if _]
         )
         output_data = np.array(
-            ["{}{}".format(_, endl) for _ in [" ".join(_) for _ in output_data] if _]
+            ["{}{}".format(" ".join(_), endl) for _ in output_data if _]
         )
-
+        
+        # Update split indices
+        for foldidx in splits["folds"].keys():
+            splits["folds"][foldidx]["train"] = [index_map[i] for i in splits["folds"][foldidx]["train"] if i in index_map]
+            splits["folds"][foldidx]["valid"] = [index_map[i] for i in splits["folds"][foldidx]["valid"] if i in index_map]
+        splits["test"] = [index_map[i] for i in splits["test"] if i in index_map]
+        
         for foldidx in splits["folds"].keys():
             fold_path = f"{model_path}/fold{foldidx}"
             if not os.path.isdir(fold_path):
