@@ -13,7 +13,7 @@ def create_docker_container(container_name, hostname, version="latest"):
     mount_dir = "OpeNTF"
     image_name = f"kmthang/opennmt:{version}"
 
-    current_dir = os.getcwd()
+    current_dir = os.path.dirname(os.getcwd())
     command = [
         "docker", "run",
         "-it",              # Interactive mode with TTY
