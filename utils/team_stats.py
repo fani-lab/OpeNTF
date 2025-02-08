@@ -120,33 +120,35 @@ def analyze_teams(teamsvecs):
 
 def main():
     # Check if correct number of command line arguments are provided
-    if len(sys.argv) != 3:
-        print("Usage: python3 team_stats.py <dataset_name> <subfolder_name>")
+    if len(sys.argv) < 3 or len(sys.argv) > 4:
+        print("Usage: python3 team_stats.py <dataset_name> <subfolder_name> [input_filename]")
         print("Example: python3 team_stats.py gith gith.data.csv.filtered.mt75.ts3")
+        print("Example with custom input file: python3 team_stats.py gith gith.data.csv.filtered.mt75.ts3 teamsvecs_fixed.pkl")
         return
 
     dataset_name = sys.argv[1]
     subfolder_name = sys.argv[2]
+    input_filename = sys.argv[3] if len(sys.argv) == 4 else 'teamsvecs.pkl'
 
     # Get the root project directory (OpeNTF)
     script_dir = Path(__file__).parent.parent.absolute()
     
-    # Construct path to the teamsvecs.pkl file
-    # Now looking directly in the data/preprocessed directory under the project root
-    teams_file = script_dir.parent / 'data' / 'preprocessed' / dataset_name / subfolder_name / 'teamsvecs.pkl'
+    # Construct path to the input file
+    teams_file = script_dir.parent / 'data' / 'preprocessed' / dataset_name / subfolder_name / input_filename
     
     try:
         with open(teams_file, 'rb') as f:
             teamsvecs = pickle.load(f)
     except FileNotFoundError:
-        print(f"Error: Could not find teamsvecs.pkl in {teams_file}")
+        print(f"Error: Could not find {input_filename} in {teams_file}")
         return
     
     # Analyze the data
     stats = analyze_teams(teamsvecs)
     
     # Create output file in the same directory as the input file
-    output_file = teams_file.parent / f'{dataset_name}_team_stats.csv'
+    output_suffix = f'_{input_filename.replace(".pkl", "")}' if input_filename != 'teamsvecs.pkl' else ''
+    output_file = teams_file.parent / f'{dataset_name}_team_stats{output_suffix}.csv'
     
     with open(output_file, 'w') as f:
         # Basic stats with dataset name
