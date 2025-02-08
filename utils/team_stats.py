@@ -3,8 +3,9 @@ import os
 import numpy as np
 from pathlib import Path
 import sys
+import argparse
 
-def analyze_teams(teamsvecs):
+def analyze_teams(teamsvecs, mt_threshold=75, ts_threshold=3):
     # Initialize counters
     num_teams = teamsvecs['skill'].shape[0]
     num_skills = teamsvecs['skill'].shape[1]
@@ -96,6 +97,18 @@ def analyze_teams(teamsvecs):
     if min_experts == float('inf'):
         min_experts = 0
 
+    # Calculate experts who participate in mt_threshold or more teams
+    mt_75_experts = sum(1 for count in expert_team_counts if count >= mt_threshold)
+    mt_75_percent = (mt_75_experts / num_experts) * 100 if num_experts > 0 else 0
+
+    # Calculate teams with ts_threshold or more skills
+    ts_3_teams = sum(1 for skills in skills_per_team if skills >= ts_threshold)
+    ts_3_percent = (ts_3_teams / num_teams) * 100 if num_teams > 0 else 0
+
+    # Track which experts have min/max team participation
+    min_team_experts_list = [i for i, count in enumerate(expert_team_counts) if count == min_exp_team]
+    max_team_experts_list = [i for i, count in enumerate(expert_team_counts) if count == max_exp_team]
+
     return {
         'num_teams': num_teams,
         'num_skills': num_skills,
@@ -115,45 +128,80 @@ def analyze_teams(teamsvecs):
         'expert_indices': expert_indices_per_team,
         'dup_indices': dup_indices,
         'expert_team_counts': expert_team_counts,
-        'unique_team_configs': unique_team_configs
+        'unique_team_configs': unique_team_configs,
+        'mt_threshold': mt_threshold,
+        'ts_threshold': ts_threshold,
+        'mt_75_experts': mt_75_experts,
+        'mt_75_percent': mt_75_percent,
+        'ts_3_teams': ts_3_teams,
+        'ts_3_percent': ts_3_percent,
+        'min_team_experts_list': min_team_experts_list,
+        'max_team_experts_list': max_team_experts_list
     }
 
 def main():
-    # Check if correct number of command line arguments are provided
-    if len(sys.argv) < 3 or len(sys.argv) > 4:
-        print("Usage: python3 team_stats.py <dataset_name> <subfolder_name> [input_filename]")
-        print("Example: python3 team_stats.py gith gith.data.csv.filtered.mt75.ts3")
-        print("Example with custom input file: python3 team_stats.py gith gith.data.csv.filtered.mt75.ts3 teamsvecs_fixed.pkl")
-        return
-
-    dataset_name = sys.argv[1]
-    subfolder_name = sys.argv[2]
-    input_filename = sys.argv[3] if len(sys.argv) == 4 else 'teamsvecs.pkl'
+    parser = argparse.ArgumentParser(
+        description='Analyze team statistics from preprocessed data.',
+        formatter_class=argparse.RawTextHelpFormatter
+    )
+    
+    parser.add_argument('dataset_name', 
+                       help='Name of the dataset folder (e.g., gith, dblp)')
+    
+    parser.add_argument('subfolder_name',
+                       help='Name of the subfolder containing the data\n' + 
+                            'Example: gith.data.csv.filtered.mt75.ts3')
+    
+    parser.add_argument('--dataset', '-d',
+                       help='Override dataset name in output (e.g., TOY-DBLP)\n' +
+                            'This affects only the name shown in stats, not the folder path')
+    
+    parser.add_argument('--input-file', '-i',
+                       default='teamsvecs.pkl',
+                       help='Input pickle file name (default: teamsvecs.pkl)')
+    
+    parser.add_argument('--mt', type=int,
+                       default=75,
+                       help='Minimum number of teams threshold for experts (default: 75)')
+    
+    parser.add_argument('--ts', type=int,
+                       default=3,
+                       help='Minimum number of skills threshold for teams (default: 3)')
+    
+    args = parser.parse_args()
 
     # Get the root project directory (OpeNTF)
     script_dir = Path(__file__).parent.parent.absolute()
     
-    # Construct path to the input file
-    teams_file = script_dir.parent / 'data' / 'preprocessed' / dataset_name / subfolder_name / input_filename
+    # Construct path to the input file using dataset_name for path
+    teams_file = script_dir.parent / 'data' / 'preprocessed' / args.dataset_name / args.subfolder_name / args.input_file
     
     try:
         with open(teams_file, 'rb') as f:
             teamsvecs = pickle.load(f)
     except FileNotFoundError:
-        print(f"Error: Could not find {input_filename} in {teams_file}")
+        print(f"Error: Could not find {args.input_file} in {teams_file}")
         return
     
-    # Analyze the data
-    stats = analyze_teams(teamsvecs)
+    # Analyze the data with custom thresholds
+    stats = analyze_teams(teamsvecs, args.mt, args.ts)
     
     # Create output file in the same directory as the input file
-    output_suffix = f'_{input_filename.replace(".pkl", "")}' if input_filename != 'teamsvecs.pkl' else ''
-    output_file = teams_file.parent / f'{dataset_name}_team_stats{output_suffix}.csv'
+    output_suffix = f'_{args.input_file.replace(".pkl", "")}' if args.input_file != 'teamsvecs.pkl' else ''
+    if args.mt != 75 or args.ts != 3:
+        output_suffix += f'.mt{args.mt}.ts{args.ts}'
+    
+    # Use custom dataset name for output file if provided
+    output_dataset = args.dataset.lower() if args.dataset else args.dataset_name
+    output_file = teams_file.parent / f'{output_dataset}_team_stats{output_suffix}.csv'
     
     with open(output_file, 'w') as f:
+        # Use custom dataset name if provided, otherwise use uppercase dataset_name
+        display_dataset = args.dataset.upper() if args.dataset else args.dataset_name.upper()
+        
         # Basic stats with dataset name
         f.write(',dataset,#teams,#skills,#experts\n')
-        f.write(f',{dataset_name.upper()},{stats["num_teams"]},{stats["num_skills"]},{stats["num_experts"]}\n')
+        f.write(f',{display_dataset},{stats["num_teams"]},{stats["num_skills"]},{stats["num_experts"]}\n')
         f.write(',,,,\n')
         
         # Zero teams and duplicates stats
@@ -190,8 +238,8 @@ def main():
                 f'{stats["max_skills"]} ({max_skill_teams} teams~{max_skill_percent:.1f}%)\n')
         f.write(',,,\n')
         
-        # Expert participation stats
-        f.write(',#min_exp_team,#max_exp_team,#mt_75,#ts_3\n')
+        # Expert participation stats - update header to show thresholds
+        f.write(f',#min_exp_team,#max_exp_team,#mt_{args.mt},#ts_{args.ts}\n')
         
         # Count experts with min/max team participation
         min_team_experts = sum(1 for x in stats['expert_team_counts'] if x == stats['min_exp_team'])
@@ -200,15 +248,23 @@ def main():
         min_exp_percent = (min_team_experts / stats['num_experts']) * 100
         max_exp_percent = (max_team_experts / stats['num_experts']) * 100
         
-        # For mt_75 and ts_3, we'll need to calculate these
-        # Assuming these are derived from the subfolder name for now
-        mt_75_experts = int(0.688 * stats['num_experts'])  # This should be calculated properly
-        ts_3_teams = stats['num_teams']  # This should be calculated properly
-        
+        # Write the first row with counts and percentages
         f.write(f',{stats["min_exp_team"]} ({min_team_experts} experts~{min_exp_percent:.1f}%),' +
                 f'{stats["max_exp_team"]} ({max_team_experts} experts~{max_exp_percent:.1f}%),' +
-                f'{mt_75_experts} ({68.8}%),' +
-                f'{ts_3_teams} ({100.0}%)\n')
+                f'{stats["mt_75_experts"]} ({stats["mt_75_percent"]:.1f}%),' +
+                f'{stats["ts_3_teams"]} ({stats["ts_3_percent"]:.1f}%)\n')
+        
+        # Write the second row with expert IDs - show first 5 and use ... for the rest
+        def format_expert_list(expert_indices):
+            sorted_indices = sorted(expert_indices)
+            if len(sorted_indices) <= 5:
+                return '-'.join(f'm{idx+1}' for idx in sorted_indices)
+            return '-'.join(f'm{idx+1}' for idx in sorted_indices[:5]) + '-...'
+        
+        min_experts_str = format_expert_list(stats['min_team_experts_list'])
+        max_experts_str = format_expert_list(stats['max_team_experts_list'])
+        f.write(f',[{min_experts_str}],[{max_experts_str}],,\n')
+        
         f.write(',,,\n')
         
         # Write header for detailed stats
@@ -216,8 +272,9 @@ def main():
         
         # Write detailed stats for each team
         for i in range(len(stats['skills_per_team'])):
-            skill_indices = [f's{idx}' for idx in stats['skill_indices'][i]]
-            expert_indices = [f'm{idx}' for idx in stats['expert_indices'][i]]
+            # Add 1 to indices to start from 1 instead of 0
+            skill_indices = [f's{idx+1}' for idx in stats['skill_indices'][i]]
+            expert_indices = [f'm{idx+1}' for idx in stats['expert_indices'][i]]
             
             f.write(f'{stats["dup_indices"][i]},{stats["skills_per_team"][i]},{stats["experts_per_team"][i]},' +
                    f'[{"-".join(skill_indices)}],' +
