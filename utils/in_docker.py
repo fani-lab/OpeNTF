@@ -172,21 +172,30 @@ def kill_all_user_processes(container_name):
 
 def print_help():
     """Print available commands and their usage."""
+    print("\nUsage: python3 in_docker.py <command> [options]")
     print("\nAvailable commands:")
-    print("\n  1. List Python3/OpenNMT processes in containers:")
-    print("     python3 in_docker.py ps <container_name> [container2 ...]")
-    print("     python3 in_docker.py ps <pattern>  (e.g., kap_*)")
-    print("\n  2. Run a script:")
-    print("     python3 in_docker.py run <container_name> <script_name.sh>")
-    print("\n  3. Stop all Python/OpenNMT processes:")
-    print("     python3 in_docker.py stopall <container_name>")
-    print("\n  4. Show this help message:")
-    print("     python3 in_docker.py help")
-    print("     python3 in_docker.py")
-    print("\nNote: Scripts should be placed in the /OpeNTF/run_scripts directory")
+
+    print("\n  ps: List Python3/OpenNMT processes in containers")
+    print("     Usage: python3 in_docker.py ps <container_name> [container2 ...]")
+    print("            python3 in_docker.py ps <pattern>  (e.g., kap_*)")
+    print("     Example: python3 in_docker.py ps my_container")
+    print("     Example: python3 in_docker.py ps my_container kap_*")
+
+    print("\n  run: Run a shell script inside a container")
+    print("     Usage: python3 in_docker.py run <container_name> <script_name.sh>")
+    print("     Example: python3 in_docker.py run my_container train.sh")
+    print("     Note: Scripts should be placed in the /OpeNTF/run_scripts directory inside the container.")
+
+    print("\n  stop: Stop a specific script process in a container")
+    print("     Usage: python3 in_docker.py stop <container_name> <script_name.sh>")
+    print("     Example: python3 in_docker.py stop my_container train.sh")
+
+    print("\n  stopall: Stop all Python/OpenNMT processes in a container")
+    print("      Usage: python3 in_docker.py stopall <container_name>")
+    print("      Example: python3 in_docker.py stopall my_container")
 
 def main():
-    if len(sys.argv) == 1 or sys.argv[1] == "help":
+    if len(sys.argv) == 1 or sys.argv[1] in ("-h", "--help"):
         print_help()
         sys.exit(0)
 
@@ -249,6 +258,10 @@ def main():
             print(f"Error: Container '{container_name}' does not exist.")
             sys.exit(1)
         kill_all_user_processes(container_name)
+
+    elif command in ("-h", "--help"):
+        print_help()
+        sys.exit(0)
 
     else:
         print(f"Unknown command: {command}")
