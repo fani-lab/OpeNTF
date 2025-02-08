@@ -17,7 +17,18 @@ def calculate_metrics(Y, Y_, per_instance=False, metrics={'P_2,5,10', 'recall_2,
         run['q' + str(i)] = {'d' + str(j): int(np.round(v * 100)) for j,v in enumerate(y_)}
         # run['q' + str(i)] = {'d' + str(idx): int(np.round(y_[idx] * 10)) for idx in np.where(y_ > 0.5)[0]}
     print(f'Evaluating {metrics} ...')
-    df = pd.DataFrame.from_dict(pytrec_eval.RelevanceEvaluator(qrel, metrics).evaluate(run))
+
+    # Generate metrics for k values from 1 to 10
+    ks = range(1, 11)
+    updated_metrics = set()
+    for metric in metrics:
+        if any(str(k) in metric for k in [2, 5, 10]):
+            for k in ks:
+                updated_metrics.add(metric.replace('_2', f'_{k}').replace('_5', f'_{k}').replace('_10', f'_{k}'))
+        else:
+            updated_metrics.add(metric)
+    
+    df = pd.DataFrame.from_dict(pytrec_eval.RelevanceEvaluator(qrel, updated_metrics).evaluate(run))
     print(f'Averaging ...')
     # df_mean = df.mean(axis=1).append(pd.Series([aucroc], index=['aucroc'])).to_frame('mean')
     df_mean = df.mean(axis=1).to_frame('mean')
