@@ -4,3 +4,7 @@ Jobs		: 1
 
 [Job 1/1] Process 2805. Model: gith_convs2s-final. Dataset: gith.
 	Started at	: 2025-02-07 02:24:41 EST
+	Ended at	: 2025-02-07 06:32:10 EST
+	Elapsed		: 4h 7m 29s (247 mins).
+
+All 1 jobs completed.
