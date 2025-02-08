@@ -9,7 +9,7 @@ def fix_teams_data(teamsvecs):
     Fix teams data by applying various filters:
     1. First remove experts that appear in less than 75 teams (but keep the teams)
     2. Remove teams with zero skills
-    3. Remove teams with less than 3 experts
+    3. Remove teams with less than 3 skills (ts_3)
     4. Remove duplicate teams (keeping only one instance)
     """
     # Convert sparse matrices to dense for easier manipulation
@@ -19,9 +19,9 @@ def fix_teams_data(teamsvecs):
     print(f"Initial number of teams: {len(teams_skill_array)}")
     print(f"Initial number of experts: {teams_member_array.shape[1]}")
     
-    # First pass: Remove experts that don't meet minimum teams requirement
+    # First pass: Remove experts that don't meet minimum teams requirement (75 teams)
     expert_team_counts = np.sum(teams_member_array, axis=0)
-    experts_with_min_teams = expert_team_counts >= 75
+    experts_with_min_teams = expert_team_counts >= 75  # Absolute threshold of 75 teams
     
     print(f"Experts with ≥75 teams: {np.sum(experts_with_min_teams)}")
     
@@ -36,15 +36,17 @@ def fix_teams_data(teamsvecs):
         iteration += 1
         # Create masks for filtering
         has_skills = np.sum(teams_skill_array, axis=1) > 0
+        has_min_skills = np.sum(teams_skill_array, axis=1) >= 3  # Teams must have at least 3 skills
         experts_count = np.sum(teams_member_array, axis=1)
         has_min_experts = experts_count >= 3  # Teams must have at least 3 experts
         
         print(f"\nIteration {iteration}:")
         print(f"Teams with skills: {np.sum(has_skills)}")
+        print(f"Teams with ≥3 skills: {np.sum(has_min_skills)}")
         print(f"Teams with ≥3 experts: {np.sum(has_min_experts)}")
         
         # Combine initial masks
-        valid_teams = has_skills & has_min_experts
+        valid_teams = has_skills & has_min_skills & has_min_experts
         
         # Get unique team configurations
         team_configs = []
