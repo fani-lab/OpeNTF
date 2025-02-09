@@ -287,6 +287,14 @@ def run(
         vecs, indexes = d_cls.generate_sparse_vectors(
             datapath, f"{prep_output}{filter_str}", filter, settings["data"]
         )
+        # Ensure that the 'id' key exists in vecs for evaluation splits.
+        if "id" not in vecs:
+            print("WARNING: 'id' key not found in vecs. Creating a default 'id' based on the 'skill' matrix.")
+            if "skill" in vecs:
+                vecs["id"] = np.arange(vecs["skill"].shape[0])
+            else:
+                raise KeyError("Both 'id' and 'skill' keys are missing from vecs!")
+        
         year_idx = []
         # do only if i2y exists in data
         if "i2y" in indexes.keys():
