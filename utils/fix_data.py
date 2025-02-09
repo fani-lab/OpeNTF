@@ -5,9 +5,16 @@ import numpy as np
 from scipy.sparse import csr_matrix
 import argparse
 
-def fix_data(teamsvecs, indexes, remove_duplicates=True):
+def fix_data(teamsvecs, indexes, remove_duplicates=True, minimum_teams=75, team_size=3):
     """
     Fix teams data and update indexes accordingly
+    
+    Args:
+        teamsvecs: Dictionary containing skill and member sparse matrices
+        indexes: Dictionary containing team and member indexes
+        remove_duplicates: Whether to remove duplicate teams
+        minimum_teams: Minimum number of teams an expert must be in (default: 75)
+        team_size: Minimum number of experts per team (default: 3)
     """
     # Convert sparse matrices to dense for easier manipulation
     teams_skill_array = teamsvecs['skill'].toarray()
@@ -29,11 +36,11 @@ def fix_data(teamsvecs, indexes, remove_duplicates=True):
                 # Create masks for filtering
                 has_skills = np.sum(teams_skill_array, axis=1) > 0
                 experts_count = np.sum(teams_member_array, axis=1)
-                has_min_experts = experts_count >= 3
+                has_min_experts = experts_count >= team_size  # Use team_size parameter
                 
                 print(f"\nIteration {iteration}:")
                 print(f"Teams with skills: {np.sum(has_skills)}")
-                print(f"Teams with ≥3 experts: {np.sum(has_min_experts)}")
+                print(f"Teams with ≥{team_size} experts: {np.sum(has_min_experts)}")
                 
                 valid_teams = has_skills & has_min_experts
                 unique_mask = np.ones(len(teams_skill_array), dtype=bool)
@@ -57,10 +64,10 @@ def fix_data(teamsvecs, indexes, remove_duplicates=True):
 
             # Now filter experts based on number of teams
             expert_team_counts = np.sum(teams_member_array, axis=0)
-            experts_with_min_teams = expert_team_counts >= 75
+            experts_with_min_teams = expert_team_counts >= minimum_teams  # Use minimum_teams parameter
             current_expert_count = np.sum(experts_with_min_teams)
             
-            print(f"\nExperts with ≥75 teams: {current_expert_count}")
+            print(f"\nExperts with ≥{minimum_teams} teams: {current_expert_count}")
             
             if current_expert_count == 0:
                 raise ValueError("All experts were filtered out!")
@@ -77,7 +84,7 @@ def fix_data(teamsvecs, indexes, remove_duplicates=True):
 
         # Remove teams that now have too few experts after zeroing out
         team_expert_counts = np.sum(teams_member_array, axis=1)
-        teams_with_experts = team_expert_counts >= 3
+        teams_with_experts = team_expert_counts >= team_size  # Use team_size parameter
         
         teams_skill_array = teams_skill_array[teams_with_experts]
         teams_member_array = teams_member_array[teams_with_experts]
@@ -104,7 +111,7 @@ def fix_data(teamsvecs, indexes, remove_duplicates=True):
                 
                 # Recheck expert counts after duplicate removal
                 expert_team_counts = np.sum(teams_member_array, axis=0)
-                if np.min(expert_team_counts[expert_team_counts > 0]) >= 75:
+                if np.min(expert_team_counts[expert_team_counts > 0]) >= minimum_teams:
                     # All experts still have enough teams
                     break
                 # If not all experts have enough teams, continue the outer loop
@@ -118,7 +125,7 @@ def fix_data(teamsvecs, indexes, remove_duplicates=True):
 
     # Final verification and cleanup
     final_expert_counts = np.sum(teams_member_array, axis=0)
-    active_experts = final_expert_counts >= 75  # Only keep experts with 75+ teams
+    active_experts = final_expert_counts >= minimum_teams  # Use minimum_teams parameter
     
     # Remove completely inactive experts from the matrix
     teams_member_array = teams_member_array[:, active_experts]
@@ -166,9 +173,14 @@ def fix_data(teamsvecs, indexes, remove_duplicates=True):
         indexes['i2m'] = {old_to_new[i]: m for m, i in indexes['i2m'].items() 
                          if i in old_to_new}
 
+    # After all the filtering is done, before returning
+    # Create an id vector for the remaining teams
+    team_ids = np.arange(teams_skill_array.shape[0])
+    
     fixed_teamsvecs = {
         'skill': csr_matrix(teams_skill_array),
-        'member': csr_matrix(teams_member_array)
+        'member': csr_matrix(teams_member_array),
+        'id': csr_matrix(team_ids.reshape(-1, 1))  # Add id vector
     }
     
     return fixed_teamsvecs, indexes
@@ -177,11 +189,14 @@ def main():
     parser = argparse.ArgumentParser(
         description="""
         Fix teams data by applying various filters:
-        1. Remove experts that appear in less than 75 teams
+        1. Remove experts that appear in less than --minimum-teams teams (default: 75)
         2. Remove teams with zero skills
-        3. Remove teams with less than 3 skills
+        3. Remove teams with less than --team-size experts (default: 3)
         4. Optionally remove duplicate teams
         5. Update corresponding indexes to maintain consistency
+        
+        Example usage:
+        python fix_data.py gith gith.data.csv.filtered.mt75.ts3 --minimum-teams 50 --team-size 4
         """,
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
@@ -195,7 +210,9 @@ def main():
     parser.add_argument(
         'subfolder_name',
         type=str,
-        help='Name of the subfolder containing the data (e.g., gith.data.csv.filtered.mt75.ts3)'
+        help='Name of the subfolder containing the data\n' +
+             'Example: gith.data.csv.filtered.mt75.ts3\n' +
+             'Note: The subfolder name can be different from the actual thresholds used'
     )
     
     parser.add_argument(
@@ -203,7 +220,21 @@ def main():
         type=str,
         choices=['yes', 'no'],
         default='yes',
-        help='Remove duplicate teams (default: yes)'
+        help='Whether to remove duplicate teams (default: yes)'
+    )
+
+    parser.add_argument(
+        '--minimum-teams', '-mt',
+        type=int,
+        default=75,
+        help='Minimum number of teams an expert must participate in (default: 75)'
+    )
+    
+    parser.add_argument(
+        '--team-size', '-ts',
+        type=int,
+        default=3,
+        help='Minimum number of experts required per team (default: 3)'
     )
 
     args = parser.parse_args()
@@ -233,7 +264,13 @@ def main():
     
     # Fix both data structures
     remove_duplicates = args.remove_duplicates.lower() == 'yes'
-    fixed_teamsvecs, fixed_indexes = fix_data(teamsvecs, indexes, remove_duplicates)
+    fixed_teamsvecs, fixed_indexes = fix_data(
+        teamsvecs, 
+        indexes, 
+        remove_duplicates=remove_duplicates,
+        minimum_teams=args.minimum_teams,
+        team_size=args.team_size
+    )
     
     # Save both files
     with open(output_file, 'wb') as f:
