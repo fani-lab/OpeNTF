@@ -9,9 +9,24 @@ def create_docker_container(container_name, hostname, version="latest"):
     """
     Create a Docker container with specified name and hostname
     """
-
     mount_dir = "OpeNTF"
     image_name = f"kmthang/opennmt:{version}"
+
+    # Check if image exists
+    check_image_cmd = ["docker", "image", "inspect", image_name]
+    try:
+        result = subprocess.run(check_image_cmd, capture_output=True, check=False)
+        if result.returncode != 0:
+            print(f"Docker image {image_name} not found. Pulling image first...")
+            try:
+                subprocess.run(["docker", "pull", image_name], check=True)
+                print(f"Successfully pulled image {image_name}")
+            except subprocess.CalledProcessError as e:
+                print(f"Error pulling Docker image: {e}")
+                return False
+    except Exception as e:
+        print(f"Error checking for Docker image: {e}")
+        return False
 
     current_dir = os.path.dirname(os.getcwd())
     command = [
