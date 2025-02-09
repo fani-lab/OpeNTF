@@ -160,13 +160,19 @@ def main():
                        default='teamsvecs.pkl',
                        help='Input pickle file name (default: teamsvecs.pkl)')
     
-    parser.add_argument('--mt', type=int,
-                       default=75,
-                       help='Minimum number of teams threshold for experts (default: 75)')
+    parser.add_argument(
+        '--minimum-teams', '-mt',
+        type=int,
+        default=75,
+        help='Minimum number of teams an expert must participate in (default: 75)'
+    )
     
-    parser.add_argument('--ts', type=int,
-                       default=3,
-                       help='Minimum number of skills threshold for teams (default: 3)')
+    parser.add_argument(
+        '--team-size', '-ts',
+        type=int,
+        default=3,
+        help='Minimum number of experts required per team (default: 3)'
+    )
     
     args = parser.parse_args()
 
@@ -184,12 +190,12 @@ def main():
         return
     
     # Analyze the data with custom thresholds
-    stats = analyze_teams(teamsvecs, args.mt, args.ts)
+    stats = analyze_teams(teamsvecs, args.minimum_teams, args.team_size)
     
     # Create output file in the same directory as the input file
     output_suffix = f'_{args.input_file.replace(".pkl", "")}' if args.input_file != 'teamsvecs.pkl' else ''
-    if args.mt != 75 or args.ts != 3:
-        output_suffix += f'.mt{args.mt}.ts{args.ts}'
+    if args.minimum_teams != 75 or args.team_size != 3:
+        output_suffix += f'.mt{args.minimum_teams}.ts{args.team_size}'
     
     # Use custom dataset name for output file if provided
     output_dataset = args.dataset.lower() if args.dataset else args.dataset_name
@@ -239,7 +245,7 @@ def main():
         f.write(',,,\n')
         
         # Expert participation stats - update header to show thresholds
-        f.write(f',#min_exp_team,#max_exp_team,#mt_{args.mt},#ts_{args.ts}\n')
+        f.write(f',#min_exp_team,#max_exp_team,#mt_{args.minimum_teams},#ts_{args.team_size}\n')
         
         # Count experts with min/max team participation
         min_team_experts = sum(1 for x in stats['expert_team_counts'] if x == stats['min_exp_team'])
