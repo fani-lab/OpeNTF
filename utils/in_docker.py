@@ -170,6 +170,28 @@ def kill_all_user_processes(container_name):
     except subprocess.CalledProcessError as e:
         print(f"Error stopping processes: {str(e)}")
 
+def remove_path_using_docker(path):
+    """Remove a file or directory using a temporary Docker container with root access."""
+    try:
+        # Create a temporary container with root access and mount the path to be deleted
+        abs_path = os.path.abspath(path)
+        parent_dir = os.path.dirname(abs_path)
+        target_name = os.path.basename(abs_path)
+        
+        cmd = [
+            'docker', 'run', '--rm',  # Remove container after execution
+            '-v', f'{parent_dir}:/workspace',  # Mount parent directory
+            'ubuntu:latest',  # Use ubuntu image for basic operations
+            'rm', '-rf', f'/workspace/{target_name}'  # Remove the target
+        ]
+        
+        subprocess.run(cmd, check=True)
+        print(f"Successfully removed: {path}")
+        
+    except subprocess.CalledProcessError as e:
+        print(f"Error removing path: {str(e)}")
+        sys.exit(1)
+
 def print_help():
     """Print available commands and their usage."""
     print("\nUsage: python3 in_docker.py <command> [options]")
@@ -193,6 +215,11 @@ def print_help():
     print("\n  stopall: Stop all Python/OpenNMT processes in a container")
     print("      Usage: python3 in_docker.py stopall <container_name>")
     print("      Example: python3 in_docker.py stopall my_container")
+
+    print("\n  rm: Remove a file or directory (useful for docker-created files)")
+    print("     Usage: python3 in_docker.py rm <path_to_folder_or_file>")
+    print("     Example: python3 in_docker.py rm /path/to/folder")
+    print("     Note: Uses a temporary Docker container with root access to remove the path")
 
 def main():
     if len(sys.argv) == 1 or sys.argv[1] in ("-h", "--help"):
@@ -258,6 +285,16 @@ def main():
             print(f"Error: Container '{container_name}' does not exist.")
             sys.exit(1)
         kill_all_user_processes(container_name)
+
+    elif command == "rm":
+        if len(sys.argv) != 3:
+            print("Error: Please provide path to remove")
+            sys.exit(1)
+        path = sys.argv[2]
+        if not os.path.exists(path):
+            print(f"Error: Path '{path}' does not exist.")
+            sys.exit(1)
+        remove_path_using_docker(path)
 
     elif command in ("-h", "--help"):
         print_help()
