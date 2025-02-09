@@ -1,6 +1,6 @@
 #!/bin/bash
 
-template_version=1.4.1
+template_version=1.5
 script_name=$(basename "$0" .sh)
 
 # Ensure the script runs in the background with nohup and redirects output to a log file
@@ -61,19 +61,13 @@ gpus="6,7"
 # ------------------------------------------------------------------------------
 
 if [ "$use_auto_datasets" = true ]; then
-  datasets=($auto_datasets)
+  datasets=("${auto_datasets[@]}")
 else
-  datasets=($manual_datasets)
+  datasets=("${manual_datasets[@]}")
 fi
 
-declare -A dataset_paths
-dataset_paths["toy_dblp"]="../data/preprocessed/dblp/toy.dblp.v12.json"
-dataset_paths["dblp"]="../data/preprocessed/dblp/dblp.v12.json.filtered.mt75.ts3"
-dataset_paths["gith"]="../data/preprocessed/gith/gith.data.csv.filtered.mt75.ts3"
-dataset_paths["imdb"]="../data/preprocessed/imdb/imdb.title.basics.tsv.filtered.mt75.ts3"
-dataset_paths["uspt"]="../data/preprocessed/uspt/uspt.patent.tsv.filtered.mt75.ts3"
-
-
+# Source dataset paths
+source "$(dirname "${BASH_SOURCE[0]}")/_dataset_paths.sh"
 
 # Log file for all run times
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
