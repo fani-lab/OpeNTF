@@ -1,9 +1,9 @@
-## Transformer with Attention Configuration for gith
+## Mean Encoder Configuration for gith
 
-save_data: ../output/nmt/run/transformer
-save_model: ../output/nmt/run/transformer_model
-src_vocab: ../output/nmt/run/transformer.vocab.src
-tgt_vocab: ../output/nmt/run/transformer.vocab.tgt
+save_data: ../output/nmt/run/mean
+save_model: ../output/nmt/run/mean_model
+src_vocab: ../output/nmt/run/mean.vocab.src
+tgt_vocab: ../output/nmt/run/mean.vocab.tgt
 overwrite: True
 data:
   corpus_1:
@@ -14,15 +14,11 @@ data:
     path_src: ../output/nmt/src-val.txt
     path_tgt: ../output/nmt/tgt-val.txt
 
-# -------------------------------------------
-# Configuration for training
-# -------------------------------------------
-
 # Common hyperparameters
 # General opts
 keep_checkpoint: -1
 seed: 0
-train_steps: 1224 # sample size of 7833
+train_steps: 1224  # sample size of 7833
 save_checkpoint_steps: 122
 valid_steps: 122
 report_every: 122
@@ -30,7 +26,7 @@ report_every: 122
 # Batching
 world_size: 2
 gpu_ranks: [0, 1]
-num_workers: 8
+num_workers: 4
 batch_size: 128
 bucket_size: 832
 valid_batch_size: 128
@@ -43,19 +39,14 @@ learning_rate: 0.0025
 adam_beta1: 0.9
 adam_beta2: 0.98
 
-# --------------------------------------------
-
 # Architecture specific hyperparameters
-encoder_type: transformer
-decoder_type: transformer
-positional_encoding: True
-hidden_size: 128
+encoder_type: mean
+decoder_type: rnn  # Usually paired with RNN decoder
+rnn_type: LSTM
+rnn_size: 128  # This is the layer_size for RNN-based models
 word_vec_size: 128
-transformer_ff: 512
+input_feed: 1
 
+# Mean Encoder specific parameters
 dropout: 0.2
-attention_dropout: 0.2
-
-enc_layers: 4
-dec_layers: 4
-heads: 4 
+dec_layers: 2  # Only decoder layers as mean encoder is single-layer 

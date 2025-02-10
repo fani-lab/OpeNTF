@@ -1,0 +1,59 @@
+## DLCL (Dynamic Linear Combination of Layers) Configuration for gith
+
+save_data: ../output/nmt/run/dlcl
+save_model: ../output/nmt/run/dlcl_model
+src_vocab: ../output/nmt/run/dlcl.vocab.src
+tgt_vocab: ../output/nmt/run/dlcl.vocab.tgt
+overwrite: True
+data:
+  corpus_1:
+    path_src: ../output/nmt/src-train.txt
+    path_tgt: ../output/nmt/tgt-train.txt
+    weight: 1
+  valid:
+    path_src: ../output/nmt/src-val.txt
+    path_tgt: ../output/nmt/tgt-val.txt
+
+# Common hyperparameters
+# General opts
+keep_checkpoint: -1
+seed: 0
+train_steps: 1224  # sample size of 7833
+save_checkpoint_steps: 122
+valid_steps: 122
+report_every: 122
+
+# Batching
+world_size: 2
+gpu_ranks: [0, 1]
+num_workers: 8
+batch_size: 128
+bucket_size: 832
+valid_batch_size: 128
+
+# Optimization
+model_dtype: "fp16"
+optim: adam
+weight_decay: 0.0001
+learning_rate: 0.0025
+adam_beta1: 0.9
+adam_beta2: 0.98
+
+# Architecture specific hyperparameters
+encoder_type: transformer
+decoder_type: transformer
+position_encoding: true
+hidden_size: 128  # This is the layer_size for Transformer-based models
+word_vec_size: 128
+transformer_ff: 512
+
+# DLCL specific parameters through transformer settings
+dropout: 0.2
+attention_dropout: 0.2
+enc_layers: 4
+dec_layers: 4
+heads: 4
+
+# Additional transformer parameters for DLCL-style behavior
+max_relative_positions: 4  # Similar to dlcl_window
+self_attn_type: "scaled-dot" 
