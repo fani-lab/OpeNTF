@@ -186,7 +186,13 @@ class Nmt(Ntf):
                     yhat_count = len(yhat_list)
                     if yhat_count != 0:
                         for pred in yhat_list:
-                            Y_[i, int(pred)] = 1 / yhat_count
+                            if pred == '<blank>':
+                                continue
+                            try:
+                                Y_[i, int(pred)] = 1 / yhat_count
+                            except ValueError:
+                                logging.warning(f"Skipping invalid prediction: {pred}")
+                                continue
 
                     # y_list = (tgt_csv.iloc[i])[0].replace('m', '').split(' ')
                     # y_count = len(y_list)
