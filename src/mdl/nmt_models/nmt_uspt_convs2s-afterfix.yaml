@@ -42,8 +42,8 @@ adam_beta2: 0.98
 # Architecture specific hyperparameters
 encoder_type: cnn
 decoder_type: cnn
-cnn_size: 256  # Increased from 128 for better representation capacity
-word_vec_size: 256  # Matched with cnn_size
+cnn_size: 128  # Increased from 128 for better representation capacity
+word_vec_size: 128  # Matched with cnn_size
 
 # ConvS2S specific parameters
 cnn_kernel_width: 5
