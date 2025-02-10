@@ -192,6 +192,30 @@ def remove_path_using_docker(path):
         print(f"Error removing path: {str(e)}")
         sys.exit(1)
 
+def rename_path_using_docker(old_path, new_path):
+    """Rename a file or directory using a temporary Docker container."""
+    try:
+        abs_old_path = os.path.abspath(old_path)
+        parent_dir = os.path.dirname(abs_old_path)
+        old_name = os.path.basename(abs_old_path)
+        abs_new_path = os.path.abspath(new_path)
+        new_name = os.path.basename(abs_new_path)
+
+
+        cmd = [
+            'docker', 'run', '--rm',
+            '-v', f'{parent_dir}:/workspace',
+            'ubuntu:latest',
+            'mv', f'/workspace/{old_name}', f'/workspace/{new_name}'
+        ]
+
+        subprocess.run(cmd, check=True)
+        print(f"Successfully renamed '{old_path}' to '{new_path}'")
+
+    except subprocess.CalledProcessError as e:
+        print(f"Error renaming path: {str(e)}")
+        sys.exit(1)
+
 def print_help():
     """Print available commands and their usage."""
     print("\nUsage: python3 in_docker.py <command> [options]")
@@ -220,6 +244,12 @@ def print_help():
     print("     Usage: python3 in_docker.py rm <path_to_folder_or_file>")
     print("     Example: python3 in_docker.py rm /path/to/folder")
     print("     Note: Uses a temporary Docker container with root access to remove the path")
+
+    print("\n  mv: Rename a file or directory (useful for docker-created files/folders)")
+    print("      Usage: python3 in_docker.py mv <old_path> <new_path>")
+    print("      Example: python3 in_docker.py mv /path/to/old_folder /path/to/new_folder")
+    print("      Note:  Uses a temporary Docker container with root access to rename the path.")
+
 
 def main():
     if len(sys.argv) == 1 or sys.argv[1] in ("-h", "--help"):
@@ -295,6 +325,17 @@ def main():
             print(f"Error: Path '{path}' does not exist.")
             sys.exit(1)
         remove_path_using_docker(path)
+
+    elif command == "mv":
+        if len(sys.argv) != 4:
+            print("Error: Please provide old path and new path")
+            sys.exit(1)
+        old_path = sys.argv[2]
+        new_path = sys.argv[3]
+        if not os.path.exists(old_path):
+            print(f"Error: Old path '{old_path}' does not exist.")
+            sys.exit(1)
+        rename_path_using_docker(old_path, new_path)
 
     elif command in ("-h", "--help"):
         print_help()
