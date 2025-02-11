@@ -52,7 +52,7 @@ conda install -y pytorch==1.10.1 torchvision==0.11.2 torchaudio==0.10.1 cudatool
 
 # Install OpenNMT-py and pytrec_eval using pip (not available in conda)
 echo "Installing OpenNMT-py and pytrec_eval..."
-pip install OpenNMT-py==3.0.4 pytrec_eval
+pip install OpenNMT-py==3.0.4 pytrec-eval-terrier==0.5.2
 
 # Install PyTorch Geometric and dependencies
 echo "Installing PyTorch Geometric ecosystem..."
