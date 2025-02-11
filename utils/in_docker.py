@@ -216,6 +216,32 @@ def rename_path_using_docker(old_path, new_path):
         print(f"Error renaming path: {str(e)}")
         sys.exit(1)
 
+def fix_ownership_using_docker(path):
+    """Change ownership of a path to current host user using a temporary Docker container."""
+    try:
+        # Get current user and group IDs
+        user_id = subprocess.check_output(['id', '-u']).decode('utf-8').strip()
+        group_id = subprocess.check_output(['id', '-g']).decode('utf-8').strip()
+
+        # Create absolute path and get parent directory
+        abs_path = os.path.abspath(path)
+        parent_dir = os.path.dirname(abs_path)
+        target_name = os.path.basename(abs_path)
+        
+        cmd = [
+            'docker', 'run', '--rm',  # Remove container after execution
+            '-v', f'{parent_dir}:/workspace',  # Mount parent directory
+            'ubuntu:latest',  # Use ubuntu image for basic operations
+            'chown', '-R', f'{user_id}:{group_id}', f'/workspace/{target_name}'  # Change ownership
+        ]
+        
+        subprocess.run(cmd, check=True)
+        print(f"Successfully changed ownership of '{path}' to user {user_id}:{group_id}")
+        
+    except subprocess.CalledProcessError as e:
+        print(f"Error changing ownership: {str(e)}")
+        sys.exit(1)
+
 def print_help():
     """Print available commands and their usage."""
     print("\nUsage: python3 in_docker.py <command> [options]")
@@ -250,6 +276,11 @@ def print_help():
     print("      Example: python3 in_docker.py mv /path/to/old_folder /path/to/new_folder")
     print("      Note:  Uses a temporary Docker container with root access to rename the path.")
 
+    print("\n  fixowner: Change ownership of a file/directory to current host user")
+    print("      Usage: python3 in_docker.py fixowner <path_to_folder_or_file>")
+    print("      Example: python3 in_docker.py fixowner /path/to/folder")
+    print("      Note: Uses a temporary Docker container to change ownership to current host user")
+    print("            Useful for fixing permission issues with Docker-created files")
 
 def main():
     if len(sys.argv) == 1 or sys.argv[1] in ("-h", "--help"):
@@ -336,6 +367,16 @@ def main():
             print(f"Error: Old path '{old_path}' does not exist.")
             sys.exit(1)
         rename_path_using_docker(old_path, new_path)
+
+    elif command == "fixowner":
+        if len(sys.argv) != 3:
+            print("Error: Please provide path to change ownership")
+            sys.exit(1)
+        path = sys.argv[2]
+        if not os.path.exists(path):
+            print(f"Error: Path '{path}' does not exist.")
+            sys.exit(1)
+        fix_ownership_using_docker(path)
 
     elif command in ("-h", "--help"):
         print_help()
