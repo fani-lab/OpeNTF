@@ -54,4 +54,4 @@ word_vec_size: 128
 # ConvS2S specific parameters
 cnn_kernel_width: 3
 layers: 8  # Number of conv layers in both encoder and decoder
-dropout: 0.2
+dropout: 0.4
