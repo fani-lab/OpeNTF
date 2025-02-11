@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Suppress FutureWarnings
+export PYTHONWARNINGS="ignore::FutureWarning"
+
 # Dataset paths configuration
 declare -A dataset_paths
 dataset_paths["toy_dblp"]="../data/preprocessed/dblp/toy.dblp.v12.json"
@@ -117,18 +120,17 @@ run_main() {
     local template_version=$1
     local script_name=$2
     local use_dataset_in_filename=$3
-    local models=("${!4}")
-    local manual_datasets=("${!5}")
+    local models_string=$4  # Receiving pipe-delimited string
+    local datasets_string=$5  # Receiving pipe-delimited string
     local gpu_indices=$6
     local run_next_script=$7
     local next_script_name=$8
 
-    # Ensure the script runs in the background with nohup and redirects output to a log file
-    if [[ "$1" != "--nohup" ]]; then
-        nohup "$0" --nohup "$@" > "${script_name}.log" 2>&1 &
-        exit
-    fi
+    # Split strings into arrays
+    IFS='|' read -ra models <<< "$models_string"
+    IFS='|' read -ra manual_datasets <<< "$datasets_string"
 
+    # Remove the nohup check since we'll handle background execution differently
     set -e  # Exit on any error
 
     # Parse datasets from script name
@@ -146,12 +148,18 @@ run_main() {
     # Print script info
     print_script_info "$template_version" "$script_name" "$jobs"
 
+    start_time=$(date +%s)
+
     # loop over models and each model over datasets
     for model in "${models[@]}"; do
-        for dataset in "${!datasets[@]}"; do
-            current_dataset="${datasets[$dataset]}"
+        for dataset in "${datasets[@]}"; do
+            current_dataset="${dataset}"
             current_dataset_path="${dataset_paths[$current_dataset]}"
             current_model="${current_dataset}_${model}"
+
+            # Create separate log files for each model
+            log_file="../run_logs/${current_model}.log"
+            error_log="../run_logs/${current_model}_errors.log"
 
             # if current_dataset has "toy_" prefix, then take out the prefix
             if [[ $current_dataset == *"toy_"* ]]; then
@@ -161,16 +169,18 @@ run_main() {
             fi
 
             # Print job status
-            print_job_status "$job_num" "$jobs" "$pid" "$current_model" "$current_dataset"
+            print_job_status "$job_num" "$jobs" "$$" "$current_model" "$current_dataset"
             
             # Print start time
             print_timestamps "Started"
             
-            # Run command
-            run_command "$current_dataset_path" "$domain" "$current_model" "$gpu_indices" &
-            
-            pid=$!
-            wait $pid
+            # Run command with model-specific log files
+            python3 -u main.py \
+                -data "$current_dataset_path" \
+                -domain "$domain" \
+                -model "nmt_${current_model}" \
+                -gpus "$gpu_indices" \
+                > "$log_file" 2> "$error_log"
             
             # Get the end time
             end_time=$(date +%s)
