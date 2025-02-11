@@ -97,13 +97,22 @@ next_script_name="example_next_script.sh"
 # Source common functions
 source "$(dirname "${BASH_SOURCE[0]}")/_commons.sh"
 
+# Convert models array to pipe-delimited string
+models_string=$(IFS='|'; echo "${models[*]}")
+
+# Convert arrays to pipe-delimited strings
+datasets_string=$(IFS='|'; echo "${datasets[*]}")
+
 # Run the main execution logic
+nohup bash -c "source \"$(dirname "${BASH_SOURCE[0]}")/_commons.sh\" && \
 run_main \
-    "$template_version" \
-    "$(basename "$0" .sh)" \
-    "$use_dataset_in_filename" \
-    "${models[@]}" \
-    "${datasets[@]}" \
-    "$gpus_to_use" \
-    "$run_next_script" \
-    "$next_script_name"
+    \"$template_version\" \
+    \"$(basename "$0" .sh)\" \
+    \"$use_dataset_in_filename\" \
+    \"$models_string\" \
+    \"$datasets_string\" \
+    \"$gpu_indices_to_use\" \
+    \"$run_next_script\" \
+    \"$next_script_name\"" > "$(basename "$0" .sh).log" 2>&1 &
+
+echo "Script started in background. Check $(basename "$0" .sh).log for progress."
