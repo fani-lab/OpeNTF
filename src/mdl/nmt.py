@@ -131,9 +131,9 @@ class Nmt(Ntf):
         else:
             try:
                 # Always use GPU 0 for translation
-                print(f"Using GPU {first_gpu}")
+                print(f"Using GPU {first_gpu}\n")
             except Exception as e:
-                print(f"Error setting GPU: {e}")
+                print(f"Error setting GPU: {e}\n")
                 gpu_available = False
 
         for foldidx in splits["folds"].keys():
