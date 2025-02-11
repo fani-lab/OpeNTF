@@ -71,7 +71,6 @@ def create_docker_container(container_name, hostname, version="latest", is_windo
     return True
 
 def main():
-    # Create argument parser
     parser = argparse.ArgumentParser(
         description='Create Docker containers for OpenNMT with proper user permissions and GPU support',
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -82,12 +81,14 @@ Examples:
     # Creates containers with host user permissions mapped automatically
 
   Create containers for Windows:
-    python3 create_containers.py --windows c1 c2 c3
-    # or
     python3 create_containers.py -w c1 c2 c3
+    # or
+    python3 create_containers.py --windows c1 c2 c3
 
   Create containers with specific version:
-    python3 create_containers.py --v 1.0 c1 c2 c3
+    python3 create_containers.py -v 1.0 c1 c2 c3
+    # or
+    python3 create_containers.py --version 1.0 c1 c2 c3
 
 Note:
   - Each container will be created with GPU support enabled
@@ -101,9 +102,12 @@ Note:
   - Container names will be used as their hostnames
   - All containers are created in detached mode (-d) with interactive TTY (-it)
 ''')
-    parser.add_argument('--v', default='latest', help='Image version (default: latest)')
-    parser.add_argument('--windows', '-w', action='store_true', help='Create containers for Windows environment')
-    parser.add_argument('containers', nargs='+', help='One or more container names to create')
+    parser.add_argument('-v', '--version', dest='v', default='latest', 
+                       help='Image version (default: latest)')
+    parser.add_argument('-w', '--windows', action='store_true', 
+                       help='Create containers for Windows environment')
+    parser.add_argument('containers', nargs='+', 
+                       help='One or more container names to create')
     
     # Parse arguments
     args = parser.parse_args()
