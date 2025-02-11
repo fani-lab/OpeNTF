@@ -31,7 +31,7 @@ models=("mode1")
 # TODO: NOT WORKING YET
 # If true, parse datasets from filename (e.g., 1.5-igd-...)
 # i = imdb, g = gith, d = dblp, u = uspt
-# use_dataset_in_filename=false
+use_dataset_in_filename=false
 
 # Used if use_dataset_in_filename is false
 datasets=("dblp")
