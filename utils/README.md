@@ -1,4 +1,4 @@
-# OpeNTF Utilities
+# OpeNTF-NMT Utilities
 
 This folder contains various utility scripts that assist with data processing, analysis, and Docker container management for the OpeNTF project. Each script is designed for a specific purpose. Below is a brief description of what each script does and why you might need to use it.
 
@@ -60,36 +60,65 @@ This folder contains various utility scripts that assist with data processing, a
 
 ### create_containers.py
 - **Purpose:** Creates Docker containers for setting up OpenNMT training environments with GPU support.
-- **Usage Example:**
-  ```bash
-  python3 create_containers.py --v 1.0 container1 container2
-  ```
-- **When to Use:** Facilitates the quick provision of containerized environments needed for OpenNMT with customizable container names and image versions.
-
-### in_docker.py
-- **Purpose:** Provides a suite of Docker container management commands, including:
-  - Listing processes inside containers.
-  - Running shell scripts within containers.
-  - Stopping specific or all processes.
-  - Removing files or directories via a temporary container.
+- **Features:**
+  - Automatic user permission mapping for Linux environments
+  - Windows compatibility mode
+  - GPU support enabled by default
 - **Usage Examples:**
   ```bash
-  # List processes in a container
-  python3 in_docker.py ps container_name
+  # Create containers in Linux (with user permission mapping)
+  python3 create_containers.py c1 c2 c3
 
-  # Run a shell script inside a container
-  python3 in_docker.py run container_name script.sh
+  # Create containers for Windows environment
+  python3 create_containers.py -w c1 c2 c3
+  # or
+  python3 create_containers.py --windows c1 c2 c3
 
-  # Stop a specific script process
-  python3 in_docker.py stop container_name script.sh
-
-  # Stop all Python/OpenNMT processes
-  python3 in_docker.py stopall container_name
-
-  # Remove a problematic file or folder
-  python3 in_docker.py rm /path/to/remove
+  # Create containers with specific version
+  python3 create_containers.py -v 1.0 c1 c2 c3
+  # or
+  python3 create_containers.py --version 1.0 c1 c2 c3
   ```
-- **When to Use:** Use this script for managing iterative training processes, troubleshooting container issues, or cleaning up resources.
+- **When to Use:** When setting up new training environments or scaling existing ones.
+
+### in_docker.py
+- **Purpose:** Provides a comprehensive suite of Docker container management commands.
+- **Available Commands:**
+  - **ps**: List Python/OpenNMT processes in containers
+    ```bash
+    python3 in_docker.py ps container_name
+    python3 in_docker.py ps "container_prefix_*"  # Pattern matching
+    ```
+  - **run**: Execute shell scripts within containers
+    ```bash
+    python3 in_docker.py run container_name script.sh
+    ```
+  - **stop**: Stop specific script processes
+    ```bash
+    python3 in_docker.py stop container_name script.sh
+    ```
+  - **stopall**: Stop all Python/OpenNMT processes
+    ```bash
+    python3 in_docker.py stopall container_name
+    ```
+  - **rm**: Remove files/directories using a temporary container
+    ```bash
+    python3 in_docker.py rm /path/to/remove
+    ```
+  - **mv**: Rename files/directories using a temporary container
+    ```bash
+    python3 in_docker.py mv /old/path /new/path
+    ```
+  - **fixowner**: Change ownership of files/directories to current host user
+    ```bash
+    python3 in_docker.py fixowner /path/to/fix
+    ```
+- **When to Use:**
+  - Managing container processes
+  - Running training scripts
+  - Handling permission issues with Docker-created files
+  - Cleaning up resources
+  - Fixing ownership of files created by Docker containers
 
 ---
 
