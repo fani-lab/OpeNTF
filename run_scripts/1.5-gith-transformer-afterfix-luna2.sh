@@ -23,17 +23,17 @@ template_version=1.5
 # ONLY EDIT THIS SECTION
 
 # GPU indices to use for training
-gpus_to_use="2"
+gpu_indices_to_use="2"
 
 # models to run located in the src/mdl/nmt_models directory
 models=("transformer-afterfix-luna2")
 
 # If true, parse datasets from filename (e.g., 1.5-igd-...)
 # i = imdb, g = gith, d = dblp, u = uspt
-use_dataset_in_filename=true
+use_dataset_in_filename=false
 
 # Used if use_dataset_in_filename is false
-datasets=("dblp")
+datasets=("gith")
 
 run_next_script=false
 next_script_name="example_next_script.sh"
@@ -103,6 +103,6 @@ run_main \
     "$use_dataset_in_filename" \
     "${models[@]}" \
     "${datasets[@]}" \
-    "$gpus_to_use" \
+    "$gpu_indices_to_use" \
     "$run_next_script" \
     "$next_script_name"
