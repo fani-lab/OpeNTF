@@ -5,6 +5,7 @@ import shlex
 import numpy as np
 import pandas as pd
 import torch
+import warnings
 from shutil import copyfile
 
 from tqdm import tqdm
@@ -13,6 +14,9 @@ from mdl.ntf import Ntf
 from sklearn.model_selection import ParameterGrid
 from sklearn.metrics import make_scorer
 
+# Suppress specific CUDA AMP warnings
+warnings.filterwarnings('ignore', message='.*torch.cuda.amp.custom_fwd.*')
+warnings.filterwarnings('ignore', message='.*torch.cuda.amp.custom_bwd.*')
 
 class Nmt(Ntf):
 
@@ -112,8 +116,25 @@ class Nmt(Ntf):
     # todo: eval on prediction files
 
     def test(self, splits, path, per_epoch, **kwargs):
-
         gpus = kwargs.get("gpus")
+        
+        # Print CUDA diagnostic information
+        print("\nCUDA Diagnostic Information:")
+        print(f"CUDA available: {torch.cuda.is_available()}")
+        print(f"CUDA version: {torch.version.cuda}")
+        print(f"Number of GPUs: {torch.cuda.device_count()}")
+        
+        gpu_available = torch.cuda.is_available()
+        if not gpu_available:
+            print("WARNING: CUDA/GPU not available, falling back to CPU")
+        else:
+            try:
+                # Always use GPU 0 for translation
+                torch.cuda.set_device(0)
+                print(f"Using GPU 0: {torch.cuda.get_device_name(0)}")
+            except Exception as e:
+                print(f"Error setting GPU: {e}")
+                gpu_available = False
 
         for foldidx in splits["folds"].keys():
             fold_path = f"{path}/fold{foldidx}"
@@ -135,7 +156,7 @@ class Nmt(Ntf):
                 cli_cmd += f"-model {model} "
                 cli_cmd += f"-src {path}/src-test.txt "
                 cli_cmd += f"-output {pred_path} "
-                cli_cmd += f"-gpu 0 " if torch.cuda.is_available() else ""
+                cli_cmd += f"-gpu 0 " if gpu_available else ""
                 cli_cmd += "--min_length 2 "
                 cli_cmd += "-verbose "
                 print(f"Executing command: {cli_cmd}")
@@ -146,10 +167,27 @@ class Nmt(Ntf):
                     )
                     print(f"Command output: {result.stdout}")
                     print(f"Command error (if any): {result.stderr}")
+                    # Verify the prediction file was created and has content
+                    if not os.path.exists(pred_path):
+                        raise RuntimeError(f"Prediction file {pred_path} was not created")
+                    if os.path.getsize(pred_path) == 0:
+                        raise RuntimeError(f"Prediction file {pred_path} is empty")
+                    # Try reading the file to verify format
+                    try:
+                        test_read = pd.read_csv(pred_path, header=None)
+                        if len(test_read) == 0:
+                            raise RuntimeError(f"No predictions found in {pred_path}")
+                    except Exception as e:
+                        raise RuntimeError(f"Error reading predictions from {pred_path}: {str(e)}")
                 except subprocess.CalledProcessError as e:
                     print(f"Error executing command: {e}")
                     print(f"Command output: {e.stdout}")
                     print(f"Command error: {e.stderr}")
+                except RuntimeError as e:
+                    print(f"Error with prediction file: {str(e)}")
+                    # Clean up empty/invalid prediction file
+                    if os.path.exists(pred_path):
+                        os.remove(pred_path)
 
     def eval(self, splits, path, member_count, y_test, per_epoch):
         fold_mean = pd.DataFrame()
@@ -194,10 +232,10 @@ class Nmt(Ntf):
                                 logging.warning(f"Skipping invalid prediction: {pred}")
                                 continue
 
-                    # y_list = (tgt_csv.iloc[i])[0].replace('m', '').split(' ')
-                    # y_count = len(y_list)
-                    # for tgt in y_list:
-                    #     Y[i, int(tgt)] = 1
+                # y_list = (tgt_csv.iloc[i])[0].replace('m', '').split(' ')
+                # y_count = len(y_list)
+                # for tgt in y_list:
+                #     Y[i, int(tgt)] = 1
                 df, df_mean, (fpr, tpr) = calculate_metrics(y_test, Y_, False)
                 df_mean.to_csv(
                     f"{fold_path}/test.fold{foldidx}.epoch{epoch}.pred.eval.mean.csv"
