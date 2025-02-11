@@ -1,159 +1,108 @@
 #!/bin/bash
 
+# Version info
 template_version=1.5
-script_name=$(basename "$0" .sh)
 
-# Ensure the script runs in the background with nohup and redirects output to a log file
-if [[ "$1" != "--nohup" ]]; then
-  nohup "$0" --nohup "$@" > "${script_name}.log" 2>&1 &
-  exit
-fi
-
-set -e  # Exit on any error
-
-# Get auto datasets from script name
-_datasets=$(echo "$script_name" | cut -d'-' -f2)
-
-# Check if _datasets contains only i,g,d,u characters
-if [[ $_datasets =~ ^[igdu]+$ ]]; then
-    use_auto_datasets=true
-else
-    use_auto_datasets=false
-fi
+# ------------------------------------------------------------------------------
+# WHY THIS SCRIPT?
+#
+# The reason for this script is to run multiple model(s) and dataset(s) one
+# after another without the need to attend in the background. This also avoids
+# the need to run multiple terminals and allows for easy monitoring of all
+# scripts while logging all terminal outputs in log files (including errors).
+#
+# That's is the power of this script.
+# 
+# Note: log files will appear in the "run_logs" directory.
+# ------------------------------------------------------------------------------
 
 
-# Initialize empty auto_datasets array
-auto_datasets=()
-
-# Loop through each character in _datasets
-for (( i=0; i<${#_datasets}; i++ )); do
-    char="${_datasets:$i:1}"
-    case $char in
-        i)
-            auto_datasets+=("imdb")
-            ;;
-        g)
-            auto_datasets+=("gith")
-            ;;
-        u)
-            auto_datasets+=("uspt")
-            ;;
-        d)
-            auto_datasets+=("dblp")
-            ;;
-    esac
-done
-
-
-# COMMAND TO RUN:
-# ./scriptname.sh
 
 # ------------------------------------------------------------------------------
 # CONFIGURATIONS
-# ------------------------------------------------------------------------------
+# ONLY EDIT THIS SECTION
 
+# GPU indices to use for training
+gpus_to_use="6,7"
+
+# models to run located in the src/mdl/nmt_models directory
 models=("mode1")
-manual_datasets=("dblp")
-gpus="6,7"
+
+# If true, parse datasets from filename (e.g., 1.5-igd-...)
+# i = imdb, g = gith, d = dblp, u = uspt
+use_dataset_in_filename=false
+
+# Used if use_dataset_in_filename is false
+datasets=("dblp")
+
+run_next_script=false
+next_script_name="example_next_script.sh"
+
+# INSTRUCTIONS ARE BELOW
+# ------------------------------------------------------------------------------
+
+
 
 # ------------------------------------------------------------------------------
-# END CONFIGURATIONS
+# INSTRUCTIONS
+# 
+# Recommended script file naming convention:
+# <version>-<dataset>-<model>-<tags>.sh
+# 
+# <version> is the version number of the template
+#
+# Example:
+# 1.5-gith-model1-run1.sh
+# 1.5-dblp-model1-run1-set1.sh
+#
+# Step 1. Duplicate and rename this script using the recommended naming 
+#         convention above.
+# Step 2. Edit the configurations above.
+# Step 3. Run the script by typing "./<script_name>.sh" in the terminal.
+#
+# ------------------------------------------------------------------------------
+# DETAILED INSTRUCTIONS
+#
+# models=("mode1")
+# models to run located in the src/mdl/nmt_models directory
+# In that directory, model names are prefixed with 
+# "nmt-<dataset_name>-<model_name>-<tags>.yaml"
+# i.e., nmt-dblp-model1-afterfix.yaml (then you write "model1" in the models array)
+#
+# If you want to run a single model models=("model1")
+# or you can still set multiple models manually like this:
+# models=("model1" "model2" "model3")
+
+# use_dataset_in_filename=false
+# If true, parse datasets from filename (e.g., 1.5-igd-...)
+# i = imdb, g = gith, d = dblp, u = uspt
+# useful approach when running multiple datasets automatically and sequentially
+# default: false
+
+# datasets=("dblp")
+# i.e., if you want to run a single dataset datasets=("dblp")
+# or you can still set multiple datasets manually like this:
+# datasets=("dblp" "imdb" "gith" "uspt")
+# useful approach when running multiple of these scripts in docker containers in
+# parallel (i.e., not sequentially, set one dataset in script and run all in docker
+# containers in parallel)
 # ------------------------------------------------------------------------------
 
-if [ "$use_auto_datasets" = true ]; then
-  datasets=("${auto_datasets[@]}")
-else
-  datasets=("${manual_datasets[@]}")
-fi
 
-# Source dataset paths
-source "$(dirname "${BASH_SOURCE[0]}")/_dataset_paths.sh"
 
-# Log file for all run times
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-times_dir="${SCRIPT_DIR}/../run_times"
-logs_dir="${SCRIPT_DIR}/../run_logs"
+# ------------------------------------------------------------------------------
+# DO NOT EDIT BELOW THIS LINE
 
-# get length of models array
-num_models=${#models[@]}
+# Source common functions
+source "$(dirname "${BASH_SOURCE[0]}")/_commons.sh"
 
-# get length of datasets array
-num_datasets=${#datasets[@]}
-
-# total jobs to run
-jobs=$((num_models * num_datasets))
-job_num=1
-
-# Ensure the directories exist
-mkdir -p ../run_logs
-cd ../src
-echo -e "Template\t: v${template_version}"
-echo -e "Script\t\t: ${script_name}.sh"
-echo -e "Jobs\t\t: ${jobs}"
-
-# loop over models and each model over datasets
-for model in "${models[@]}"; do
-  for dataset in "${!datasets[@]}"; do
-
-    current_dataset="${datasets[$dataset]}"
-    current_dataset_path="${dataset_paths[$current_dataset]}"
-    current_model="${current_dataset}_${model}"
-
-    # if current_dataset has "toy_" prefix, then take out the prefix and assign the dataset name to domain variable
-    if [[ $current_dataset == *"toy_"* ]]; then
-      domain=${current_dataset#"toy_"}
-    else
-      domain=$current_dataset
-    fi
-
-    echo ""
-    # Get the start time
-    start_time=$(date +%s)
-    start_time_est=$(date -u -d "-3 hours -33 minutes" +"%Y-%m-%d %H:%M:%S")
-    
-    # Run the command with nohup and capture its PID
-    nohup python3 -u main.py \
-      -data $current_dataset_path \
-      -domain $domain \
-      -model "nmt_${current_model}" \
-      -gpus $gpus \
-      > "../run_logs/${current_model}.log" 2> "../run_logs/${current_model}_errors.log" &
-    
-    pid=$!
-    
-    echo "[Job $job_num/$jobs] Process $pid. Model: ${current_model}. Dataset: ${current_dataset}."
-    echo -e "\tStarted at\t: ${start_time_est} EST"
-    
-    # Wait for the process to complete
-    wait $pid
-    
-    # Get the end time
-    end_time=$(date +%s)
-    end_time_est=$(date -u -d "-3 hours -33 minutes" +"%Y-%m-%d %H:%M:%S")
-     echo -e "\tEnded at\t: ${end_time_est} EST"
-    
-    # Calculate the elapsed time in seconds
-    elapsed_time=$(($end_time - $start_time))
-
-    # Convert elapsed time into hours, minutes, and seconds
-    hours=$(($elapsed_time / 3600))
-    minutes=$(($elapsed_time % 3600 / 60))
-    seconds=$(($elapsed_time % 60))
-    
-    # Format the elapsed time as Xh Xm Xs
-    formatted_time="${hours}h ${minutes}m ${seconds}s"
-
-    in_minutes=$(($elapsed_time / 60))
-    job_num=$((job_num + 1))
-
-    echo -e "\tElapsed\t\t: ${formatted_time} ($in_minutes mins)."
-  done
-done
-
-echo ""
-echo "All ${jobs} jobs completed."
-
-# run another .sh file
-# echo ""
-# echo "Running the next .sh file..."
-# ./abs_imdb_wvsize.sh
+# Run the main execution logic
+run_main \
+    "$template_version" \
+    "$(basename "$0" .sh)" \
+    "$use_dataset_in_filename" \
+    "${models[@]}" \
+    "${datasets[@]}" \
+    "$gpus_to_use" \
+    "$run_next_script" \
+    "$next_script_name"

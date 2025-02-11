@@ -1,0 +1,1175 @@
+s4 s20
+s1 s3 s16 s20
+s3 s14 s20
+s1 s20
+s4 s11 s20
+s1 s20
+s4 s20
+s1 s17 s20
+s4 s20
+s3 s8 s20
+s0 s1 s10 s14 s15 s17 s20
+s1 s3 s4 s8 s20
+s1 s20
+s4 s20
+s1 s20
+s3 s4 s17 s20
+s1 s3 s17 s20
+s1 s20
+s1 s20
+s1 s20
+s4 s20
+s3 s4 s20
+s1 s20
+s0 s1 s3 s4 s5 s10 s12 s15 s20
+s1 s3 s17 s20
+s1 s4 s20
+s3 s4 s8 s20
+s1 s20
+s1 s3 s17 s20
+s1 s20
+s1 s20
+s0 s1 s10 s11 s20
+s3 s4 s10 s20
+s1 s3 s20
+s8 s20
+s0 s1 s3 s20
+s4 s20
+s3 s8 s20
+s1 s20
+s3 s14 s20
+s1 s3 s4 s17 s20
+s1 s20
+s1 s3 s8 s9 s13 s14 s15 s17 s20
+s1 s3 s4 s20
+s3 s8 s20
+s1 s20
+s1 s3 s4 s20
+s0 s1 s20
+s0 s20
+s1 s20
+s1 s3 s17 s20
+s4 s14 s15 s20
+s3 s15 s20
+s4 s20
+s3 s14 s15 s20
+s1 s3 s20
+s0 s1 s20
+s1 s3 s10 s20
+s0 s1 s5 s10 s17 s20
+s1 s3 s20
+s1 s20
+s1 s20
+s1 s17 s20
+s1 s20
+s1 s20
+s1 s3 s20
+s1 s20
+s0 s20
+s11 s20
+s1 s3 s20
+s1 s17 s20
+s1 s20
+s4 s20
+s0 s3 s4 s20
+s1 s4 s20
+s1 s20
+s1 s10 s20
+s3 s4 s14 s15 s20
+s1 s4 s20
+s3 s4 s10 s14 s15 s20
+s4 s20
+s1 s20
+s1 s4 s20
+s4 s14 s15 s20
+s1 s3 s4 s11 s20
+s1 s20
+s1 s20
+s1 s3 s20
+s1 s20
+s1 s3 s20
+s3 s4 s20
+s1 s11 s20
+s1 s20
+s3 s10 s20
+s1 s17 s20
+s1 s20
+s1 s20
+s1 s3 s20
+s1 s20
+s1 s20
+s1 s20
+s1 s20
+s3 s20
+s0 s20
+s0 s1 s2 s3 s17 s20
+s8 s20
+s4 s20
+s1 s3 s10 s17 s20
+s3 s4 s20
+s1 s3 s20
+s1 s3 s17 s20
+s1 s20
+s1 s3 s4 s20
+s1 s20
+s1 s10 s20
+s4 s20
+s0 s1 s3 s20
+s1 s20
+s3 s4 s10 s14 s15 s20
+s1 s10 s20
+s1 s20
+s1 s3 s17 s20
+s1 s20
+s1 s20
+s3 s8 s20
+s1 s3 s20
+s3 s20
+s3 s20
+s11 s20
+s1 s17 s20
+s1 s20
+s0 s1 s20
+s0 s1 s3 s4 s20
+s1 s3 s4 s20
+s4 s20
+s1 s20
+s1 s3 s17 s20
+s4 s20
+s2 s20
+s1 s3 s17 s20
+s1 s20
+s0 s1 s4 s10 s20
+s0 s1 s20
+s0 s1 s3 s4 s8 s20
+s1 s4 s20
+s8 s20
+s0 s1 s3 s5 s10 s12 s14 s15 s20
+s1 s17 s20
+s1 s17 s20
+s1 s10 s11 s15 s20
+s3 s4 s10 s14 s15 s20
+s1 s20
+s3 s4 s10 s14 s15 s20
+s1 s3 s20
+s3 s4 s15 s20
+s1 s20
+s0 s1 s3 s4 s5 s10 s20
+s1 s3 s4 s11 s14 s15 s17 s20
+s1 s20
+s3 s20
+s0 s1 s20
+s1 s20
+s4 s12 s20
+s1 s17 s20
+s3 s10 s20
+s1 s17 s20
+s0 s3 s20
+s3 s4 s8 s10 s11 s20
+s1 s3 s20
+s1 s4 s20
+s1 s10 s20
+s1 s20
+s10 s20
+s0 s3 s4 s15 s20
+s1 s20
+s1 s20
+s1 s20
+s0 s1 s13 s20
+s1 s20
+s1 s20
+s1 s20
+s1 s20
+s0 s3 s9 s20
+s0 s1 s3 s7 s10 s12 s17 s20
+s3 s9 s20
+s1 s4 s20
+s1 s3 s4 s8 s10 s14 s20
+s1 s3 s17 s20
+s4 s15 s20
+s3 s4 s10 s14 s15 s20
+s1 s20
+s0 s3 s20
+s0 s3 s4 s20
+s1 s20
+s1 s3 s4 s8 s10 s14 s20
+s1 s20
+s3 s14 s15 s20
+s1 s17 s20
+s1 s20
+s1 s3 s17 s20
+s1 s20
+s0 s1 s3 s10 s14 s20
+s1 s20
+s3 s8 s14 s20
+s4 s20
+s1 s17 s20
+s0 s20
+s3 s4 s14 s15 s20
+s3 s20
+s1 s4 s20
+s1 s4 s20
+s17 s20
+s1 s20
+s1 s20
+s1 s20
+s0 s3 s8 s20
+s1 s20
+s0 s20
+s3 s9 s20
+s1 s20
+s4 s20
+s1 s3 s4 s15 s20
+s1 s20
+s4 s15 s20
+s1 s20
+s1 s11 s20
+s1 s20
+s1 s3 s20
+s1 s17 s20
+s1 s20
+s3 s4 s10 s20
+s3 s4 s10 s14 s15 s20
+s1 s20
+s1 s3 s20
+s1 s20
+s0 s1 s20
+s3 s4 s20
+s1 s10 s20
+s8 s20
+s3 s10 s20
+s1 s3 s4 s15 s20
+s0 s3 s4 s20
+s8 s20
+s3 s4 s14 s20
+s1 s20
+s3 s4 s20
+s1 s20
+s1 s11 s17 s20
+s0 s3 s4 s8 s20
+s3 s4 s11 s20
+s1 s17 s20
+s1 s3 s17 s20
+s1 s20
+s4 s20
+s1 s3 s17 s20
+s1 s20
+s1 s17 s20
+s0 s1 s10 s20
+s8 s20
+s3 s4 s20
+s0 s1 s3 s20
+s1 s20
+s3 s15 s20
+s1 s11 s20
+s1 s20
+s3 s4 s14 s15 s20
+s1 s17 s20
+s0 s3 s20
+s3 s4 s10 s14 s15 s20
+s0 s20
+s1 s20
+s3 s8 s20
+s0 s20
+s4 s20
+s0 s3 s5 s7 s10 s12 s20
+s1 s4 s20
+s3 s4 s17 s20
+s1 s20
+s4 s20
+s0 s1 s4 s10 s20
+s1 s20
+s1 s10 s11 s20
+s0 s20
+s1 s20
+s1 s20
+s1 s11 s20
+s3 s10 s20
+s4 s20
+s0 s3 s13 s16 s20
+s1 s20
+s1 s20
+s1 s17 s20
+s3 s4 s14 s15 s20
+s1 s20
+s3 s4 s10 s14 s15 s20
+s0 s1 s20
+s3 s4 s20
+s1 s3 s17 s20
+s1 s20
+s3 s4 s20
+s0 s3 s8 s20
+s3 s4 s8 s14 s20
+s1 s17 s20
+s4 s20
+s1 s20
+s1 s20
+s4 s20
+s1 s20
+s14 s15 s20
+s2 s3 s20
+s0 s1 s10 s11 s20
+s3 s4 s9 s13 s14 s15 s20
+s1 s3 s17 s20
+s3 s15 s20
+s1 s20
+s4 s20
+s2 s20
+s1 s20
+s1 s20
+s1 s4 s20
+s1 s20
+s1 s20
+s1 s20
+s1 s3 s4 s9 s17 s20
+s4 s20
+s1 s20
+s1 s20
+s1 s3 s17 s20
+s3 s8 s20
+s1 s4 s8 s20
+s3 s4 s10 s14 s15 s20
+s1 s20
+s10 s20
+s3 s4 s14 s15 s20
+s1 s20
+s1 s20
+s1 s4 s20
+s3 s8 s20
+s1 s2 s3 s4 s8 s17 s20
+s1 s20
+s1 s20
+s1 s20
+s1 s20
+s4 s20
+s1 s20
+s3 s8 s20
+s1 s20
+s1 s20
+s3 s4 s10 s20
+s0 s1 s3 s10 s17 s20
+s8 s20
+s4 s20
+s4 s20
+s1 s3 s17 s20
+s3 s4 s10 s14 s15 s20
+s1 s3 s4 s8 s20
+s1 s17 s20
+s17 s20
+s0 s1 s2 s3 s4 s5 s6 s7 s8 s9 s10 s11 s12 s14 s15 s16 s17 s20
+s1 s3 s4 s10 s20
+s17 s20
+s3 s10 s11 s14 s15 s20
+s1 s20
+s8 s20
+s0 s1 s3 s4 s10 s12 s14 s17 s20
+s1 s8 s20
+s1 s3 s4 s8 s17 s20
+s3 s10 s20
+s1 s20
+s1 s17 s20
+s3 s4 s20
+s0 s1 s3 s10 s17 s20
+s1 s3 s17 s20
+s4 s15 s20
+s1 s8 s20
+s1 s20
+s3 s20
+s1 s3 s20
+s1 s10 s11 s15 s20
+s3 s4 s10 s14 s15 s20
+s3 s8 s20
+s3 s20
+s1 s10 s20
+s3 s10 s14 s15 s20
+s10 s20
+s3 s4 s20
+s3 s4 s20
+s1 s20
+s3 s5 s10 s20
+s0 s3 s20
+s1 s4 s20
+s4 s14 s20
+s1 s20
+s1 s20
+s1 s20
+s9 s20
+s1 s3 s20
+s8 s20
+s1 s20
+s4 s20
+s1 s3 s4 s8 s20
+s1 s3 s17 s20
+s1 s20
+s4 s20
+s1 s2 s20
+s1 s3 s20
+s1 s3 s4 s20
+s1 s20
+s1 s20
+s1 s20
+s4 s11 s14 s20
+s1 s20
+s1 s3 s4 s9 s20
+s1 s3 s20
+s1 s3 s17 s20
+s0 s3 s8 s20
+s1 s20
+s3 s4 s14 s20
+s0 s1 s10 s17 s20
+s1 s20
+s4 s20
+s0 s1 s20
+s1 s10 s11 s15 s20
+s0 s1 s20
+s3 s4 s17 s20
+s1 s4 s20
+s0 s1 s3 s10 s12 s14 s20
+s1 s4 s15 s20
+s10 s20
+s0 s1 s3 s5 s10 s14 s15 s20
+s1 s4 s10 s20
+s0 s1 s3 s7 s10 s12 s17 s20
+s4 s20
+s4 s20
+s1 s4 s20
+s1 s17 s20
+s1 s20
+s1 s20
+s3 s14 s15 s20
+s1 s20
+s0 s1 s11 s20
+s1 s3 s4 s20
+s1 s20
+s1 s20
+s1 s2 s3 s20
+s1 s8 s10 s11 s20
+s3 s4 s20
+s1 s20
+s1 s20
+s1 s20
+s1 s20
+s1 s17 s20
+s3 s14 s20
+s1 s4 s20
+s1 s4 s20
+s1 s20
+s3 s4 s5 s10 s20
+s4 s20
+s0 s20
+s1 s3 s17 s20
+s1 s20
+s1 s17 s20
+s0 s1 s10 s20
+s0 s3 s20
+s1 s3 s17 s20
+s4 s20
+s1 s3 s20
+s1 s17 s20
+s4 s20
+s4 s20
+s3 s4 s10 s14 s15 s20
+s1 s3 s17 s20
+s1 s3 s20
+s0 s1 s3 s4 s20
+s0 s3 s4 s10 s14 s15 s20
+s3 s4 s10 s14 s15 s20
+s3 s4 s10 s14 s15 s20
+s1 s11 s20
+s1 s20
+s0 s1 s3 s14 s15 s20
+s4 s20
+s1 s20
+s9 s20
+s1 s17 s20
+s1 s20
+s1 s3 s17 s20
+s1 s20
+s3 s9 s20
+s0 s1 s10 s12 s14 s15 s20
+s8 s20
+s4 s20
+s1 s20
+s4 s20
+s0 s1 s3 s4 s20
+s1 s17 s20
+s4 s20
+s0 s20
+s1 s20
+s1 s3 s17 s20
+s17 s20
+s8 s20
+s4 s20
+s3 s15 s20
+s3 s4 s20
+s0 s20
+s5 s20
+s4 s20
+s1 s3 s17 s20
+s1 s3 s4 s20
+s1 s2 s3 s4 s20
+s1 s3 s20
+s1 s3 s17 s20
+s1 s20
+s4 s20
+s1 s20
+s0 s20
+s1 s3 s4 s20
+s0 s1 s10 s14 s20
+s3 s4 s8 s10 s14 s20
+s0 s20
+s1 s20
+s1 s3 s4 s17 s20
+s3 s4 s11 s20
+s1 s3 s4 s10 s14 s15 s20
+s0 s1 s20
+s1 s20
+s1 s10 s11 s15 s20
+s0 s1 s2 s3 s4 s7 s8 s20
+s1 s20
+s4 s20
+s1 s20
+s1 s20
+s3 s10 s20
+s0 s1 s3 s10 s12 s16 s20
+s1 s20
+s3 s6 s20
+s1 s3 s4 s20
+s0 s1 s3 s20
+s0 s1 s3 s20
+s1 s3 s4 s15 s20
+s0 s1 s20
+s1 s20
+s1 s2 s3 s4 s17 s20
+s3 s4 s10 s14 s15 s20
+s1 s3 s17 s20
+s1 s20
+s1 s20
+s1 s17 s20
+s0 s1 s3 s20
+s1 s20
+s3 s20
+s2 s20
+s4 s20
+s3 s4 s20
+s4 s20
+s4 s20
+s15 s20
+s8 s20
+s4 s20
+s1 s3 s13 s20
+s3 s14 s15 s20
+s0 s7 s10 s20
+s3 s14 s15 s20
+s1 s20
+s0 s3 s20
+s1 s3 s17 s20
+s1 s17 s20
+s4 s20
+s3 s4 s8 s10 s14 s15 s20
+s1 s10 s11 s20
+s1 s17 s20
+s3 s4 s8 s20
+s1 s20
+s0 s1 s4 s20
+s1 s20
+s1 s4 s20
+s10 s20
+s8 s20
+s0 s1 s3 s10 s20
+s4 s10 s11 s17 s20
+s15 s20
+s1 s20
+s0 s20
+s1 s20
+s3 s10 s20
+s17 s20
+s1 s17 s20
+s1 s3 s10 s20
+s10 s20
+s1 s20
+s4 s20
+s1 s20
+s1 s4 s20
+s10 s20
+s0 s1 s3 s4 s5 s7 s8 s10 s11 s12 s17 s20
+s1 s20
+s1 s20
+s1 s17 s20
+s3 s4 s8 s20
+s0 s1 s20
+s3 s4 s20
+s0 s3 s4 s20
+s1 s3 s17 s20
+s14 s20
+s1 s20
+s9 s20
+s4 s20
+s3 s4 s14 s15 s20
+s3 s4 s8 s20
+s1 s3 s17 s20
+s3 s4 s14 s15 s20
+s1 s20
+s1 s20
+s3 s20
+s4 s20
+s3 s8 s20
+s4 s20
+s2 s20
+s1 s6 s13 s20
+s4 s20
+s1 s20
+s1 s20
+s3 s5 s8 s20
+s1 s17 s20
+s1 s20
+s1 s20
+s1 s3 s20
+s10 s20
+s1 s20
+s1 s4 s20
+s1 s3 s4 s20
+s1 s20
+s1 s3 s20
+s3 s9 s13 s20
+s0 s1 s3 s9 s20
+s1 s3 s17 s20
+s1 s20
+s1 s3 s20
+s2 s20
+s3 s4 s15 s20
+s1 s3 s17 s20
+s1 s3 s4 s20
+s3 s11 s14 s20
+s1 s20
+s1 s20
+s1 s3 s15 s17 s20
+s0 s20
+s3 s4 s9 s20
+s4 s20
+s3 s14 s15 s20
+s1 s20
+s3 s8 s20
+s4 s13 s20
+s11 s14 s15 s20
+s1 s20
+s1 s20
+s1 s4 s14 s15 s20
+s1 s20
+s1 s17 s20
+s1 s20
+s3 s14 s15 s20
+s1 s20
+s0 s1 s20
+s1 s3 s8 s20
+s1 s20
+s1 s2 s3 s20
+s1 s3 s17 s20
+s1 s3 s20
+s1 s20
+s1 s20
+s4 s20
+s1 s20
+s1 s3 s20
+s3 s4 s8 s10 s14 s20
+s1 s20
+s0 s20
+s0 s3 s7 s10 s20
+s4 s20
+s1 s20
+s1 s3 s4 s8 s11 s20
+s3 s8 s14 s15 s20
+s1 s3 s10 s20
+s0 s20
+s3 s9 s20
+s3 s4 s20
+s4 s20
+s3 s14 s20
+s3 s4 s8 s14 s15 s20
+s3 s4 s10 s14 s15 s20
+s1 s20
+s8 s13 s20
+s4 s20
+s0 s1 s20
+s1 s10 s20
+s1 s17 s20
+s4 s20
+s1 s20
+s14 s15 s20
+s1 s3 s17 s20
+s1 s3 s17 s20
+s3 s4 s14 s15 s20
+s1 s3 s4 s20
+s3 s10 s15 s20
+s1 s20
+s1 s20
+s1 s20
+s3 s9 s20
+s3 s4 s10 s14 s15 s20
+s4 s20
+s1 s3 s4 s20
+s1 s20
+s1 s20
+s3 s14 s20
+s1 s17 s20
+s3 s4 s10 s14 s15 s20
+s4 s20
+s3 s20
+s1 s20
+s4 s20
+s1 s17 s20
+s1 s20
+s0 s1 s20
+s1 s20
+s1 s20
+s1 s3 s10 s17 s20
+s3 s14 s15 s20
+s1 s20
+s1 s20
+s15 s20
+s1 s20
+s1 s20
+s3 s10 s20
+s6 s10 s13 s20
+s1 s20
+s3 s20
+s1 s17 s20
+s17 s20
+s1 s20
+s1 s20
+s3 s8 s20
+s1 s20
+s0 s3 s12 s20
+s1 s20
+s3 s4 s10 s14 s15 s20
+s1 s10 s11 s20
+s1 s3 s17 s20
+s1 s20
+s4 s20
+s0 s1 s3 s20
+s3 s4 s10 s15 s20
+s0 s20
+s1 s20
+s0 s1 s20
+s1 s20
+s0 s1 s3 s4 s8 s10 s14 s15 s20
+s3 s4 s20
+s3 s15 s20
+s1 s20
+s1 s4 s8 s11 s20
+s3 s20
+s1 s20
+s0 s20
+s4 s20
+s3 s5 s20
+s4 s20
+s1 s3 s4 s14 s15 s20
+s1 s20
+s1 s2 s3 s20
+s8 s20
+s4 s20
+s4 s20
+s1 s3 s17 s20
+s1 s3 s20
+s1 s20
+s1 s20
+s1 s3 s20
+s4 s20
+s3 s4 s10 s14 s15 s20
+s3 s20
+s3 s4 s10 s14 s15 s20
+s1 s3 s4 s20
+s4 s20
+s1 s4 s11 s20
+s0 s1 s3 s4 s20
+s0 s1 s3 s4 s20
+s1 s3 s17 s20
+s1 s20
+s4 s20
+s1 s3 s20
+s4 s20
+s3 s4 s20
+s1 s3 s4 s20
+s1 s8 s20
+s8 s20
+s3 s15 s20
+s1 s20
+s1 s20
+s3 s4 s10 s14 s15 s20
+s3 s8 s20
+s1 s3 s4 s8 s9 s17 s20
+s4 s20
+s1 s3 s11 s20
+s3 s4 s10 s14 s15 s20
+s1 s3 s17 s20
+s1 s20
+s1 s3 s4 s15 s20
+s4 s20
+s1 s20
+s1 s3 s4 s20
+s1 s20
+s1 s3 s4 s5 s10 s14 s15 s20
+s1 s20
+s1 s3 s20
+s1 s20
+s1 s3 s20
+s1 s3 s17 s20
+s4 s20
+s1 s20
+s1 s20
+s1 s4 s20
+s1 s20
+s4 s20
+s0 s1 s2 s3 s4 s5 s6 s7 s9 s10 s17 s20
+s3 s4 s10 s14 s15 s20
+s1 s20
+s2 s20
+s1 s13 s20
+s4 s20
+s4 s20
+s1 s4 s5 s20
+s0 s20
+s1 s20
+s0 s1 s3 s10 s20
+s3 s9 s20
+s0 s1 s3 s5 s10 s17 s20
+s1 s20
+s1 s11 s17 s20
+s3 s4 s10 s14 s15 s20
+s0 s3 s8 s14 s20
+s1 s20
+s4 s20
+s0 s1 s3 s12 s17 s20
+s0 s20
+s1 s20
+s1 s20
+s0 s3 s4 s14 s15 s20
+s1 s20
+s1 s20
+s3 s4 s8 s20
+s1 s20
+s1 s2 s4 s20
+s4 s20
+s8 s20
+s0 s1 s3 s20
+s3 s8 s20
+s1 s3 s20
+s4 s14 s15 s20
+s1 s20
+s1 s20
+s0 s1 s20
+s0 s20
+s1 s3 s20
+s1 s3 s4 s10 s11 s14 s15 s20
+s3 s4 s14 s15 s20
+s0 s20
+s1 s20
+s4 s20
+s0 s20
+s1 s10 s17 s20
+s3 s8 s9 s14 s20
+s1 s20
+s1 s4 s20
+s3 s10 s14 s15 s20
+s1 s20
+s3 s4 s14 s15 s20
+s5 s20
+s1 s3 s4 s17 s20
+s4 s20
+s4 s20
+s1 s20
+s1 s17 s20
+s1 s20
+s4 s20
+s1 s20
+s1 s3 s20
+s1 s11 s20
+s1 s20
+s4 s20
+s0 s3 s20
+s3 s10 s20
+s0 s1 s3 s8 s13 s20
+s4 s20
+s1 s20
+s3 s20
+s1 s20
+s1 s3 s4 s20
+s3 s10 s14 s15 s20
+s4 s20
+s15 s20
+s4 s20
+s4 s20
+s8 s20
+s1 s2 s3 s4 s6 s8 s9 s11 s12 s14 s15 s16 s20
+s1 s2 s3 s20
+s3 s4 s20
+s1 s17 s20
+s0 s1 s3 s5 s10 s17 s20
+s1 s4 s20
+s1 s20
+s1 s20
+s1 s20
+s3 s4 s20
+s3 s4 s20
+s0 s20
+s1 s3 s20
+s1 s4 s20
+s1 s17 s20
+s3 s4 s14 s15 s20
+s1 s20
+s0 s1 s3 s4 s8 s10 s14 s15 s20
+s1 s3 s4 s17 s20
+s0 s1 s20
+s1 s20
+s0 s1 s3 s10 s20
+s0 s3 s20
+s0 s20
+s0 s20
+s0 s1 s2 s3 s6 s9 s10 s17 s20
+s3 s4 s15 s20
+s0 s1 s2 s3 s20
+s1 s17 s20
+s4 s20
+s1 s17 s20
+s1 s3 s15 s17 s20
+s1 s3 s17 s20
+s3 s4 s10 s14 s15 s20
+s0 s1 s17 s20
+s4 s20
+s1 s17 s20
+s1 s17 s20
+s3 s4 s14 s15 s20
+s3 s20
+s0 s1 s20
+s6 s10 s20
+s3 s4 s14 s15 s20
+s1 s3 s20
+s1 s20
+s1 s3 s4 s17 s20
+s8 s20
+s8 s9 s20
+s3 s14 s20
+s0 s1 s10 s20
+s1 s20
+s3 s4 s10 s14 s15 s20
+s1 s17 s20
+s4 s20
+s1 s3 s4 s9 s14 s15 s20
+s1 s20
+s3 s4 s20
+s1 s3 s4 s9 s11 s14 s15 s20
+s1 s20
+s0 s1 s4 s10 s20
+s3 s4 s10 s14 s15 s20
+s2 s4 s20
+s0 s3 s4 s14 s15 s20
+s1 s3 s4 s20
+s1 s20
+s3 s4 s10 s14 s15 s20
+s1 s20
+s1 s20
+s3 s4 s15 s20
+s1 s10 s20
+s4 s20
+s3 s4 s10 s14 s15 s20
+s3 s4 s10 s14 s15 s20
+s1 s20
+s0 s20
+s1 s17 s20
+s4 s20
+s1 s20
+s4 s9 s11 s14 s15 s20
+s1 s20
+s1 s3 s5 s17 s20
+s1 s4 s20
+s3 s14 s15 s20
+s1 s20
+s4 s20
+s0 s20
+s1 s20
+s3 s4 s10 s14 s15 s20
+s1 s20
+s4 s20
+s1 s2 s3 s20
+s1 s20
+s1 s10 s20
+s1 s20
+s3 s4 s20
+s3 s4 s20
+s4 s20
+s4 s20
+s4 s20
+s1 s20
+s3 s14 s20
+s1 s2 s20
+s3 s4 s8 s20
+s1 s3 s17 s20
+s10 s20
+s3 s4 s10 s14 s15 s20
+s1 s3 s4 s14 s15 s17 s20
+s1 s20
+s1 s3 s4 s10 s20
+s8 s20
+s1 s3 s5 s17 s20
+s2 s20
+s1 s20
+s3 s8 s20
+s4 s20
+s1 s20
+s3 s4 s20
+s4 s20
+s3 s9 s14 s20
+s1 s3 s4 s17 s20
+s1 s3 s17 s20
+s8 s20
+s1 s3 s4 s13 s14 s15 s20
+s0 s1 s3 s4 s6 s8 s12 s17 s20
+s3 s4 s8 s20
+s1 s2 s3 s4 s20
+s0 s1 s3 s20
+s11 s20
+s0 s1 s3 s10 s12 s17 s20
+s1 s20
+s2 s20
+s0 s1 s20
+s0 s1 s10 s14 s15 s17 s20
+s3 s10 s20
+s3 s4 s14 s15 s17 s20
+s0 s3 s5 s7 s12 s14 s15 s20
+s8 s20
+s1 s17 s20
+s1 s11 s20
+s1 s3 s9 s20
+s3 s4 s10 s14 s15 s20
+s1 s20
+s4 s20
+s1 s3 s4 s20
+s1 s20
+s1 s3 s4 s8 s9 s11 s12 s14 s15 s20
+s1 s3 s5 s10 s17 s20
+s1 s17 s20
+s0 s1 s2 s3 s6 s9 s10 s11 s17 s20
+s0 s1 s3 s9 s20
+s3 s8 s20
+s1 s20
+s1 s20
+s1 s10 s17 s20
+s3 s10 s14 s15 s20
+s1 s20
+s1 s3 s4 s8 s12 s15 s20
+s1 s3 s20
+s3 s4 s10 s14 s15 s20
+s1 s3 s10 s17 s20
+s3 s4 s8 s20
+s4 s20
+s4 s20
+s0 s3 s4 s8 s20
+s1 s8 s20
+s1 s20
+s1 s20
+s0 s20
+s1 s20
+s3 s4 s10 s14 s15 s20
+s1 s20
+s1 s4 s20
+s1 s3 s4 s8 s17 s20
+s1 s4 s20
+s1 s20
+s1 s20
+s3 s15 s20
+s8 s20
+s1 s20
+s0 s1 s3 s5 s7 s12 s20
+s1 s17 s20
+s3 s5 s10 s20
+s1 s20
+s0 s1 s3 s5 s10 s17 s20
+s1 s17 s20
+s1 s20
+s0 s1 s3 s10 s12 s14 s16 s17 s20
+s1 s20
+s0 s1 s3 s20
+s1 s20
+s0 s3 s20
+s1 s20
+s1 s20
+s1 s3 s8 s17 s20
+s1 s20
+s4 s11 s14 s15 s20
+s1 s20
+s1 s20
+s0 s1 s3 s5 s7 s8 s10 s12 s17 s20
+s1 s20
+s3 s4 s20
+s1 s4 s20
+s1 s20
+s1 s3 s4 s11 s14 s15 s20
+s1 s14 s20
+s3 s4 s8 s20
+s1 s20
+s1 s20
+s3 s4 s8 s20
+s1 s20
+s4 s20
+s1 s17 s20
+s1 s3 s17 s20
+s4 s20
+s4 s20
+s0 s1 s3 s5 s10 s14 s15 s17 s20
+s0 s3 s20
+s3 s4 s5 s9 s10 s20
+s4 s20
+s1 s20
+s0 s1 s4 s10 s17 s20
+s1 s20
+s1 s20
+s4 s20
+s1 s20
+s3 s4 s14 s20
+s1 s17 s20
+s4 s20
+s3 s4 s20
+s1 s20
+s3 s14 s20
+s1 s3 s4 s20
+s1 s3 s20
+s4 s20
+s8 s20
+s0 s1 s3 s20
+s3 s4 s8 s14 s20
+s1 s20
+s1 s3 s17 s20
+s4 s20
+s3 s4 s14 s15 s20
+s1 s20
+s3 s14 s20
+s1 s20
+s1 s20
+s4 s20
+s3 s20
+s3 s8 s20
+s0 s1 s20
+s8 s20
+s1 s20
+s1 s20
+s1 s20
+s1 s20
+s4 s20
+s0 s20
+s1 s3 s4 s8 s20
+s0 s3 s10 s20
+s1 s4 s20
+s1 s20
+s2 s20
+s3 s8 s20
+s0 s1 s17 s20
+s1 s20
+s0 s1 s3 s4 s10 s20
+s0 s1 s10 s11 s20
+s2 s20
+s0 s1 s3 s20
+s1 s20
+s1 s3 s20
+s1 s17 s20
+s1 s3 s4 s20
+s4 s20

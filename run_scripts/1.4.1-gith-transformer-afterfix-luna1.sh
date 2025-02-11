@@ -3,6 +3,9 @@
 template_version=1.4.1
 script_name=$(basename "$0" .sh)
 
+# Suppress FutureWarnings
+export PYTHONWARNINGS="ignore::FutureWarning"
+
 # Ensure the script runs in the background with nohup and redirects output to a log file
 if [[ "$1" != "--nohup" ]]; then
   nohup "$0" --nohup "$@" > "${script_name}.log" 2>&1 &
@@ -18,9 +21,9 @@ set -e  # Exit on any error
 # CONFIGURATIONS
 # ------------------------------------------------------------------------------
 
-models=("transformer-afterfix-bs832")
+models=("transformer-afterfix-luna1")
 datasets=("gith")
-gpus="6,7"
+gpus="2"
 
 # ------------------------------------------------------------------------------
 # END CONFIGURATIONS
@@ -73,7 +76,8 @@ for model in "${models[@]}"; do
     echo ""
     # Get the start time
     start_time=$(date +%s)
-    start_time_est=$(date -u -d "-3 hours -33 minutes" +"%Y-%m-%d %H:%M:%S")
+    # Convert to EST (UTC-5)
+    start_time_est=$(TZ="America/New_York" date +"%Y-%m-%d %H:%M:%S")
     
     # Run the command with nohup and capture its PID
     nohup python3 -u main.py \
@@ -93,8 +97,9 @@ for model in "${models[@]}"; do
     
     # Get the end time
     end_time=$(date +%s)
-    end_time_est=$(date -u -d "-3 hours -33 minutes" +"%Y-%m-%d %H:%M:%S")
-     echo -e "\tEnded at\t: ${end_time_est} EST"
+    # Convert to EST (UTC-5)
+    end_time_est=$(TZ="America/New_York" date +"%Y-%m-%d %H:%M:%S")
+    echo -e "\tEnded at\t: ${end_time_est} EST"
     
     # Calculate the elapsed time in seconds
     elapsed_time=$(($end_time - $start_time))
@@ -110,7 +115,7 @@ for model in "${models[@]}"; do
     in_minutes=$(($elapsed_time / 60))
     job_num=$((job_num + 1))
 
-    echo -e "\tElapsed\t\t: ${formatted_time} ($in_minutes mins)."
+    echo -e "\tElapsed\t\t: ${formatted_time} (${in_minutes} mins)."
   done
 done
 
