@@ -34,7 +34,7 @@ models=("convs2s-final-luna")
 use_dataset_in_filename=false
 
 # Used if use_dataset_in_filename is false
-datasets=("dblp")
+datasets=("uspt")
 
 run_next_script=false
 next_script_name="example_next_script.sh"
