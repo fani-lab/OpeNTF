@@ -1,0 +1,57 @@
+## ConvS2S Configuration for dblp
+
+save_data: ../output/nmt/run/convs2s
+save_model: ../output/nmt/run/convs2s_model
+src_vocab: ../output/nmt/run/convs2s.vocab.src
+tgt_vocab: ../output/nmt/run/convs2s.vocab.tgt
+overwrite: True
+data:
+  corpus_1:
+    path_src: ../output/nmt/src-train.txt
+    path_tgt: ../output/nmt/tgt-train.txt
+    weight: 1
+  valid:
+    path_src: ../output/nmt/src-val.txt
+    path_tgt: ../output/nmt/tgt-val.txt
+
+# -------------------------------------------
+# Configuration for training
+# -------------------------------------------
+
+# Common hyperparameters
+# General opts
+keep_checkpoint: -1
+seed: 0
+train_steps: 15527 # sample size of 99375
+save_checkpoint_steps: 1553
+valid_steps: 1553
+report_every: 1553
+
+# Batching
+world_size: 1
+gpu_ranks: [0]
+num_workers: 8
+batch_size: 128
+bucket_size: 832
+valid_batch_size: 128
+
+# Optimization
+model_dtype: "fp16"
+optim: adam
+weight_decay: 0.0001
+learning_rate: 0.0007
+adam_beta1: 0.9
+adam_beta2: 0.98
+
+# --------------------------------------------
+
+# Architecture specific hyperparameters
+encoder_type: cnn
+decoder_type: cnn
+cnn_size: 128 # same as hidden size
+word_vec_size: 128
+
+# ConvS2S specific parameters
+cnn_kernel_width: 3
+layers: 8  # Number of conv layers in both encoder and decoder
+dropout: 0.4
