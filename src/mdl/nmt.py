@@ -117,7 +117,6 @@ class Nmt(Ntf):
 
     def test(self, splits, path, per_epoch, **kwargs):
         gpus = kwargs.get("gpus")
-        first_gpu = gpus.split(",")[0].strip() if gpus else None
         
         # Print CUDA diagnostic information
         print("\nCUDA Diagnostic Information:")
@@ -131,9 +130,10 @@ class Nmt(Ntf):
         else:
             try:
                 # Always use GPU 0 for translation
-                print(f"Using GPU {first_gpu}\n")
+                torch.cuda.set_device(0)
+                print(f"Using GPU 0: {torch.cuda.get_device_name(0)}")
             except Exception as e:
-                print(f"Error setting GPU: {e}\n")
+                print(f"Error setting GPU: {e}")
                 gpu_available = False
 
         for foldidx in splits["folds"].keys():
@@ -156,7 +156,7 @@ class Nmt(Ntf):
                 cli_cmd += f"-model {model} "
                 cli_cmd += f"-src {path}/src-test.txt "
                 cli_cmd += f"-output {pred_path} "
-                cli_cmd += f"-gpu 0 " if gpu_available else ""
+                cli_cmd += f"-gpu 0 "
                 cli_cmd += "--min_length 2 "
                 cli_cmd += "-verbose "
                 print(f"Executing command: {cli_cmd}")
