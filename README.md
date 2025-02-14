@@ -131,29 +131,31 @@ Modify the hyperparameters and other settings you wish such as data paths, train
 
 #### 3.2. In the bash script, edit the configurations to match your model name and dataset name. You only need to edit the `# CONFIGURATIONS` section.
 
-    > Example
-    ```bash
-    # ------------------------------------------------------------------------------
-    # CONFIGURATIONS
-    # ONLY EDIT THIS SECTION
+> Example
+```
+# ------------------------------------------------------------------------------
+# CONFIGURATIONS
+# ONLY EDIT THIS SECTION
 
-    # GPU indices to use for training
-    gpus_to_use="6,7"
+# GPU indices to use for training
+gpus_to_use="6,7"
 
-    # models to run located in the src/mdl/nmt_models directory
-    models=("mode1")
+# models to run located in the src/mdl/nmt_models directory
+models=("mode1")
 
-    # Used if use_dataset_in_filename is false
-    datasets=("dblp")
+# Used if use_dataset_in_filename is false
+datasets=("dblp")
 
-    run_next_script=false
-    next_script_name="example_next_script.sh"
-    ```
+run_next_script=false
+next_script_name="example_next_script.sh"
+```
 
-    Now you can run the bash script with:
-    ```
-    ./mycnn_model.sh
-    ```
+
+Now you can run the bash script with:
+```
+./mycnn_model.sh
+```
+    
     
 <br />
 
