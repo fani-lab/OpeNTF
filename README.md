@@ -103,22 +103,19 @@ container_name@hostname:/OpeNTF/run_scripts# ./nmt_model.sh
 
 ## 2. Creating a new NMT model
 
-- #### 2.1. Duplicate one of the three templates available in `src/mdl/nmt_models/` folder and prefix your model with `nmt_`:
-  > Templates
+### 2.1. Duplicate one of the three templates available in `src/mdl/nmt_models/` folder and prefix your model with `nmt_`:
+  > Available templates
   - `_template_transformer.yml`
   - `_template_rnn.yml`
   - `_template_cnn.yml`
   
-    <br/>
 
   > Example
   ```
   nmt_mycnn_model.yaml
   ```
 
-<br/>
-
-- #### 2.2. Modify the hyperparameters and other settings you wish to modify, such as data paths, such as training steps, batch size, etc.
+Modify the hyperparameters and other settings you wish such as data paths, training steps, hidden size, batch size, number of layers, number of GPUs to use, etc.
 
 <br />
 
@@ -154,11 +151,29 @@ container_name@hostname:/OpeNTF/run_scripts# ./nmt_model.sh
     run_next_script=false
     next_script_name="example_next_script.sh"
     ```
+
+    Now you can run the bash script with:
+    ```
+    ./mycnn_model.sh
+    ```
     
 <br />
 
 
 
-## 5. Automating multiple models
+## 5. Automating multiple models and datasets
 
-**### Step 1. ###** As you may have noticed, use of multiple models, yes you can create multiple model files and mention them in the bash script as instructed in.
+In the configuration section of the bash script, you can specify multiple models and datasets to run. For example:
+```
+models=("mode1" "mode2")
+datasets=("dblp" "imdb")
+```
+
+This will run the following:
+- `mode1` on `dblp` dataset.
+- `mode1` on `imdb` dataset.
+- `mode2` on `dblp` dataset.
+- `mode2` on `imdb` dataset.
+
+
+
