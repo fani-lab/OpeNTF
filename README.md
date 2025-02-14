@@ -42,23 +42,23 @@ docker pull kmthang/opennmt
 
 1.1.3. Once downloaded, create a container from it with:
 ```
-docker run -it -d --name nmt_container_name --hostname nmt_host_name --gpus all -v $(pwd):/OpeNTF kmthang/opennmt
+docker run -it -d --name container_name --hostname host_name --gpus all -v $(pwd):/OpeNTF kmthang/opennmt
 ```
-> Note: run the above command while the `/OpeNTF` folder. You can change the `nmt_container_name` and `nmt_host_name` to whatever you like.
+> Note: run the above command while in root repository which is the `/OpeNTF` folder. You can change the `container_name` and `host_name` to whatever you like.
 
 <br/>
 
 1.1.4. Connect to the container by this command:
 ```
-docker attach nmt_container_name
+docker attach container_name
 ```
 
-You're now inside the Docker container. You can now run the your bash script inside the `/OpeNTF/run_scripts` folder. See section for how to create a new bash script.
+You're now inside the Docker container. You can now run your bash script inside the `/OpeNTF/run_scripts` folder. See section for how to create a new bash script.
 
 > Example
 ```
-nmt_host@759fe234ae0f:/OpeNTF# cd /run_scripts
-nmt_host@759fe234ae0f:/OpeNTF/run_scripts# ./nmt_model.sh
+container_name@hostname:/OpeNTF# cd /run_scripts
+container_name@hostname:/OpeNTF/run_scripts# ./nmt_model.sh
 ```
 
 <br/>
@@ -70,13 +70,13 @@ nmt_host@759fe234ae0f:/OpeNTF/run_scripts# ./nmt_model.sh
 
     - 1.2.1.1. Create a new virtual environment with:
         ```
-        python -m venv nmt_venv_name
+        python -m venv venv_name
         ```
-        > Note: be in the `/OpeNTF` folder when running the above command. You can change the `nmt_venv_name` to whatever you like.
+        > Note: be in the `/OpeNTF` folder when running the above command. You can change the `venv_name` to whatever you like.
 
     - 1.2.1.2. Activate the virtual environment with:
         ```
-        source nmt_venv_name/bin/activate
+        source venv_name/bin/activate
         ```
 
     <br />
@@ -85,7 +85,7 @@ nmt_host@759fe234ae0f:/OpeNTF/run_scripts# ./nmt_model.sh
 
     - 1.2.2.1. Create a new conda environment with:
         ```
-        conda create -n nmt_venv_name python=3.8
+        conda create -n venv_name python=3.8
         ```
 
     <br />
