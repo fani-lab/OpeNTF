@@ -30,41 +30,39 @@ Three ways to run our pipeline:
 
 ### 1.1. The Docker approach (recommended)
 
-#### 1.1.1. Download and install Docker from here: [Get Docker | Docker Docs](https://docs.docker.com/get-started/get-docker/)
+- #### 1.1.1. Download and install Docker from here: [Get Docker | Docker Docs](https://docs.docker.com/get-started/get-docker/)
 
-<br />
 
-#### 1.1.2. Once your docker is up and running, pull our a ready-made image from the Docker Hub with this command. It's about 26 GB.
-```
-docker pull kmthang/opennmt
-```
-> Note: you may need to login first using `docker login` command.
-
-<br/>
-
-#### 1.1.3. Once downloaded, create a container from it with:
-```
-docker run -it -d --name container_name --hostname host_name --gpus all -v $(pwd):/OpeNTF kmthang/opennmt
-```
-> Note: run the above command while in root repository which is the `/OpeNTF` folder. You can change the `container_name` and `host_name` to whatever you like.
+- #### 1.1.2. Once your docker is up and running, pull our a ready-made image from the Docker Hub with this command. It's about 26 GB.
+    ```
+    docker pull kmthang/opennmt
+    ```
+    > Note: you may need to login first using `docker login` command.
 
 <br/>
 
-#### 1.1.4. Connect to the container by this command:
-```
-docker attach container_name
-```
+- #### 1.1.3. Once downloaded, create a container from it with:
+    ```
+    docker run -it -d --name container_name --hostname host_name --gpus all -v $(pwd):/OpeNTF kmthang/opennmt
+    ```
+    > Note: run the above command while in root repository which is the `/OpeNTF` folder. You can change the `container_name` and `host_name` to whatever you like.
 
-<br />
+<br/>
 
-#### 1.1.5. Run the bash script
-```
-./run_scripts/nmt_model.sh
-```
-> Example
-```
-container_name@hostname:/OpeNTF/run_scripts# ./nmt_model.sh
-```
+- #### 1.1.4. Connect to the container by this command:
+    ```
+    docker attach container_name
+    ```
+
+
+- #### 1.1.5. Run the bash script
+    ```
+    ./run_scripts/nmt_model.sh
+    ```
+    > Example
+    ```
+    container_name@hostname:/OpeNTF/run_scripts# ./nmt_model.sh
+    ```
 
 <br/>
 
@@ -103,7 +101,7 @@ container_name@hostname:/OpeNTF/run_scripts# ./nmt_model.sh
 
 ## 2. Creating a new NMT model
 
-### 2.1. Duplicate one of the three templates available in `src/mdl/nmt_models/` folder and prefix your model with `nmt_`:
+Duplicate one of the three templates available in `src/mdl/nmt_models/` folder and prefix your model with `nmt_`:
   > Available templates
   - `_template_transformer.yml`
   - `_template_rnn.yml`
@@ -122,7 +120,7 @@ Modify the hyperparameters and other settings you wish such as data paths, train
 
 ## 3. Create a new bash script
 
-- #### 3.1. Duplicate a latest bash script template in `/run_scripts` folder and rename the file name to something else (no need to prefix with `nmt_`):
+#### 3.1. Duplicate a latest bash script template in `/run_scripts` folder and rename the file name to something else (no need to prefix with `nmt_`):
   > Example
   ```
   mycnn_model.sh
@@ -131,7 +129,7 @@ Modify the hyperparameters and other settings you wish such as data paths, train
 <br/>
 
 
-- #### 3.2. In the bash script, edit the configurations to match your model name and dataset name. You only need to edit the `# CONFIGURATIONS` section.
+#### 3.2. In the bash script, edit the configurations to match your model name and dataset name. You only need to edit the `# CONFIGURATIONS` section.
 
     > Example
     ```bash
@@ -169,7 +167,7 @@ models=("mode1" "mode2")
 datasets=("dblp" "imdb")
 ```
 
-This will run the following:
+This will run the following in top to bottom order:
 - `mode1` on `dblp` dataset.
 - `mode1` on `imdb` dataset.
 - `mode2` on `dblp` dataset.
