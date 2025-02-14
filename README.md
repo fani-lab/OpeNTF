@@ -3,7 +3,7 @@
 This repository contains the code implementation for our research paper "Translative Neural Team Recommendation" (SIGIR 2025). The paper proposes a novel approach to team recommendation by treating it as a neural machine translation problem, where individual member skills and characteristics are translated into optimal team compositions. Our method leverages state-of-the-art sequence-to-sequence (seq2seq) neural machine translation (NMT) architectures such as the Transformer and RNN with attention and convolutional model, and the [OpenNMT-py](https://github.com/OpenNMT/OpenNMT-py) framework to capture complex relationships between team members and project requirements, leading to more effective team formation recommendations.
 <br/>
 <br/>
-> ![Overview of the sequence-2-sequence architecture.](./nmt%20fig%201%20-%20horizontal%20large.jpg)
+> ![Overview of the sequence-2-sequence architecture.](./newflow_v3.jpg)
 > Overview of the sequence-to-sequence architecture.
 
 <br/>
