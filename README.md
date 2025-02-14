@@ -1,58 +1,116 @@
-# `OpeNTF`: Team Recommendation via Translation Approach
+# `OpeNTF`: Translative Neural Team Recommendation
 
-This readme is specifically for the neural machine translation models, specifically the models supported by the OpenNMT-py framework. In this readme, you'd be able to set up and run the dataset using either the existing NMT models or a model of your own.
+This repository contains the code implementation for our research paper "Translative Neural Team Recommendation" (SIGIR 2025). The paper proposes a novel approach to team recommendation by treating it as a neural machine translation problem, where individual member skills and characteristics are translated into optimal team compositions. Our method leverages state-of-the-art sequence-to-sequence (seq2seq) neural machine translation (NMT) architectures such as the Transformer and RNN with attention and convolutional model, and the [OpenNMT-py](https://github.com/OpenNMT/OpenNMT-py) framework to capture complex relationships between team members and project requirements, leading to more effective team formation recommendations.
+<br/>
+<br/>
+> ![Overview of the sequence-2-sequence architecture.](./nmt%20fig%201%20-%20horizontal%20large.jpg)
+> Overview of the sequence-to-sequence architecture.
 
-## 0. Workflow Overview
-This repository utilizes the following workflow:
+<br/>
+<br/>
 
-1. Set up and run docker.
-5. Create and run a new docker container from our image.
-7. Create a new NMT model config file from a template.
-8. Create a new bash script to automate the test from a template.
-9. Run your bash script.
-10. Collect the results in the `output/dataset_name` folder.
 
-## 1. Setup docker
+## Workflow Overview 
 
-For the most convenience, this setup is heavily reliant on the usage of Docker. Therefore,
+1. Set up environment
+2. Run the models.
+3. Collect the results.
 
-**### Step 1. ###** Download and install Docker from here: [Get Docker | Docker Docs](https://docs.docker.com/get-started/get-docker/)
+<br/>
 
-**### Step 2. ###** Once your docker is installed, run it and then in a terminal, run the following command to download a ready-made image we've prepared from the Docker Hub. It's about 26 GB.:
+## 1. Set up environment
+
+Three ways to run our pipeline:
+
+- 1.1. The Docker approach (recommended)
+- 1.2. The virtual environment approach (i.e., `venv` or conda `env`)
+- 1.3. Without any of the above
+
+<br/>
+
+### 1.1. The Docker approach (recommended)
+
+1.1.1. Download and install Docker from here: [Get Docker | Docker Docs](https://docs.docker.com/get-started/get-docker/)
+
+1.1.2. Once your docker is up and running, pull our a ready-made image from the Docker Hub with this command. It's about 26 GB.
 ```
-docker pull kmthang/opennmt:3.0.4-torch1.10.1
+docker pull kmthang/opennmt
+```
+> Note: you may need to login first using `docker login` command.
+
+<br/>
+
+1.1.3. Once downloaded, create a container from it with:
+```
+docker run -it -d --name nmt_container_name --hostname nmt_host_name --gpus all -v $(pwd):/OpeNTF kmthang/opennmt
+```
+> Note: run the above command while the `/OpeNTF` folder. You can change the `nmt_container_name` and `nmt_host_name` to whatever you like.
+
+<br/>
+
+1.1.4. Connect to the container by this command:
+```
+docker attach nmt_container_name
 ```
 
-**### Step 3. ###** Once the image is on your system, let's create a container from it and then run it with the following command:
+You're now inside the Docker container. You can now run the your bash script inside the `/OpeNTF/run_scripts` folder. See section for how to create a new bash script.
 
-###### Note: before running the following command, be in the following folder: `/OpeNTF`, so the volume mapping won't confuse you.
-
+> Example
 ```
-docker run -it -d --name nmt_container --hostname nmt_host --gpus all -v $(pwd):/OpeNTF kmthang/opennmt:3.0.4-torch1.10.1
-```
-
-You can change the `nmt_container` and `nmt_host` to whatever you want.
-
-**### Step 4. ###** Connect to the container by running the following command:
-```
-docker attach nmt_container
+nmt_host@759fe234ae0f:/OpeNTF# cd /run_scripts
+nmt_host@759fe234ae0f:/OpeNTF/run_scripts# ./nmt_model.sh
 ```
 
-You're now inside the Docker container. Your terminal should look something like this:
+<br/>
 
-```
-nmt_host@759fe234ae0f:/OpeNTF#
-```
 
-Feel free to run the following two commands to see if the container has access to the host's dedicated GPUs.
-Check 1: `root@759fe234ae0f:/OpeNTF# nvidia-smi`
-Check 2: `root@759fe234ae0f:/OpeNTF# nvcc --version`
+### 1.2. The virtual environment approach (i.e., `venv` or conda `env`)
 
-You're good to run the models if both return proper results and no errors.
+- 1.2.1. Python venv
 
-## 2. Create a new NMT model from a template
+    - 1.2.1.1. Create a new virtual environment with:
+        ```
+        python -m venv nmt_venv_name
+        ```
+        > Note: be in the `/OpeNTF` folder when running the above command. You can change the `nmt_venv_name` to whatever you like.
 
-**### Step 1. ###** Duplicate one of the three templates available in `src/mdl/nmt_models/` folder and prefix your model with `nmt_`:
+    - 1.2.1.2. Activate the virtual environment with:
+        ```
+        source nmt_venv_name/bin/activate
+        ```
+
+    <br />
+
+- 1.2.2. Conda env
+
+    - 1.2.2.1. Create a new conda environment with:
+        ```
+        conda create -n nmt_venv_name python=3.8
+        ```
+
+    <br />
+
+
+- 1.2.3. Install the dependencies either one of the following:
+    ```
+    pip install -r requirements.txt
+    ```
+    or run the setup_nmt_env.sh script:
+    ```
+    ./setup_nmt_env.sh
+    ```
+
+
+<br />
+
+
+
+
+
+
+## 2. Creating a new NMT model and bash script
+
+2.1. Duplicate one of the three templates available in `src/mdl/nmt_models/` folder and prefix your model with `nmt_`:
 - `_template_transformer.yml`
 - `_template_rnn.yml`
 - `_template_cnn.yml`
