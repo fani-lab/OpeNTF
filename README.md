@@ -13,8 +13,10 @@ This repository contains the code implementation for our research paper "Transla
 ## Workflow Overview 
 
 1. Set up environment
-2. Run the models.
-3. Collect the results.
+2. Create a new NMT model
+3. Create a new bash script
+4. Run the model
+5. Automate multiple models and datasets
 
 <br/>
 
@@ -150,15 +152,23 @@ run_next_script=false
 next_script_name="example_next_script.sh"
 ```
 
+<br/>
 
-Now you can run the bash script with:
+
+## 4. Run the model
+
+Once you have a your model(s) and dataset(s) ready, and set up in the bash script, you can run the model with:
 ```
 ./mycnn_model.sh
 ```
-    
-    
-<br />
+Logs will be saved in
+```
+./run_scripts/bash_script_name.log        # The bash script log
+./run_logs/model_name.log                 # The model log
+./run_logs/model_name_errors.log          # The model error log
+```
 
+<br/>
 
 
 ## 5. Automating multiple models and datasets
