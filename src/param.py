@@ -13,12 +13,12 @@ settings = {
         "baseline": {
             "random": {"b": 128},
             "fnn": {
-                "l": [100],  # list of number of nodes in each layer
-                "lr": 0.001,  # learning rate
+                "l": [128],  # list of number of nodes in each layer
+                "lr": 0.1,  # learning rate
                 "b": 128,  # batch size
-                "e": 10,  # epoch
+                "e": 1,  # epoch
                 "nns": 3,  # number of negative samples
-                "ns": "none",  # 'none', 'uniform', 'unigram', 'unigram_b'
+                "ns": "unigram_b",  # 'none', 'uniform', 'unigram', 'unigram_b'
                 "loss": "SL",  # 'SL'-> superloss, 'DP' -> Data Parameters, 'normal' -> Binary Cross Entropy
             },
             "bnn": {
@@ -34,7 +34,7 @@ settings = {
             "caser": {},
             "rrn": {"with_zero": True},
             "emb": {
-                "d": 100,  # embedding dimension
+                "d": 128,  # embedding dimension
                 "e": 100,  # epoch
                 "dm": 1,  # training algorithm. 1: distributed memory (PV-DM), 0: distributed bag of words (PV-DBOW)
                 "w": 1,  # cooccurrence window
@@ -46,7 +46,7 @@ settings = {
             "eval",
             "fair",
         ],  # 'train', 'test', 'eval', 'plot', 'agg', 'fair'
-        "nfolds": 3,
+        "nfolds": 5,
         "train_test_split": 0.85,
         "step_ahead": 2,  # for now, it means that whatever are in the last [step_ahead] time interval will be the test set!
     },
