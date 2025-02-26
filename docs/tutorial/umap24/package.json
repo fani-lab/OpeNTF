@@ -1,5 +1,5 @@
 {
-  "name": "team-formation",
+  "name": "Tutorial-UMAP24",
   "version": "0.1.0",
   "homepage": "https://fani-lab.github.io/OpeNTF/tutorial/umap24",
   "private": true,
@@ -20,8 +20,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "predeploy": "yarn run build",
-    "deploy": "gh-pages -d build"
+    //"deploy": "gh-pages -d build -b main -e docs/tutorial/umap25" >> Hossein: for now, locally build, then push the content of the build folder in the same path :(
   },
   "browserslist": {
     "production": [
