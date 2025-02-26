@@ -8,7 +8,7 @@ gensim
 
 # OpenNMT and pytrec_eval
 OpenNMT-py==3.0.4
-pytrec_eval
+pytrec-eval-terrier==0.5.2
 
 # PyTorch ecosystem
 --find-links https://download.pytorch.org/whl/cu111/torch_stable.html

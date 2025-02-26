@@ -375,8 +375,8 @@ def run(
                 baseline_name,
                 settings["model"]["cmd"],
                 settings["fair"],
-                model_name=baseline_name,
-                gpus=gpus,
+                # model_name=baseline_name,
+                # gpus=gpus,
                 merge_skills=False,
             )
     if "agg" in settings["model"]["cmd"]:
