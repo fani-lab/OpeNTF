@@ -1,6 +1,6 @@
 {
   "name": "team-formation",
-  "version": "0.2.0",
+  "version": "0.1.0",
   "homepage": "https://fani-lab.github.io/OpeNTF/tutorial/umap24",
   "private": true,
   "dependencies": {

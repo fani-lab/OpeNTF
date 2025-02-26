@@ -609,70 +609,37 @@ function Home() {
         </span>
         <div className="section-body d-flex p-3 direction-row justify-content-between">
           <div className="presenter">
-            <a
-              href="https://www.linkedin.com/in/mahdis-saeedi-b80b8321a/"
-              target="_blank"
-            >
-              <div class="presenter-img">
-                <img
-                  class="front"
-                  src={require("../img/mahdis.jpg")}
-                  alt="Mahdis Saeedi"
-                />
-                <img
-                  class="back"
-                  src={require("../img/flamingo.jpg")}
-                  alt="Flamingo"
-                />
+            <a href="https://www.linkedin.com/in/mahdis-saeedi-b80b8321a/" target="_blank">
+              <div className="presenter-img">
+                <img className="front" src={require("../img/mahdis.jpg")} alt="Mahdis Saeedi"/>
+                <img className="back" src={require("../img/flamingo.jpg")} alt="Flamingo"/>
               </div>
             </a>
-            <span className="ref-name fs-5">Mahdis Saeedi</span>
-            <span className="text-muted fs-6 fst-italic">
-              University of Windsor
-            </span>
+            <span className="ref-name fs-5"><a href="https://www.linkedin.com/in/mahdis-saeedi-b80b8321a/"
+                                               target="_blank">Mahdis Saeedi</a></span>
+            <span className="text-muted fs-6 fst-italic">University of Windsor</span>
           </div>
           <div className="presenter">
-            <a
-              href="https://www.linkedin.com/in/christine-wong-6828b0193/"
-              target="_blank"
-            >
-              <div class="presenter-img">
-                <img
-                  class="front"
-                  src={require("../img/christine.jpg")}
-                  alt="Christine Wong"
-                />
-                <img
-                  class="back"
-                  src={require("../img/cardinal.jpg")}
-                  alt="Cardinal"
-                />
+            <a href="https://www.linkedin.com/in/christine-wong-6828b0193/" target="_blank">
+              <div className="presenter-img">
+                <img className="front" src={require("../img/christine.jpg")} alt="Christine Wong"/>
+                <img className="back" src={require("../img/cardinal.jpg")} alt="Cardinal"/>
               </div>
             </a>
-            <span className="ref-name fs-5">Christine Wong</span>
-            <span className="text-muted fs-6 fst-italic">
-              University of Windsor
-            </span>
+            <span className="ref-name fs-5"><a href="https://www.linkedin.com/in/christine-wong-6828b0193/"
+                                               target="_blank">Christine Wong</a></span>
+            <span className="text-muted fs-6 fst-italic">University of Windsor</span>
           </div>
           <div className="presenter">
             <a href="http://hosseinfani.github.io/" target="_blank">
-              <div class="presenter-img">
-                <img
-                  class="front"
-                  src={require("../img/hossein.jpg")}
-                  alt="Hossein Fani"
-                />
-                <img
-                  class="back"
-                  src={require("../img/sloth.jpg")}
-                  alt="Sloth"
-                />
+              <div className="presenter-img">
+                <img className="front" src={require("../img/hossein.jpg")} alt="Hossein Fani"/>
+                <img className="back" src={require("../img/sloth.jpg")} alt="Sloth"/>
               </div>
             </a>
-            <span className="ref-name fs-5">Hossein Fani</span>
-            <span className="text-muted fs-6 fst-italic">
-              University of Windsor
-            </span>
+            <span className="ref-name fs-5"><a href="http://hosseinfani.github.io/"
+                                               target="_blank">Hossein Fani</a></span>
+            <span className="text-muted fs-6 fst-italic">University of Windsor</span>
           </div>
         </div>
       </section>
@@ -681,23 +648,19 @@ function Home() {
           Materials
         </span>
         <div className="section-body p-2">
-          <div class="p-2">
-            <a
-              target="_blank"
-              href="https://hosseinfani.github.io/res/papers/2024_UMAP_Collaborative_Team_Recommendation_for_Skilled_Users_Objectives_Techniques_and_New_Perspectives.pdf"
-            >
-              Full Outline
-            </a>
+          <div className="p-2">
+            <a target="_blank"
+               href="https://hosseinfani.github.io/res/papers/2024_UMAP_Collaborative_Team_Recommendation_for_Skilled_Users_Objectives_Techniques_and_New_Perspectives.pdf">Full
+              Outline</a>
           </div>
-          <div class="p-2">
-            <a href="javascript:void(0)" style={{ cursor: "default" }}>
-              Presentation Slides (Upcoming)
-            </a>
+          <div className="p-2">
+            <a target="_blank"
+               href="https://www.slideshare.net/slideshow/collaborative-team-recommendation-for-skilled-users-objectives-techniques-and-new-perspectives/270130704">Presentation
+              Slides</a>
           </div>
-          <div class="p-2">
-            <a href="javascript:void(0)" style={{ cursor: "default" }}>
-              Presentation Video (Upcoming)
-            </a>
+          <div className="p-2">
+            <a target="_blank"
+               href="https://www.youtube.com/playlist?list=PLKFWrqRN8VmRmxwDKlaA7Moa_Wv0li7ex"> Presentation Video</a>
           </div>
         </div>
       </section>
