@@ -44,6 +44,8 @@ def create_docker_container(container_name, hostname, version="latest", is_windo
         "--name", container_name,
         "--hostname", hostname,
     ]
+    # full command above
+    # docker run -it -d --name c1 --hostname c1 kmthang/opennmt:latest
 
     # Add user mapping for Linux
     if not is_windows:
