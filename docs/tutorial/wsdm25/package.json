@@ -1,7 +1,7 @@
 {
-  "name": "Tutorial-SIGIR-AP24",
-  "version": "0.2.0",
-  "homepage": "https://fani-lab.github.io/OpeNTF/tutorial/sigir-ap24",
+  "name": "Tutorial-WSDM25",
+  "version": "0.3.0",
+  "homepage": "https://fani-lab.github.io/OpeNTF/tutorial/wsdm25",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.2",
@@ -20,7 +20,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "deploy": "gh-pages -d build -b main -e docs/tutorial/sigir-ap24"
+    "deploy": "gh-pages -d build -b main -e docs/tutorial/wsdm25"
   },
   "browserslist": {
     "production": [

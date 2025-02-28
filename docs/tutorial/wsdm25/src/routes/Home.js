@@ -52,8 +52,8 @@ function Home() {
             <section id="section-location" class="active">
             <span id="section-title-location" className="section-title">Time and Location</span>
                 <div className="section-body" style={{textAlign: "center"}}>
-                    <b>9:00 AM - 12:15 PM (GMT+9), Monday, December 9, 2024<br/>
-                    Room 3, 2nd floor, Building 63, Nishiwaseda, Waseda University, Tokyo, Japan</b>{" "}
+                    <b>?:00 AM - 12:15 PM (GMT+1), Monday, March 10, 2025<br/>
+                    Room ?, ? floor, Building ?, Hannover Congress Centre (HCC), Hannover, Germany</b>{" "}
                     <br/>
                 </div>
             </section>
@@ -606,24 +606,24 @@ function Home() {
                         <span className="text-muted fs-6 fst-italic">University of Windsor</span>
                     </div>
                     <div className="presenter">
-                        <a href="https://www.linkedin.com/in/christine-wong-6828b0193/" target="_blank">
+                        <a href="https://www.linkedin.com/in/md-jamil-ahmed-545164247/" target="_blank">
                             <div className="presenter-img">
-                                <img className="front" src={require("../img/christine.jpg")} alt="Christine Wong"/>
-                                <img className="back" src={require("../img/cardinal.jpg")} alt="Cardinal"/>
+                                <img className="front" src={require("../img/jamil.jpg")} alt="Md Jamil Ahmed"/>
+                                <img className="back" src={require("../img/cat_footballer.jpg")} alt="Cat Footballer"/>
                             </div>
                         </a>
-                        <span className="ref-name fs-5"><a href="https://www.linkedin.com/in/christine-wong-6828b0193/"
-                                                           target="_blank">Christine Wong</a></span>
+                        <span className="ref-name fs-5"><a href="https://www.linkedin.com/in/md-jamil-ahmed-545164247/"
+                                                           target="_blank">Md Jamil Ahmed</a></span>
                         <span className="text-muted fs-6 fst-italic">University of Windsor</span>
                     </div>
                     <div className="presenter">
-                        <a href="https://www.linkedin.com/in/md-jamil-ahmed-545164247/" target="_blank">
+                        <a href="https://www.linkedin.com/in/christine-wong-6828b0193/" target="_blank">
                             <div class="presenter-img">
-                                <img class="front" src={require("../img/jamil.jpg")} alt="Md Jamil Ahmed"/>
-                                <img class="back" src={require("../img/cat_footballer.jpg")} alt="Cat Footballer"/>
+                                <img class="front" src={require("../img/christine.jpg")} alt="Christine Wong"/>
+                                <img class="back" src={require("../img/cardinal.jpg")} alt="Cardinal"/>
                             </div>
                         </a>
-                        <span className="ref-name fs-5"><a href="https://www.linkedin.com/in/md-jamil-ahmed-545164247/" target="_blank">Md Jamil Ahmed</a></span>
+                        <span className="ref-name fs-5"><a href="https://www.linkedin.com/in/christine-wong-6828b0193/" target="_blank">Christine Wong</a></span>
                         <span className="text-muted fs-6 fst-italic">University of Windsor</span>
                     </div>
                     <div className="presenter">
@@ -642,13 +642,13 @@ function Home() {
         <span id="section-title-download" className="section-title">Materials</span>
                 <div className="section-body p-2">
                     <div class="p-2">
-                        <a target="_blank" href="https://hosseinfani.github.io/res/papers/2024_SIGIRAP_Paradigm_Shifts_in_Team_Recommendation_From_Historical_Subgraph_Optimization_to_Emerging_Graph_Neural_Network.pdf">Full Outline</a>
+                        <a target="_blank" href="https://hosseinfani.github.io/res/papers/2025_WSDM_Bridging_Historical_Subgraph_Optimization_and_Modern_Graph_Neural_Network_Approaches_in_Team_Recommendations.pdf">Full Outline</a>
                     </div>
                     <div class="p-2">
-                        <a target="_blank" href="https://hosseinfani.github.io/res/slides/2024_SIGIRAP_Paradigm_Shifts_in_Team_Recommendation_From_Historical_Subgraph_Optimization_to_Emerging_Graph_Neural_Network.pdf">Presentation Slides</a>
+                        <a target="_blank" >Presentation Slides</a>
                     </div>
                     <div class="p-2">
-                        <a target="_blank" href="https://www.youtube.com/playlist?list=PLKFWrqRN8VmSOQA74QRJRwwYDyp1YNZE-"> Presentation Video</a>
+                        <a target="_blank" > Presentation Video</a>
                     </div>
                 </div>
             </section>
