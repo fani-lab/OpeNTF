@@ -22,9 +22,11 @@ body {
 }
 
 .title-text {
-  color: white;
+  color: #b3dfda;
 }
 
 .title-box {
-  background: #3a4039b0;
+  background: #000000d4;
+  margin-top: 200px !important;
+
 }

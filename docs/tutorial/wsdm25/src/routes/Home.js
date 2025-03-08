@@ -1,5 +1,6 @@
 import {useEffect} from "react";
 import "./Home.css";
+import {isDisabled} from "bootstrap/js/src/util";
 
 function Home() {
     let offsets = [];
@@ -9,8 +10,8 @@ function Home() {
     }, []);
 
     const onWindowLoaded = () => {
-        const ids = ["location","abstract","audience","prereq","outline","presenters","download",];
-        const topMargin = parseInt(getComputedStyle(window.document.body).fontSize) * 6;
+        const ids = ["location","abstract","audience","outline", "searchbased", "learnbased", "challeng", "apps", "presenters"];
+        const topMargin = parseInt(getComputedStyle(window.document.body).fontSize) * 10;
         offsets = ids.map((id) => {
             const offset =
                 document.getElementById("section-title-" + id)?.offsetTop - topMargin - 15;
@@ -52,38 +53,39 @@ function Home() {
             <section id="section-location" class="active">
             <span id="section-title-location" className="section-title">Time and Location</span>
                 <div className="section-body" style={{textAlign: "center"}}>
-                    <b>?:00 AM - 12:15 PM (GMT+1), Monday, March 10, 2025<br/>
-                    Room ?, ? floor, Building ?, Hannover Congress Centre (HCC), Hannover, Germany</b>{" "}
-                    <br/>
+                    Afternoon 1:30 PM - 5:00 PM (GMT+1)<br/>
+                    Half-day, Monday, March 10, 2025<br/>
+                    Konferenzraum 16, Hannover Congress Centre (HCC), Hannover, Germany{" "}
+                    <br/><br/>
+                    [<a target="_blank" href="https://hosseinfani.github.io/res/papers/2025_WSDM_Bridging_Historical_Subgraph_Optimization_and_Modern_Graph_Neural_Network_Approaches_in_Team_Recommendations.pdf">Full Outline</a>]
+                    [<a target="_blank" style={{color: "gray"}}>Slides</a>]
+                    [<a target="_blank" style={{color: "gray"}}>Recording</a>]
                 </div>
             </section>
             <section id="section-abstract"><span id="section-title-abstract" className="section-title">Abstract</span>
                 <div className="section-body justify-paragraph">
-                    Collaborative team recommendation involves selecting users with
+                    Collaborative team recommendation involves selecting experts with
                     certain skills to form a team who will, more likely than not,
-                    accomplish a complex task successfully. To automate the traditionally
-                    tedious and error-prone manual process of team formation, researchers
-                    from several scientific spheres have proposed methods to tackle the
+                    accomplish a complex task. To automate the traditionally
+                    tedious and error-prone manual process of team formation, researchers have proposed methods to tackle the
                     problem. In this tutorial, while providing a taxonomy of team
-                    recommendation works based on their algorithmic approaches to model
-                    skilled users in collaborative teams, we perform a comprehensive and
-                    hands-on study of the graph-based approaches that comprise the
-                    mainstream in this field, then cover the neural team recommenders as
-                    the cutting-edge class of approaches. Further, we provide unifying
-                    definitions, formulations, and evaluation schema. Last, we introduce
+                    recommendation works based on their algorithmic approaches, we perform a comprehensive and
+                    hands-on study of the graph-based and learning-based approaches that comprise the
+                    mainstream in this field, then cover the graph neural team recommenders as
+                    the cutting-edge class of approaches. Further, we introduce
                     details of training strategies, benchmarking datasets, and open-source
                     tools, along with directions for future works.
                 </div>
             </section>
             <section id="section-audience"><span id="section-title-audience" className="section-title">Target Audience</span>
                 <div className="section-body justify-paragraph">
-                    Team recommendation problem falls under social information retrieval
-                    (Social IR) where we seek to find the right group of skillful users to
+                    Team recommendation falls under social information retrieval
+                    (Social IR) where we seek to find the right group of skillful experts to
                     solve the tasks at hand or only with the assistance of social
                     resources. In this tutorial,
                     <ul>
                         <li className="justify-paragraph">
-                            we target beginner or intermediate researchers, industry
+                            We target beginner or intermediate researchers, industry
                             technologists and practitioners with a broad interest in user
                             modeling and recommender systems who are willing to have a whole
                             picture of team recommendation techniques.
@@ -98,59 +100,53 @@ function Home() {
                         <li className="justify-paragraph">
                             Last, having regard to the unified comparative analysis, this
                             tutorial enables organizations and practitioners to compare
-                            different models and readily pick the most suitable one for their
-                            application to form collaborative teams of skilled users whose
+                            different models and pick the most suitable one for their
+                            application to form collaborative teams of experts whose
                             success is almost surely guaranteed.
                         </li>
                     </ul>
-                </div>
-            </section>
-            <section id="section-prereq">
-        <span id="section-title-prereq" className="section-title">Prerequisite Knowledge</span>
-                <div className="section-body justify-paragraph">
-                    The target audience needs to be familiar with graph theory and machine
-                    learning. Where appropriate, the tutorial will not make any
-                    assumptions about the audience’s knowledge on more advanced
-                    techniques. As such, sufficient details will be provided as
-                    appropriate so that the content will be accessible and understandable
-                    to those with a fundamental understanding of such principles.
+                    <div className="justify-paragraph">
+                        The target audience needs to be familiar with graph theory and machine
+                        learning. Where appropriate, the tutorial will not make any
+                        assumptions about the audience’s knowledge on more advanced
+                        techniques. As such, sufficient details will be provided as
+                        appropriate so that the content will be accessible and understandable
+                        to those with a fundamental understanding of such principles.
+                    </div>
                 </div>
             </section>
             <section id="section-outline"><span id="section-title-outline" className="section-title">Outline</span>
                 <div className="section-body">
                   <span className="d-block w-100 justify-paragraph">
-                    From Figure 1 (below), we begin to introduce intuitive definitions
+                    As seen in Figure 1, we begin to introduce intuitive definitions
                     of a team and some representative, historical to modern and
                     state-of-the-art methods for solving the team recommendation
                     problem, motivating the importance of the problem, followed by a
                     novel taxonomy of computational methods, as explained hereafter.
                   </span>
-                    <img src={require("../img/taxonomy.jpg")}alt="Taxonomy of team recommendation methods." height="300"/>
+                    <img src={require("../img/taxonomy.jpg")} alt="Taxonomy of team recommendation methods." height="300"/>
                     <p> Figure 1. Taxonomy of team recommendation methods.</p>
-                    <div className="outline-topic">
+                </div>
+            </section>
+            <section id="section-searchbased"><span id="section-title-searchbased" className="section-title">Search-based Heuristics</span>
+                    <div className="section-body">
                         <span className="section-date">35 minutes</span>
-                        <span className="fw-bold text-uppercase h5">Search-based Heuristics</span>
-                    <span className="d-block w-100 justify-paragraph">
-                      This section provides an overview of the graph-based approaches in
-                      team formation methods. Operations Research-based methods,
-                      although conceiving the foremost computational models, overlooked
-                      the organizational and social ties among users and are hence
-                      excluded in our tutorial.
-                    </span>
+                        <span className="d-block w-100 justify-paragraph">
+                          This section provides an overview of the graph-based approaches in
+                          team formation methods. Operations Research-based methods,
+                          although conceiving the foremost computational models, overlooked
+                          the organizational and social ties among users and are hence
+                          excluded in our tutorial.
+                        </span>
                         <div className="topic-item">
-                            <ul>
-                                <li className="justify-paragraph">
-                  <span className="fw-bold">
-                    Subgraph Optimization Objectives:
-                  </span>
+                            <ul><li className="justify-paragraph">
+                                <span className="fw-bold">Subgraph Optimization Objectives:</span>
                                     &nbsp;In our tutorial, we formalized more than 13 objectives
                                     in a unified framework with integrated notations for better
                                     readability and fostering conventions in this realm.
                                 </li>
                                 <li className="justify-paragraph">
-                  <span className="fw-bold">
-                    Subgraph Optimization Techniques:
-                  </span>
+                                  <span className="fw-bold">Subgraph Optimization Techniques:</span>
                                     &nbsp;We describe the seminal heuristics that have been
                                     followed by the majority of researchers, as well as the groups
                                     that optimization techniques can be studied in.
@@ -167,57 +163,15 @@ function Home() {
                         <div className="topic-item">
                             <span className="fw-bold text-uppercase h6">Reading List</span>
                             <ul>
-                                <li>
-                                    <a href="https://doi.org/10.1016/j.eswa.2021.114886">
-                                        A unified framework for effective team formation in social
-                                        networks
-                                    </a>{" "}
-                                    (Selvarajah et al., 2021)
-                                </li>
-                                <li>
-                                    <a href="https://doi.org/10.1145/3459637.3481969">
-                                        RW-Team: Robust Team Formation using Random Walk
-                                    </a>{" "}
-                                    (Nemec et al., 2021)
-                                </li>
-                                <li>
-                                    <a href="https://doi.org/10.1145/3465399">
-                                        A Comprehensive Review and a Taxonomy Proposal of Team
-                                        Formation Problems
-                                    </a>{" "}
-                                    (Juarez et al., 2021)
-                                </li>
-                                <li>
-                                    <a href="https://doi.org/10.1109/TKDE.2020.2985376">
-                                        Effective Keyword Search Over Weighted Graphs
-                                    </a>{" "}
-                                    (Kargar et al., 2020)
-                                </li>
-                                <li>
-                                    <a href="https://doi.org/10.1093/comjnl/bxw088">
-                                        Forming Grouped Teams with Efficient Collaboration in Social
-                                        Networks
-                                    </a>{" "}
-                                    (Huang et al., 2017)
-                                </li>
-                                <li>
-                                    <a href="https://doi.org/10.5441/002/edbt.2017.54">
-                                        Authority-based Team Discovery in Social Networks
-                                    </a>{" "}
-                                    (Zihayat et al., 2017)
-                                </li>
-                                <li>
-                                    <a href="https://doi.org/10.1109/WI-IAT.2014.112">
-                                        Two-Phase Pareto Set Discovery for Team Formation in Social
-                                        Networks
-                                    </a>{" "}
-                                    (Zihayat et al., 2014)
-                                </li>
-                                <li>
-                                    <a href="https://doi.org/10.1145/2488388.2488482">
-                                        Towards realistic team formation in social networks based on
-                                        densest subgraphs
-                                    </a>{" "}
+                                <li><a href="https://doi.org/10.1016/j.eswa.2021.114886">A unified framework for effective team formation in social networks</a>{" "}(Selvarajah et al., 2021)</li>
+                                <li><a href="https://doi.org/10.1145/3459637.3481969">RW-Team: Robust Team Formation using Random Walk</a>{" "}(Nemec et al., 2021)</li>
+                                <li><a href="https://doi.org/10.1145/3465399">A Comprehensive Review and a Taxonomy Proposal of Team Formation Problems</a>{" "}(Juarez et al., 2021)</li>
+                                <li><a href="https://doi.org/10.1109/TKDE.2020.2985376">Effective Keyword Search Over Weighted Graphs</a>{" "}(Kargar et al., 2020)</li>
+                                <li><a href="https://doi.org/10.1093/comjnl/bxw088">Forming Grouped Teams with Efficient Collaboration in Social Networks</a>{" "}(Huang et al., 2017)</li>
+                                <li><a href="https://doi.org/10.5441/002/edbt.2017.54">Authority-based Team Discovery in Social Networks</a>{" "}(Zihayat et al., 2017)</li>
+                                <li><a href="https://doi.org/10.1109/WI-IAT.2014.112">Two-Phase Pareto Set Discovery for Team Formation in Social Networks</a>{" "}(Zihayat et al., 2014)</li>
+                                <li><a href="https://doi.org/10.1145/2488388.2488482">Towards realistic team formation in social networks based on
+                                        densest subgraphs</a>{" "}
                                     (Rangapuram et al., 2013)
                                 </li>
                                 <li>
@@ -262,27 +216,19 @@ function Home() {
                             </ul>
                         </div>
                     </div>
-                    <div className="outline-topic">
+            </section>
+            <section id="section-learnbased"><span id="section-title-learnbased" className="section-title">Learning-based Heuristics</span>
+                    <div className="section-body">
                         <span className="section-date">55 minutes</span>
-                        <span className="fw-bold text-uppercase h5">
-              Learning-based Heuristics
-            </span>
                         <span className="d-block w-100 justify-paragraph">
-              We will then explain the learning-based methods, which has been
-              mostly based on neural models. Learning-based methods bring
-              efficiency while enhancing efficacy due to the inherently
-              iterative and online learning procedure, and can address the
-              limitations of search-based solutions with respect to scalability,
-              as well as dynamic expert networks (
-              <a href="https://dl.acm.org/doi/10.1145/3589762">
-                Rad, R. et al., 2023
-              </a>
-              ;{" "}
-                            <a href="https://dl.acm.org/doi/10.1145/3340531.3412140">
-                Rad, R.H., et al., 2020
-              </a>
-              ).
-            </span>
+                          We will then explain the learning-based methods, which has been
+                          mostly based on neural models. Learning-based methods bring
+                          efficiency while enhancing efficacy due to the inherently
+                          iterative and online learning procedure, and can address the
+                          limitations of search-based solutions with respect to scalability,
+                          as well as dynamic expert networks (<a href="https://dl.acm.org/doi/10.1145/3589762">Rad, R. et al., 2023</a>
+                          ;{" "}<a href="https://dl.acm.org/doi/10.1145/3340531.3412140">Rad, R.H., et al., 2020</a>).
+                        </span>
                         <div className="topic-item">
                             <ul>
                                 <li className="justify-paragraph">
@@ -445,58 +391,39 @@ function Home() {
                             <span className="d-block w-100 justify-paragraph"></span>
                         </div>
                     </div>
-                    <div className="outline-topic">
+            </section>
+            <section id="section-challeng"><span id="section-title-challeng" className="section-title">Challenges and New Perspectives</span>
+                    <div className="section-body">
                         <span className="section-date">20 minutes</span>
-                        <span className="fw-bold text-uppercase h5">
-              Challenges and New Perspectives
-            </span>
                         <div className="topic-item">
-              <span className="fw-bold">
-                Fair and Diverse Team Recommendation
-              </span>
+                            <span className="fw-bold">Fair and Diverse Team Recommendation</span>
                             <span className="d-block w-100 justify-paragraph">
-                The primary focus of existing team recommendation methods is the
-                maximization of the success rate for the recommended teams,
-                largely ignoring diversity in the recommended users. In our
-                tutorial, we introduce notions of fairness, that enables further added in-processing 
-                <a href="https://github.com/fani-lab/OpeNTF/tree/vivaFemme-bias24">
-                  <i> (Vivafemme) </i>
-                </a> 
-                 and post-processing reranking 
-                <a href="https://github.com/fani-lab/Adila">
-                  <i> (Adila) </i>
-                </a> refinements to
-                reassure the desired fair outcome and explore the synergistic
-                trade-offs between notions of fairness and success rate for the
-                proposed solutions.
-              </span>
-                            <img
-                                src={require("../img/vivafemme.jpg")}
-                                alt="Vivafemme's pipeline architecture."
-                                height="500"
-                            />
-                            <p>
-                                {" "}
-                                Figure 4.{" "}
-                                <a href="https://github.com/fani-lab/OpeNTF/tree/vivaFemme-bias24">
-                                    <i>Vivafemme</i>
-                                </a>
-                                's pipeline architecture.
-                            </p>
+                                The primary focus of existing team recommendation methods is the
+                                maximization of the success rate for the recommended teams,
+                                largely ignoring diversity in the recommended users. In our
+                                tutorial, we introduce notions of fairness, that enables further added in-processing
+                                <a href="https://github.com/fani-lab/OpeNTF/tree/vivaFemme-bias24"><i> (vivaFemme) </i></a>and post-processing reranking
+                                <a href="https://github.com/fani-lab/Adila"><i> (Adila) </i></a> refinements to
+                                reassure the desired fair outcome and explore the synergistic
+                                trade-offs between notions of fairness and success rate for the
+                                proposed solutions.
+                              </span>
+                            <img src={require("../img/vivafemme.jpg")} alt="Vivafemme's pipeline architecture." height="500" />
+                            <p> {" "} Figure 4.{" "} <a href="https://github.com/fani-lab/OpeNTF/tree/vivaFemme-bias24"> <i>Vivafemme</i> </a> 's pipeline architecture.</p>
                         </div>
                         <div className="topic-item">
                             <span className="fw-bold">Spatial Team Recommendation</span>
                             <span className="d-block w-100 justify-paragraph">
-                In search of an optimal team, companies further look for skilled
-                users in a region where the organization is geographically
-                based, which leads to new challenges as it requires drilling
-                down on the skills of users while maintaining the condition of a
-                given geolocation. We conclude our tutorial by bringing forth
-                the spatial team recommendation problem; that is, given a set of
-                users, skills and geolocations, the goal is to determine whether
-                the combination of skills and geolocations in forming teams has
-                synergistic effects.
-              </span>
+                                In search of an optimal team, companies further look for skilled
+                                users in a region where the organization is geographically
+                                based, which leads to new challenges as it requires drilling
+                                down on the skills of users while maintaining the condition of a
+                                given geolocation. We conclude our tutorial by bringing forth
+                                the spatial team recommendation problem; that is, given a set of
+                                users, skills and geolocations, the goal is to determine whether
+                                the combination of skills and geolocations in forming teams has
+                                synergistic effects.
+                              </span>
                         </div>
                         <div className="topic-item">
                             <span className="fw-bold text-uppercase h6">Reading List</span>
@@ -552,48 +479,43 @@ function Home() {
                             </ul>
                         </div>
                     </div>
-                    <div className="outline-topic">
-                        <span className="section-date">20 minutes</span>
-                        <span className="fw-bold text-uppercase h5">
-              Applications
-            </span>
+            </section>
+            <section id="section-apps"><span id="section-title-apps" className="section-title">Applications</span>
+                <div className="section-body">
+                    <span className="section-date">20 minutes</span>
                         <div className="topic-item">
                             In this section, we highlight the practical significance of team recommendation by
                             explaining its seemingly unrelated yet highly valuable applications in education,
                             research, and healthcare, in addition to its common use cases.
                             <span className="d-block w-100 justify-paragraph">
-                <ul>
-                  <li>
-                    <b> Group Learning: </b>
-                    Team recommendation finds immediate application in group-based learning environments. 
-                    In online classes, where physical presence and interaction are absent, team recommendation connects students to share ideas and build relationships. 
-                    This not only enhances their social skills but also combats the isolation that can sometimes accompany remote learning. 
-                    Via working in teams, students are exposed to varying viewpoints, backgrounds, and problem-solving approaches.
-                  </li>
-                  <li>
-                    <b> Reviewer Assignment: </b> 
-                    Another immediate application of team recommendation is in peer-review assignments where a group of reviewers 
-                    are paired with manuscripts within the reviewers' expertise for high-quality reviews while managing conflicts of interests. 
-                    Like team recommendation, herein, research topics (skills) and reviewers (experts) are mapped into a 
-                    latent space and, given a manuscript about a subset of research topics, team recommendation aims to recommend 
-                    reviewers with top-k closest vectors to the vectors of the research.
-                  </li>
-                  <li>
-                    <b> Palliative Care: </b> 
-                    Another application of team recommendation is in healthcare, which assigns a team of caregivers to patients who 
-                    seek help for their daily activities due to disease or disorders. The challenge lies in optimally assigning care 
-                    providers in teams to address patients' needs while considering factors such as communication, distance, and contract costs.
-                  </li>
-                </ul>
-              </span>
+                                <ul>
+                                  <li><b> Group Learning: </b>
+                                    Team recommendation finds immediate application in group-based learning environments.
+                                    In online classes, where physical presence and interaction are absent, team recommendation connects students to share ideas and build relationships.
+                                    This not only enhances their social skills but also combats the isolation that can sometimes accompany remote learning.
+                                    Via working in teams, students are exposed to varying viewpoints, backgrounds, and problem-solving approaches.
+                                  </li>
+                                  <li>
+                                    <b> Reviewer Assignment: </b>
+                                    Another immediate application of team recommendation is in peer-review assignments where a group of reviewers
+                                    are paired with manuscripts within the reviewers' expertise for high-quality reviews while managing conflicts of interests.
+                                    Like team recommendation, herein, research topics (skills) and reviewers (experts) are mapped into a
+                                    latent space and, given a manuscript about a subset of research topics, team recommendation aims to recommend
+                                    reviewers with top-k closest vectors to the vectors of the research.
+                                  </li>
+                                  <li>
+                                    <b> Palliative Care: </b>
+                                    Another application of team recommendation is in healthcare, which assigns a team of caregivers to patients who
+                                    seek help for their daily activities due to disease or disorders. The challenge lies in optimally assigning care
+                                    providers in teams to address patients' needs while considering factors such as communication, distance, and contract costs.
+                                  </li>
+                                </ul>
+                            </span>
                         </div>
-                    </div>
                 </div>
             </section>
             <section id="section-presenters">
-        <span id="section-title-presenters" className="section-title">
-          Presenters
-        </span>
+                <span id="section-title-presenters" className="section-title">Presenters</span>
                 <div className="section-body d-flex p-3 direction-row justify-content-between">
                     <div className="presenter">
                         <a href="https://www.linkedin.com/in/mahdis-saeedi-b80b8321a/" target="_blank">
@@ -635,20 +557,6 @@ function Home() {
                         </a>
                         <span className="ref-name fs-5"><a href="http://hosseinfani.github.io/" target="_blank">Hossein Fani</a></span>
                         <span className="text-muted fs-6 fst-italic">University of Windsor</span>
-                    </div>
-                </div>
-            </section>
-            <section id="section-download">
-        <span id="section-title-download" className="section-title">Materials</span>
-                <div className="section-body p-2">
-                    <div class="p-2">
-                        <a target="_blank" href="https://hosseinfani.github.io/res/papers/2025_WSDM_Bridging_Historical_Subgraph_Optimization_and_Modern_Graph_Neural_Network_Approaches_in_Team_Recommendations.pdf">Full Outline</a>
-                    </div>
-                    <div class="p-2">
-                        <a target="_blank" >Presentation Slides</a>
-                    </div>
-                    <div class="p-2">
-                        <a target="_blank" > Presentation Video</a>
                     </div>
                 </div>
             </section>

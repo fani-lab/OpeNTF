@@ -11,7 +11,7 @@ section.active {
 }
 
 section.active .section-title {
-  color: #790396;
+  color: #b83b21;
   font-weight: 600;
   text-transform: uppercase;
   font-size: larger;
@@ -24,7 +24,7 @@ section:not(:first-child) {
 section.active .section-body {
   /*transition: 0.5s all ease;*/
   border-left: 2px double;
-  border-color: #790396;
+  border-color: #b83b21;
   padding-left: 1.5em;
 }
 
@@ -38,7 +38,7 @@ section.active .section-list {
 
 section.active .section-list li::before {
   content: "●";
-  color: #790396;
+  color: #b83b21;
   padding-right: 0.7rem;
 }
 
@@ -72,12 +72,12 @@ section .presenter {
 }
 
 section .presenter:not(:last-child) {
-  border-right: 1px solid #790396;
+  border-right: 1px solid #b83b21;
 }
 
 .email-link,
 .external-link {
-  color: #790396;
+  color: #b83b21;
   text-decoration: none;
   /* font-size: small; */
 }
@@ -86,7 +86,7 @@ section .presenter:not(:last-child) {
 .external-link:hover,
 .email-link:active,
 .external-link:active {
-  color: #790396;
+  color: #b83b21;
   text-decoration: underline;
 }
 
@@ -95,7 +95,7 @@ section .outline-topic {
 }
 
 section .outline-topic:not(:last-child) {
-  border-bottom: #790396 1px solid;
+  border-bottom: #b83b21 1px solid;
 }
 
 section .topic-item {
@@ -108,22 +108,22 @@ img {
 }
 
 a {
-  color: #790396;
+  color: forestgreen;
   text-decoration: none;
 }
 
 a:hover {
-  color: #790396;
+  color: forestgreen;
   text-decoration: underline;
 }
 
 .plain-link {
-  color: white;
+  color: #b3dfda;
   text-decoration: none;
 }
 
 .plain-link:hover {
-  color: white;
+  color: #b3dfda;
 }
 
 .justify-paragraph {
@@ -132,7 +132,7 @@ a:hover {
 
 .footnote:hover {
   font-size: larger;
-  color: #790396;
+  color: #b83b21;
   padding: none;
 }
 
@@ -159,5 +159,5 @@ a:hover {
 }
 
 #section-location {
-    color: #790396;
+    color: #b83b21;
 }

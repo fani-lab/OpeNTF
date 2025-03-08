@@ -1,14 +1,14 @@
 {
   "files": {
-    "main.css": "/OpeNTF/tutorial/wsdm25/static/css/main.d5151a0a.css",
-    "main.js": "/OpeNTF/tutorial/wsdm25/static/js/main.f5a59a16.js",
+    "main.css": "/OpeNTF/tutorial/wsdm25/static/css/main.d80bf315.css",
+    "main.js": "/OpeNTF/tutorial/wsdm25/static/js/main.821686c7.js",
     "static/js/453.67c6b62a.chunk.js": "/OpeNTF/tutorial/wsdm25/static/js/453.67c6b62a.chunk.js",
     "static/media/vivafemme.jpg": "/OpeNTF/tutorial/wsdm25/static/media/vivafemme.63a4bcf87ffb259610f1.jpg",
     "static/media/taxonomy.jpg": "/OpeNTF/tutorial/wsdm25/static/media/taxonomy.112cb6d1e28b8085b5cf.jpg",
     "static/media/bootstrap-icons.woff?": "/OpeNTF/tutorial/wsdm25/static/media/bootstrap-icons.39795c0b4513de014cf8.woff",
     "static/media/flow-t.jpg": "/OpeNTF/tutorial/wsdm25/static/media/flow-t.d74b6d7d81298fc229c8.jpg",
+    "static/media/banner.jpg": "/OpeNTF/tutorial/wsdm25/static/media/banner.36753e515b878b729346.jpg",
     "static/media/bootstrap-icons.woff2?": "/OpeNTF/tutorial/wsdm25/static/media/bootstrap-icons.b7bcc075b395c14ce8c2.woff2",
-    "static/media/banner.jpg": "/OpeNTF/tutorial/wsdm25/static/media/banner.aafd9134f1a68488b57a.jpg",
     "static/media/bnn.jpg": "/OpeNTF/tutorial/wsdm25/static/media/bnn.a23ef36c3343a47487f8.jpg",
     "static/media/christine.jpg": "/OpeNTF/tutorial/wsdm25/static/media/christine.bc135ec837001ec8405c.jpg",
     "static/media/jamil.jpg": "/OpeNTF/tutorial/wsdm25/static/media/jamil.6824079edfec5272f733.jpg",
@@ -18,12 +18,12 @@
     "static/media/cardinal.jpg": "/OpeNTF/tutorial/wsdm25/static/media/cardinal.8741a54c4187f7f7231c.jpg",
     "static/media/sloth.jpg": "/OpeNTF/tutorial/wsdm25/static/media/sloth.810860bd0d914fe498d9.jpg",
     "index.html": "/OpeNTF/tutorial/wsdm25/index.html",
-    "main.d5151a0a.css.map": "/OpeNTF/tutorial/wsdm25/static/css/main.d5151a0a.css.map",
-    "main.f5a59a16.js.map": "/OpeNTF/tutorial/wsdm25/static/js/main.f5a59a16.js.map",
+    "main.d80bf315.css.map": "/OpeNTF/tutorial/wsdm25/static/css/main.d80bf315.css.map",
+    "main.821686c7.js.map": "/OpeNTF/tutorial/wsdm25/static/js/main.821686c7.js.map",
     "453.67c6b62a.chunk.js.map": "/OpeNTF/tutorial/wsdm25/static/js/453.67c6b62a.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.d5151a0a.css",
-    "static/js/main.f5a59a16.js"
+    "static/css/main.d80bf315.css",
+    "static/js/main.821686c7.js"
   ]
 }
