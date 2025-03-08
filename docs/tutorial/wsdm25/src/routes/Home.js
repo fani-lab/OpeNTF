@@ -128,9 +128,8 @@ function Home() {
                     <p> Figure 1. Taxonomy of team recommendation methods.</p>
                 </div>
             </section>
-            <section id="section-searchbased"><span id="section-title-searchbased" className="section-title">Search-based Heuristics</span>
+            <section id="section-searchbased"><span id="section-title-searchbased" className="section-title">Search-based Heuristics (35 Minutes)</span>
                     <div className="section-body">
-                        <span className="section-date">35 minutes</span>
                         <span className="d-block w-100 justify-paragraph">
                           This section provides an overview of the graph-based approaches in
                           team formation methods. Operations Research-based methods,
@@ -164,70 +163,32 @@ function Home() {
                             <span className="fw-bold text-uppercase h6">Reading List</span>
                             <ul>
                                 <li><a href="https://doi.org/10.1016/j.eswa.2021.114886">A unified framework for effective team formation in social networks</a>{" "}(Selvarajah et al., 2021)</li>
-                                <li><a href="https://doi.org/10.1145/3459637.3481969">RW-Team: Robust Team Formation using Random Walk</a>{" "}(Nemec et al., 2021)</li>
-                                <li><a href="https://doi.org/10.1145/3465399">A Comprehensive Review and a Taxonomy Proposal of Team Formation Problems</a>{" "}(Juarez et al., 2021)</li>
-                                <li><a href="https://doi.org/10.1109/TKDE.2020.2985376">Effective Keyword Search Over Weighted Graphs</a>{" "}(Kargar et al., 2020)</li>
-                                <li><a href="https://doi.org/10.1093/comjnl/bxw088">Forming Grouped Teams with Efficient Collaboration in Social Networks</a>{" "}(Huang et al., 2017)</li>
-                                <li><a href="https://doi.org/10.5441/002/edbt.2017.54">Authority-based Team Discovery in Social Networks</a>{" "}(Zihayat et al., 2017)</li>
-                                <li><a href="https://doi.org/10.1109/WI-IAT.2014.112">Two-Phase Pareto Set Discovery for Team Formation in Social Networks</a>{" "}(Zihayat et al., 2014)</li>
-                                <li><a href="https://doi.org/10.1145/2488388.2488482">Towards realistic team formation in social networks based on
-                                        densest subgraphs</a>{" "}
-                                    (Rangapuram et al., 2013)
-                                </li>
-                                <li>
-                                    <a href="https://doi.org/10.1137/1.9781611972825.15">
-                                        Multi-skill Collaborative Teams based on Densest Subgraphs
-                                    </a>{" "}
-                                    (Gajewar et al., 2012)
-                                </li>
-                                <li>
-                                    <a href="https://doi.org/10.1145/2339530.2339690">
-                                        Capacitated team formation problem on social networks
-                                    </a>{" "}
-                                    (Datta et al., 2012)
-                                </li>
-                                <li>
-                                    <a href="https://doi.org/10.1109/ICDMW.2011.28">
-                                        An Effective Expert Team Formation in Social Networks Based
-                                        on Skill Grading
-                                    </a>{" "}
-                                    (Farhadi et al., 2011)
-                                </li>
-                                <li>
-                                    <a href="https://doi.org/10.1145/2063576.2063718">
-                                        Discovering top-k teams of experts with/without a leader in
-                                        social networks
-                                    </a>{" "}
-                                    (Kargar et al., 2011)
-                                </li>
-                                <li>
-                                    <a href="https://doi.org/10.1109/SocialCom.2010.12">
-                                        Team Formation for Generalized Tasks in Expertise Social
-                                        Networks
-                                    </a>{" "}
-                                    (Li et al., 2010)
-                                </li>
-                                <li>
-                                    <a href="https://doi.org/10.1145/1557019.1557074">
-                                        Finding a team of experts in social networks
-                                    </a>{" "}
-                                    (Lappas et al., 2009)
-                                </li>
+                                <li><a href="https://doi.org/10.1145/3459637.3481969">RW-Team: Robust team formation using random walk</a>{" "}(Nemec et al., 2021)</li>
+                                <li><a href="https://doi.org/10.1145/3465399">A Comprehensive review and a taxonomy proposal of team formation Problems</a>{" "}(Juarez et al., 2021)</li>
+                                <li><a href="https://doi.org/10.1109/TKDE.2020.2985376">Effective keyword search over weighted graphs</a>{" "}(Kargar et al., 2020)</li>
+                                <li><a href="https://doi.org/10.1093/comjnl/bxw088">Forming grouped teams with efficient collaboration in social networks</a>{" "}(Huang et al., 2017)</li>
+                                <li><a href="https://doi.org/10.5441/002/edbt.2017.54">Authority-based team discovery in social networks</a>{" "}(Zihayat et al., 2017)</li>
+                                <li><a href="https://doi.org/10.1109/WI-IAT.2014.112">Two-phase pareto set discovery for team formation in social networks</a>{" "}(Zihayat et al., 2014)</li>
+                                <li><a href="https://doi.org/10.1145/2488388.2488482">Towards realistic team formation in social networks based on densest subgraphs</a>{" "}(Rangapuram et al., 2013)</li>
+                                <li><a href="https://doi.org/10.1137/1.9781611972825.15">Multi-skill collaborative teams based on densest subgraphs</a>{" "}(Gajewar et al., 2012)</li>
+                                <li><a href="https://doi.org/10.1145/2339530.2339690">Capacitated team formation problem on social networks</a>{" "}(Datta et al., 2012)</li>
+                                <li><a href="https://doi.org/10.1109/ICDMW.2011.28">An effective expert team formation in social networks based on skill grading</a>{" "}(Farhadi et al., 2011)</li>
+                                <li><a href="https://doi.org/10.1145/2063576.2063718">Discovering top-k teams of experts with/without a leader in social networks</a>{" "}(Kargar et al., 2011)</li>
+                                <li><a href="https://doi.org/10.1109/SocialCom.2010.12">Team formation for generalized tasks in expertise social networks</a>{" "}(Li et al., 2010)</li>
+                                <li><a href="https://doi.org/10.1145/1557019.1557074">Finding a team of experts in social networks</a>{" "}(Lappas et al., 2009)</li>
                             </ul>
                         </div>
                     </div>
             </section>
-            <section id="section-learnbased"><span id="section-title-learnbased" className="section-title">Learning-based Heuristics</span>
+            <section id="section-learnbased"><span id="section-title-learnbased" className="section-title">Learning-based Heuristics (55 Minutes)</span>
                     <div className="section-body">
-                        <span className="section-date">55 minutes</span>
                         <span className="d-block w-100 justify-paragraph">
                           We will then explain the learning-based methods, which has been
                           mostly based on neural models. Learning-based methods bring
                           efficiency while enhancing efficacy due to the inherently
                           iterative and online learning procedure, and can address the
                           limitations of search-based solutions with respect to scalability,
-                          as well as dynamic expert networks (<a href="https://dl.acm.org/doi/10.1145/3589762">Rad, R. et al., 2023</a>
-                          ;{" "}<a href="https://dl.acm.org/doi/10.1145/3340531.3412140">Rad, R.H., et al., 2020</a>).
+                          as well as dynamic expert networks (<a href="https://dl.acm.org/doi/10.1145/3589762">Rad, R. et al., 2023</a>;{" "}<a href="https://dl.acm.org/doi/10.1145/3340531.3412140">Rad, R.H., et al., 2020</a>).
                         </span>
                         <div className="topic-item">
                             <ul>
@@ -244,146 +205,40 @@ function Home() {
                                     unsuccessful teams and streaming training strategy that put a
                                     chronological order on teams during training.
                                 </li>
-                                <img
-                                    src={require("../img/flow-t.jpg")}
-                                    alt="Streaming training strategy in neural-based team formation methods."
-                                    height="300"
-                                />
-                                <p>
-                                    {" "}
-                                    Figure 2. Streaming training strategy in neural-based team
-                                    formation methods.
-                                </p>
+                                <img src={require("../img/flow-t.jpg")} alt="Streaming training strategy in neural-based team formation methods." height="300" />
+                                <p>{" "}Figure 2. Streaming training strategy in neural-based team formation methods.</p>
                                 <li className="justify-paragraph">
-                  <span className="fw-bold">
-                    Hands-On{" "}
-                      <a href="https://github.com/fani-lab/OpeNTF">
-                      <i>OpeNTF</i>
-                    </a>
-                    :
-                  </span>
+                                  <span className="fw-bold">
+                                    Hands-On{" "}<a href="https://github.com/fani-lab/OpeNTF">OpeNTF</a>:
+                                  </span>
                                     &nbsp;In our tutorial, we introduce publicly available
                                     libraries and tools for the task of team recommendation.
                                     Notably, we provide hands-on experience with{" "}
-                                    <a href="https://github.com/fani-lab/OpeNTF">
-                                        <i>OpeNTF</i>
-                                    </a>
-                                    , an open-source benchmark library for neural models.​
+                                    <a href="https://github.com/fani-lab/OpeNTF">OpeNTF</a>
+                                    , an open-source benchmark library for neural models.
                                 </li>
-                                <img
-                                    src={require("../img/bnn.jpg")}
-                                    alt="Bayesian neural network (bnn), one of OpeNTF's supported neural models."
-                                    height="300"
-                                />
-                                <p>
-                                    {" "}
-                                    Figure 3. Bayesian neural network (bnn), one of{" "}
-                                    <a href="https://github.com/fani-lab/OpeNTF">
-                                        <i>OpeNTF</i>
-                                    </a>
-                                    's supported neural models.
-                                </p>
+                                <img src={require("../img/bnn.jpg")} alt="Bayesian neural network (bnn), one of OpeNTF's supported neural models." height="300"/>
+                                <p>{" "}Figure 3. Bayesian neural network (bnn), one of <a href="https://github.com/fani-lab/OpeNTF">OpeNTF</a>'s supported neural models.</p>
                             </ul>
                         </div>
                         <div className="topic-item">
                             <span className="fw-bold text-uppercase h6">Reading List</span>
                             <ul>
-                                <li>
-                                    <a href="https://link.springer.com/chapter/10.1007/978-3-031-56027-9_20">
-                                        A Streaming Approach to Neural Team Formation Training
-                                    </a>{" "}
-                                    (Fani et al., 2024)
-                                </li>
-                                <li>
-                                    <a href="https://doi.org/10.1145/3589762">
-                                        A Variational Neural Architecture for Skill-based Team
-                                        Formation
-                                    </a>{" "}
-                                    (Rad et al., 2023)
-                                </li>
-                                <li>
-                                    <a href="https://doi.org/10.1109/IJCNN54540.2023.10191717">
-                                        Transfer Learning with Graph Attention Networks for Team
-                                        Recommendation
-                                    </a>{" "}
-                                    (Kaw et al., 2023)
-                                </li>
-                                <li>
-                                    <a href="https://doi.org/10.1007/s10791-023-09421-6">
-                                        Learning heterogeneous subgraph representations for team
-                                        discovery
-                                    </a>{" "}
-                                    (Nguyen et al., 2023)
-                                </li>
-                                <li>
-                                    <a href="https://doi.org/10.1145/3511808.3557526">
-                                        OpeNTF: A Benchmark Library for Neural Team Formation
-                                    </a>{" "}
-                                    (Dashti et al., 2022)
-                                </li>
-                                <li>
-                                    <a href="https://doi.org/10.1145/3511808.3557590">
-                                        Effective Neural Team Formation via Negative Samples
-                                    </a>{" "}
-                                    (Dashti et al., 2022)
-                                </li>
-                                <li>
-                                    <a href="https://doi.org/10.48786/edbt.2022.37">
-                                        A Neural Approach to Forming Coherent Teams in Collaboration
-                                        Networks
-                                    </a>{" "}
-                                    (Rad et al., 2022)
-                                </li>
-                                <li>
-                                    <a href="https://doi.org/10.1145/3501247.3531578">
-                                        Subgraph Representation Learning for Team Mining
-                                    </a>{" "}
-                                    (Rad et al., 2022)
-                                </li>
-                                <li>
-                                    <a href="https://doi.org/10.1145/3404835.3463105">
-                                        Retrieving Skill-Based Teams from Collaboration Networks
-                                    </a>{" "}
-                                    (Rad et al., 2021)
-                                </li>
-                                <li>
-                                    <a href="https://doi.org/10.1145/3459637.3481992">
-                                        PyTFL: A Python-based Neural Team Formation Toolkit
-                                    </a>{" "}
-                                    (Rad et al., 2021)
-                                </li>
-                                <li>
-                                    <a href="https://doi.org/10.3389%2Ffdata.2019.00014">
-                                        Deep Neural Networks for Optimal Team Composition
-                                    </a>{" "}
-                                    (Sapienza et al., 2019)
-                                </li>
-                                <li>
-                                    <a href="https://dl.acm.org/doi/10.1145/3340531.3412140">
-                                        Learning to Form Skill-based Teams of Experts
-                                    </a>{" "}
-                                    (Rad et al., 2019)
-                                </li>
-                                <li>
-                                    <a href="https://dl.acm.org/doi/10.1145/3097983.3098036">
-                                        metapath2vec: Scalable Representation Learning for
-                                        Heterogeneous Networks
-                                    </a>{" "}
-                                    (Dong et al., 2017)
-                                </li>
-                                <li>
-                                    <a href="https://www.semanticscholar.org/paper/Representation-Learning-on-Graphs%3A-Methods-and-Hamilton-Ying/ecf6c42d84351f34e1625a6a2e4cc6526da45c74">
-                                        Representation Learning on Graphs: Methods and Applications
-                                    </a>{" "}
-                                    (Hamilton et al., 2017)
-                                </li>
-                                <li>
-                                    <a href="https://doi.org/10.1145/1935826.1935914">
-                                        Supervised Random Walks: Predicting and Recommending Links
-                                        in Social Networks
-                                    </a>{" "}
-                                    (Backstrom et al., 2011)
-                                </li>
+                                <li><a href="https://link.springer.com/chapter/10.1007/978-3-031-56027-9_20">A streaming approach to neural team formation training</a> (Fani et al., 2024)</li>
+                                <li><a href="https://doi.org/10.1145/3589762">A variational neural architecture for skill-based team formation</a>{" "}(Rad et al., 2023)</li>
+                                <li><a href="https://doi.org/10.1109/IJCNN54540.2023.10191717">Transfer learning with graph attention networks for team recommendation</a>{" "}(Kaw et al., 2023)</li>
+                                <li><a href="https://doi.org/10.1007/s10791-023-09421-6">Learning heterogeneous subgraph representations for team discovery</a> (Nguyen et al., 2023)</li>
+                                <li><a href="https://doi.org/10.1145/3511808.3557526">OpeNTF: A benchmark library for neural team formation</a> (Dashti et al., 2022)</li>
+                                <li><a href="https://doi.org/10.1145/3511808.3557590">Effective neural team formation via negative samples</a> (Dashti et al., 2022)</li>
+                                <li><a href="https://doi.org/10.48786/edbt.2022.37">A neural approach to forming coherent teams in collaboration networks</a> (Rad et al., 2022)</li>
+                                <li><a href="https://doi.org/10.1145/3501247.3531578">Subgraph representation learning for team mining</a> (Rad et al., 2022)</li>
+                                <li><a href="https://doi.org/10.1145/3404835.3463105">Retrieving skill-based teams from collaboration networks</a> (Rad et al., 2021)</li>
+                                <li><a href="https://doi.org/10.1145/3459637.3481992">PyTFL: A python-based neural team formation toolkit</a> (Rad et al., 2021)</li>
+                                <li><a href="https://doi.org/10.3389%2Ffdata.2019.00014">Deep neural networks for optimal team composition</a> (Sapienza et al., 2019)</li>
+                                <li><a href="https://dl.acm.org/doi/10.1145/3340531.3412140">Learning to form skill-based teams of experts</a> (Rad et al., 2019)</li>
+                                <li><a href="https://dl.acm.org/doi/10.1145/3097983.3098036">metapath2vec: Scalable representation learning for heterogeneous networks</a> (Dong et al., 2017)</li>
+                                <li><a href="https://www.semanticscholar.org/paper/Representation-Learning-on-Graphs%3A-Methods-and-Hamilton-Ying/ecf6c42d84351f34e1625a6a2e4cc6526da45c74">Representation learning on graphs: methods and applications</a> (Hamilton et al., 2017)</li>
+                                <li><a href="https://doi.org/10.1145/1935826.1935914">Supervised random walks: predicting and recommending links in social networks</a> (Backstrom et al., 2011)</li>
                             </ul>
                         </div>
                         <div className="topic-item">
@@ -392,9 +247,8 @@ function Home() {
                         </div>
                     </div>
             </section>
-            <section id="section-challeng"><span id="section-title-challeng" className="section-title">Challenges and New Perspectives</span>
+            <section id="section-challeng"><span id="section-title-challeng" className="section-title">Challenges and New Perspectives (20 Minutes)</span>
                     <div className="section-body">
-                        <span className="section-date">20 minutes</span>
                         <div className="topic-item">
                             <span className="fw-bold">Fair and Diverse Team Recommendation</span>
                             <span className="d-block w-100 justify-paragraph">
@@ -402,14 +256,14 @@ function Home() {
                                 maximization of the success rate for the recommended teams,
                                 largely ignoring diversity in the recommended users. In our
                                 tutorial, we introduce notions of fairness, that enables further added in-processing
-                                <a href="https://github.com/fani-lab/OpeNTF/tree/vivaFemme-bias24"><i> (vivaFemme) </i></a>and post-processing reranking
-                                <a href="https://github.com/fani-lab/Adila"><i> (Adila) </i></a> refinements to
+                                <a href="https://github.com/fani-lab/OpeNTF/tree/vivaFemme-bias24"> (vivaFemme) </a>and post-processing reranking
+                                <a href="https://github.com/fani-lab/Adila"> (Adila) </a> refinements to
                                 reassure the desired fair outcome and explore the synergistic
                                 trade-offs between notions of fairness and success rate for the
                                 proposed solutions.
                               </span>
                             <img src={require("../img/vivafemme.jpg")} alt="Vivafemme's pipeline architecture." height="500" />
-                            <p> {" "} Figure 4.{" "} <a href="https://github.com/fani-lab/OpeNTF/tree/vivaFemme-bias24"> <i>Vivafemme</i> </a> 's pipeline architecture.</p>
+                            <p>Figure 4.<a href="https://github.com/fani-lab/OpeNTF/tree/vivaFemme-bias24"> vivaFemme</a>'s pipeline architecture.</p>
                         </div>
                         <div className="topic-item">
                             <span className="fw-bold">Spatial Team Recommendation</span>
@@ -428,61 +282,19 @@ function Home() {
                         <div className="topic-item">
                             <span className="fw-bold text-uppercase h6">Reading List</span>
                             <ul>
-                                <li>
-                                    <a href="https://doi.org/10.1007/978-3-031-37249-0_9">
-                                        Bootless Application of Greedy Re-ranking Algorithms in Fair
-                                        Neural Team Formation
-                                    </a>{" "}
-                                    (Loghmani et al., 2023)
-                                </li>
-                                <li>
-                                    <a href="https://doi.org/10.1016/j.ipm.2021.102707">
-                                        Fair Top-k Ranking with Multiple Protected Groups
-                                    </a>{" "}
-                                    (Zehlike et al., 2022)
-                                </li>
-                                <li>
-                                    <a href="https://doi.org/10.1609/aaai.v36i11.21445">
-                                        Has ceo gender bias really been fixed? adversarial attacking
-                                        and improving gender fairness in image search
-                                    </a>{" "}
-                                    (Feng et al., 2022)
-                                </li>
-                                <li>
-                                    <a href="http://papers.nips.cc/paper_files/paper/2022/hash/cdd0640218a27e9e2c0e52e324e25db0-Abstract-Conference.html">
-                                        Fair Ranking with Noisy Protected Attributes
-                                    </a>{" "}
-                                    (Mehrotra et al., 2022)
-                                </li>
-                                <li>
-                                    <a href="https://link.springer.com/article/10.1007/s42452-020-2801-5">
-                                        Challenges and barriers in virtual teams: a literature
-                                        review
-                                    </a>{" "}
-                                    (Morrison et al., 2020)
-                                </li>
-                                <li>
-                                    <a href="https://doi.org/10.1145/3292500.3330691">
-                                        Fairness-Aware Ranking in Search & Recommendation Systems
-                                        with Application to LinkedIn Talent Search
-                                    </a>{" "}
-                                    (Geyik et al., 2019)
-                                </li>
-                                <li>
-                                    <a href="https://doi.org/10.1145/1460563.1460633">
-                                        Who collaborates successfully? prior experience reduces
-                                        collaboration barriers in distributed interdisciplinary
-                                        research
-                                    </a>{" "}
-                                    (Cummings et al., 2008)
-                                </li>
+                                <li><a href="https://doi.org/10.1007/978-3-031-37249-0_9">Bootless application of greedy re-ranking algorithms in fair neural team formation</a> (Loghmani et al., 2023)</li>
+                                <li><a href="https://doi.org/10.1016/j.ipm.2021.102707">Fair top-k ranking with multiple protected groups</a>{" "}(Zehlike et al., 2022)</li>
+                                <li><a href="https://doi.org/10.1609/aaai.v36i11.21445">Has ceo gender bias really been fixed? adversarial attacking and improving gender fairness in image search</a> (Feng et al., 2022)</li>
+                                <li><a href="http://papers.nips.cc/paper_files/paper/2022/hash/cdd0640218a27e9e2c0e52e324e25db0-Abstract-Conference.html">Fair ranking with noisy protected attributes</a> (Mehrotra et al., 2022)</li>
+                                <li><a href="https://link.springer.com/article/10.1007/s42452-020-2801-5">Challenges and barriers in virtual teams: a literature review</a> (Morrison et al., 2020)</li>
+                                <li><a href="https://doi.org/10.1145/3292500.3330691">Fairness-aware ranking in search & recommendation systems with application to linkedin talent search</a> (Geyik et al., 2019)</li>
+                                <li><a href="https://doi.org/10.1145/1460563.1460633">Who collaborates successfully? prior experience reduces collaboration barriers in distributed interdisciplinary research</a> (Cummings et al., 2008)</li>
                             </ul>
                         </div>
                     </div>
             </section>
-            <section id="section-apps"><span id="section-title-apps" className="section-title">Applications</span>
+            <section id="section-apps"><span id="section-title-apps" className="section-title">Applications (20 Minutes)</span>
                 <div className="section-body">
-                    <span className="section-date">20 minutes</span>
                         <div className="topic-item">
                             In this section, we highlight the practical significance of team recommendation by
                             explaining its seemingly unrelated yet highly valuable applications in education,
@@ -495,16 +307,14 @@ function Home() {
                                     This not only enhances their social skills but also combats the isolation that can sometimes accompany remote learning.
                                     Via working in teams, students are exposed to varying viewpoints, backgrounds, and problem-solving approaches.
                                   </li>
-                                  <li>
-                                    <b> Reviewer Assignment: </b>
+                                  <li><b> Reviewer Assignment: </b>
                                     Another immediate application of team recommendation is in peer-review assignments where a group of reviewers
                                     are paired with manuscripts within the reviewers' expertise for high-quality reviews while managing conflicts of interests.
                                     Like team recommendation, herein, research topics (skills) and reviewers (experts) are mapped into a
                                     latent space and, given a manuscript about a subset of research topics, team recommendation aims to recommend
                                     reviewers with top-k closest vectors to the vectors of the research.
                                   </li>
-                                  <li>
-                                    <b> Palliative Care: </b>
+                                  <li><b> Palliative Care: </b>
                                     Another application of team recommendation is in healthcare, which assigns a team of caregivers to patients who
                                     seek help for their daily activities due to disease or disorders. The challenge lies in optimally assigning care
                                     providers in teams to address patients' needs while considering factors such as communication, distance, and contract costs.
@@ -525,7 +335,9 @@ function Home() {
                             </div>
                         </a>
                         <span className="ref-name fs-5"><a href="https://www.linkedin.com/in/mahdis-saeedi-b80b8321a/" target="_blank">Mahdis Saeedi</a></span>
-                        <span className="text-muted fs-6 fst-italic">University of Windsor</span>
+                        <span className="text-muted fs-6 ">University of Windsor</span>
+                        <span className="text-muted fs-10">Postdoctoral Fellow, School of
+                            Computer Science<br/>Lecturer, Department of Mathematics</span>
                     </div>
                     <div className="presenter">
                         <a href="https://www.linkedin.com/in/md-jamil-ahmed-545164247/" target="_blank">
@@ -536,7 +348,10 @@ function Home() {
                         </a>
                         <span className="ref-name fs-5"><a href="https://www.linkedin.com/in/md-jamil-ahmed-545164247/"
                                                            target="_blank">Md Jamil Ahmed</a></span>
-                        <span className="text-muted fs-6 fst-italic">University of Windsor</span>
+                        <span className="text-muted fs-6">University of Windsor</span>
+                        <span className="text-muted fs-10">
+                            MSc, School of Computer Science.
+                        </span>
                     </div>
                     <div className="presenter">
                         <a href="https://www.linkedin.com/in/christine-wong-6828b0193/" target="_blank">
@@ -546,7 +361,10 @@ function Home() {
                             </div>
                         </a>
                         <span className="ref-name fs-5"><a href="https://www.linkedin.com/in/christine-wong-6828b0193/" target="_blank">Christine Wong</a></span>
-                        <span className="text-muted fs-6 fst-italic">University of Windsor</span>
+                        <span className="text-muted fs-6">University of Windsor</span>
+                        <span className="text-muted fs-10">
+                            BSc, School of Computer Science.
+                        </span>
                     </div>
                     <div className="presenter">
                         <a href="http://hosseinfani.github.io/" target="_blank">
@@ -556,7 +374,10 @@ function Home() {
                             </div>
                         </a>
                         <span className="ref-name fs-5"><a href="http://hosseinfani.github.io/" target="_blank">Hossein Fani</a></span>
-                        <span className="text-muted fs-6 fst-italic">University of Windsor</span>
+                        <span className="text-muted fs-6">University of Windsor</span>
+                        <span className="text-muted fs-10">
+                            Assistant Professor,  School of Computer Science.
+                        </span>
                     </div>
                 </div>
             </section>

@@ -161,3 +161,7 @@ a:hover {
 #section-location {
     color: #b83b21;
 }
+
+.fs-10{
+    font-size: 0.5rem !important;
+}

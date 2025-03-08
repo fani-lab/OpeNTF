@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/OpeNTF/tutorial/wsdm25/static/css/main.d80bf315.css",
-    "main.js": "/OpeNTF/tutorial/wsdm25/static/js/main.821686c7.js",
+    "main.css": "/OpeNTF/tutorial/wsdm25/static/css/main.07c2b64f.css",
+    "main.js": "/OpeNTF/tutorial/wsdm25/static/js/main.60be6b1e.js",
     "static/js/453.67c6b62a.chunk.js": "/OpeNTF/tutorial/wsdm25/static/js/453.67c6b62a.chunk.js",
     "static/media/vivafemme.jpg": "/OpeNTF/tutorial/wsdm25/static/media/vivafemme.63a4bcf87ffb259610f1.jpg",
     "static/media/taxonomy.jpg": "/OpeNTF/tutorial/wsdm25/static/media/taxonomy.112cb6d1e28b8085b5cf.jpg",
@@ -18,12 +18,12 @@
     "static/media/cardinal.jpg": "/OpeNTF/tutorial/wsdm25/static/media/cardinal.8741a54c4187f7f7231c.jpg",
     "static/media/sloth.jpg": "/OpeNTF/tutorial/wsdm25/static/media/sloth.810860bd0d914fe498d9.jpg",
     "index.html": "/OpeNTF/tutorial/wsdm25/index.html",
-    "main.d80bf315.css.map": "/OpeNTF/tutorial/wsdm25/static/css/main.d80bf315.css.map",
-    "main.821686c7.js.map": "/OpeNTF/tutorial/wsdm25/static/js/main.821686c7.js.map",
+    "main.07c2b64f.css.map": "/OpeNTF/tutorial/wsdm25/static/css/main.07c2b64f.css.map",
+    "main.60be6b1e.js.map": "/OpeNTF/tutorial/wsdm25/static/js/main.60be6b1e.js.map",
     "453.67c6b62a.chunk.js.map": "/OpeNTF/tutorial/wsdm25/static/js/453.67c6b62a.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.d80bf315.css",
-    "static/js/main.821686c7.js"
+    "static/css/main.07c2b64f.css",
+    "static/js/main.60be6b1e.js"
   ]
 }
