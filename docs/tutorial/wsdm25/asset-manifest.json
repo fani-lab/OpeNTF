@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/OpeNTF/tutorial/wsdm25/static/css/main.07c2b64f.css",
-    "main.js": "/OpeNTF/tutorial/wsdm25/static/js/main.a9c50b7b.js",
+    "main.js": "/OpeNTF/tutorial/wsdm25/static/js/main.3b93a08e.js",
     "static/js/453.67c6b62a.chunk.js": "/OpeNTF/tutorial/wsdm25/static/js/453.67c6b62a.chunk.js",
     "static/media/taxonomy.png": "/OpeNTF/tutorial/wsdm25/static/media/taxonomy.55fe4da306a89e548fe6.png",
     "static/media/vivafemme.jpg": "/OpeNTF/tutorial/wsdm25/static/media/vivafemme.63a4bcf87ffb259610f1.jpg",
@@ -20,11 +20,11 @@
     "static/media/sloth.jpg": "/OpeNTF/tutorial/wsdm25/static/media/sloth.810860bd0d914fe498d9.jpg",
     "index.html": "/OpeNTF/tutorial/wsdm25/index.html",
     "main.07c2b64f.css.map": "/OpeNTF/tutorial/wsdm25/static/css/main.07c2b64f.css.map",
-    "main.a9c50b7b.js.map": "/OpeNTF/tutorial/wsdm25/static/js/main.a9c50b7b.js.map",
+    "main.3b93a08e.js.map": "/OpeNTF/tutorial/wsdm25/static/js/main.3b93a08e.js.map",
     "453.67c6b62a.chunk.js.map": "/OpeNTF/tutorial/wsdm25/static/js/453.67c6b62a.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.07c2b64f.css",
-    "static/js/main.a9c50b7b.js"
+    "static/js/main.3b93a08e.js"
   ]
 }

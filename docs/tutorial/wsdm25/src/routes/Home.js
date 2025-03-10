@@ -199,7 +199,7 @@ function Home() {
                                     architecture and their applications in team recommendation,
                                     from autoencoder to graph neural networks.
                                     <img src={require("../img/e2e.png")} alt="Top: Graph representation learning of skills." height="300"/>
-                                    <p>Figure 2. Top: Graph representation learning of skills (<a target="_blank" href="https://doi.org/10.1145/3404835.3463105">Rad et al., 2021</a>). Buttom: End-to-End Graph neural team recommendation (<a target="_blank" href="">Ahmed et al., 2025</a>)</p>
+                                    <p>Figure 2. Top: Graph representation learning of skills (<a target="_blank" href="https://doi.org/10.1145/3404835.3463105">Rad et al., 2021</a>). Bottom: End-to-End Graph neural team recommendation (<a target="_blank" href="">Ahmed et al., 2025</a>)</p>
                                 </li>
                                 <li className="justify-paragraph">
                                     <span className="fw-bold">Training Strategies:</span>
