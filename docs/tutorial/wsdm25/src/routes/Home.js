@@ -197,10 +197,10 @@ function Home() {
                                     <span className="fw-bold">Neural Architectures:</span>
                                     &nbsp;We will lay out the details of different neural
                                     architecture and their applications in team recommendation,
-                                    from autoencoder to graph neural networks.
-                                    <img src={require("../img/e2e.png")} alt="Top: Graph representation learning of skills." height="300"/>
-                                    <p>Figure 2. Top: Graph representation learning of skills (<a target="_blank" href="https://doi.org/10.1145/3404835.3463105">Rad et al., 2021</a>). Bottom: End-to-End Graph neural team recommendation (<a target="_blank" href="">Ahmed et al., 2025</a>)</p>
+                                    from autoencoder to graph neural networks
                                 </li>
+                                    <img src={require("../img/e2e.png")} alt="Top: Graph representation learning of skills." height="400"/>
+                                    <p>Figure 2. Top: Graph representation learning of skills (<a target="_blank" href="https://doi.org/10.1145/3404835.3463105">Rad et al., 2021</a>). Bottom: End-to-End Graph neural team recommendation (<a target="_blank" href="">Ahmed et al., 2025</a>)</p>
                                 <li className="justify-paragraph">
                                     <span className="fw-bold">Training Strategies:</span>
                                     &nbsp;In our tutorial, we will discuss the details of
@@ -208,7 +208,7 @@ function Home() {
                                     unsuccessful teams and streaming training strategy that put a
                                     chronological order on teams during training.
                                 </li>
-                                <img src={require("../img/flow-t.jpg")} alt="Streaming training strategy in neural-based team formation methods." height="250" />
+                                <img src={require("../img/flow-t.jpg")} alt="Streaming training strategy in neural-based team formation methods." height="350" />
                                 <p>{" "}Figure 3. Streaming training strategy in neural-based team formation methods.</p>
                                 <li className="justify-paragraph">
                                   <span className="fw-bold">
@@ -257,15 +257,21 @@ function Home() {
                                 The primary focus of existing team recommendation methods is the
                                 maximization of the success rate for the recommended teams,
                                 largely ignoring diversity in the recommended users. In our
-                                tutorial, we introduce notions of fairness, that enables further added in-processing
-                                <a target="_blank" href="https://github.com/fani-lab/OpeNTF/tree/vivaFemme-bias24"> (vivaFemme) </a>and post-processing reranking
+                                tutorial, we introduce notions of fairness and in-process, e.g.,
+                                <a target="_blank" href="https://github.com/fani-lab/OpeNTF/tree/vivaFemme-bias24"> (vivaFemme)</a> and
+                                <a target="_blank" href="https://github.com/fani-lab/OpeNTF/tree/cl-wsdm25"> debiasing learning curricula</a>,
+                                and post-processing reranking
                                 <a target="_blank" href="https://github.com/fani-lab/Adila"> (Adila) </a> refinements to
                                 reassure the desired fair outcome and explore the synergistic
                                 trade-offs between notions of fairness and success rate for the
                                 proposed solutions.
                               </span>
-                            <img src={require("../img/vivafemme.jpg")} alt="vivaFemme's pipeline architecture." height="300" />
-                            <p>Figure 4.<a target="_blank" href="https://github.com/fani-lab/OpeNTF/tree/vivaFemme-bias24"> vivaFemme</a>'s pipeline architecture.</p>
+                            <img src={require("../img/vivafemme.jpg")} alt="vivaFemme's loss regularization to mitigate gender bias in team recommendation." height="400" />
+                            <p>Figure 4. vivaFemme's loss regularization to mitigate gender bias in team recommendation. [<a target="_blank" href="https://github.com/fani-lab/OpeNTF/tree/vivaFemme-bias24">code</a>][<a target="_blank" href="https://hosseinfani.github.io/res/papers/2024_BIAS_SIGIR_vivaFemme_Mitigating_Gender_Bias_in_Neural_Team_Recommendation_via_Female-Advocate_Loss_Regularization.pdf">paper</a>]</p>
+                            <img src={require("../img/cl.png")} alt="Adaptive loss-based curricula to mitigate popularity bias." height="200" />
+                            <p>Figure 5. Adaptive loss-based curricula to mitigate popularity bias.[<a target="_blank" href="https://github.com/fani-lab/OpeNTF/tree/cl-wsdm25">code</a>][<a target="_blank" href="https://hosseinfani.github.io/res/papers/2025_WSDM_Adaptive_Loss-based_Curricula_for_Neural_Team_Recommendation.pdf">paper</a>]</p>
+                            <img src={require("../img/adila.png")} alt="Adila's reranking pipeline." height="300" />
+                            <p>Figure 6. Adila's reranking pipeline. [<a target="_blank" href="https://github.com/fani-lab/Adila/tree/bias23">code</a>][<a target="_blank" href="https://hosseinfani.github.io/res/papers/2023_BIAS_ECIR_Bootless_Application_of_Greedy_Re-ranking_Algorithms_in_Fair_Neural_Team_Formation.pdf">paper</a>]</p>
                         </div>
                         <div className="topic-item">
                             <span className="fw-bold">Spatial Team Recommendation</span>
@@ -284,6 +290,8 @@ function Home() {
                         <div className="topic-item">
                             <span className="fw-bold text-uppercase h6">Reading List</span>
                             <ul>
+                                <li><a target="_blank" href="https://doi.org/10.1145/3701551.3703574">Adaptive loss-based curricula for neural team recommendation.</a> (Barzegar et al., 2025)</li>
+                                <li><a target="_blank" href="https://doi.org/10.1007/978-3-031-71975-2_6">vivafemme: Mitigating gender bias in neural team recommendation via female-advocate loss regularization.</a> (Moasses et al., 2024)</li>
                                 <li><a target="_blank" href="https://doi.org/10.1007/978-3-031-37249-0_9">Bootless application of greedy re-ranking algorithms in fair neural team formation</a> (Loghmani et al., 2023)</li>
                                 <li><a target="_blank" href="https://doi.org/10.1016/j.ipm.2021.102707">Fair top-k ranking with multiple protected groups</a>{" "}(Zehlike et al., 2022)</li>
                                 <li><a target="_blank" href="https://doi.org/10.1609/aaai.v36i11.21445">Has ceo gender bias really been fixed? adversarial attacking and improving gender fairness in image search</a> (Feng et al., 2022)</li>
