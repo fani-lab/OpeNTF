@@ -337,9 +337,8 @@ function Home() {
                             </div>
                         </a>
                         <span className="ref-name fs-5"><a target="_blank" href="https://www.linkedin.com/in/mahdis-saeedi-b80b8321a/" target="_blank">Mahdis Saeedi</a></span>
-                        <span className="text-muted fs-6 ">University of Windsor</span>
-                        <span className="text-muted fs-10">Postdoctoral Fellow, School of
-                            Computer Science<br/>Lecturer, Department of Mathematics</span>
+                         <span className="text-muted fs-10">Postdoctoral Fellow, School of Computer Science<br/>Lecturer, Department of Mathematics<br/> University of Windsor</span>
+
                     </div>
                     <div className="presenter">
                         <a target="_blank" href="https://www.linkedin.com/in/md-jamil-ahmed-545164247/" target="_blank">
@@ -350,10 +349,8 @@ function Home() {
                         </a>
                         <span className="ref-name fs-5"><a target="_blank" href="https://www.linkedin.com/in/md-jamil-ahmed-545164247/"
                                                            target="_blank">Md Jamil Ahmed</a></span>
-                        <span className="text-muted fs-6">University of Windsor</span>
-                        <span className="text-muted fs-10">
-                            MSc, School of Computer Science.
-                        </span>
+                        <span className="text-muted fs-10">MSc Student<br/>School of Computer Science<br/>University of Windsor</span>
+
                     </div>
                     <div className="presenter">
                         <a target="_blank" href="https://www.linkedin.com/in/christine-wong-6828b0193/" target="_blank">
@@ -363,10 +360,7 @@ function Home() {
                             </div>
                         </a>
                         <span className="ref-name fs-5"><a target="_blank" href="https://www.linkedin.com/in/christine-wong-6828b0193/" target="_blank">Christine Wong</a></span>
-                        <span className="text-muted fs-6">University of Windsor</span>
-                        <span className="text-muted fs-10">
-                            BSc, School of Computer Science.
-                        </span>
+                        <span className="text-muted fs-10">BSc Student<br/>School of Computer Science<br/>University of Windsor</span>
                     </div>
                     <div className="presenter">
                         <a target="_blank" href="http://hosseinfani.github.io/" target="_blank">
@@ -376,10 +370,8 @@ function Home() {
                             </div>
                         </a>
                         <span className="ref-name fs-5"><a target="_blank" href="http://hosseinfani.github.io/" target="_blank">Hossein Fani</a></span>
-                        <span className="text-muted fs-6">University of Windsor</span>
-                        <span className="text-muted fs-10">
-                            Assistant Professor,  School of Computer Science.
-                        </span>
+                        <span className="text-muted fs-10">Assistant Professor<br/>School of Computer Science<br/>University of Windsor</span>
+
                     </div>
                 </div>
             </section>
