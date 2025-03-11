@@ -3,6 +3,15 @@ function Menu() {
     <div className="d-flex flex-column justify-content-center top-menu">
       <div className="row">
         <div className="center-block title-box">
+          {/*<div className="text-left" style={*/}
+          {/*  {position: "absolute",*/}
+          {/*    top: 0,*/}
+          {/*    left: "50%",*/}
+          {/*    transform: "translateX(-50%)",*/}
+          {/*    textAlign: "left",*/}
+          {/*    whiteSpace: "nowrap"}}>*/}
+          {/*  A Tutorial on*/}
+          {/*</div>*/}
           <div className="text-center">
             <span className="fs-2 title-text">Bridging Historical Subgraph Optimization and Modern Graph Neural Network in Team Recommendation
             </span>

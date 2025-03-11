@@ -58,7 +58,7 @@ function Home() {
                     Konferenzraum 16, Hannover Congress Centre (HCC), Hannover, Germany{" "}
                     <br/><br/>
                     [<a target="_blank" href="https://hosseinfani.github.io/res/papers/2025_WSDM_Bridging_Historical_Subgraph_Optimization_and_Modern_Graph_Neural_Network_Approaches_in_Team_Recommendations.pdf">Full Outline</a>]
-                    [<a target="_blank" style={{color: "gray"}}>Slides</a>]
+                    [<a target="_blank" href="https://hosseinfani.github.io/res/slides/2025_WSDM_Bridging_Historical_Subgraph_Optimization_and_Modern_Graph_Neural_Network_Approaches_in_Team_Recommendations.pdf">Slides</a>]
                     [<a target="_blank" style={{color: "gray"}}>Recording</a>]
                 </div>
             </section>
