@@ -644,7 +644,8 @@ class Team:
                 pbar.update(1)
                 
                 # Free GPU memory explicitly, including tensors we created
-                del skill_values, skill_indices, sparse_skill
+                if 'skill_values' in locals():
+                    del skill_values, skill_indices, sparse_skill
                 if 'member_values' in locals():
                     del member_values, member_indices, sparse_member
                 torch.cuda.empty_cache()
