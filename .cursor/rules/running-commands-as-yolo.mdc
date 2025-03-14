@@ -1,0 +1,8 @@
+---
+description: When runnng commands in yolo
+globs: 
+alwaysApply: false
+---
+- When running commands in the terminal, run within my current environment
+
+conda activate nmtenv2

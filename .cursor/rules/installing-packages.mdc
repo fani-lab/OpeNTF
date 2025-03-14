@@ -1,0 +1,11 @@
+---
+description: when installing packages
+globs: 
+alwaysApply: false
+---
+
+
+Where there's packages to install using such either conda or pip, or any package installer task, 
+give me the commands to install packages, I'll install them manually.
+
+Then ask me to proceed and when I click Accept or yes, we'll proceed to next steps.
