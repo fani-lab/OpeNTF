@@ -1,0 +1,20 @@
+cmn==2.0.0
+colorama==0.4.6
+contourpy==1.3.1
+cycler==0.12.1
+fonttools==4.56.0
+kiwisolver==1.4.8
+matplotlib==3.10.1
+numpy==2.2.3
+-e git+https://github.com/fani-lab/OpeNTF.git@0cf7cd7bb1ccf83be20a151d63dabcf18018990d#egg=opentf_nmt2
+packaging==24.2
+pandas==2.2.3
+pillow==11.1.0
+pyparsing==3.2.1
+python-dateutil==2.9.0.post0
+pytz==2025.1
+scipy==1.15.2
+seaborn==0.13.2
+six==1.17.0
+tqdm==4.67.1
+tzdata==2025.1
