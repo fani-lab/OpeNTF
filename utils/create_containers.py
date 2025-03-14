@@ -47,12 +47,6 @@ def create_docker_container(container_name, hostname, version="latest", is_windo
     # full command above
     # docker run -it -d --name c1 --hostname c1 kmthang/opennmt:latest
 
-    # Add user mapping for Linux
-    if not is_windows:
-        user_id = subprocess.check_output(['id', '-u']).decode('utf-8').strip()
-        group_id = subprocess.check_output(['id', '-g']).decode('utf-8').strip()
-        command.extend(["--user", f"{user_id}:{group_id}"])  # Map container user to host user
-
     # Add GPU configuration based on mode
     if gpu_mode == "all":
         command.extend(["--gpus", "all"])
@@ -119,7 +113,6 @@ def create_docker_container(container_name, hostname, version="latest", is_windo
         print(f"Running command: {' '.join(command)}")
         subprocess.run(command, check=True)
         print(f"Successfully created container: {container_name} with hostname: {hostname}")
-        print(f"Container created with user mapping: {user_id}:{group_id}" if not is_windows else "Container created for Windows")
     except subprocess.CalledProcessError as e:
         print(f"Error creating container {container_name}: {e}")
         return False
@@ -131,13 +124,12 @@ def create_docker_container(container_name, hostname, version="latest", is_windo
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Create Docker containers for OpenNMT with proper user permissions and GPU support',
+        description='Create Docker containers for OpenNMT with proper permissions and GPU support',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog='''
 Examples:
   Create containers with latest image (Linux):
     python3 create_containers.py c1 c2 c3
-    # Creates containers with host user permissions mapped automatically
 
   Create containers for Windows:
     python3 create_containers.py -w c1 c2 c3
@@ -159,11 +151,8 @@ Note:
   - Each container will be created with GPU support enabled by default
   - For Linux:
     * Current directory will be mounted to /OpeNTF
-    * Host user permissions will be mapped automatically to prevent permission issues
-    * Uses host user and group IDs for container operations
   - For Windows:
     * Current directory will be mounted to C:/OpeNTF
-    * Uses default Docker user permissions
   - Container names will be used as their hostnames
   - All containers are created in detached mode (-d) with interactive TTY (-it)
 ''')
