@@ -1,0 +1,27 @@
+---
+description: formatting of command-line program help menu
+globs: **/*.py
+alwaysApply: false
+---
+# Always following for the following guidelines when writing/making/updating a help menu for a command-line program
+
+- Always have a shortcut version and long form version args
+- Always put the shortcut versions before the long form version
+- Always put the required args in a group before the optional ones (if there are both kinds)
+- Always 3 spaces to start the args line, then in next line 1 tab before writing the description
+- Always leave 1 empty space before starting another arg
+
+Example:
+```
+Required:
+   -i INPUT, --input INPUT
+	Input file or folder
+
+   -d DATASET_NAME, --dataset-name DATASET_NAME
+	Dataset name
+
+
+Optionals:
+   -t THREADS, --threads THREADS
+	Number of threads to use
+```
