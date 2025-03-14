@@ -1,1 +1,0 @@
-# TODO: a script to run multiple models in multiple docker containers at once
