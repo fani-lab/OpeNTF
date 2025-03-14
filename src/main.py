@@ -1,6 +1,12 @@
 import os, json
 import argparse
+from time import time
+import multiprocessing
+import sys
 import pickle
+
+# Add the project root directory to the Python path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import numpy as np
 import pandas as pd
@@ -12,37 +18,65 @@ import scipy.sparse
 import torch
 
 import param
+from utils.tprint import tprint
 from cmn.tools import NumpyArrayEncoder, popular_nonpopular_ratio
-from cmn.publication import Publication
-from cmn.movie import Movie
-from cmn.patent import Patent
-from cmn.github import Repo
+from cmn_v3.dblp import Publication
+from cmn_v3.gith import Repository
+# from cmn.movie_old import Movie
+# from cmn.patent_old import Patent
+# from cmn.github_old import Repo
 from mdl.fnn import Fnn
 from mdl.bnn import Bnn
 from mdl.rnd import Rnd
 from mdl.nmt import Nmt
-from mdl.tnmt import tNmt
-from mdl.tntf import tNtf
+# from mdl.tnmt import tNmt
+# from mdl.tntf import tNtf
 from mdl.team2vec.team2vec import Team2Vec
-from mdl.caser import Caser
-from mdl.rrn import Rrn
-from cmn.tools import generate_popular_and_nonpopular
+# from mdl.caser import Caser
+# from mdl.rrn import Rrn
+# from cmn.tools import generate_popular_and_nonpopular
 
 
 # Kap: 0-based indexing (0-7) ie. "0,1,2,3,4,5,6,7"
 # GPUS_TO_USE = "6,7"
 
+# Format durations as hours:minutes:seconds
+def format_time(seconds):
+    hours, remainder = divmod(seconds, 3600)
+    minutes, seconds = divmod(remainder, 60)
+    return f"{int(hours):02d}:{int(minutes):02d}:{int(seconds):02d}"
+
+# Create a unique output path - add (n) if path already exists
+def create_unique_output_path(base_path):
+    """
+    Creates a unique output path by adding _n to the end if the path already exists.
+    
+    Args:
+        base_path: The base output path to check
+    
+    Returns:
+        A unique output path that doesn't exist yet
+    """
+    if not os.path.exists(base_path):
+        return base_path
+    
+    counter = 1
+    while True:
+        new_path = f"{base_path}_{counter}"
+        if not os.path.exists(new_path):
+            return new_path
+        counter += 1
 
 # Kap: Set GPUs to use
 def set_gpus(gpus):
     num_gpus = torch.cuda.device_count()
     if num_gpus > 1:
-        print(f"\n{num_gpus} GPUs detected. Using GPUs: {gpus} .\n")
+        tprint(f"{num_gpus} GPUs detected. Using GPUs: {gpus} .")
         os.environ["CUDA_VISIBLE_DEVICES"] = gpus
-    elif torch.cuda.device_count() == 1:
-        print("\nOnly one GPU detected. Using it (if CUDA is available).\n")
+    elif num_gpus == 1:
+        tprint("Only one GPU detected. Using it (if CUDA is available).")
     else:
-        print("\nNo GPUs detected. Using CPU.\n")
+        tprint("No GPUs detected. Using CPU.")
 
 
 def create_evaluation_splits(
@@ -139,157 +173,365 @@ def run(
     model_list,
     gpus,
     output,
-    exp_id,
     settings,
 ):
+    overall_start_time = time()
+
     filter_str = (
-        f".filtered.mt{settings['data']['filter']['min_nteam']}.ts{settings['data']['filter']['min_team_size']}"
+        f".filtered.mt{settings['data']['min_nteam']}.ts{settings['data']['min_team_size']}"
         if filter
+        # TODO: remove this once we have a new filter logic setup, currently use the -o flag to specify the output folder name
         else ""
     )
 
-    if exp_id:
-        output = f"{output}exp_{exp_id}/"
-    if not os.path.isdir(output):
-        os.makedirs(output)
 
     datasets = {}
     models = {}
 
     if "dblp" in domain_list:
         datasets["dblp"] = Publication
-    if "imdb" in domain_list:
-        datasets["imdb"] = Movie
-    if "uspt" in domain_list:
-        datasets["uspt"] = Patent
+    # if "imdb" in domain_list:
+    #     datasets["imdb"] = Movie
+    # if "uspt" in domain_list:
+    #     datasets["uspt"] = Patent
     if "gith" in domain_list:
-        datasets["gith"] = Repo
+        datasets["gith"] = Repository
 
     # model names starting with 't' means that they will follow the streaming scenario
     # model names ending with _a1 means that they have one 1 added to their input for time as aspect learning
     # model names having _dt2v means that they learn the input embedding with doc2vec where input is (skills + year)
 
-    # non-temporal (no streaming scenario, bag of teams)
-    if "random" in model_list:
-        models["random"] = Rnd()
-    if "fnn" in model_list:
-        models["fnn"] = Fnn()
-    if "bnn" in model_list:
-        models["bnn"] = Bnn()
-    if "fnn_emb" in model_list:
-        models["fnn_emb"] = Fnn()
-    if "bnn_emb" in model_list:
-        models["bnn_emb"] = Bnn()
-
-    # Kap: handle the NMT models and the variants
-    for model_name in model_list:
+    # Extract models, excluding None if present
+    models_to_use = [m for m in model_list if m is not None]
+    
+    # Check if we're in preprocessing-only mode
+    preprocessing_only = len(models_to_use) == 0 or (len(models_to_use) == 1 and models_to_use[0] == '')
+    
+    if preprocessing_only:
+        # Use tprint for timestamp-based logging
+        tprint("No models specified. Running in preprocessing-only mode.")
+        
+        # Process each dataset
+        for d_name, d_cls in datasets.items():
+            datapath = data_list[domain_list.index(d_name)]
+            
+            # Base preprocessed data directory 
+            base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "preprocessed"))
+            
+            # The domain directory (e.g., 'dblp')
+            domain_dir = os.path.join(base_dir, d_name)
+            
+            # If output is specified, use it as a subfolder name
+            if output:
+                # Create a folder name combining the output value with filter specifications
+                output_folder = f"{output}{filter_str}"
+                # Full output path
+                base_output_path = os.path.join(domain_dir, output_folder)
+                # Create a unique path if it already exists
+                output_path = create_unique_output_path(base_output_path)
+            else:
+                # If no output specified, use the dataset filename with filter specifications 
+                dataset_filename = os.path.basename(datapath)
+                base_output_path = os.path.join(domain_dir, f"{dataset_filename}{filter_str}")
+                # Create a unique path if it already exists
+                output_path = create_unique_output_path(base_output_path)
+            
+            # Ensure output directory exists
+            os.makedirs(output_path, exist_ok=True)
+            
+            # Set domain name in settings for proper logging
+            settings["data"]["domain"] = d_name
+            
+            # Start time for this dataset's preprocessing
+            dataset_start_time = time()
+            tprint(f"Starting preprocessing for {d_name} dataset from {datapath}")
+            tprint(f"Output will be saved to {os.path.abspath(output_path)}")
+            
+            # Generate sparse vectors
+            vecs, indexes = d_cls.generate_sparse_vectors_v3(datapath, output_path, gpus=gpus)
+            
+            # Log the actual output directory used
+            tprint(f"Data saved to {os.path.abspath(output_path)}")
+            
+            # Ensure that the 'id' key exists in vecs for evaluation splits
+            if "id" not in vecs:
+                tprint(f"WARNING: 'id' key not found in vecs. Creating a default 'id' based on the 'skill' matrix.")
+                if "skill" in vecs:
+                    vecs["id"] = np.arange(vecs["skill"].shape[0])
+                else:
+                    raise KeyError("Both 'id' and 'skill' keys are missing from vecs!")
+            
+            # Process year indices for temporal data
+            year_idx = []
+            if "i2y" in indexes.keys():
+                for i in range(1, len(indexes["i2y"])):
+                    if indexes["i2y"][i][0] - indexes["i2y"][i - 1][0] > settings["model"]["nfolds"]:
+                        year_idx.append(indexes["i2y"][i - 1])
+                year_idx.append(indexes["i2y"][-1])
+                indexes["i2y"] = year_idx
+            
+            # Create evaluation splits - this creates splits.json
+            splits = create_evaluation_splits(
+                vecs["id"].shape[0] if "id" in vecs and vecs["id"].shape[0] > 0 else 0,
+                settings["model"]["nfolds"],
+                settings["model"]["train_test_split"],
+                indexes["i2y"] if future and "i2y" in indexes and len(indexes["i2y"]) > 0 else None,
+                output=f"{output_path}",
+                step_ahead=settings["model"]["step_ahead"],
+            )
+            
+            # Calculate elapsed time
+            dataset_elapsed_time = time() - dataset_start_time
+            formatted_time = format_time(dataset_elapsed_time)
+            
+            tprint(f"Data preprocessing completed for {d_name} dataset in {formatted_time}")
+            tprint(f"Created files:")
+            tprint(f"  - {output_path}/teams.pkl")
+            tprint(f"  - {output_path}/indexes.pkl")
+            tprint(f"  - {output_path}/teamsvecs.pkl")
+            tprint(f"  - {output_path}/splits.json")
+            
+            # Generate experts-skills-counts directory and files
+            experts_skills_dir = os.path.join(output_path, "experts-skills-counts")
+            os.makedirs(experts_skills_dir, exist_ok=True)
+            
+            # Load teams to extract experts and skills
+            with open(os.path.join(output_path, "teams.pkl"), 'rb') as f:
+                teams = pickle.load(f)
+            
+            # Extract and count skills
+            all_skills = []
+            for team in teams:
+                all_skills.extend(team.skills)
+            
+            skill_counts = {}
+            for skill in all_skills:
+                if skill in skill_counts:
+                    skill_counts[skill] += 1
+                else:
+                    skill_counts[skill] = 1
+            
+            # Sort skills by count (descending)
+            sorted_skills = sorted(skill_counts.items(), key=lambda x: x[1], reverse=True)
+            
+            # Write skills to file regardless of raw_logs setting
+            skills_file = os.path.join(experts_skills_dir, f"skills_{len(sorted_skills)}.log")
+            with open(skills_file, 'w', encoding='utf-8') as f:
+                for skill, count in sorted_skills:
+                    f.write(f"{count}\t{skill}\n")
+            
+            # Extract and count experts (members)
+            all_members = {}
+            for team in teams:
+                for member in team.members:
+                    member_id = member.id
+                    # Store the member object, not just the ID
+                    if member_id in all_members:
+                        all_members[member_id][0] += 1
+                    else:
+                        all_members[member_id] = [1, member]
+            
+            # Sort experts by count (descending)
+            sorted_members = sorted(all_members.items(), key=lambda x: x[1][0], reverse=True)
+            
+            # Write experts to file
+            experts_file = os.path.join(experts_skills_dir, f"experts_{len(sorted_members)}.log")
+            with open(experts_file, 'w', encoding='utf-8') as f:
+                for member_id, (count, member) in sorted_members:
+                    # Use member.name for DBLP, member.login for GitHub
+                    member_name = getattr(member, 'name', getattr(member, 'login', member_id))
+                    f.write(f"{count}\t{member_name}\n")
+            
+            tprint(f"Generated experts and skills count files:")
+            tprint(f"  - {skills_file}")
+            tprint(f"  - {experts_file}")
+            
+            # Generate stats-reports directory
+            stats_reports_dir = os.path.join(output_path, "stats-reports")
+            os.makedirs(stats_reports_dir, exist_ok=True)
+            
+            # Call data-reports.py script
+            teamsvecs_path = os.path.join(output_path, "teamsvecs.pkl")
+            gpu_param = f"gpu={gpus}" if gpus is not None else "cpu"
+            data_reports_script = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "utils", "data-reports.py"))
+            
+            if os.path.exists(data_reports_script):
+                tprint(f"Generating data reports using {data_reports_script}")
+                data_reports_cmd = f"python {data_reports_script} -i {teamsvecs_path} -o {stats_reports_dir} -mode {gpu_param}"
+                
+                try:
+                    tprint(f"Running command: {data_reports_cmd}")
+                    os.system(data_reports_cmd)
+                    tprint(f"Data reports generated in {stats_reports_dir}")
+                except Exception as e:
+                    tprint(f"Error generating data reports: {str(e)}")
+            else:
+                tprint(f"Warning: data-reports.py script not found at {data_reports_script}")
+            
+            # Generate toy dataset if enabled in settings
+            if settings["data"]["processing"].get("make_toy_data", False):
+                toy_data_size = settings["data"]["processing"].get("toy_data_size", 100)
+                tprint(f"Generating toy dataset with {toy_data_size} teams")
+                
+                # Extract main dataset folder name to use as the base for toy dataset
+                main_output_folder = os.path.basename(output_path)
+                
+                # Create toy output path based on main dataset folder name
+                toy_output_folder = f"{main_output_folder}_toy_{toy_data_size}"
+                base_toy_output_path = os.path.join(domain_dir, toy_output_folder)
+                toy_output_path = create_unique_output_path(base_toy_output_path)
+                os.makedirs(toy_output_path, exist_ok=True)
+                
+                tprint(f"Toy dataset will be saved to {os.path.abspath(toy_output_path)}")
+                
+                # Create a subset of teams
+                toy_teams = teams[:toy_data_size] if len(teams) > toy_data_size else teams
+                
+                # Save toy teams
+                with open(os.path.join(toy_output_path, "teams.pkl"), 'wb') as f:
+                    pickle.dump(toy_teams, f)
+                
+                # Build indexes for toy dataset
+                toy_indexes = d_cls.build_indexes(toy_teams)
+                
+                # Save toy indexes
+                with open(os.path.join(toy_output_path, "indexes.pkl"), 'wb') as f:
+                    pickle.dump(toy_indexes, f)
+                
+                # Generate sparse vectors for toy dataset
+                # Extract the subset of vectors
+                toy_vecs = {}
+                for key in vecs:
+                    if hasattr(vecs[key], 'shape') and vecs[key].shape[0] > toy_data_size:
+                        toy_vecs[key] = vecs[key][:toy_data_size]
+                    else:
+                        toy_vecs[key] = vecs[key]
+                
+                # Save toy teamsvecs
+                with open(os.path.join(toy_output_path, "teamsvecs.pkl"), 'wb') as f:
+                    pickle.dump(toy_vecs, f)
+                
+                # Create evaluation splits for toy dataset
+                toy_splits = create_evaluation_splits(
+                    toy_vecs["id"].shape[0] if "id" in toy_vecs and toy_vecs["id"].shape[0] > 0 else 0,
+                    settings["model"]["nfolds"],
+                    settings["model"]["train_test_split"],
+                    toy_indexes["i2y"] if future and "i2y" in toy_indexes and len(toy_indexes["i2y"]) > 0 else None,
+                    output=f"{toy_output_path}",
+                    step_ahead=settings["model"]["step_ahead"],
+                )
+                
+                tprint(f"Toy dataset created with {len(toy_teams)} teams")
+                tprint(f"Created toy files:")
+                tprint(f"  - {toy_output_path}/teams.pkl")
+                tprint(f"  - {toy_output_path}/indexes.pkl")
+                tprint(f"  - {toy_output_path}/teamsvecs.pkl")
+                tprint(f"  - {toy_output_path}/splits.json")
+                
+                # Generate experts-skills-counts for toy dataset
+                toy_experts_skills_dir = os.path.join(toy_output_path, "experts-skills-counts")
+                os.makedirs(toy_experts_skills_dir, exist_ok=True)
+                
+                # Extract and count skills for toy dataset
+                toy_all_skills = []
+                for team in toy_teams:
+                    toy_all_skills.extend(team.skills)
+                
+                toy_skill_counts = {}
+                for skill in toy_all_skills:
+                    if skill in toy_skill_counts:
+                        toy_skill_counts[skill] += 1
+                    else:
+                        toy_skill_counts[skill] = 1
+                
+                # Sort skills by count (descending)
+                toy_sorted_skills = sorted(toy_skill_counts.items(), key=lambda x: x[1], reverse=True)
+                
+                # Write skills to file regardless of raw_logs setting
+                toy_skills_file = os.path.join(toy_experts_skills_dir, f"skills_{len(toy_sorted_skills)}.log")
+                with open(toy_skills_file, 'w', encoding='utf-8') as f:
+                    for skill, count in toy_sorted_skills:
+                        f.write(f"{count}\t{skill}\n")
+                
+                # Extract and count experts (members) for toy dataset
+                toy_all_members = {}
+                for team in toy_teams:
+                    for member in team.members:
+                        member_id = member.id
+                        # Store the member object, not just the ID
+                        if member_id in toy_all_members:
+                            toy_all_members[member_id][0] += 1
+                        else:
+                            toy_all_members[member_id] = [1, member]
+                
+                # Sort experts by count (descending)
+                toy_sorted_members = sorted(toy_all_members.items(), key=lambda x: x[1][0], reverse=True)
+                
+                # Write experts to file
+                toy_experts_file = os.path.join(toy_experts_skills_dir, f"experts_{len(toy_sorted_members)}.log")
+                with open(toy_experts_file, 'w', encoding='utf-8') as f:
+                    for member_id, (count, member) in toy_sorted_members:
+                        # Use member.name for DBLP, member.login for GitHub
+                        member_name = getattr(member, 'name', getattr(member, 'login', member_id))
+                        f.write(f"{count}\t{member_name}\n")
+                
+                tprint(f"Generated experts and skills count files for toy dataset:")
+                tprint(f"  - {toy_skills_file}")
+                tprint(f"  - {toy_experts_file}")
+                
+                # Generate stats-reports for toy dataset
+                toy_stats_reports_dir = os.path.join(toy_output_path, "stats-reports")
+                os.makedirs(toy_stats_reports_dir, exist_ok=True)
+                
+                # Call data-reports.py script for toy dataset
+                toy_teamsvecs_path = os.path.join(toy_output_path, "teamsvecs.pkl")
+                
+                if os.path.exists(data_reports_script):
+                    tprint(f"Generating data reports for toy dataset")
+                    toy_data_reports_cmd = f"python {data_reports_script} -i {toy_teamsvecs_path} -o {toy_stats_reports_dir} -mode {gpu_param}"
+                    
+                    try:
+                        tprint(f"Running command: {toy_data_reports_cmd}")
+                        os.system(toy_data_reports_cmd)
+                        tprint(f"Toy data reports generated in {toy_stats_reports_dir}")
+                    except Exception as e:
+                        tprint(f"Error generating toy data reports: {str(e)}")
+                else:
+                    tprint(f"Warning: data-reports.py script not found at {data_reports_script}")
+        
+        # Calculate overall elapsed time
+        overall_elapsed_time = time() - overall_start_time
+        formatted_overall_time = format_time(overall_elapsed_time)
+        
+        tprint(f"All preprocessing completed in {formatted_overall_time}")
+        tprint(f"Exiting as no models were specified.")
+        return
+    
+    # Only get here if models are specified
+    # Load the models
+    for model_name in models_to_use:
         if model_name.startswith("nmt"):
             models[model_name] = Nmt()
-            
-
-
-    # streaming scenario (no vector for time)
-    if "tfnn" in model_list:
-        models["tfnn"] = tNtf(
-            Fnn(),
-            settings["model"]["nfolds"],
-            step_ahead=settings["model"]["step_ahead"],
-        )
-    if "tbnn" in model_list:
-        models["tbnn"] = tNtf(
-            Bnn(),
-            settings["model"]["nfolds"],
-            step_ahead=settings["model"]["step_ahead"],
-        )
-    if "tfnn_emb" in model_list:
-        models["tfnn_emb"] = tNtf(
-            Fnn(),
-            settings["model"]["nfolds"],
-            step_ahead=settings["model"]["step_ahead"],
-        )
-    if "tbnn_emb" in model_list:
-        models["tbnn_emb"] = tNtf(
-            Bnn(),
-            settings["model"]["nfolds"],
-            step_ahead=settings["model"]["step_ahead"],
-        )
-    if "tnmt" in model_list:
-        models["tnmt"] = tNmt(
-            settings["model"]["nfolds"], settings["model"]["step_ahead"]
-        )
-
-    # streaming scenario with adding one 1 to the input (time as aspect/vector for time)
-    if "tfnn_a1" in model_list:
-        models["tfnn_a1"] = tNtf(
-            Fnn(),
-            settings["model"]["nfolds"],
-            step_ahead=settings["model"]["step_ahead"],
-        )
-    if "tbnn_a1" in model_list:
-        models["tbnn_a1"] = tNtf(
-            Bnn(),
-            settings["model"]["nfolds"],
-            step_ahead=settings["model"]["step_ahead"],
-        )
-    if "tfnn_emb_a1" in model_list:
-        models["tfnn_emb_a1"] = tNtf(
-            Fnn(),
-            settings["model"]["nfolds"],
-            step_ahead=settings["model"]["step_ahead"],
-        )
-    if "tbnn_emb_a1" in model_list:
-        models["tbnn_emb_a1"] = tNtf(
-            Bnn(),
-            settings["model"]["nfolds"],
-            step_ahead=settings["model"]["step_ahead"],
-        )
-
-    # streaming scenario with adding the year to the doc2vec training (temporal dense skill vecs in input)
-    if "tfnn_dt2v_emb" in model_list:
-        models["tfnn_dt2v_emb"] = tNtf(
-            Fnn(),
-            settings["model"]["nfolds"],
-            step_ahead=settings["model"]["step_ahead"],
-        )
-    if "tbnn_dt2v_emb" in model_list:
-        models["tbnn_dt2v_emb"] = tNtf(
-            Bnn(),
-            settings["model"]["nfolds"],
-            step_ahead=settings["model"]["step_ahead"],
-        )
-
-    # todo: temporal: time as an input feature
-
-    # temporal recommender systems
-    if "caser" in model_list:
-        models["caser"] = Caser(settings["model"]["step_ahead"])
-    if "rrn" in model_list:
-        models["rrn"] = Rrn(
-            settings["model"]["baseline"]["rrn"]["with_zero"],
-            settings["model"]["step_ahead"],
-        )
-    if "np_ratio" in fair:
-        settings["fair"]["np_ratio"] = fair["np_ratio"]
-    if "fairness" in fair:
-        settings["fair"]["fairness"] = fair["fairness"]
-    if "k_max" in fair:
-        settings["fair"]["k_max"] = fair["k_max"]
-    if "attribute" in fair:
-        settings["fair"]["attribute"] = fair["attribute"]
-
-    assert len(datasets) > 0
-    assert len(datasets) == len(domain_list)
-    assert len(models) > 0
+        elif model_name == "random":
+            models["random"] = Rnd()
+        elif model_name == "fnn":
+            models["fnn"] = Fnn()
+        elif model_name == "bnn":
+            models["bnn"] = Bnn() 
+        # Add other model types as needed
+    
+    # Ensure we have at least one model
+    assert len(models) > 0, "No valid models were specified!"
 
     for d_name, d_cls in datasets.items():
         datapath = data_list[domain_list.index(d_name)]
         prep_output = f"./../data/preprocessed/{d_name}/{os.path.split(datapath)[-1]}"
-        vecs, indexes = d_cls.generate_sparse_vectors(
-            datapath, f"{prep_output}{filter_str}", filter, settings["data"]
+        vecs, indexes = d_cls.generate_sparse_vectors_v3(
+            datapath, f"{prep_output}{filter_str}", filter, settings["data"], gpus=gpus
         )
         # Ensure that the 'id' key exists in vecs for evaluation splits.
         if "id" not in vecs:
-            print("WARNING: 'id' key not found in vecs. Creating a default 'id' based on the 'skill' matrix.")
+            tprint("WARNING: 'id' key not found in vecs. Creating a default 'id' based on the 'skill' matrix.")
             if "skill" in vecs:
                 vecs["id"] = np.arange(vecs["skill"].shape[0])
             else:
@@ -345,7 +587,7 @@ def run(
                 )
 
             # Kap: added to indicate if GPU is available and to get the last GPU
-            set_gpus(gpus)
+            set_gpus(settings["gpus"])
 
             baseline_name = (
                 m_name.lstrip("t")
@@ -355,11 +597,12 @@ def run(
             )
 
             device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-            print(f"Using device: {device}")
-            print(f"Running for (dataset, model): ({d_name}, {m_name}) ... ")
+            tprint(f"Using device: {device}")
+            tprint(f"Running for (dataset, model): ({d_name}, {m_name}) ... ")
 
-            output_path = f"{output}{os.path.split(datapath)[-1]}{filter_str}/{m_name}/t{vecs_['skill'].shape[0]}.s{vecs_['skill'].shape[1]}.m{vecs_['member'].shape[1]}.{baseline_name}"
-
+            base_output_path = f"{output}{os.path.split(datapath)[-1]}{filter_str}/{m_name}/t{vecs_['skill'].shape[0]}.s{vecs_['skill'].shape[1]}.m{vecs_['member'].shape[1]}.{baseline_name}"
+            output_path = create_unique_output_path(base_output_path)
+            tprint(f"Output will be saved to {os.path.abspath(output_path)}")
 
             # Kap: don't copy if model name starts with "nmt", I have a handler in nmt.py
             if not m_name.startswith("nmt"):
@@ -375,8 +618,6 @@ def run(
                 baseline_name,
                 settings["model"]["cmd"],
                 settings["fair"],
-                # model_name=baseline_name,
-                # gpus=gpus,
                 merge_skills=False,
             )
     if "agg" in settings["model"]["cmd"]:
@@ -384,105 +625,159 @@ def run(
 
 
 def addargs(parser):
-    dataset = parser.add_argument_group("dataset")
-    dataset.add_argument(
-        "-data",
-        "--data-list",
-        nargs="+",
-        type=str,
-        default=[],
+    """Parse and Set Arguments."""
+
+    # Define our custom help text
+    help_text = """OpenNTF: Open Neural Team Formation
+
+Required:
+   -i INPUT, --input INPUT
+\tINPUT FOLDER where to look for teamsvecs.pkl or raw file (default: None)
+
+   -d DOMAIN, --domain DOMAIN
+\tDomain of the dataset. Options: dblp, gith, imdb, uspt (default: None)
+
+
+Optionals:
+   -m MODEL, --model MODEL
+\tModel to perform the task, or the type of the experiments to run, e.g., random, heuristic, expert, etc. If not provided, process will stop after data loading. (default: None)
+
+   -train TRAIN, --train TRAIN
+\tWhether to train the model (default: 0)
+
+   -filter FILTER, --filter FILTER
+\tWhether to filter data: zero: no filtering, one: filter zero degree nodes, two: filter one degree nodes (default: 0)
+
+   -future FUTURE, --future FUTURE
+\tForecast future teams: zero: no need to forecast future teams, one: predict future teams (default: 0)
+
+   -fair FAIR, --fair FAIR
+\tApply fairness to model (default: 0)
+
+   -o OUTPUT, --output OUTPUT
+\tOUTPUT FOLDER NAME only (the full path is hardcoded, this specifies the folder name only). If the specified folder exists, a number in brackets will be added (e.g., 'v3_filtered1 (1)') (default: None)
+
+   -gpus GPUS, --gpus GPUS
+\tCUDA Visible GPUs (default: None)
+
+   -t THREADS, --threads THREADS
+\tNumber of threads to use for parallel processing (0 for auto, defaults to 75% of available CPU cores) (default: 0)
+
+   -b BATCH_SIZE, --batch-size BATCH_SIZE
+\tBatch size for processing large datasets (default: IMDB: 10000, DBLP: 10000, GITH: 1000, USPT: 5000)
+"""
+
+    # Override the help option to print our custom help text
+    parser.add_argument('-h', '--help', action='help', default=argparse.SUPPRESS,
+                        help=argparse.SUPPRESS)
+    
+    # Required arguments group
+    required = parser.add_argument_group('Required')
+    required.add_argument(
+        "-i", "--input",  # Updated to match help menu
+        dest="data",      # Keep the original destination
+        help=argparse.SUPPRESS,
         required=True,
-        help="a list of dataset paths; required; (eg. -data ./../data/raw/toy.json)",
-    )
-    dataset.add_argument(
-        "-domain",
-        "--domain-list",
-        nargs="+",
-        type=str.lower,
-        default=[],
-        required=True,
-        help="a list of domains; required; (eg. -domain dblp imdb uspt gith)",
-    )
-    dataset.add_argument(
-        "-filter",
-        type=int,
-        default=0,
-        choices=[0, 1],
-        help="remove outliers? (e.g., -filter 0 (default) or 1)",
-    )
-    dataset.add_argument(
-        "-future",
-        type=int,
-        default=0,
-        choices=[0, 1],
-        help="predict future? (e.g., -future 0 (default) or 1)",
+        metavar="INPUT"
     )
 
-    baseline = parser.add_argument_group("baseline")
-    baseline.add_argument(
-        "-model",
-        "--model-list",
-        nargs="+",
-        type=str.lower,
-        default=[],
+    required.add_argument(
+        "-d", "--domain",  # Updated to match help menu
+        dest="domain",
+        help=argparse.SUPPRESS,
         required=True,
-        help="a list of neural models (eg. -model random fnn bnn fnn_emb bnn_emb nmt)",
+        metavar="DOMAIN"
     )
 
-    gpus = parser.add_argument_group("gpus")
-    gpus.add_argument(
-        "-gpus",
-        "--gpus",
-        type=str,
-        default="7", # Kap: 7th is my default, change to reflec which GPUs you're assigned
+    # Optional arguments group
+    optionals = parser.add_argument_group('Optionals')
+    optionals.add_argument(
+        "-m", "--model",  # Updated to match help menu
+        dest="model",
+        help=argparse.SUPPRESS,
         required=False,
-        help="gpus to use (eg. -gpus 6,7)",
-    )
-
-    output = parser.add_argument_group("output")
-    output.add_argument(
-        "-output",
-        type=str,
-        default="./../output/",
-        help="The output path (default: -output ./../output/)",
-    )
-    output.add_argument("-exp_id", type=str, default=None, help="ID of the experiment")
-
-    fair = parser.add_argument_group("fair")
-    fair.add_argument(
-        "-np_ratio",
-        "--np_ratio",
-        type=float,
         default=None,
-        required=False,
-        help="desired ratio of non-popular experts after reranking; if None, based on distribution in dataset; default: None; Eg. 0.5",
+        metavar="MODEL"
     )
-    fair.add_argument(
-        "-fairness",
-        "--fairness",
-        nargs="+",
-        type=str,
-        default="det_greedy",
-        required=False,
-        help="reranking algorithm from {det_greedy, det_cons, det_relaxed}; required; Eg. det_cons",
-    )
-    fair.add_argument(
-        "-k_max",
-        "--k_max",
+
+    optionals.add_argument(
+        "-train", "--train",
+        dest="train",
+        help=argparse.SUPPRESS,
+        default=0,
         type=int,
+        metavar="TRAIN"
+    )
+
+    optionals.add_argument(
+        "-filter", "--filter",
+        dest="filter",
+        help=argparse.SUPPRESS,
+        default=0,
+        type=int,
+        metavar="FILTER"
+    )
+
+    optionals.add_argument(
+        "-future", "--future",
+        dest="future",
+        help=argparse.SUPPRESS,
+        default=0,
+        type=int,
+        metavar="FUTURE"
+    )
+
+    optionals.add_argument(
+        "-fair", "--fair",
+        dest="fair",
+        help=argparse.SUPPRESS,
+        default=0,
+        type=int,
+        metavar="FAIR"
+    )
+
+    optionals.add_argument(
+        "-o", "--output",  # Updated to match help menu
+        dest="output",
+        help=argparse.SUPPRESS,
         default=None,
-        required=False,
-        help="cutoff for the reranking algorithms; default: None",
-    )
-    fair.add_argument(
-        "-attribute",
-        "--attribute",
-        nargs="+",
         type=str,
-        default="popularity",
-        required=False,
-        help="the set of our sensitive attributes",
+        metavar="OUTPUT"
     )
+
+    optionals.add_argument(
+        "-gpus", "--gpus",
+        dest="gpus",
+        help=argparse.SUPPRESS,
+        default=None,
+        metavar="GPUS"
+    )
+    
+    optionals.add_argument(
+        "-t", "--threads",
+        dest="threads",
+        help=argparse.SUPPRESS,
+        default=0,
+        type=int,
+        metavar="THREADS"
+    )
+    
+    optionals.add_argument(
+        "-b", "--batch-size",
+        dest="batch_size",
+        help=argparse.SUPPRESS,
+        default=0,  # 0 means use domain-specific defaults
+        type=int,
+        metavar="BATCH_SIZE"
+    )
+    
+    # Override the print_help method to print our custom help text
+    def custom_print_help(file=None):
+        print(help_text, file=file)
+    
+    parser.print_help = custom_print_help
+    
+    return parser
 
 
 # python -u main.py -data ../data/raw/dblp/toy.dblp.v12.json
@@ -498,28 +793,88 @@ def addargs(parser):
 # To run on compute canada servers you can use the following command: (time is in minutes)
 # sbatch --account=def-hfani --mem=96000MB --time=2880 cc.sh
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Neural Team Formation")
-    addargs(parser)
+def main():
+    """Main Function."""
+    # Start overall execution timer
+    overall_start_time = time()
+    
+    # Use tprint for timestamp-based logging
+    tprint("Starting processing pipeline")
+
+    # parse the arguments
+    parser = argparse.ArgumentParser(add_help=False, description='OpenNTF: Open Neural Team Formation')
+    parser = addargs(parser)
     args = parser.parse_args()
 
-    fair = {
-        "fairness": args.fairness,
-        "k_max": args.k_max,
-        "np_ratio": args.np_ratio,
-        "attribute": args.attribute,
-    }
+    # Load settings from file
+    settings = param.settings
+
+    # Setup thread count for parallel processing
+    if args.threads > 0:
+        settings["data"]["processing"]["nthreads"] = args.threads
+        tprint(f"Using {args.threads} threads for parallel processing")
+    else:
+        thread_count = multiprocessing.cpu_count()
+        recommended_threads = max(1, int(thread_count * 0.75))  # Use 75% of cores by default
+        settings["data"]["processing"]["nthreads"] = recommended_threads
+        tprint(f"Auto-configuring thread count to {recommended_threads} (75% of {thread_count} cores)")
+    
+    # Setup chunk size for parallel processing - use domain-specific defaults if not specified
+    if args.batch_size > 0:
+        settings["data"]["processing"]["batch_size"] = args.batch_size
+        tprint(f"Using specified batch size of {args.batch_size}")
+    else:
+        tprint(f"Using default batch size of domain-specific default batch size")
+    
+    
+    # print the arguments
+    tprint(f"Experiment Arguments:")
+    params = vars(args)
+    for k in params.keys():
+        tprint(f"  {k}:\t{params[k]}")
+
+    # ensure output folder exists
+    if args.output:
+        # Make sure if the output folder already exists, we create a unique one
+        # This is just for the user level folder that's passed in via -o/--output
+        # The specific paths with domain/dataset/etc. get handled in the run function
+        output_folder = args.output
+        if os.path.exists(output_folder):
+            tprint(f"Output folder '{output_folder}' already exists")
+            # We don't need to create it here, just ensure we pass the right output name
+            # to the run function where full paths are constructed
+        else:
+            os.makedirs(output_folder)
+
+    # Set which GPUs are going to be used
+    if args.gpus is not None:
+        set_gpus(args.gpus)
+
+    # Run the experiment
+    run_start_time = time()
     run(
-        data_list=args.data_list,
-        domain_list=args.domain_list,
-        fair=fair,
+        data_list=[args.data],
+        domain_list=[args.domain],
+        fair=args.fair,
         filter=args.filter,
         future=args.future,
-        model_list=args.model_list,
+        model_list=[args.model] if args.model is not None else [],
         gpus=args.gpus,
         output=args.output,
-        exp_id=args.exp_id,
-        settings=param.settings,
+        settings=settings,
     )
+    run_end_time = time()
+    
+    # Calculate and display total execution time
+    overall_end_time = time()
+    run_duration = run_end_time - run_start_time
+    total_duration = overall_end_time - overall_start_time
+    
+    tprint("=" * 80)
+    tprint("Execution Summary:")
+    tprint(f"  Processing time: {format_time(run_duration)} (HH:MM:SS)")
+    tprint(f"  Total execution time: {format_time(total_duration)} (HH:MM:SS)")
+    tprint("=" * 80)
 
-    # aggregate(args.output)
+if __name__ == "__main__":
+    main()
