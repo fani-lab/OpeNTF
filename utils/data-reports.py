@@ -554,6 +554,34 @@ def generate_distribution_charts(stats, output_dir, dataset_name, n_jobs=DEFAULT
             
             gpu_prep_time = time.time() - gpu_prep_start
             tprint(f"Data prepared for GPU in {gpu_prep_time:.2f} seconds: {len(skill_indices)} skill-team pairs, {len(member_indices)} member-team pairs")
+            
+            # Count teams per skill using GPU
+            tprint("Computing teams per skill on GPU...")
+            teams_per_skill_gpu = cp.zeros(stats['num_skills'], dtype=cp.int32)
+            
+            # Process in batches to avoid GPU memory issues
+            batch_size = 1000
+            num_batches = (stats['num_skills'] + batch_size - 1) // batch_size
+            
+            for batch_idx in tqdm(range(num_batches), desc="Counting teams per skill", ncols=100):
+                start_idx = batch_idx * batch_size
+                end_idx = min((batch_idx + 1) * batch_size, stats['num_skills'])
+                
+                for skill_idx in range(start_idx, end_idx):
+                    # Count teams that have this skill
+                    skill_mask = (skill_indices_gpu == skill_idx)
+                    unique_teams = cp.unique(team_indices_for_skills_gpu[skill_mask])
+                    teams_per_skill_gpu[skill_idx] = len(unique_teams)
+            
+            # Transfer results back to CPU
+            teams_per_skill = cp.asnumpy(teams_per_skill_gpu)
+            
+            # Calculate the distribution just like in the CPU version
+            skill_team_count_distribution = Counter(teams_per_skill)
+            
+            # Sort by number of teams
+            x_values = sorted(skill_team_count_distribution.keys())
+            y_values = [skill_team_count_distribution[x] for x in x_values]
         else:
             tprint("GPU acceleration requested but not available. Falling back to CPU.")
             use_gpu = False
@@ -609,31 +637,13 @@ def generate_distribution_charts(stats, output_dir, dataset_name, n_jobs=DEFAULT
         
         # Transfer results back to CPU
         teams_per_skill = cp.asnumpy(teams_per_skill_gpu)
-    else:
-        # Original CPU version
-        for skill_idx in tqdm(range(stats['num_skills']), desc="Counting teams per skill", ncols=100):
-            # Count teams that have this skill
-            skill_team_count = sum(1 for team_skills in stats['skill_indices_per_team'] if skill_idx in team_skills)
-            teams_per_skill.append(skill_team_count)
-    
-    # Count occurrence of each team count
-    if use_gpu and CUPY_AVAILABLE:
-        # GPU-accelerated counting of distribution
-        import cupy as cp
         
-        # Move teams_per_skill to GPU if it's not already there
-        if not isinstance(teams_per_skill, cp.ndarray):
-            teams_per_skill_gpu = cp.array(teams_per_skill)
-        else:
-            teams_per_skill_gpu = teams_per_skill
-            
-        # Get unique values and counts
-        x_values_gpu, counts_gpu = cp.unique(teams_per_skill_gpu, return_counts=True)
+        # Calculate the distribution just like in the CPU version
+        skill_team_count_distribution = Counter(teams_per_skill)
         
-        # Sort by team count
-        sort_indices = cp.argsort(x_values_gpu)
-        x_values = cp.asnumpy(x_values_gpu[sort_indices])
-        y_values = cp.asnumpy(counts_gpu[sort_indices])
+        # Sort by number of teams
+        x_values = sorted(skill_team_count_distribution.keys())
+        y_values = [skill_team_count_distribution[x] for x in x_values]
     else:
         # Original CPU version
         skill_team_count_distribution = Counter(teams_per_skill)
@@ -642,6 +652,11 @@ def generate_distribution_charts(stats, output_dir, dataset_name, n_jobs=DEFAULT
         x_values = sorted(skill_team_count_distribution.keys())
         y_values = [skill_team_count_distribution[x] for x in x_values]
     
+    # Make sure we have data to plot
+    if not x_values or not y_values:
+        tprint("Warning: No data available for teams per skill distribution plot. Skipping.")
+        return
+        
     # Plot histogram
     plt.bar(x_values, y_values, color='steelblue', alpha=0.7)
     plt.title('Distribution of Skills by Number of Teams (Histogram)', fontsize=14)
@@ -689,7 +704,7 @@ def generate_distribution_charts(stats, output_dir, dataset_name, n_jobs=DEFAULT
     # Count occurrence of each team count
     with tqdm(total=1, desc="Preparing compact plot data", ncols=100) as pbar:
         skill_team_count_distribution = Counter(teams_per_skill)
-        
+    
         # Sort by number of teams
         x_values = sorted(skill_team_count_distribution.keys())
         y_values = [skill_team_count_distribution[x] for x in x_values]
@@ -808,13 +823,16 @@ def generate_distribution_charts(stats, output_dir, dataset_name, n_jobs=DEFAULT
         sort_indices = cp.argsort(x_values_gpu)
         x_values = cp.asnumpy(x_values_gpu[sort_indices])
         y_values = cp.asnumpy(counts_gpu[sort_indices])
+        
+        # Create a Counter-like dictionary for consistency with CPU path
+        expert_team_count_distribution = {x: y for x, y in zip(x_values, y_values)}
     else:
         # Original CPU version
         expert_team_count_distribution = Counter(teams_per_expert)
-        
-        # Sort by number of teams
-        x_values = sorted(expert_team_count_distribution.keys())
-        y_values = [expert_team_count_distribution[x] for x in x_values]
+    
+    # Sort by number of teams
+    x_values = sorted(expert_team_count_distribution.keys())
+    y_values = [expert_team_count_distribution[x] for x in x_values]
     
     # Plot histogram
     plt.bar(x_values, y_values, color='firebrick', alpha=0.7)
@@ -857,11 +875,11 @@ def generate_distribution_charts(stats, output_dir, dataset_name, n_jobs=DEFAULT
     # Count occurrence of each team count
     with tqdm(total=1, desc="Preparing experts compact plot data", ncols=100) as pbar:
         expert_team_count_distribution = Counter(teams_per_expert)
-        
-        # Sort by number of teams
-        x_values = sorted(expert_team_count_distribution.keys())
-        y_values = [expert_team_count_distribution[x] for x in x_values]
-        pbar.update(1)
+    
+    # Sort by number of teams
+    x_values = sorted(expert_team_count_distribution.keys())
+    y_values = [expert_team_count_distribution[x] for x in x_values]
+    pbar.update(1)
     
     # Plot with 'x' markers
     plt.scatter(x_values, y_values, marker='x', color='blue', alpha=1.0, s=50)
@@ -1220,7 +1238,7 @@ def main():
     
     # Optional arguments
     parser.add_argument('-o', '--output-dir', type=str, required=False,
-                      help='Output directory for reports (default: derived from input path)')
+                       help='Output directory for reports (default: derived from input path)')
     
     parser.add_argument('-mode', '--mode', type=str, default='cpu',
                       help='Processing mode: cpu (default), gpu (first GPU), gpu=all (all GPUs), gpu=N (specific GPU), gpu=N,M (multiple GPUs)')
@@ -1463,7 +1481,6 @@ def main():
             # Count experts with min/max team participation
             min_team_experts = sum(1 for x in stats['expert_team_counts'] if x == stats['min_exp_team'])
             max_team_experts = sum(1 for x in stats['expert_team_counts'] if x == stats['max_exp_team'])
-            
             min_exp_percent = (min_team_experts / stats['num_experts']) * 100
             max_exp_percent = (max_team_experts / stats['num_experts']) * 100
             
