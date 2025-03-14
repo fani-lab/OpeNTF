@@ -216,50 +216,20 @@ def rename_path_using_docker(old_path, new_path):
         print(f"Error renaming path: {str(e)}")
         sys.exit(1)
 
-def fix_ownership_using_docker(path):
-    """Change ownership of a path to current host user using a temporary Docker container."""
-    try:
-        # Get current user and group IDs
-        user_id = subprocess.check_output(['id', '-u']).decode('utf-8').strip()
-        group_id = subprocess.check_output(['id', '-g']).decode('utf-8').strip()
-
-        # Create absolute path and get parent directory
-        abs_path = os.path.abspath(path)
-        parent_dir = os.path.dirname(abs_path)
-        target_name = os.path.basename(abs_path)
-        
-        cmd = [
-            'docker', 'run', '--rm',  # Remove container after execution
-            '-v', f'{parent_dir}:/workspace',  # Mount parent directory
-            'ubuntu:latest',  # Use ubuntu image for basic operations
-            'chown', '-R', f'{user_id}:{group_id}', f'/workspace/{target_name}'  # Change ownership
-        ]
-        
-        subprocess.run(cmd, check=True)
-        print(f"Successfully changed ownership of '{path}' to user {user_id}:{group_id}")
-        
-    except subprocess.CalledProcessError as e:
-        print(f"Error changing ownership: {str(e)}")
-        sys.exit(1)
-
 def print_help():
-    """Print available commands and their usage."""
-    print("\nUsage: python3 in_docker.py <command> [options]")
-    print("\nAvailable commands:")
-
-    print("\n  ps: List Python3/OpenNMT processes in containers")
-    print("     Usage: python3 in_docker.py ps <container_name> [container2 ...]")
-    print("            python3 in_docker.py ps <pattern>  (e.g., kap_*)")
+    print("\nDocker Container Management")
+    print("=========================")
+    print("  ps: Show Python/OpenNMT processes in container(s)")
+    print("     Usage: python3 in_docker.py ps <container_name> [<another_container> ...]")
     print("     Example: python3 in_docker.py ps my_container")
-    print("     Example: python3 in_docker.py ps my_container kap_*")
-
-    print("\n  run: Run a shell script inside a container")
-    print("     Usage: python3 in_docker.py run <container_name> <script_name.sh>")
+    print("     Note: You can use wildcards in container names, e.g., 'python3 in_docker.py ps container*'")
+    
+    print("\n  run: Run a shell script in a container")
+    print("     Usage: python3 in_docker.py run <container_name> <script_name>")
     print("     Example: python3 in_docker.py run my_container train.sh")
-    print("     Note: Scripts should be placed in the /OpeNTF/run_scripts directory inside the container.")
-
-    print("\n  stop: Stop a specific script process in a container")
-    print("     Usage: python3 in_docker.py stop <container_name> <script_name.sh>")
+    
+    print("\n  stop: Stop a specific script in a container")
+    print("     Usage: python3 in_docker.py stop <container_name> <script_name>")
     print("     Example: python3 in_docker.py stop my_container train.sh")
 
     print("\n  stopall: Stop all Python/OpenNMT processes in a container")
@@ -276,11 +246,9 @@ def print_help():
     print("      Example: python3 in_docker.py mv /path/to/old_folder /path/to/new_folder")
     print("      Note:  Uses a temporary Docker container with root access to rename the path.")
 
-    print("\n  fixowner: Change ownership of a file/directory to current host user")
-    print("      Usage: python3 in_docker.py fixowner <path_to_folder_or_file>")
-    print("      Example: python3 in_docker.py fixowner /path/to/folder")
-    print("      Note: Uses a temporary Docker container to change ownership to current host user")
-    print("            Useful for fixing permission issues with Docker-created files")
+    print("\n  Note: For fixowner functionality, please use the fix_owner.py script:")
+    print("      Usage: python3 fix_owner.py <path_to_folder_or_file>")
+    print("      Example: python3 fix_owner.py /path/to/folder")
 
 def main():
     if len(sys.argv) == 1 or sys.argv[1] in ("-h", "--help"):
@@ -325,7 +293,7 @@ def main():
             print(f"Error: Container '{container_name}' does not exist.")
             sys.exit(1)
         run_shell_script_in_container(container_name, script_name)
-
+    
     elif command == "stop":
         if len(sys.argv) != 4:
             print("Error: Please provide container name and script name")
@@ -336,7 +304,7 @@ def main():
             print(f"Error: Container '{container_name}' does not exist.")
             sys.exit(1)
         kill_process_in_container(container_name, script_name)
-
+    
     elif command == "stopall":
         if len(sys.argv) != 3:
             print("Error: Please provide container name")
@@ -346,7 +314,7 @@ def main():
             print(f"Error: Container '{container_name}' does not exist.")
             sys.exit(1)
         kill_all_user_processes(container_name)
-
+    
     elif command == "rm":
         if len(sys.argv) != 3:
             print("Error: Please provide path to remove")
@@ -367,16 +335,6 @@ def main():
             print(f"Error: Old path '{old_path}' does not exist.")
             sys.exit(1)
         rename_path_using_docker(old_path, new_path)
-
-    elif command == "fixowner":
-        if len(sys.argv) != 3:
-            print("Error: Please provide path to change ownership")
-            sys.exit(1)
-        path = sys.argv[2]
-        if not os.path.exists(path):
-            print(f"Error: Path '{path}' does not exist.")
-            sys.exit(1)
-        fix_ownership_using_docker(path)
 
     elif command in ("-h", "--help"):
         print_help()
