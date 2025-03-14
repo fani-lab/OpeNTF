@@ -79,9 +79,12 @@ settings = {
         },
         "processing": {
             "debug_logs": False, # True for debug logs
+            "raw_logs": False, # True for raw logs
             "nthreads": 0,  # <= 0 for all cores
             "cpu_batch_size": 25_000, # -1 for domain-specific batch size in their own code in src/cmn/<domain>.py
             "gpu_batch_size": 500_000, # -1 for domain-specific batch size in their own code in src/cmn/<domain>.py
+            "make_toy_data": True, # True for making toy data
+            "toy_data_size": 100, # Number of teams to use for toy data
         },
     },
     "fair": {
