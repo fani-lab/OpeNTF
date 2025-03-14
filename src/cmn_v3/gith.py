@@ -34,6 +34,10 @@ def log_error(datapath, error_type, repo_id, message, data=None):
         message: Error message
         data: The problematic data object that caused the error
     """
+    # Check if raw_logs is enabled before proceeding
+    if not GITH_PARAMS['processing'].get('raw_logs', False):
+        return
+        
     log_path = os.path.join(os.path.dirname(datapath), "gith_errors.log")
     with open(log_path, 'a', encoding='utf-8') as log_file:
         # Format timestamp
@@ -167,25 +171,31 @@ class Repository(Team):
         # Clear the error log before starting
         error_log_path = os.path.join(os.path.dirname(datapath), "gith_errors.log")
         try:
-            with open(error_log_path, 'w') as f:
-                f.write(f"GitHub Data Processing Errors Log - Started: {datetime.now()}\n\n")
+            # Only initialize error log if raw_logs is enabled
+            if GITH_PARAMS['processing'].get('raw_logs', False):
+                with open(error_log_path, 'w') as f:
+                    f.write(f"GitHub Data Processing Errors Log - Started: {datetime.now()}\n\n")
         except Exception as e:
             tprint(f"Warning: Could not initialize error log: {str(e)}")
             
         # Initialize invalid repositories log
         invalids_log_path = os.path.join(os.path.dirname(datapath), "gith_invalids.log")
         try:
-            with open(invalids_log_path, 'w') as f:
-                f.write(f"GitHub Invalid Repositories Log - Started: {datetime.now()}\n")
-                f.write(f"This file contains repositories that didn't pass filters and why.\n\n")
+            # Only initialize invalids log if raw_logs is enabled
+            if GITH_PARAMS['processing'].get('raw_logs', False):
+                with open(invalids_log_path, 'w') as f:
+                    f.write(f"GitHub Invalid Repositories Log - Started: {datetime.now()}\n")
+                    f.write(f"This file contains repositories that didn't pass filters and why.\n\n")
         except Exception as e:
             tprint(f"Warning: Could not initialize invalids log: {str(e)}")
             
         # Initialize repository output log
         output_log_path = os.path.join(os.path.dirname(datapath), "gith_output.log")
         try:
-            with open(output_log_path, 'w') as f:
-                f.write(f"GitHub Repository Data - Started: {datetime.now()}\n\n")
+            # Only initialize output log if raw_logs is enabled
+            if GITH_PARAMS['processing'].get('raw_logs', False):
+                with open(output_log_path, 'w') as f:
+                    f.write(f"GitHub Repository Data - Started: {datetime.now()}\n\n")
         except Exception as e:
             tprint(f"Warning: Could not initialize output log: {str(e)}")
             
@@ -610,10 +620,12 @@ class Repository(Team):
                             # Initialize log file if it's the first time using it
                             if current_log_path not in initialized_log_files:
                                 try:
-                                    with open(current_log_path, 'w', encoding='utf-8') as f:
-                                        f.write(f"GitHub Repository Data - Started: {datetime.now()}\n")
-                                        f.write(f"File segment: {os.path.basename(current_log_path)}\n\n")
-                                    initialized_log_files.add(current_log_path)
+                                    # Only initialize log file if raw_logs is enabled
+                                    if GITH_PARAMS['processing'].get('raw_logs', False):
+                                        with open(current_log_path, 'w', encoding='utf-8') as f:
+                                            f.write(f"GitHub Repository Data - Started: {datetime.now()}\n")
+                                            f.write(f"File segment: {os.path.basename(current_log_path)}\n\n")
+                                        initialized_log_files.add(current_log_path)
                                 except Exception as e:
                                     if debug_logs:
                                         tprint(f"Error initializing log file {current_log_path}: {str(e)}")
@@ -756,74 +768,39 @@ class Repository(Team):
         tprint(f"Processed {len(repositories)} valid repositories in {processing_time:.2f} seconds")
         tprint(f"Found {len(all_members)} unique contributors and {len(all_skills)} unique skills")
         
-        # Write all unique skills to a log file, sorted alphabetically
-        skills_log_path = os.path.join(os.path.dirname(datapath), "gith_skills.log")
-        try:
-            with open(skills_log_path, 'w', encoding='utf-8') as skills_file:
-                # Sort skills alphabetically
-                sorted_skills = sorted(all_skills)
-                
-                # Filter out some common non-programming language entries
-                suspicious_entries = 0
-                excluded_entries = []
-                
-                for skill in sorted_skills:
-                    # Skip skills that are too long or contain suspicious characters
-                    if len(skill) > 50 or any(c in skill for c in ['<', '>', '=', '{', '}', ';', '(', ')']):
-                        suspicious_entries += 1
-                        excluded_entries.append(skill)
-                        continue
-                        
-                    # Skip skills that are just numbers
-                    if skill.replace('.', '').isdigit():
-                        suspicious_entries += 1
-                        excluded_entries.append(skill)
-                        continue
-                        
-                    # Write valid skills to the log file
-                    skills_file.write(f"{skill}\n")
-                
-                # Write a summary at the end
-                if suspicious_entries > 0:
-                    skills_file.write(f"\n# {suspicious_entries} suspicious entries excluded:\n")
-                    for entry in excluded_entries[:20]:  # Show first 20 excluded entries
-                        skills_file.write(f"# - {entry}\n")
-                    if len(excluded_entries) > 20:
-                        skills_file.write(f"# ... and {len(excluded_entries) - 20} more\n")
-                        
-            tprint(f"Wrote {len(all_skills) - suspicious_entries} unique skills to {skills_log_path} ({suspicious_entries} suspicious entries excluded)")
-        except Exception as e:
-            tprint(f"Error writing skills log: {str(e)}")
-        
         # Add summary to error log
         try:
-            with open(error_log_path, 'a', encoding='utf-8') as error_file:
-                error_file.write(f"\n\n--- PROCESSING SUMMARY ---\n")
-                error_file.write(f"Completed: {datetime.now()}\n")
-                error_file.write(f"Total repositories processed: {len(df)}\n")
-                error_file.write(f"Valid repositories: {len(repositories)}\n")
-                error_file.write(f"Unique contributors: {len(all_members)}\n")
-                error_file.write(f"Unique skills: {len(all_skills)}\n")
-                error_file.write(f"Processing time: {time() - start_time:.2f} seconds\n")
+            # Only write to error log if raw_logs is enabled
+            if GITH_PARAMS['processing'].get('raw_logs', False):
+                with open(error_log_path, 'a', encoding='utf-8') as error_file:
+                    error_file.write(f"\n\n--- PROCESSING SUMMARY ---\n")
+                    error_file.write(f"Completed: {datetime.now()}\n")
+                    error_file.write(f"Total repositories processed: {len(df)}\n")
+                    error_file.write(f"Valid repositories: {len(repositories)}\n")
+                    error_file.write(f"Unique contributors: {len(all_members)}\n")
+                    error_file.write(f"Unique skills: {len(all_skills)}\n")
+                    error_file.write(f"Processing time: {time() - start_time:.2f} seconds\n")
         except Exception as e:
             tprint(f"Error writing error log summary: {str(e)}")
         
         # Add summary to output log
         try:
-            # Add summary to each log file
-            for log_path in initialized_log_files:
-                with open(log_path, 'a', encoding='utf-8') as output_file:
-                    output_file.write(f"\n\n{'=' * 80}\n")
-                    output_file.write(f"DATASET SUMMARY\n")
-                    output_file.write(f"{'=' * 80}\n\n")
-                    output_file.write(f"Completed: {datetime.now()}\n")
-                    output_file.write(f"Total repositories processed: {len(df)}\n")
-                    output_file.write(f"Valid repositories logged: {len(repositories)}\n")
-                    output_file.write(f"Unique contributors: {len(all_members)}\n")
-                    output_file.write(f"Unique skills: {len(all_skills)}\n")
-                    output_file.write(f"Processing time: {time() - start_time:.2f} seconds\n")
-                    output_file.write(f"Log files created: {len(initialized_log_files)}\n")
-                    output_file.write(f"Log files: {', '.join([os.path.basename(p) for p in initialized_log_files])}\n")
+            # Only write to output logs if raw_logs is enabled
+            if GITH_PARAMS['processing'].get('raw_logs', False):
+                # Add summary to each log file
+                for log_path in initialized_log_files:
+                    with open(log_path, 'a', encoding='utf-8') as output_file:
+                        output_file.write(f"\n\n{'=' * 80}\n")
+                        output_file.write(f"DATASET SUMMARY\n")
+                        output_file.write(f"{'=' * 80}\n\n")
+                        output_file.write(f"Completed: {datetime.now()}\n")
+                        output_file.write(f"Total repositories processed: {len(df)}\n")
+                        output_file.write(f"Valid repositories logged: {len(repositories)}\n")
+                        output_file.write(f"Unique contributors: {len(all_members)}\n")
+                        output_file.write(f"Unique skills: {len(all_skills)}\n")
+                        output_file.write(f"Processing time: {time() - start_time:.2f} seconds\n")
+                        output_file.write(f"Log files created: {len(initialized_log_files)}\n")
+                        output_file.write(f"Log files: {', '.join([os.path.basename(p) for p in initialized_log_files])}\n")
         except Exception as e:
             tprint(f"Error writing output log summary: {str(e)}")
             
