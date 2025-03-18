@@ -13,56 +13,125 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 import numpy as np
 import pandas as pd
-from sklearn.model_selection import KFold, train_test_split
 from scipy.sparse import lil_matrix
 from shutil import copyfile
 import scipy.sparse
-
 import torch
 
-# Import param is now dynamic based on copy_and_load_param function
+# Import utility functions
 from utils.tprint import tprint
+from utils.set_gpus import set_gpus
+from utils.format_time import format_time
+from utils.create_unique_output_path import create_unique_output_path
+from utils.create_toy_logs_folder import create_toy_logs_folder
+from utils.create_evaluation_splits import create_evaluation_splits
+
+# Import project modules
 from cmn.tools import NumpyArrayEncoder, popular_nonpopular_ratio
 from cmn_v3.dblp import Publication
 from cmn_v3.gith import Repository
 from cmn_v3.helper_functions.get_nthreads import get_nthreads
 
-# from cmn.movie_old import Movie
-# from cmn.patent_old import Patent
-# from cmn.github_old import Repo
+# Import model classes
 from mdl.fnn import Fnn
 from mdl.bnn import Bnn
 from mdl.rnd import Rnd
 from mdl.nmt import Nmt
-
-# from mdl.tnmt import tNmt
-# from mdl.tntf import tNtf
 from mdl.team2vec.team2vec import Team2Vec
-
-# from mdl.caser import Caser
-# from mdl.rrn import Rrn
-# from cmn.tools import generate_popular_and_nonpopular
 
 
 # Kap: 0-based indexing (0-7) ie. "0,1,2,3,4,5,6,7"
 # GPUS_TO_USE = "6,7"
 
 
-# Format durations as hours:minutes:seconds
-def format_time(seconds):
-    hours, remainder = divmod(seconds, 3600)
-    minutes, seconds = divmod(remainder, 60)
-    return f"{int(hours):02d}:{int(minutes):02d}:{int(seconds):02d}"
+def aggregate(output):
+    files = list()
+    for dirpath, dirnames, filenames in os.walk(output):
+        if not dirnames:
+            files += [
+                os.path.join(os.path.normpath(dirpath), file).split(os.sep)
+                for file in filenames
+                if file.endswith("pred.eval.mean.csv")
+            ]
+
+    # concate the year folder to setting for temporal baselines
+    for file in files:
+        if file[3].startswith("t"):
+            file[4] += "/" + file[5]
+            del file[5]
+
+    files = pd.DataFrame(
+        files, columns=["", "", "domain", "baseline", "setting", "rfile"]
+    )
+    rfiles = files.groupby("rfile")
+    for rf, r in rfiles:
+        dfff = pd.DataFrame()
+        rdomains = r.groupby("domain")
+        for rd, rr in rdomains:
+            names = ["metrics"]
+            dff = pd.DataFrame()
+            df = rdomains.get_group(rd)
+            hr = False
+            for i, row in df.iterrows():
+                if not hr:
+                    dff = pd.concat(
+                        [
+                            dff,
+                            pd.read_csv(
+                                f"{output}{rd}/{row['baseline']}/{row['setting']}/{rf}",
+                                usecols=[0],
+                            ),
+                        ],
+                        axis=1,
+                        ignore_index=True,
+                    )
+                    hr = True
+                dff = pd.concat(
+                    [
+                        dff,
+                        pd.read_csv(
+                            f"{output}{rd}/{row['baseline']}/{row['setting']}/{rf}",
+                            usecols=[1],
+                        ),
+                    ],
+                    axis=1,
+                    ignore_index=True,
+                )
+                names += [row["baseline"] + "." + row["setting"]]
+            dff.set_axis(names, axis=1, inplace=True)
+            dff.to_csv(f"{output}{rd}/{rf.replace('.csv', '.agg.csv')}", index=False)
 
 
-# Create a unique output path - add (n) if path already exists
-def create_unique_output_path(base_path):
-    """Create a unique output path by appending a timestamp if the base path already exists."""
-    if not os.path.exists(base_path):
-        return base_path
+def copy_and_load_param(output_folder):
+    """
+    Creates a copy of param.py as param_copy.py in the output folder and dynamically imports it.
 
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    return f"{base_path}_{timestamp}"
+    Args:
+        output_folder: Path to the output folder
+
+    Returns:
+        The imported param module with settings
+    """
+    if not os.path.exists(output_folder):
+        os.makedirs(output_folder, exist_ok=True)
+
+    # Source and destination paths
+    src_param_path = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), "param.py")
+    )
+    dst_param_path = os.path.join(output_folder, "param_copy.py")
+
+    # Copy the file
+    shutil.copy2(src_param_path, dst_param_path)
+    tprint(f"Copied param.py to {dst_param_path}")
+
+    # Dynamically import the copied module
+    spec = importlib.util.spec_from_file_location("param_copy", dst_param_path)
+    param_copy = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(param_copy)
+
+    tprint(f"Using settings from copied param_copy.py in {dst_param_path}")
+    return param_copy
 
 
 def create_toy_logs_folder(toy_output_path, toy_teams):
@@ -161,64 +230,6 @@ def create_evaluation_splits(
     return splits
 
 
-def aggregate(output):
-    files = list()
-    for dirpath, dirnames, filenames in os.walk(output):
-        if not dirnames:
-            files += [
-                os.path.join(os.path.normpath(dirpath), file).split(os.sep)
-                for file in filenames
-                if file.endswith("pred.eval.mean.csv")
-            ]
-
-    # concate the year folder to setting for temporal baselines
-    for file in files:
-        if file[3].startswith("t"):
-            file[4] += "/" + file[5]
-            del file[5]
-
-    files = pd.DataFrame(
-        files, columns=["", "", "domain", "baseline", "setting", "rfile"]
-    )
-    rfiles = files.groupby("rfile")
-    for rf, r in rfiles:
-        dfff = pd.DataFrame()
-        rdomains = r.groupby("domain")
-        for rd, rr in rdomains:
-            names = ["metrics"]
-            dff = pd.DataFrame()
-            df = rdomains.get_group(rd)
-            hr = False
-            for i, row in df.iterrows():
-                if not hr:
-                    dff = pd.concat(
-                        [
-                            dff,
-                            pd.read_csv(
-                                f"{output}{rd}/{row['baseline']}/{row['setting']}/{rf}",
-                                usecols=[0],
-                            ),
-                        ],
-                        axis=1,
-                        ignore_index=True,
-                    )
-                    hr = True
-                dff = pd.concat(
-                    [
-                        dff,
-                        pd.read_csv(
-                            f"{output}{rd}/{row['baseline']}/{row['setting']}/{rf}",
-                            usecols=[1],
-                        ),
-                    ],
-                    axis=1,
-                    ignore_index=True,
-                )
-                names += [row["baseline"] + "." + row["setting"]]
-            dff.set_axis(names, axis=1, inplace=True)
-            dff.to_csv(f"{output}{rd}/{rf.replace('.csv', '.agg.csv')}", index=False)
-
-
 def run(
     data_list,
     domain_list,
@@ -298,6 +309,35 @@ def run(
 
             # Ensure output directory exists
             os.makedirs(output_path, exist_ok=True)
+
+            # Copy param.py from the temporary folder to the actual data output folder
+            temp_param_path = os.path.join(
+                os.path.dirname(os.path.dirname(__file__)), output, "param_copy.py"
+            )
+            if os.path.exists(temp_param_path):
+                shutil.copy2(
+                    temp_param_path, os.path.join(output_path, "param_copy.py")
+                )
+                tprint(f"Copied param_copy.py to data output folder: {output_path}")
+
+                # Set environment variable to point to the actual data output folder
+                os.environ["OUTPUT_DIR"] = os.path.abspath(output_path)
+                tprint(
+                    f"Set OUTPUT_DIR environment variable to {os.environ['OUTPUT_DIR']}"
+                )
+            else:
+                tprint(
+                    f"Warning: param_copy.py not found in temporary folder: {temp_param_path}"
+                )
+                tprint("Using default param.py from src directory")
+                src_param_path = os.path.abspath(
+                    os.path.join(os.path.dirname(__file__), "param.py")
+                )
+                shutil.copy2(src_param_path, os.path.join(output_path, "param_copy.py"))
+                os.environ["OUTPUT_DIR"] = os.path.abspath(output_path)
+                tprint(
+                    f"Set OUTPUT_DIR environment variable to {os.environ['OUTPUT_DIR']}"
+                )
 
             # Set domain name in settings for proper logging
             settings["data"]["domain"] = d_name
@@ -536,13 +576,13 @@ def run(
                 main_output_folder = os.path.basename(output_path)
 
                 # Create toy output path based on main dataset folder name
-                toy_output_folder = f"{main_output_folder}_toy_{toy_data_size}"
+                toy_output_folder = f"{main_output_folder}_toy"
                 base_toy_output_path = os.path.join(domain_dir, toy_output_folder)
                 toy_output_path = create_unique_output_path(base_toy_output_path)
                 os.makedirs(toy_output_path, exist_ok=True)
 
                 tprint(
-                    f"Toy dataset will be saved to {os.path.abspath(toy_output_path)}"
+                    f"Toy dataset with {toy_data_size} teams will be saved to {os.path.abspath(toy_output_path)}"
                 )
 
                 # Create a subset of teams
@@ -873,7 +913,7 @@ def run(
                     os.makedirs(output_path)
                 # param.py is already copied to the output folder at the beginning
                 # No need to copy it again, just copy from the output folder to the model folder
-                copyfile(f"{output}/param.py", f"{output_path}/param.py")
+                copyfile(f"{output}/param_copy.py", f"{output_path}/param_copy.py")
 
             m_obj.run(
                 splits,
@@ -1074,36 +1114,6 @@ Optionals:
 # sbatch --account=def-hfani --mem=96000MB --time=2880 cc.sh
 
 
-def copy_and_load_param(output_folder):
-    """
-    Creates a copy of param.py in the output folder and dynamically imports it.
-
-    Args:
-        output_folder: Path to the output folder
-
-    Returns:
-        The imported param module with settings
-    """
-    if not os.path.exists(output_folder):
-        os.makedirs(output_folder, exist_ok=True)
-
-    # Source and destination paths
-    src_param_path = os.path.abspath("./param.py")
-    dst_param_path = os.path.join(output_folder, "param.py")
-
-    # Copy the file
-    shutil.copy2(src_param_path, dst_param_path)
-    tprint(f"Copied param.py to {dst_param_path}")
-
-    # Dynamically import the copied module
-    spec = importlib.util.spec_from_file_location("param_copy", dst_param_path)
-    param_copy = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(param_copy)
-
-    tprint(f"Using settings from copied param.py in {dst_param_path}")
-    return param_copy
-
-
 def main():
     """Main Function."""
     # Start overall execution timer
@@ -1121,16 +1131,22 @@ def main():
 
     # ensure output folder exists
     output_folder = args.output if args.output else "default_output"
-    if not os.path.exists(output_folder):
-        os.makedirs(output_folder)
 
-    # Copy param.py to output folder and load settings from it
-    param = copy_and_load_param(output_folder)
+    # First create just a temporary folder to store the param.py for loading
+    temp_output_folder = os.path.join(
+        os.path.dirname(os.path.dirname(__file__)), output_folder
+    )
+    if not os.path.exists(temp_output_folder):
+        os.makedirs(temp_output_folder)
+
+    # Copy param.py to temporary output folder and load settings from it
+    param = copy_and_load_param(temp_output_folder)
     settings = param.settings
 
-    # Set environment variable so other modules can find the copied param.py
-    os.environ["OUTPUT_DIR"] = os.path.abspath(output_folder)
-    tprint(f"Set OUTPUT_DIR environment variable to {os.environ['OUTPUT_DIR']}")
+    # The actual data output folder will be:
+    # data/preprocessed/{domain}/{output_folder}
+    # We'll set this environment variable after the data folder is created
+    # in the run() function to avoid having to replicate the folder creation logic here
 
     # Setup thread count for parallel processing
     if args.threads > 0:
