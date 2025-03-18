@@ -62,9 +62,9 @@ settings = {
         "filters": {
             "common": {
                 # None/False/0 means no filtering
-                "remove_dup_teams": True,
-                "remove_empty_skills_teams": True,
-                "remove_empty_experts_teams": True,
+                "remove_dup_teams": False,
+                "remove_empty_skills_teams": False,
+                "remove_empty_experts_teams": False,
                 "min_team_size": None,
                 "max_team_size": None,
                 "min_skills": None,
