@@ -28,6 +28,9 @@ def tprint(message):
     
     Args:
         message (str): Message to print
+    
+    Returns:
+        str: Timestamped message
     """
     timestamped_message = f"[{get_est_time()}] {message}"
 
