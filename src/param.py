@@ -59,32 +59,46 @@ settings = {
             "gith": {},
         },
         "location_type": "country",  # should be one of 'city', 'state', 'country' and represents the location of members in teams (not the location of teams)
-
-        # filters that can be applied in first pass of preprocessing
-        "pass1_filters": {
-            "remove_duplicates": False, # True for removing duplicates
-            "remove_empty_skills": False, # True for removing empty skills
-            "remove_empty_members": False, # True for removing empty teams
-            "min_team_size": -1, # -1 for no filtering
-            "max_team_size": -1, # -1 for no filtering
-            "min_skills": -1, # -1 for no filtering
-            "max_skills": -1, # -1 for no filtering
-        },
-        "filter": {
-            # filters included in output folder name
-        },
-        # filters that require new rounds of data processing
-        "passn_filters": {
-            "min_nteam": -1, # -1 for no filtering
+        "filters": {
+            "common": {
+                # None/False/0 means no filtering
+                "remove_dup_teams": True,
+                "remove_empty_skills_teams": True,
+                "remove_empty_experts_teams": True,
+                "min_team_size": None,
+                "max_team_size": None,
+                "min_skills": None,
+                "max_skills": None,
+                "min_teams_per_expert": None,
+                "max_teams_per_expert": None,
+            },
+            # Domain-specific filters
+            # Each has their own min/max years because we may want different ranges for different domains
+            "gith": {
+                # repository creation year
+                "min_year": None,  # None means no filtering
+                "max_year": None,  # None means no filtering
+            },
+            "dblp": {
+                # paper publication year
+                "min_year": None,  # None means no filtering
+                "max_year": None,  # None means no filtering
+            },
+            "uspt": {
+                # Add USPT-specific filters here as needed
+            },
+            "imdb": {
+                # Add IMDB-specific filters here as needed
+            },
         },
         "processing": {
-            "debug_logs": False, # True for debug logs
-            "raw_logs": False, # True for raw logs
-            "nthreads": 0,  # <= 0 for all cores
-            "cpu_batch_size": 25_000, # -1 for domain-specific batch size in their own code in src/cmn/<domain>.py
-            "gpu_batch_size": 500_000, # -1 for domain-specific batch size in their own code in src/cmn/<domain>.py
-            "make_toy_data": True, # True for making toy data
-            "toy_data_size": 100, # Number of teams to use for toy data
+            "debug_logs": False,  # True for debug logs
+            "raw_logs": False,  # True for raw logs
+            "nthreads": 0.75,  # refer to src/cmn_v3/helper_functions/get_nthreads.py for detailed info on possible values
+            "cpu_batch_size": 25_000,  # -1 for domain-specific batch size in their own code in src/cmn/<domain>.py
+            "gpu_batch_size": 500_000,  # -1 for domain-specific batch size in their own code in src/cmn/<domain>.py
+            "make_toy_data": True,  # True for making toy data
+            "toy_data_size": 100,  # Number of teams to use for toy data
         },
     },
     "fair": {
@@ -99,5 +113,5 @@ settings = {
         "mode": 0,
         "core": -1,
         "attribute": ["gender", "popularity"],
-    }
+    },
 }
