@@ -25,13 +25,13 @@ from .gith_contributor import GithContributor
 from utils.tprint import tprint
 
 
-# Try to load param.py from the output directory if specified in environment variable
+# Try to load param_copy.py from the output directory if specified in environment variable
 # Otherwise fall back to the default param.py
 def get_settings():
     output_dir = os.environ.get("OUTPUT_DIR")
-    if output_dir and os.path.exists(os.path.join(output_dir, "param.py")):
+    if output_dir and os.path.exists(os.path.join(output_dir, "param_copy.py")):
         # Load from output directory
-        param_path = os.path.join(output_dir, "param.py")
+        param_path = os.path.join(output_dir, "param_copy.py")
         spec = importlib.util.spec_from_file_location("param_copy", param_path)
         param_copy = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(param_copy)
