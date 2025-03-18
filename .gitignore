@@ -42,6 +42,20 @@ wheels/
 *.sqlite
 
 data/raw
+
+# These files are too large to commit
+data/preprocessed/*/*/indexes.pkl
+data/preprocessed/*/*/teams.pkl
+data/preprocessed/*/*/teamsvecs.pkl
+data/preprocessed/*/*/splits.json
+data/preprocessed/*/*/counts
+data/preprocessed/*/*/logs
+
+# This is too large to commit but we want others like markdown summary and png plots
+data/preprocessed/*/*/stats-reports/*_team_stats.csv
+
+
+
 output/toy.dblp.v12.json
 output/**/fold*
 
@@ -55,9 +69,6 @@ baseline/caser_pytorch/datasets
 *.pt
 *.src
 *.tgt
-# *.pkl
-*.png
-# *.log
 *.pred
 *.7z
 *.npy
