@@ -951,7 +951,9 @@ def generate_distribution_charts(stats, out_dir, dataset_name, n_jobs=1, use_gpu
         plt.figure(figsize=(10, 6))
 
         # Create histogram
-        plt.hist(experts_per_team, bins=20, color="blue", alpha=0.7, edgecolor="black")
+        plt.hist(
+            experts_per_team, bins=20, color="firebrick", alpha=0.7, edgecolor="black"
+        )
         plt.title(
             f"Distribution of Number of Experts per Team ({dataset_name.upper()})",
             fontsize=14,
@@ -1003,7 +1005,7 @@ def generate_distribution_charts(stats, out_dir, dataset_name, n_jobs=1, use_gpu
         y_values = [expert_team_count_distribution[x] for x in x_values]
 
         # Plot with 'x' markers
-        plt.scatter(x_values, y_values, marker="x", color="blue", alpha=1.0, s=50)
+        plt.scatter(x_values, y_values, marker="x", color="firebrick", alpha=1.0, s=50)
 
         # Add dataset name to top right
         plt.text(
