@@ -50,9 +50,8 @@ data/preprocessed/*/*/teamsvecs.pkl
 data/preprocessed/*/*/splits.json
 data/preprocessed/*/*/counts
 data/preprocessed/*/*/logs
+data/preprocessed/*/*/reports/*_team_stats.csv
 
-# This is too large to commit but we want others like markdown summary and png plots
-data/preprocessed/*/*/stats-reports/*_team_stats.csv
 
 
 
