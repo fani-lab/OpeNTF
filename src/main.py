@@ -5,6 +5,8 @@ import multiprocessing
 import sys
 import pickle
 from datetime import datetime
+import importlib.util
+import shutil
 
 # Add the project root directory to the Python path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -18,7 +20,7 @@ import scipy.sparse
 
 import torch
 
-import param
+# Import param is now dynamic based on copy_and_load_param function
 from utils.tprint import tprint
 from cmn.tools import NumpyArrayEncoder, popular_nonpopular_ratio
 from cmn_v3.dblp import Publication
@@ -869,7 +871,9 @@ def run(
             if not m_name.startswith("nmt"):
                 if not os.path.isdir(output_path):
                     os.makedirs(output_path)
-                copyfile("./param.py", f"{output_path}/param.py")
+                # param.py is already copied to the output folder at the beginning
+                # No need to copy it again, just copy from the output folder to the model folder
+                copyfile(f"{output}/param.py", f"{output_path}/param.py")
 
             m_obj.run(
                 splits,
@@ -1070,6 +1074,36 @@ Optionals:
 # sbatch --account=def-hfani --mem=96000MB --time=2880 cc.sh
 
 
+def copy_and_load_param(output_folder):
+    """
+    Creates a copy of param.py in the output folder and dynamically imports it.
+
+    Args:
+        output_folder: Path to the output folder
+
+    Returns:
+        The imported param module with settings
+    """
+    if not os.path.exists(output_folder):
+        os.makedirs(output_folder, exist_ok=True)
+
+    # Source and destination paths
+    src_param_path = os.path.abspath("./param.py")
+    dst_param_path = os.path.join(output_folder, "param.py")
+
+    # Copy the file
+    shutil.copy2(src_param_path, dst_param_path)
+    tprint(f"Copied param.py to {dst_param_path}")
+
+    # Dynamically import the copied module
+    spec = importlib.util.spec_from_file_location("param_copy", dst_param_path)
+    param_copy = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(param_copy)
+
+    tprint(f"Using settings from copied param.py in {dst_param_path}")
+    return param_copy
+
+
 def main():
     """Main Function."""
     # Start overall execution timer
@@ -1085,8 +1119,18 @@ def main():
     parser = addargs(parser)
     args = parser.parse_args()
 
-    # Load settings from file
+    # ensure output folder exists
+    output_folder = args.output if args.output else "default_output"
+    if not os.path.exists(output_folder):
+        os.makedirs(output_folder)
+
+    # Copy param.py to output folder and load settings from it
+    param = copy_and_load_param(output_folder)
     settings = param.settings
+
+    # Set environment variable so other modules can find the copied param.py
+    os.environ["OUTPUT_DIR"] = os.path.abspath(output_folder)
+    tprint(f"Set OUTPUT_DIR environment variable to {os.environ['OUTPUT_DIR']}")
 
     # Setup thread count for parallel processing
     if args.threads > 0:
@@ -1112,19 +1156,6 @@ def main():
     params = vars(args)
     for k in params.keys():
         tprint(f"  {k}:\t{params[k]}")
-
-    # ensure output folder exists
-    if args.output:
-        # Make sure if the output folder already exists, we create a unique one
-        # This is just for the user level folder that's passed in via -o/--output
-        # The specific paths with domain/dataset/etc. get handled in the run function
-        output_folder = args.output
-        if os.path.exists(output_folder):
-            tprint(f"Output folder '{output_folder}' already exists")
-            # We don't need to create it here, just ensure we pass the right output name
-            # to the run function where full paths are constructed
-        else:
-            os.makedirs(output_folder)
 
     # Set which GPUs are going to be used
     if args.gpus is not None:
