@@ -7,6 +7,7 @@ import pickle
 from datetime import datetime
 import importlib.util
 import shutil
+from pathlib import Path
 
 # Add the project root directory to the Python path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -30,7 +31,7 @@ from utils.create_evaluation_splits import create_evaluation_splits
 from cmn.tools import NumpyArrayEncoder, popular_nonpopular_ratio
 from cmn_v3.dblp import Publication
 from cmn_v3.gith import Repository
-from cmn_v3.helper_functions.get_nthreads import get_nthreads
+from utils.parse_nthreads import parse_nthreads
 
 # Import model classes
 from mdl.fnn import Fnn
@@ -39,9 +40,7 @@ from mdl.rnd import Rnd
 from mdl.nmt import Nmt
 from mdl.team2vec.team2vec import Team2Vec
 
-
-# Kap: 0-based indexing (0-7) ie. "0,1,2,3,4,5,6,7"
-# GPUS_TO_USE = "6,7"
+from src.param import settings
 
 
 def aggregate(output):
@@ -102,132 +101,58 @@ def aggregate(output):
             dff.to_csv(f"{output}{rd}/{rf.replace('.csv', '.agg.csv')}", index=False)
 
 
-def copy_and_load_param(output_folder):
+def dynamic_import(output_folder):
     """
-    Creates a copy of param.py as param_copy.py in the output folder and dynamically imports it.
+    Dynamically import a module from the given output folder
 
     Args:
-        output_folder: Path to the output folder
+        output_folder: Path to the output folder where param_copy.py is located
 
     Returns:
         The imported param module with settings
     """
-    if not os.path.exists(output_folder):
-        os.makedirs(output_folder, exist_ok=True)
+    # Check if output_folder is a directory or file
+    output_path = Path(output_folder)
+    if output_path.is_dir():
+        # If it's a directory, look for param_copy.py in it
+        param_copy_path = output_path / "param_copy.py"
+    else:
+        # If it's already a file path, use it as is
+        param_copy_path = output_path
 
-    # Source and destination paths
-    src_param_path = os.path.abspath(
-        os.path.join(os.path.dirname(__file__), "param.py")
-    )
-    dst_param_path = os.path.join(output_folder, "param_copy.py")
+    # Make sure the file exists
+    if not param_copy_path.exists():
+        # If the file doesn't exist, create a blank param_copy.py with default settings
+        tprint(
+            f"Warning: param_copy.py not found at {param_copy_path}, creating default settings"
+        )
+        from shutil import copyfile
 
-    # Copy the file
-    shutil.copy2(src_param_path, dst_param_path)
-    tprint(f"Copied param.py to {dst_param_path}")
+        try:
+            param_src = os.path.join(os.path.dirname(__file__), "param.py")
+            os.makedirs(output_path, exist_ok=True)
+            copyfile(param_src, param_copy_path)
+        except Exception as e:
+            tprint(f"Error creating param_copy.py: {e}")
+            # Return the original param module as fallback
+            import param
+
+            return param
 
     # Dynamically import the copied module
-    spec = importlib.util.spec_from_file_location("param_copy", dst_param_path)
+    spec = importlib.util.spec_from_file_location("param_copy", str(param_copy_path))
+    if spec is None:
+        tprint(
+            f"Error: Could not create spec for {param_copy_path}, falling back to default param"
+        )
+        import param
+
+        return param
+
     param_copy = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(param_copy)
 
-    tprint(f"Using settings from copied param_copy.py in {dst_param_path}")
     return param_copy
-
-
-def create_toy_logs_folder(toy_output_path, toy_teams):
-    """
-    Create a logs folder for the toy dataset with entries_processed.log and skills.log
-
-    Args:
-        toy_output_path: Path to the toy dataset directory
-        toy_teams: List of team objects in the toy dataset
-    """
-    logs_dir = os.path.join(toy_output_path, "logs")
-    os.makedirs(logs_dir, exist_ok=True)
-
-    # Create entries_processed.log
-    entries_processed_path = os.path.join(logs_dir, "entries_processed.log")
-    with open(entries_processed_path, "w", encoding="utf-8") as f:
-        f.write(f"Total entries processed: {len(toy_teams)}\n")
-        f.write(f"Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
-
-        # Add some sample entries
-        for i, team in enumerate(toy_teams[:10]):  # Show first 10 teams
-            team_id = getattr(team, "id", f"team_{i}")
-            team_name = getattr(team, "name", getattr(team, "title", team_id))
-            num_members = len(getattr(team, "members", []))
-            num_skills = len(getattr(team, "skills", []))
-            f.write(
-                f"Processed: {team_name} (ID: {team_id}) - {num_members} members, {num_skills} skills\n"
-            )
-
-        if len(toy_teams) > 10:
-            f.write(f"... and {len(toy_teams) - 10} more entries\n")
-
-    # Create skills.log
-    skills_path = os.path.join(logs_dir, "skills.log")
-    with open(skills_path, "w", encoding="utf-8") as f:
-        f.write(f"Skills from toy dataset with {len(toy_teams)} teams\n")
-        f.write(f"Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
-
-        # Collect and count all skills
-        all_skills = {}
-        for team in toy_teams:
-            for skill in getattr(team, "skills", []):
-                if skill in all_skills:
-                    all_skills[skill] += 1
-                else:
-                    all_skills[skill] = 1
-
-        # Sort skills by frequency
-        sorted_skills = sorted(all_skills.items(), key=lambda x: x[1], reverse=True)
-
-        # Write skills to file
-        for skill, count in sorted_skills:
-            f.write(f"{skill}: {count} occurrences\n")
-
-    tprint(f"Created logs folder for toy dataset:")
-    tprint(f"  - {entries_processed_path}")
-    tprint(f"  - {skills_path}")
-
-
-# Kap: Set GPUs to use
-def set_gpus(gpus):
-    num_gpus = torch.cuda.device_count()
-    if num_gpus > 1:
-        tprint(f"{num_gpus} GPUs detected. Using GPU indices: {gpus} .")
-        os.environ["CUDA_VISIBLE_DEVICES"] = gpus
-    elif num_gpus == 1:
-        tprint("Only one GPU detected. Using it (if CUDA is available).")
-    else:
-        tprint("No GPUs detected. Using CPU.")
-
-
-def create_evaluation_splits(
-    n_sample, n_folds, train_ratio=0.85, year_idx=None, output="./", step_ahead=1
-):
-    if year_idx:
-        train = np.arange(
-            year_idx[0][0], year_idx[-step_ahead][0]
-        )  # for teamporal folding, we do on each time interval ==> look at tntf.py
-        test = np.arange(year_idx[-step_ahead][0], n_sample)
-    else:
-        train, test = train_test_split(
-            np.arange(n_sample), train_size=train_ratio, random_state=0, shuffle=True
-        )
-
-    splits = dict()
-    splits["test"] = test
-    splits["folds"] = dict()
-    skf = KFold(n_splits=n_folds, random_state=0, shuffle=True)
-    for k, (trainIdx, validIdx) in enumerate(skf.split(train)):
-        splits["folds"][k] = dict()
-        splits["folds"][k]["train"] = train[trainIdx]
-        splits["folds"][k]["valid"] = train[validIdx]
-
-    with open(f"{output}/splits.json", "w") as f:
-        json.dump(splits, f, cls=NumpyArrayEncoder, indent=1)
-    return splits
 
 
 def run(
@@ -244,7 +169,7 @@ def run(
     overall_start_time = time()
 
     filter_str = (
-        f".filtered.mt{settings['data']['min_nteam']}.ts{settings['data']['min_team_size']}"
+        f".filtered.mt{settings['data']['filters']['common']['min_team_size']}.ts{settings['data']['filters']['common']['min_teams_per_expert']}"
         if filter
         # TODO: remove this once we have a new filter logic setup, currently use the -o flag to specify the output folder name
         else ""
@@ -270,93 +195,319 @@ def run(
     models_to_use = [m for m in model_list if m is not None]
 
     # Check if we're in preprocessing-only mode
-    preprocessing_only = len(models_to_use) == 0 or (
-        len(models_to_use) == 1 and models_to_use[0] == ""
-    )
+    preprocessing_only = len(models_to_use) == 0
 
-    if preprocessing_only:
-        # Use tprint for timestamp-based logging
-        tprint("No models specified. Running in preprocessing-only mode.")
+    # Process each dataset
+    for d_name, d_cls in datasets.items():
+        datapath = data_list[domain_list.index(d_name)]
 
-        # Process each dataset
-        for d_name, d_cls in datasets.items():
-            datapath = data_list[domain_list.index(d_name)]
+        # Base preprocessed data directory
+        base_dir = os.path.abspath(
+            os.path.join(os.path.dirname(__file__), "..", "data", "preprocessed")
+        )
 
-            # Base preprocessed data directory
-            base_dir = os.path.abspath(
-                os.path.join(os.path.dirname(__file__), "..", "data", "preprocessed")
+        # The domain directory (e.g., 'dblp')
+        domain_dir = os.path.join(base_dir, d_name)
+
+        # If output is specified, use it as a subfolder name
+        if output:
+            # Create a folder name combining the output value with filter specifications
+            output_folder = f"{output}.{filter_str}"
+            # Full output path
+            base_output_path = os.path.join(domain_dir, output_folder)
+            # Create a unique path if it already exists
+            output_path = create_unique_output_path(base_output_path)
+        else:
+            # If no output specified, use the dataset filename with filter specifications
+            dataset_filename = os.path.basename(datapath)
+            base_output_path = os.path.join(
+                domain_dir, f"{dataset_filename}.{filter_str}"
+            )
+            # Create a unique path if it already exists
+            output_path = create_unique_output_path(base_output_path)
+
+        # Ensure output directory exists
+        os.makedirs(output_path, exist_ok=True)
+
+        # copy settings to output path
+        shutil.copy2(
+            os.path.join(os.path.dirname(__file__), "param.py"),
+            os.path.join(output_path, "param_copy.py"),
+        )
+
+        # Dynamically import the copied param_copy.py module from the output folder
+        param_copy_module = dynamic_import(output_path)
+        settings = param_copy_module.settings
+
+        # Set domain name in settings for proper logging
+        settings["data"]["domain"] = d_name
+
+        # Start time for this dataset's preprocessing
+        dataset_start_time = time()
+        tprint(f"Starting preprocessing for {d_name} dataset from {datapath}")
+        tprint(f"Output will be saved to {os.path.abspath(output_path)}")
+
+        # Generate sparse vectors
+        vecs, indexes = d_cls.generate_sparse_vectors_v3(
+            datapath, output_path, gpus=gpus
+        )
+
+        # Log the actual output directory used
+        tprint(f"Data saved to {os.path.abspath(output_path)}")
+
+        # Apply filters to the teamsvecs data
+        tprint("Applying filters to teamsvecs data...")
+
+        # Get filter configuration from settings
+        filter_config = settings["data"].get("filters", {})
+
+        # Path to the apply_filters.py script
+        apply_filters_script = os.path.abspath(
+            os.path.join(
+                os.path.dirname(__file__),
+                "cmn_v3",
+                "helper_functions",
+                "apply_filters.py",
+            )
+        )
+
+        # Path to the teamsvecs.pkl file
+        teamsvecs_path = os.path.join(output_path, "teamsvecs.pkl")
+
+        # Run the apply_filters.py script
+        if os.path.exists(apply_filters_script):
+            tprint(f"Running filter script: {apply_filters_script}")
+
+            # Create a temporary JSON config file for the filters
+            filter_config_path = os.path.join(output_path, "filter_config.json")
+            with open(filter_config_path, "w") as f:
+                json.dump(filter_config, f, indent=2)
+
+            # Build the command
+            filter_cmd = f"python {apply_filters_script} -i {teamsvecs_path} -o {output_path} -c {filter_config_path} -d {d_name}"
+
+            try:
+                tprint(f"Running command: {filter_cmd}")
+                os.system(filter_cmd)
+                tprint(f"Filters applied to teamsvecs data")
+
+                # Reload the filtered teamsvecs data
+                with open(teamsvecs_path, "rb") as f:
+                    vecs = pickle.load(f)
+            except Exception as e:
+                tprint(f"Error applying filters: {str(e)}")
+        else:
+            tprint(
+                f"Warning: apply_filters.py script not found at {apply_filters_script}"
             )
 
-            # The domain directory (e.g., 'dblp')
-            domain_dir = os.path.join(base_dir, d_name)
-
-            # If output is specified, use it as a subfolder name
-            if output:
-                # Create a folder name combining the output value with filter specifications
-                output_folder = f"{output}{filter_str}"
-                # Full output path
-                base_output_path = os.path.join(domain_dir, output_folder)
-                # Create a unique path if it already exists
-                output_path = create_unique_output_path(base_output_path)
+        # Ensure that the 'id' key exists in vecs for evaluation splits
+        if "id" not in vecs:
+            tprint(
+                f"WARNING: 'id' key not found in vecs. Creating a default 'id' based on the 'skill' matrix."
+            )
+            if "skill" in vecs:
+                vecs["id"] = np.arange(vecs["skill"].shape[0])
             else:
-                # If no output specified, use the dataset filename with filter specifications
-                dataset_filename = os.path.basename(datapath)
-                base_output_path = os.path.join(
-                    domain_dir, f"{dataset_filename}{filter_str}"
-                )
-                # Create a unique path if it already exists
-                output_path = create_unique_output_path(base_output_path)
+                raise KeyError("Both 'id' and 'skill' keys are missing from vecs!")
 
-            # Ensure output directory exists
-            os.makedirs(output_path, exist_ok=True)
+        # Process year indices for temporal data
+        year_idx = []
+        if "i2y" in indexes.keys():
+            for i in range(1, len(indexes["i2y"])):
+                if (
+                    indexes["i2y"][i][0] - indexes["i2y"][i - 1][0]
+                    > settings["model"]["nfolds"]
+                ):
+                    year_idx.append(indexes["i2y"][i - 1])
+            year_idx.append(indexes["i2y"][-1])
+            indexes["i2y"] = year_idx
 
-            # Copy param.py from the temporary folder to the actual data output folder
-            temp_param_path = os.path.join(
-                os.path.dirname(os.path.dirname(__file__)), output, "param_copy.py"
+        # Create evaluation splits - this creates splits.json
+        splits = create_evaluation_splits(
+            vecs["id"].shape[0] if "id" in vecs and vecs["id"].shape[0] > 0 else 0,
+            settings["model"]["nfolds"],
+            settings["model"]["train_test_split"],
+            (
+                indexes["i2y"]
+                if future and "i2y" in indexes and len(indexes["i2y"]) > 0
+                else None
+            ),
+            output=f"{output_path}",
+            step_ahead=settings["model"]["step_ahead"],
+        )
+
+        # Calculate elapsed time
+        dataset_elapsed_time = time() - dataset_start_time
+        formatted_time = format_time(dataset_elapsed_time)
+
+        tprint(f"Data preprocessing completed for {d_name} dataset in {formatted_time}")
+        tprint(f"Created files:")
+        tprint(f"  - {output_path}/teams.pkl")
+        tprint(f"  - {output_path}/indexes.pkl")
+        tprint(f"  - {output_path}/teamsvecs.pkl")
+        tprint(f"  - {output_path}/splits.json")
+
+        # Load teams regardless of raw_logs setting, as we'll need them for toy dataset generation
+        with open(os.path.join(output_path, "teams.pkl"), "rb") as f:
+            teams = pickle.load(f)
+
+        # Generate counts directory (renamed from experts-skills-counts)
+        # Only generate these files if raw_logs is True in the settings
+        if settings["data"]["processing"].get("raw_logs", False):
+            counts_dir = os.path.join(output_path, "counts")
+            os.makedirs(counts_dir, exist_ok=True)
+
+            # Extract and count skills
+            all_skills = []
+            for team in teams:
+                all_skills.extend(team.skills)
+
+            skill_counts = {}
+            for skill in all_skills:
+                if skill in skill_counts:
+                    skill_counts[skill] += 1
+                else:
+                    skill_counts[skill] = 1
+
+            # Sort skills by count (descending)
+            sorted_skills = sorted(
+                skill_counts.items(), key=lambda x: x[1], reverse=True
             )
-            if os.path.exists(temp_param_path):
-                shutil.copy2(
-                    temp_param_path, os.path.join(output_path, "param_copy.py")
-                )
-                tprint(f"Copied param_copy.py to data output folder: {output_path}")
 
-                # Set environment variable to point to the actual data output folder
-                os.environ["OUTPUT_DIR"] = os.path.abspath(output_path)
-                tprint(
-                    f"Set OUTPUT_DIR environment variable to {os.environ['OUTPUT_DIR']}"
-                )
-            else:
-                tprint(
-                    f"Warning: param_copy.py not found in temporary folder: {temp_param_path}"
-                )
-                tprint("Using default param.py from src directory")
-                src_param_path = os.path.abspath(
-                    os.path.join(os.path.dirname(__file__), "param.py")
-                )
-                shutil.copy2(src_param_path, os.path.join(output_path, "param_copy.py"))
-                os.environ["OUTPUT_DIR"] = os.path.abspath(output_path)
-                tprint(
-                    f"Set OUTPUT_DIR environment variable to {os.environ['OUTPUT_DIR']}"
-                )
+            # Write skills to file
+            skills_file = os.path.join(counts_dir, f"skills_{len(sorted_skills)}.log")
+            with open(skills_file, "w", encoding="utf-8") as f:
+                for skill, count in sorted_skills:
+                    f.write(f"{count}\t{skill}\n")
 
-            # Set domain name in settings for proper logging
-            settings["data"]["domain"] = d_name
+            # Extract and count experts (members)
+            all_members = {}
+            for team in teams:
+                for member in team.members:
+                    member_id = member.id
+                    # Store the member object, not just the ID
+                    if member_id in all_members:
+                        all_members[member_id][0] += 1
+                    else:
+                        all_members[member_id] = [1, member]
 
-            # Start time for this dataset's preprocessing
-            dataset_start_time = time()
-            tprint(f"Starting preprocessing for {d_name} dataset from {datapath}")
-            tprint(f"Output will be saved to {os.path.abspath(output_path)}")
-
-            # Generate sparse vectors
-            vecs, indexes = d_cls.generate_sparse_vectors_v3(
-                datapath, output_path, gpus=gpus
+            # Sort experts by count (descending)
+            sorted_members = sorted(
+                all_members.items(), key=lambda x: x[1][0], reverse=True
             )
 
-            # Log the actual output directory used
-            tprint(f"Data saved to {os.path.abspath(output_path)}")
+            # Write experts to file
+            experts_file = os.path.join(
+                counts_dir, f"experts_{len(sorted_members)}.log"
+            )
+            with open(experts_file, "w", encoding="utf-8") as f:
+                for member_id, (count, member) in sorted_members:
+                    # Use member.name for DBLP, member.login for GitHub
+                    member_name = getattr(
+                        member, "name", getattr(member, "login", member_id)
+                    )
+                    f.write(f"{count}\t{member_name}\n")
 
-            # Apply filters to the teamsvecs data
-            tprint("Applying filters to teamsvecs data...")
+            # Add teams count file
+            teams_file = os.path.join(counts_dir, f"teams_{len(teams)}.log")
+            with open(teams_file, "w", encoding="utf-8") as f:
+                for team in teams:
+                    # Use team.title or other appropriate attribute for team name, or "EMPTY" if none exist
+                    team_title = getattr(
+                        team,
+                        "title",
+                        getattr(team, "name", getattr(team, "id", "EMPTY")),
+                    )
+                    f.write(f"{1}\t{team_title}\n")
+
+            tprint(f"Generated counts files:")
+            tprint(f"  - {skills_file}")
+            tprint(f"  - {experts_file}")
+            tprint(f"  - {teams_file}")
+        else:
+            tprint(
+                "Skipping generation of counts files - raw_logs is disabled in settings"
+            )
+
+        # Generate reports directory
+        stats_reports_dir = os.path.join(output_path, "reports")
+        os.makedirs(stats_reports_dir, exist_ok=True)
+
+        # Call generate_reports.py script
+        teamsvecs_path = os.path.join(output_path, "teamsvecs.pkl")
+        gpu_param = f"gpu={gpus}" if gpus is not None else "cpu"
+        reports_script = os.path.abspath(
+            os.path.join(
+                os.path.dirname(__file__),
+                "cmn_v3",
+                "helper_functions",
+                "generate_reports.py",
+            )
+        )
+
+        if os.path.exists(reports_script):
+            tprint(f"Generating data reports using {reports_script}")
+            reports_cmd = f"python {reports_script} -i {teamsvecs_path} -o {stats_reports_dir} -mode {gpu_param}"
+
+            try:
+                tprint(f"Running command: {reports_cmd}")
+                os.system(reports_cmd)
+                tprint(f"Data reports generated in {stats_reports_dir}")
+            except Exception as e:
+                tprint(f"Error generating data reports: {str(e)}")
+        else:
+            tprint(f"Warning: generate_reports.py script not found at {reports_script}")
+
+        # Generate toy dataset if enabled in settings
+        if settings["data"]["processing"].get("make_toy_data", False):
+            toy_data_size = settings["data"]["processing"].get("toy_data_size", 100)
+            tprint(f"Generating toy dataset with {toy_data_size} teams")
+
+            # Note: We already loaded the teams variable earlier, no need to load it again
+
+            # Extract main dataset folder name to use as the base for toy dataset
+            main_output_folder = os.path.basename(output_path)
+
+            # Create toy output path based on main dataset folder name
+            toy_output_folder = f"{main_output_folder}_toy"
+            base_toy_output_path = os.path.join(domain_dir, toy_output_folder)
+            toy_output_path = create_unique_output_path(base_toy_output_path)
+            os.makedirs(toy_output_path, exist_ok=True)
+
+            tprint(
+                f"Toy dataset with {toy_data_size} teams will be saved to {os.path.abspath(toy_output_path)}"
+            )
+
+            # Create a subset of teams
+            toy_teams = teams[:toy_data_size] if len(teams) > toy_data_size else teams
+
+            # Save toy teams
+            with open(os.path.join(toy_output_path, "teams.pkl"), "wb") as f:
+                pickle.dump(toy_teams, f)
+
+            # Build indexes for toy dataset
+            toy_indexes = d_cls.build_indexes(toy_teams)
+
+            # Save toy indexes
+            with open(os.path.join(toy_output_path, "indexes.pkl"), "wb") as f:
+                pickle.dump(toy_indexes, f)
+
+            # Generate sparse vectors for toy dataset
+            # Extract the subset of vectors
+            toy_vecs = {}
+            for key in vecs:
+                if hasattr(vecs[key], "shape") and vecs[key].shape[0] > toy_data_size:
+                    toy_vecs[key] = vecs[key][:toy_data_size]
+                else:
+                    toy_vecs[key] = vecs[key]
+
+            # Save toy teamsvecs
+            with open(os.path.join(toy_output_path, "teamsvecs.pkl"), "wb") as f:
+                pickle.dump(toy_vecs, f)
+
+            # Apply filters to the toy teamsvecs data
+            tprint("Applying filters to toy teamsvecs data...")
 
             # Get filter configuration from settings
             filter_config = settings["data"].get("filters", {})
@@ -371,142 +522,119 @@ def run(
                 )
             )
 
-            # Path to the teamsvecs.pkl file
-            teamsvecs_path = os.path.join(output_path, "teamsvecs.pkl")
+            # Path to the toy teamsvecs.pkl file
+            toy_teamsvecs_path = os.path.join(toy_output_path, "teamsvecs.pkl")
 
             # Run the apply_filters.py script
             if os.path.exists(apply_filters_script):
-                tprint(f"Running filter script: {apply_filters_script}")
+                tprint(f"Running filter script for toy dataset: {apply_filters_script}")
 
                 # Create a temporary JSON config file for the filters
-                filter_config_path = os.path.join(output_path, "filter_config.json")
-                with open(filter_config_path, "w") as f:
+                toy_filter_config_path = os.path.join(
+                    toy_output_path, "filter_config.json"
+                )
+                with open(toy_filter_config_path, "w") as f:
                     json.dump(filter_config, f, indent=2)
 
                 # Build the command
-                filter_cmd = f"python {apply_filters_script} -i {teamsvecs_path} -o {output_path} -c {filter_config_path} -d {d_name}"
+                toy_filter_cmd = f"python {apply_filters_script} -i {toy_teamsvecs_path} -o {toy_output_path} -c {toy_filter_config_path} -d {d_name}"
 
                 try:
-                    tprint(f"Running command: {filter_cmd}")
-                    os.system(filter_cmd)
-                    tprint(f"Filters applied to teamsvecs data")
+                    tprint(f"Running command: {toy_filter_cmd}")
+                    os.system(toy_filter_cmd)
+                    tprint(f"Filters applied to toy teamsvecs data")
 
-                    # Reload the filtered teamsvecs data
-                    with open(teamsvecs_path, "rb") as f:
-                        vecs = pickle.load(f)
+                    # Reload the filtered toy teamsvecs data
+                    with open(toy_teamsvecs_path, "rb") as f:
+                        toy_vecs = pickle.load(f)
                 except Exception as e:
-                    tprint(f"Error applying filters: {str(e)}")
+                    tprint(f"Error applying filters to toy dataset: {str(e)}")
             else:
                 tprint(
                     f"Warning: apply_filters.py script not found at {apply_filters_script}"
                 )
 
-            # Ensure that the 'id' key exists in vecs for evaluation splits
-            if "id" not in vecs:
-                tprint(
-                    f"WARNING: 'id' key not found in vecs. Creating a default 'id' based on the 'skill' matrix."
-                )
-                if "skill" in vecs:
-                    vecs["id"] = np.arange(vecs["skill"].shape[0])
-                else:
-                    raise KeyError("Both 'id' and 'skill' keys are missing from vecs!")
-
-            # Process year indices for temporal data
-            year_idx = []
-            if "i2y" in indexes.keys():
-                for i in range(1, len(indexes["i2y"])):
-                    if (
-                        indexes["i2y"][i][0] - indexes["i2y"][i - 1][0]
-                        > settings["model"]["nfolds"]
-                    ):
-                        year_idx.append(indexes["i2y"][i - 1])
-                year_idx.append(indexes["i2y"][-1])
-                indexes["i2y"] = year_idx
-
-            # Create evaluation splits - this creates splits.json
-            splits = create_evaluation_splits(
-                vecs["id"].shape[0] if "id" in vecs and vecs["id"].shape[0] > 0 else 0,
+            # Create evaluation splits for toy dataset
+            toy_splits = create_evaluation_splits(
+                (
+                    toy_vecs["id"].shape[0]
+                    if "id" in toy_vecs and toy_vecs["id"].shape[0] > 0
+                    else 0
+                ),
                 settings["model"]["nfolds"],
                 settings["model"]["train_test_split"],
                 (
-                    indexes["i2y"]
-                    if future and "i2y" in indexes and len(indexes["i2y"]) > 0
+                    toy_indexes["i2y"]
+                    if future and "i2y" in toy_indexes and len(toy_indexes["i2y"]) > 0
                     else None
                 ),
-                output=f"{output_path}",
+                output=f"{toy_output_path}",
                 step_ahead=settings["model"]["step_ahead"],
             )
 
-            # Calculate elapsed time
-            dataset_elapsed_time = time() - dataset_start_time
-            formatted_time = format_time(dataset_elapsed_time)
+            tprint(f"Toy dataset created with {len(toy_teams)} teams")
+            tprint(f"Created toy files:")
+            tprint(f"  - {toy_output_path}/teams.pkl")
+            tprint(f"  - {toy_output_path}/indexes.pkl")
+            tprint(f"  - {toy_output_path}/teamsvecs.pkl")
+            tprint(f"  - {toy_output_path}/splits.json")
 
-            tprint(
-                f"Data preprocessing completed for {d_name} dataset in {formatted_time}"
-            )
-            tprint(f"Created files:")
-            tprint(f"  - {output_path}/teams.pkl")
-            tprint(f"  - {output_path}/indexes.pkl")
-            tprint(f"  - {output_path}/teamsvecs.pkl")
-            tprint(f"  - {output_path}/splits.json")
+            # Create logs folder with entries_processed.log and skills.log
+            create_toy_logs_folder(toy_output_path, toy_teams)
 
-            # Load teams regardless of raw_logs setting, as we'll need them for toy dataset generation
-            with open(os.path.join(output_path, "teams.pkl"), "rb") as f:
-                teams = pickle.load(f)
-
-            # Generate counts directory (renamed from experts-skills-counts)
+            # Generate counts directory for toy dataset (renamed from experts-skills-counts)
             # Only generate these files if raw_logs is True in the settings
             if settings["data"]["processing"].get("raw_logs", False):
-                counts_dir = os.path.join(output_path, "counts")
-                os.makedirs(counts_dir, exist_ok=True)
+                toy_counts_dir = os.path.join(toy_output_path, "counts")
+                os.makedirs(toy_counts_dir, exist_ok=True)
 
-                # Extract and count skills
-                all_skills = []
-                for team in teams:
-                    all_skills.extend(team.skills)
+                # Extract and count skills for toy dataset
+                toy_all_skills = []
+                for team in toy_teams:
+                    toy_all_skills.extend(team.skills)
 
-                skill_counts = {}
-                for skill in all_skills:
-                    if skill in skill_counts:
-                        skill_counts[skill] += 1
+                toy_skill_counts = {}
+                for skill in toy_all_skills:
+                    if skill in toy_skill_counts:
+                        toy_skill_counts[skill] += 1
                     else:
-                        skill_counts[skill] = 1
+                        toy_skill_counts[skill] = 1
 
                 # Sort skills by count (descending)
-                sorted_skills = sorted(
-                    skill_counts.items(), key=lambda x: x[1], reverse=True
+                toy_sorted_skills = sorted(
+                    toy_skill_counts.items(), key=lambda x: x[1], reverse=True
                 )
 
                 # Write skills to file
-                skills_file = os.path.join(
-                    counts_dir, f"skills_{len(sorted_skills)}.log"
+                toy_skills_file = os.path.join(
+                    toy_counts_dir, f"skills_{len(toy_sorted_skills)}.log"
                 )
-                with open(skills_file, "w", encoding="utf-8") as f:
-                    for skill, count in sorted_skills:
+                with open(toy_skills_file, "w", encoding="utf-8") as f:
+                    for skill, count in toy_sorted_skills:
                         f.write(f"{count}\t{skill}\n")
 
-                # Extract and count experts (members)
-                all_members = {}
-                for team in teams:
+                # Extract and count experts (members) for toy dataset
+                toy_all_members = {}
+                for team in toy_teams:
                     for member in team.members:
                         member_id = member.id
                         # Store the member object, not just the ID
-                        if member_id in all_members:
-                            all_members[member_id][0] += 1
+                        if member_id in toy_all_members:
+                            toy_all_members[member_id][0] += 1
                         else:
-                            all_members[member_id] = [1, member]
+                            toy_all_members[member_id] = [1, member]
 
                 # Sort experts by count (descending)
-                sorted_members = sorted(
-                    all_members.items(), key=lambda x: x[1][0], reverse=True
+                toy_sorted_members = sorted(
+                    toy_all_members.items(), key=lambda x: x[1][0], reverse=True
                 )
 
                 # Write experts to file
-                experts_file = os.path.join(
-                    counts_dir, f"experts_{len(sorted_members)}.log"
+                toy_experts_file = os.path.join(
+                    toy_counts_dir, f"experts_{len(toy_sorted_members)}.log"
                 )
-                with open(experts_file, "w", encoding="utf-8") as f:
-                    for member_id, (count, member) in sorted_members:
+                with open(toy_experts_file, "w", encoding="utf-8") as f:
+                    for member_id, (count, member) in toy_sorted_members:
                         # Use member.name for DBLP, member.login for GitHub
                         member_name = getattr(
                             member, "name", getattr(member, "login", member_id)
@@ -514,9 +642,11 @@ def run(
                         f.write(f"{count}\t{member_name}\n")
 
                 # Add teams count file
-                teams_file = os.path.join(counts_dir, f"teams_{len(teams)}.log")
-                with open(teams_file, "w", encoding="utf-8") as f:
-                    for team in teams:
+                toy_teams_file = os.path.join(
+                    toy_counts_dir, f"teams_{len(toy_teams)}.log"
+                )
+                with open(toy_teams_file, "w", encoding="utf-8") as f:
+                    for team in toy_teams:
                         # Use team.title or other appropriate attribute for team name, or "EMPTY" if none exist
                         team_title = getattr(
                             team,
@@ -525,287 +655,47 @@ def run(
                         )
                         f.write(f"{1}\t{team_title}\n")
 
-                tprint(f"Generated counts files:")
-                tprint(f"  - {skills_file}")
-                tprint(f"  - {experts_file}")
-                tprint(f"  - {teams_file}")
+                tprint(f"Generated counts files for toy dataset:")
+                tprint(f"  - {toy_skills_file}")
+                tprint(f"  - {toy_experts_file}")
+                tprint(f"  - {toy_teams_file}")
             else:
                 tprint(
-                    "Skipping generation of counts files - raw_logs is disabled in settings"
+                    "Skipping generation of counts files for toy dataset - raw_logs is disabled in settings"
                 )
 
-            # Generate reports directory
-            stats_reports_dir = os.path.join(output_path, "reports")
-            os.makedirs(stats_reports_dir, exist_ok=True)
+            # Generate reports for toy dataset
+            toy_stats_reports_dir = os.path.join(toy_output_path, "reports")
+            os.makedirs(toy_stats_reports_dir, exist_ok=True)
 
-            # Call generate_reports.py script
-            teamsvecs_path = os.path.join(output_path, "teamsvecs.pkl")
-            gpu_param = f"gpu={gpus}" if gpus is not None else "cpu"
-            reports_script = os.path.abspath(
-                os.path.join(
-                    os.path.dirname(__file__),
-                    "cmn_v3",
-                    "helper_functions",
-                    "generate_reports.py",
-                )
-            )
+            # Call generate_reports.py script for toy dataset
+            toy_teamsvecs_path = os.path.join(toy_output_path, "teamsvecs.pkl")
 
             if os.path.exists(reports_script):
-                tprint(f"Generating data reports using {reports_script}")
-                reports_cmd = f"python {reports_script} -i {teamsvecs_path} -o {stats_reports_dir} -mode {gpu_param}"
+                tprint(f"Generating data reports for toy dataset")
+                toy_reports_cmd = f"python {reports_script} -i {toy_teamsvecs_path} -o {toy_stats_reports_dir} -mode {gpu_param}"
 
                 try:
-                    tprint(f"Running command: {reports_cmd}")
-                    os.system(reports_cmd)
-                    tprint(f"Data reports generated in {stats_reports_dir}")
+                    tprint(f"Running command: {toy_reports_cmd}")
+                    os.system(toy_reports_cmd)
+                    tprint(f"Toy data reports generated in {toy_stats_reports_dir}")
                 except Exception as e:
-                    tprint(f"Error generating data reports: {str(e)}")
+                    tprint(f"Error generating toy data reports: {str(e)}")
             else:
                 tprint(
                     f"Warning: generate_reports.py script not found at {reports_script}"
                 )
-
-            # Generate toy dataset if enabled in settings
-            if settings["data"]["processing"].get("make_toy_data", False):
-                toy_data_size = settings["data"]["processing"].get("toy_data_size", 100)
-                tprint(f"Generating toy dataset with {toy_data_size} teams")
-
-                # Note: We already loaded the teams variable earlier, no need to load it again
-
-                # Extract main dataset folder name to use as the base for toy dataset
-                main_output_folder = os.path.basename(output_path)
-
-                # Create toy output path based on main dataset folder name
-                toy_output_folder = f"{main_output_folder}_toy"
-                base_toy_output_path = os.path.join(domain_dir, toy_output_folder)
-                toy_output_path = create_unique_output_path(base_toy_output_path)
-                os.makedirs(toy_output_path, exist_ok=True)
-
-                tprint(
-                    f"Toy dataset with {toy_data_size} teams will be saved to {os.path.abspath(toy_output_path)}"
-                )
-
-                # Create a subset of teams
-                toy_teams = (
-                    teams[:toy_data_size] if len(teams) > toy_data_size else teams
-                )
-
-                # Save toy teams
-                with open(os.path.join(toy_output_path, "teams.pkl"), "wb") as f:
-                    pickle.dump(toy_teams, f)
-
-                # Build indexes for toy dataset
-                toy_indexes = d_cls.build_indexes(toy_teams)
-
-                # Save toy indexes
-                with open(os.path.join(toy_output_path, "indexes.pkl"), "wb") as f:
-                    pickle.dump(toy_indexes, f)
-
-                # Generate sparse vectors for toy dataset
-                # Extract the subset of vectors
-                toy_vecs = {}
-                for key in vecs:
-                    if (
-                        hasattr(vecs[key], "shape")
-                        and vecs[key].shape[0] > toy_data_size
-                    ):
-                        toy_vecs[key] = vecs[key][:toy_data_size]
-                    else:
-                        toy_vecs[key] = vecs[key]
-
-                # Save toy teamsvecs
-                with open(os.path.join(toy_output_path, "teamsvecs.pkl"), "wb") as f:
-                    pickle.dump(toy_vecs, f)
-
-                # Apply filters to the toy teamsvecs data
-                tprint("Applying filters to toy teamsvecs data...")
-
-                # Get filter configuration from settings
-                filter_config = settings["data"].get("filters", {})
-
-                # Path to the apply_filters.py script
-                apply_filters_script = os.path.abspath(
-                    os.path.join(
-                        os.path.dirname(__file__),
-                        "cmn_v3",
-                        "helper_functions",
-                        "apply_filters.py",
-                    )
-                )
-
-                # Path to the toy teamsvecs.pkl file
-                toy_teamsvecs_path = os.path.join(toy_output_path, "teamsvecs.pkl")
-
-                # Run the apply_filters.py script
-                if os.path.exists(apply_filters_script):
-                    tprint(
-                        f"Running filter script for toy dataset: {apply_filters_script}"
-                    )
-
-                    # Create a temporary JSON config file for the filters
-                    toy_filter_config_path = os.path.join(
-                        toy_output_path, "filter_config.json"
-                    )
-                    with open(toy_filter_config_path, "w") as f:
-                        json.dump(filter_config, f, indent=2)
-
-                    # Build the command
-                    toy_filter_cmd = f"python {apply_filters_script} -i {toy_teamsvecs_path} -o {toy_output_path} -c {toy_filter_config_path} -d {d_name}"
-
-                    try:
-                        tprint(f"Running command: {toy_filter_cmd}")
-                        os.system(toy_filter_cmd)
-                        tprint(f"Filters applied to toy teamsvecs data")
-
-                        # Reload the filtered toy teamsvecs data
-                        with open(toy_teamsvecs_path, "rb") as f:
-                            toy_vecs = pickle.load(f)
-                    except Exception as e:
-                        tprint(f"Error applying filters to toy dataset: {str(e)}")
-                else:
-                    tprint(
-                        f"Warning: apply_filters.py script not found at {apply_filters_script}"
-                    )
-
-                # Create evaluation splits for toy dataset
-                toy_splits = create_evaluation_splits(
-                    (
-                        toy_vecs["id"].shape[0]
-                        if "id" in toy_vecs and toy_vecs["id"].shape[0] > 0
-                        else 0
-                    ),
-                    settings["model"]["nfolds"],
-                    settings["model"]["train_test_split"],
-                    (
-                        toy_indexes["i2y"]
-                        if future
-                        and "i2y" in toy_indexes
-                        and len(toy_indexes["i2y"]) > 0
-                        else None
-                    ),
-                    output=f"{toy_output_path}",
-                    step_ahead=settings["model"]["step_ahead"],
-                )
-
-                tprint(f"Toy dataset created with {len(toy_teams)} teams")
-                tprint(f"Created toy files:")
-                tprint(f"  - {toy_output_path}/teams.pkl")
-                tprint(f"  - {toy_output_path}/indexes.pkl")
-                tprint(f"  - {toy_output_path}/teamsvecs.pkl")
-                tprint(f"  - {toy_output_path}/splits.json")
-
-                # Create logs folder with entries_processed.log and skills.log
-                create_toy_logs_folder(toy_output_path, toy_teams)
-
-                # Generate counts directory for toy dataset (renamed from experts-skills-counts)
-                # Only generate these files if raw_logs is True in the settings
-                if settings["data"]["processing"].get("raw_logs", False):
-                    toy_counts_dir = os.path.join(toy_output_path, "counts")
-                    os.makedirs(toy_counts_dir, exist_ok=True)
-
-                    # Extract and count skills for toy dataset
-                    toy_all_skills = []
-                    for team in toy_teams:
-                        toy_all_skills.extend(team.skills)
-
-                    toy_skill_counts = {}
-                    for skill in toy_all_skills:
-                        if skill in toy_skill_counts:
-                            toy_skill_counts[skill] += 1
-                        else:
-                            toy_skill_counts[skill] = 1
-
-                    # Sort skills by count (descending)
-                    toy_sorted_skills = sorted(
-                        toy_skill_counts.items(), key=lambda x: x[1], reverse=True
-                    )
-
-                    # Write skills to file
-                    toy_skills_file = os.path.join(
-                        toy_counts_dir, f"skills_{len(toy_sorted_skills)}.log"
-                    )
-                    with open(toy_skills_file, "w", encoding="utf-8") as f:
-                        for skill, count in toy_sorted_skills:
-                            f.write(f"{count}\t{skill}\n")
-
-                    # Extract and count experts (members) for toy dataset
-                    toy_all_members = {}
-                    for team in toy_teams:
-                        for member in team.members:
-                            member_id = member.id
-                            # Store the member object, not just the ID
-                            if member_id in toy_all_members:
-                                toy_all_members[member_id][0] += 1
-                            else:
-                                toy_all_members[member_id] = [1, member]
-
-                    # Sort experts by count (descending)
-                    toy_sorted_members = sorted(
-                        toy_all_members.items(), key=lambda x: x[1][0], reverse=True
-                    )
-
-                    # Write experts to file
-                    toy_experts_file = os.path.join(
-                        toy_counts_dir, f"experts_{len(toy_sorted_members)}.log"
-                    )
-                    with open(toy_experts_file, "w", encoding="utf-8") as f:
-                        for member_id, (count, member) in toy_sorted_members:
-                            # Use member.name for DBLP, member.login for GitHub
-                            member_name = getattr(
-                                member, "name", getattr(member, "login", member_id)
-                            )
-                            f.write(f"{count}\t{member_name}\n")
-
-                    # Add teams count file
-                    toy_teams_file = os.path.join(
-                        toy_counts_dir, f"teams_{len(toy_teams)}.log"
-                    )
-                    with open(toy_teams_file, "w", encoding="utf-8") as f:
-                        for team in toy_teams:
-                            # Use team.title or other appropriate attribute for team name, or "EMPTY" if none exist
-                            team_title = getattr(
-                                team,
-                                "title",
-                                getattr(team, "name", getattr(team, "id", "EMPTY")),
-                            )
-                            f.write(f"{1}\t{team_title}\n")
-
-                    tprint(f"Generated counts files for toy dataset:")
-                    tprint(f"  - {toy_skills_file}")
-                    tprint(f"  - {toy_experts_file}")
-                    tprint(f"  - {toy_teams_file}")
-                else:
-                    tprint(
-                        "Skipping generation of counts files for toy dataset - raw_logs is disabled in settings"
-                    )
-
-                # Generate reports for toy dataset
-                toy_stats_reports_dir = os.path.join(toy_output_path, "reports")
-                os.makedirs(toy_stats_reports_dir, exist_ok=True)
-
-                # Call generate_reports.py script for toy dataset
-                toy_teamsvecs_path = os.path.join(toy_output_path, "teamsvecs.pkl")
-
-                if os.path.exists(reports_script):
-                    tprint(f"Generating data reports for toy dataset")
-                    toy_reports_cmd = f"python {reports_script} -i {toy_teamsvecs_path} -o {toy_stats_reports_dir} -mode {gpu_param}"
-
-                    try:
-                        tprint(f"Running command: {toy_reports_cmd}")
-                        os.system(toy_reports_cmd)
-                        tprint(f"Toy data reports generated in {toy_stats_reports_dir}")
-                    except Exception as e:
-                        tprint(f"Error generating toy data reports: {str(e)}")
-                else:
-                    tprint(
-                        f"Warning: generate_reports.py script not found at {reports_script}"
-                    )
 
         # Calculate overall elapsed time
         overall_elapsed_time = time() - overall_start_time
         formatted_overall_time = format_time(overall_elapsed_time)
 
         tprint(f"All preprocessing completed in {formatted_overall_time}")
+        tprint(f"Exiting as no models were specified.")
+        return
+
+    if preprocessing_only:
+        tprint(f"Preprocessing only completed in {formatted_overall_time}")
         tprint(f"Exiting as no models were specified.")
         return
 
@@ -913,7 +803,10 @@ def run(
                     os.makedirs(output_path)
                 # param.py is already copied to the output folder at the beginning
                 # No need to copy it again, just copy from the output folder to the model folder
-                copyfile(f"{output}/param_copy.py", f"{output_path}/param_copy.py")
+                copyfile(
+                    f"{os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', 'temp', output)}/param_copy.py",
+                    f"{output_path}/param_copy.py",
+                )
 
             m_obj.run(
                 splits,
@@ -933,7 +826,7 @@ def addargs(parser):
     """Parse and Set Arguments."""
 
     # Define our custom help text
-    help_text = """OpenNTF: Open Neural Team Formation
+    help_text = """OpeNTF: Open Neural Team Formation
 
 Required:
    -i INPUT, --input INPUT
@@ -1067,7 +960,8 @@ Optionals:
         "--gpus",
         dest="gpus",
         help=argparse.SUPPRESS,
-        default=None,
+        default=settings["gpus"],
+        type=str,
         metavar="GPUS",
     )
 
@@ -1076,7 +970,7 @@ Optionals:
         "--threads",
         dest="threads",
         help=argparse.SUPPRESS,
-        default=0,
+        default=parse_nthreads(settings),
         type=int,
         metavar="THREADS",
     )
@@ -1115,76 +1009,21 @@ Optionals:
 
 
 def main():
-    """Main Function."""
-    # Start overall execution timer
     overall_start_time = time()
 
-    # Use tprint for timestamp-based logging
     tprint("Starting processing pipeline")
 
     # parse the arguments
     parser = argparse.ArgumentParser(
-        add_help=False, description="OpenNTF: Open Neural Team Formation"
+        add_help=False, description="OpeNTF: Open Neural Team Formation"
     )
     parser = addargs(parser)
     args = parser.parse_args()
 
-    # ensure output folder exists
-    output_folder = args.output if args.output else "default_output"
-
-    # First create just a temporary folder to store the param.py for loading
-    temp_output_folder = os.path.join(
-        os.path.dirname(os.path.dirname(__file__)), output_folder
-    )
-    if not os.path.exists(temp_output_folder):
-        os.makedirs(temp_output_folder)
-
-    # Copy param.py to temporary output folder and load settings from it
-    param = copy_and_load_param(temp_output_folder)
-    settings = param.settings
-
-    # The actual data output folder will be:
-    # data/preprocessed/{domain}/{output_folder}
-    # We'll set this environment variable after the data folder is created
-    # in the run() function to avoid having to replicate the folder creation logic here
-
-    # Setup thread count for parallel processing
-    if args.threads > 0:
-        # Override the default thread count if explicitly specified
-        settings["data"]["processing"]["nthreads"] = args.threads
-        tprint(f"Using {args.threads} threads for parallel processing (CLI override)")
-    else:
-        # Let get_nthreads() use the value already in settings without updating it
-        # This just ensures the thread count is logged with the right message
-        get_nthreads()
-        # Note: We don't need to update settings["data"]["processing"]["nthreads"]
-        # since get_nthreads() reads from this value and the original value remains
-
-    # Setup chunk size for parallel processing - use domain-specific defaults if not specified
-    if args.batch_size > 0:
-        settings["data"]["processing"]["batch_size"] = args.batch_size
-        tprint(f"Using specified batch size of {args.batch_size}")
-    else:
-        tprint(f"Using default batch size of domain-specific default batch size")
-
-    # print the arguments
-    tprint(f"Argument Values:")
-    params = vars(args)
-    for k in params.keys():
-        tprint(f"  {k}:\t{params[k]}")
-
-    # Set which GPUs are going to be used
     if args.gpus is not None:
-        # Use command line argument if provided
         set_gpus(args.gpus)
-        # Update settings to keep consistency
-        settings["gpus"] = args.gpus
     else:
-        # Use settings from param.py if command line argument is not provided
-        tprint(
-            f"No GPU index specified via command line, using value from param.py: {settings['gpus']}"
-        )
-        set_gpus(settings["gpus"])
+        tprint(f"No GPU index specified. Using CPU.")
 
     # Run the experiment
     run_start_time = time()
@@ -1195,9 +1034,7 @@ def main():
         filter=args.filter,
         future=args.future,
         model_list=[args.model] if args.model is not None else [],
-        gpus=(
-            args.gpus if args.gpus is not None else settings["gpus"]
-        ),  # Use settings["gpus"] as fallback
+        gpus=args.gpus,
         output=args.output,
         settings=settings,
     )
