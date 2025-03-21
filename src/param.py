@@ -1,12 +1,15 @@
 import random
 import torch
 import numpy as np
+import os
 
 random.seed(0)
 torch.manual_seed(0)
 torch.cuda.manual_seed_all(0)
 
 np.random.seed(0)
+
+
 
 settings = {
     "gpus": "2",
@@ -63,8 +66,8 @@ settings = {
             "common": {
                 # None/False/0 means no filtering
                 "remove_dup_teams": False,
-                "remove_empty_skills_teams": False,
-                "remove_empty_experts_teams": False,
+                "remove_empty_skills_teams": True,
+                "remove_empty_experts_teams": True,
                 "min_team_size": None,
                 "max_team_size": None,
                 "min_skills": None,
@@ -78,6 +81,7 @@ settings = {
                 # repository creation year
                 "min_year": None,  # None means no filtering
                 "max_year": None,  # None means no filtering
+                "ntop_skills_only": None,  # None means no filtering, enter a number to include only top n skills, ie if 30, only top 30 most common skills will be included in skills set
             },
             "dblp": {
                 # paper publication year
@@ -97,8 +101,9 @@ settings = {
             "nthreads": 0.75,  # refer to src/cmn_v3/helper_functions/get_nthreads.py for detailed info on possible values
             "cpu_batch_size": 25_000,  # -1 for domain-specific batch size in their own code in src/cmn/<domain>.py
             "gpu_batch_size": 500_000,  # -1 for domain-specific batch size in their own code in src/cmn/<domain>.py
-            "make_toy_data": True,  # True for making toy data
+            "make_toy_data": False,  # True for making toy data
             "toy_data_size": 100,  # Number of teams to use for toy data
+            "output_dir": None,  # don't set this, it will be set automatically in src/main.py (used for copying param.py to the output directory)
         },
     },
     "fair": {
