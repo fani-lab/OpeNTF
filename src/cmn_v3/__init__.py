@@ -16,7 +16,8 @@ The preprocessing pipeline converts raw data into sparse vectors for machine lea
 from .team import Team, tprint
 from .dblp import Publication
 from .dblp_author import DblpAuthor
-from .dblp_venue import DblpVenue
+
+# .dblp_venue import removed as per requirements
 from .gith import Repository
 from .gith_contributor import GithContributor
 
@@ -24,7 +25,7 @@ __all__ = [
     "Team",
     "Publication",  # DBLP
     "DblpAuthor",  # DBLP-specific author class
-    "DblpVenue",  # DBLP-specific venue class
+    # "DblpVenue" removed as per requirements
     "Repository",  # Gith
     "GithContributor",  # Gith-specific contributor class
     "tprint",

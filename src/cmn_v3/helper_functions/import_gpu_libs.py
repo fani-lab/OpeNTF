@@ -4,48 +4,20 @@
 Utility function to import GPU libraries and check their availability.
 """
 
+import sys
+from pathlib import Path
+
+# Add the project root to the Python path if it's not already there
+project_root = str(Path(__file__).resolve().parent.parent.parent)
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
 from utils.tprint import tprint
+from utils.parse_gpus_string import parse_gpus_string
 
 # Globals that will be used by other modules
 CUPY_AVAILABLE = False
 SELECTED_GPU_DEVICES = None
-
-
-def parse_gpu_string(gpu_str):
-    """
-    Parse a GPU string specification into a list of device indices
-
-    Args:
-        gpu_str: String specification of GPU devices (e.g., "0", "0,1,2")
-
-    Returns:
-        List of integers representing GPU device indices, or special strings like "all" or "first"
-    """
-    if not gpu_str:
-        return None
-
-    if isinstance(gpu_str, list):
-        # Already a list of indices
-        return gpu_str
-
-    if not isinstance(gpu_str, str):
-        return None
-
-    # Handle special strings
-    if gpu_str.lower() == "all":
-        return "all"
-    if gpu_str.lower() == "first":
-        return "first"
-
-    # Parse comma-separated indices
-    try:
-        if "," in gpu_str:
-            return [int(idx.strip()) for idx in gpu_str.split(",")]
-        else:
-            return [int(gpu_str.strip())]
-    except ValueError:
-        tprint(f"Invalid GPU specification: {gpu_str}. Using first available GPU.")
-        return "first"
 
 
 def import_gpu_libs():
@@ -67,7 +39,7 @@ def import_gpu_libs():
 
             # Parse SELECTED_GPU_DEVICES if it's a string
             if isinstance(SELECTED_GPU_DEVICES, str):
-                SELECTED_GPU_DEVICES = parse_gpu_string(SELECTED_GPU_DEVICES)
+                SELECTED_GPU_DEVICES = parse_gpus_string(SELECTED_GPU_DEVICES)
 
             # Handle the special modes for GPU selection
             if SELECTED_GPU_DEVICES == "all":
@@ -117,6 +89,21 @@ def import_gpu_libs():
     except Exception as e:
         tprint(f"Error importing GPU libraries: {str(e)}")
         return False
+
+
+def set_gpu_devices(devices):
+    """
+    Set the GPU devices to use before initializing GPU libraries.
+
+    Args:
+        devices: Can be "all", "first", a list of device indices, or a string to parse
+
+    Returns:
+        bool: True if successful, False otherwise
+    """
+    global SELECTED_GPU_DEVICES
+    SELECTED_GPU_DEVICES = devices
+    return import_gpu_libs()
 
 
 # Initialize the module

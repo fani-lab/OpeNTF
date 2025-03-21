@@ -63,38 +63,18 @@ from cmn_v3.helper_functions.import_gpu_libs import (
     CUPY_AVAILABLE,
     SELECTED_GPU_DEVICES,
     import_gpu_libs,
-    parse_gpu_string,
+    set_gpu_devices,
 )
+
+# Import parse_gpus_string directly from utils instead of parse_gpu_string from import_gpu_libs
+from utils.parse_gpus_string import parse_gpus_string
 from cmn_v3.helper_functions.get_gpu_device import get_gpu_device
 from cmn_v3.helper_functions.get_default_threads import get_default_threads
-from cmn_v3.helper_functions.get_nthreads import get_nthreads
+from utils.parse_nthreads import parse_nthreads
 
 # Default number of threads for parallel processing
 # We'll reduce this if GPU mode is active to prevent memory contention
-DEFAULT_THREADS = get_nthreads()
-
-
-def get_default_threads(mode_str="cpu"):
-    """
-    Get the default number of threads based on the execution mode.
-
-    Args:
-        mode_str: The execution mode (cpu or gpu)
-
-    Returns:
-        Number of threads to use for parallel processing
-    """
-    # If using CPU mode, use all available threads
-    if mode_str == "cpu" or not mode_str.startswith("gpu"):
-        return DEFAULT_THREADS
-
-    # If using GPU mode, reduce thread count to prevent memory contention
-    # Use just 1/4 of available threads when using GPU
-    gpu_threads = max(4, DEFAULT_THREADS // 4)
-    tprint(
-        f"Using reduced thread count ({gpu_threads}) for GPU mode to prevent memory contention"
-    )
-    return gpu_threads
+DEFAULT_THREADS = parse_nthreads()
 
 
 def analyze_teams(teamsvecs, n_jobs=None):
@@ -706,8 +686,8 @@ def parse_gpu_mode(mode_str):
         if "=" in mode_str:
             device_part = mode_str.split("=", 1)[1].strip()
 
-            # Use the parse_gpu_string function for consistent handling
-            devices = parse_gpu_string(device_part)
+            # Use the parse_gpus_string function for consistent handling
+            devices = parse_gpus_string(device_part)
 
             # Validate devices if they're specified as indices
             if isinstance(devices, list):
@@ -1382,478 +1362,325 @@ def generate_markdown_report(stats, report_params, out_file=None):
     return str(out_file)
 
 
-def main():
-    # Start the timer
+def generate_reports(
+    input_file=None,
+    output_dir=None,
+    domain=None,
+    threads=None,
+    mode="auto",
+    depth=1,
+    force=False,
+    **kwargs,
+):
+    """
+    Generate reports and visualizations for team data.
+    This function is a wrapper for the main() function that provides a programmatic interface.
+
+    Args:
+        input_file: Path to the teamsvecs.pkl file or directory containing it
+        output_dir: Output directory for reports and visualizations
+        domain: Domain name (e.g., 'dblp', 'gith')
+        threads: Number of threads for parallel processing
+        mode: Processing mode ('auto', 'cpu', 'gpu', 'gpu=0', 'gpu=all', etc.)
+        depth: Analysis depth (1-3, higher values produce more detailed reports)
+        force: Force overwrite of existing files
+        **kwargs: Additional arguments to pass to main function
+
+    Returns:
+        Dictionary containing paths to generated reports and visualizations
+    """
+    # Prepare arguments for main function
+    import argparse
+
+    args = argparse.Namespace(
+        input_file=input_file,
+        output_dir=output_dir,
+        domain=domain,
+        threads=threads if threads is not None else DEFAULT_THREADS,
+        mode=mode,
+        depth=depth,
+        force=force,
+        **kwargs,
+    )
+
+    # Call main function
+    return main(args)
+
+
+def main(args=None):
+    """
+    Main entry point for the script.
+
+    Args:
+        args: Optional argparse.Namespace object. If None, args will be parsed from command line.
+
+    Returns:
+        Dictionary containing paths to generated reports and visualizations
+    """
     start_time = time.time()
 
-    tprint("Starting data reports process...")
+    # Parse command line arguments if not provided
+    if args is None:
+        parser = argparse.ArgumentParser(
+            description="Generate reports and visualizations for team data.",
+            formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        )
 
-    parser = argparse.ArgumentParser(
-        description="Generate reports and visualizations for teams data."
-    )
+        # Required arguments
+        parser.add_argument(
+            "-i",
+            "--input-file",
+            dest="input_file",
+            required=True,
+            help="Path to the teamsvecs.pkl file or directory containing it",
+        )
 
-    # Required arguments
-    parser.add_argument(
-        "-i",
-        "--input-path",
-        type=str,
-        required=True,
-        help="Path to the input file or directory",
-    )
-    parser.add_argument(
-        "-d",
-        "--dataset",
-        type=str,
-        required=False,
-        help="Dataset name (gith, dblp, etc.)",
-    )
+        # Optional arguments
+        parser.add_argument(
+            "-o",
+            "--output-dir",
+            dest="output_dir",
+            help="Output directory for reports (default: same directory as input file)",
+        )
+        parser.add_argument(
+            "-d",
+            "--domain",
+            dest="domain",
+            help="Domain name (optional, will be inferred from filepath if not provided)",
+        )
+        parser.add_argument(
+            "-t",
+            "--threads",
+            dest="threads",
+            type=int,
+            default=DEFAULT_THREADS,
+            help=f"Number of threads for parallel processing (default: {DEFAULT_THREADS})",
+        )
+        parser.add_argument(
+            "-mode",
+            dest="mode",
+            default="auto",
+            help="Processing mode: 'cpu', 'gpu', 'gpu=0', 'gpu=0,1', 'gpu=all', or 'auto' (default)",
+        )
+        parser.add_argument(
+            "-depth",
+            dest="depth",
+            type=int,
+            choices=[1, 2, 3],
+            default=1,
+            help="Analysis depth: 1 (basic), 2 (detailed), 3 (comprehensive)",
+        )
+        parser.add_argument(
+            "-force",
+            dest="force",
+            action="store_true",
+            help="Force overwrite of existing files",
+        )
 
-    # Optional arguments
-    parser.add_argument(
-        "-o",
-        "--output-dir",
-        type=str,
-        required=False,
-        help="Output directory for reports (default: derived from input path)",
-    )
+        args = parser.parse_args()
 
-    parser.add_argument(
-        "-mode",
-        "--mode",
-        type=str,
-        default="gpu",
-        help="Processing mode: gpu (default - first GPU), cpu, gpu=all (all GPUs), gpu=N (specific GPU), gpu=N,M (multiple GPUs)",
-    )
+    # Process input path and determine output directory and domain
+    input_path = Path(args.input_file)
+    if not input_path.exists():
+        tprint(f"Error: Input file or directory does not exist: {input_path}")
+        return None
 
-    # Update default threads based on mode
-    global DEFAULT_THREADS
-    DEFAULT_THREADS = get_default_threads("gpu")  # Default to GPU mode initially
-
-    parser.add_argument(
-        "-t",
-        "--threads",
-        type=int,
-        default=DEFAULT_THREADS,
-        help=f"Number of parallel threads to use (default: auto-detected based on mode)",
-    )
-
-    parser.add_argument(
-        "-fs",
-        "--filter-stats",
-        type=str,
-        default="filter_stats.txt",
-        help="Path to filter stats file (default: filter_stats.txt in the same directory as the input file)",
-    )
-
-    parser.add_argument("--debug", action="store_true", help="Enable debug output")
-
-    args = parser.parse_args()
-
-    # Parse the mode to extract GPU device indices if specified
-    mode, device_indices = parse_gpu_mode(args.mode)
-
-    # If GPU devices were specified, set them globally
-    if mode == "gpu":
-        global SELECTED_GPU_DEVICES
-        SELECTED_GPU_DEVICES = device_indices
-
-    # Update default threads based on selected mode if user didn't specify
-    if args.threads == DEFAULT_THREADS:  # Only if user didn't override
-        DEFAULT_THREADS = get_nthreads()  # Use the enhanced thread_utils function
-        args.threads = DEFAULT_THREADS
-        if mode == "cpu":
-            tprint(
-                f"Auto-detected {multiprocessing.cpu_count()} CPU cores, using {args.threads} threads from thread_utils"
-            )
-        else:
-            tprint(f"Using {args.threads} CPU threads for GPU-accelerated mode")
-    else:
-        tprint(f"Using user-specified {args.threads} threads")
-
-    # Set debug mode if requested
-    if args.debug:
-        global DEBUG
-        DEBUG = True
-
-    input_path = Path(args.input_path)
-
-    # If input is a directory, look for teamsvecs.pkl inside it
+    # If input is a directory, look for teamsvecs.pkl file
     if input_path.is_dir():
         teamsvecs_path = input_path / "teamsvecs.pkl"
         if not teamsvecs_path.exists():
-            raise FileNotFoundError(f"Could not find teamsvecs.pkl in {input_path}")
-        input_path = teamsvecs_path
+            tprint(f"Error: Could not find teamsvecs.pkl in directory: {input_path}")
+            return None
+    else:
+        teamsvecs_path = input_path
 
-    # Derive output directory from input path if not specified
+    # If domain not provided, try to infer from path
+    domain_name = args.domain
+    if domain_name is None:
+        # Try to extract domain from path (dblp, gith, etc.)
+        path_parts = str(teamsvecs_path).lower().split(os.path.sep)
+        potential_domains = ["dblp", "gith", "so", "nih"]
+        for part in path_parts:
+            for domain in potential_domains:
+                if domain in part:
+                    domain_name = domain
+                    break
+            if domain_name:
+                break
+
+        # If still not found, use directory name
+        if domain_name is None:
+            domain_name = teamsvecs_path.parent.name.lower()
+            tprint(f"Domain not provided, using directory name: {domain_name}")
+
+    # Determine output directory
     if args.output_dir:
         output_dir = Path(args.output_dir)
     else:
-        # Just use the parent directory of the input file
-        output_dir = input_path.parent
+        output_dir = teamsvecs_path.parent / "reports"
 
-    # If dataset name is not provided, try to infer from the path
-    if not args.dataset:
-        # Try to infer dataset name from path
-        path_str = str(input_path).lower()
-        if "gith" in path_str:
-            dataset_name = "gith"
-        elif "dblp" in path_str:
-            dataset_name = "dblp"
-        elif "uspt" in path_str:
-            dataset_name = "uspt"
-        elif "imdb" in path_str:
-            dataset_name = "imdb"
-        elif "cf9" in path_str:
-            dataset_name = "cf9"
-        else:
-            dataset_name = "unknown"
+    # Create output directory if it doesn't exist
+    output_dir.mkdir(exist_ok=True, parents=True)
+    tprint(f"Output directory: {output_dir}")
 
-        tprint(f"Inferred dataset name: {dataset_name}")
-    else:
-        dataset_name = args.dataset.lower()
+    # Check if output files already exist and force flag is not set
+    output_file = output_dir / f"{domain_name}_statistics.csv"
+    md_file_path = output_dir / f"{domain_name}_statistics.md"
 
-    # Load the data
-    tprint(f"Loading data from {input_path}...")
-    with tqdm(total=1, desc="Loading data", ncols=100) as pbar:
+    if not args.force and (output_file.exists() or md_file_path.exists()):
+        tprint("Output files already exist. Use -force to overwrite.")
+        existing_files = []
+        if output_file.exists():
+            existing_files.append(str(output_file))
+        if md_file_path.exists():
+            existing_files.append(str(md_file_path))
+
+        # Return existing files without processing
+        return {
+            "csv_report": str(output_file) if output_file.exists() else None,
+            "markdown_report": str(md_file_path) if md_file_path.exists() else None,
+            "charts": {},
+            "stats": {},
+            "execution_time": 0,
+        }
+
+    # Set up GPU/CPU mode
+    if args.mode.lower() == "auto":
+        # Try to initialize GPU, fall back to CPU if not available
         try:
-            with open(input_path, "rb") as f:
-                teamsvecs = pickle.load(f)
-                teamsvecs_data = teamsvecs
-                pbar.update(1)
+            gpu_mode, gpu_devices = parse_gpu_mode("gpu")
+            if gpu_mode == "cpu":
+                tprint("GPU not available, using CPU mode")
+            else:
+                tprint(f"Using GPU mode with devices: {gpu_devices}")
         except Exception as e:
-            tprint(f"Error loading teamsvecs data: {e}")
-            sys.exit(1)
-
-    # Check for filter stats file - use the specified file or default
-    filter_stats_path = None
-
-    # If a relative path was provided, look relative to the input file's directory
-    if not os.path.isabs(args.filter_stats):
-        filter_stats_path = input_path.parent / args.filter_stats
+            tprint(f"Error initializing GPU: {str(e)}")
+            gpu_mode = "cpu"
+            gpu_devices = None
     else:
-        # If an absolute path was provided, use it directly
-        filter_stats_path = Path(args.filter_stats)
+        gpu_mode, gpu_devices = parse_gpu_mode(args.mode)
 
-    filter_info = {}
-    removed_items = []
+    # Import GPU libraries if needed
+    if gpu_mode == "gpu":
+        # Set the global SELECTED_GPU_DEVICES before calling import_gpu_libs
+        global SELECTED_GPU_DEVICES
+        SELECTED_GPU_DEVICES = gpu_devices
+        set_gpu_devices(SELECTED_GPU_DEVICES)
+        tprint(f"Using GPU acceleration with devices: {SELECTED_GPU_DEVICES}")
+        use_gpu = True
+    else:
+        tprint("Using CPU mode for processing")
+        use_gpu = False
 
-    if filter_stats_path.exists():
-        tprint(f"Found filter stats at {filter_stats_path}")
-        try:
-            with open(filter_stats_path, "r") as f:
-                lines = f.readlines()
-                # Flag to track when we're in the "Removed:" section
-                in_removed_section = False
+    # Load the teamsvecs file
+    tprint(f"Loading team data from: {teamsvecs_path}")
+    try:
+        with open(teamsvecs_path, "rb") as f:
+            teamsvecs = pickle.load(f)
+        tprint(f"Successfully loaded team data of size: {len(teamsvecs)}")
+    except Exception as e:
+        tprint(f"Error loading team data: {str(e)}")
+        return None
 
-                for line in lines:
-                    line = line.strip()
-                    if not line:
-                        continue  # Skip empty lines
+    # Determine number of threads to use
+    n_jobs = args.threads
+    if use_gpu:
+        # Reduce thread count when using GPU to avoid memory contention
+        n_jobs = min(n_jobs, get_default_threads("gpu"))
+        tprint(f"Adjusted thread count for GPU mode: {n_jobs}")
 
-                    # Check if we're entering the "Removed:" section
-                    if line == "Removed:":
-                        in_removed_section = True
-                        continue
+    # Analyze teams
+    tprint(f"Analyzing teams with {n_jobs} threads...")
+    stats = analyze_teams(teamsvecs, n_jobs=n_jobs)
+    tprint(f"Analysis complete. Found {stats['n_teams']} teams.")
 
-                    # If we're in the "Removed:" section and the line starts with "- "
-                    if in_removed_section and line.startswith("- "):
-                        removed_item = line[2:]  # Remove the "- " prefix
-                        removed_items.append(removed_item)
-                    # If we're in the removed section but the line doesn't start with "- "
-                    # and it's not empty, we've exited the removed section
-                    elif in_removed_section and not line.startswith("- "):
-                        in_removed_section = False
-
-                    # Extract other key-value pairs for debugging
-                    if ":" in line and not in_removed_section:
-                        parts = line.split(":", 1)
-                        if len(parts) == 2:
-                            key = parts[0].strip()
-                            value = parts[1].strip()
-                            if key and value:
-                                filter_info[key] = value
-
-        except Exception as e:
-            tprint(f"Warning: Could not parse filter stats file: {e}")
-
-    # Add debug flag to compare duplicate detection with filter.py
-    if args.debug and "Duplicate teams" in filter_info:
-        tprint(
-            f"\nDEBUG: Filter stats reported {filter_info['Duplicate teams']} duplicates"
-        )
-        tprint(
-            "DEBUG: Will compare with generate_reports.py duplicate detection method"
+    # Generate charts based on the analysis depth
+    charts = {}
+    if args.depth >= 1:
+        tprint("Generating basic charts...")
+        charts = generate_distribution_charts(
+            stats, output_dir, domain_name, n_jobs=n_jobs, use_gpu=use_gpu
         )
 
-    tprint("Analyzing teams data...")
-    stats = analyze_teams(teamsvecs, n_jobs=args.threads)
-
-    # Add diagnostic duplicate detection when in debug mode
-    if args.debug:
-        tprint("\nRunning diagnostic duplicate detection...")
-        filter_style_dup_count = analyze_duplicate_detection(
-            teamsvecs["skill"], teamsvecs["member"]
-        )
-        tprint(f"Filter-style duplicate count: {filter_style_dup_count}")
-        tprint(f"Reports-style duplicate count: {stats['dup_teams']}")
-
-    # Compare duplicate counts if debugging
-    if args.debug and "Duplicate teams" in filter_info:
-        filter_dup_count = int(filter_info["Duplicate teams"].replace(",", ""))
-        reports_dup_count = stats["dup_teams"]
-        tprint(f"\nDEBUG: Duplicate team comparison:")
-        tprint(f"  - data-filter.py found: {filter_dup_count} duplicates")
-        tprint(f"  - generate_reports.py found: {reports_dup_count} duplicates")
-        tprint(f"  - Difference: {abs(filter_dup_count - reports_dup_count)} teams")
-        if filter_dup_count != reports_dup_count:
-            tprint(f"  - Possible reasons for difference:")
-            tprint(
-                f"    1. Different definition of duplicates (filter looks at both experts & skills, reports might have additional criteria)"
-            )
-            tprint(
-                f"    2. Different ordering/processing of teams during duplicate detection"
-            )
-            tprint(
-                f"    3. Filter removes duplicates before analysis, reports counts after they're already removed"
-            )
-
-    # Create output file in the same directory as the input file
-    input_filename = input_path.name
-    output_suffix = (
-        f'_{input_filename.replace(".pkl", "")}'
-        if input_filename != "teamsvecs.pkl"
-        else ""
-    )
-
-    # Create reports directory next to the input file
-    stats_reports_dir = input_path.parent / "reports"
-    stats_reports_dir.mkdir(exist_ok=True, parents=True)
+    # Generate additional reports based on depth
+    if args.depth >= 2:
+        tprint("Generating detailed team report...")
+        # Add code here for more detailed reports if needed
 
     # Generate CSV report
-    output_file = stats_reports_dir / f"{dataset_name}_team_stats{output_suffix}.csv"
+    tprint(f"Generating CSV report at: {output_file}")
+    try:
+        # Create DataFrame from stats
+        report_data = {
+            "Metric": [
+                "Total Teams",
+                "Unique Team Configurations",
+                "Duplicate Teams",
+                "Zero Skill Teams",
+                "Zero Expert Teams",
+                "Min Skills Per Team",
+                "Max Skills Per Team",
+                "Min Experts Per Team",
+                "Max Experts Per Team",
+                "Min Teams Per Expert",
+                "Max Teams Per Expert",
+                "Unique Skills",
+                "Unique Experts",
+            ],
+            "Value": [
+                stats["n_teams"],
+                stats["n_unique_team_configs"],
+                stats["dup_teams"],
+                stats["zero_skill_teams"],
+                stats["zero_expert_teams"],
+                stats["min_skills"],
+                stats["max_skills"],
+                stats["min_experts"],
+                stats["max_experts"],
+                stats["min_participation"],
+                stats["max_participation"],
+                stats["unique_skills"],
+                stats["unique_experts"],
+            ],
+        }
 
-    tprint(f"Writing report to {output_file}...")
-    sys.stdout.flush()
-    with tqdm(total=1, desc="Writing report", ncols=100) as pbar:
-        with open(output_file, "w") as f:
-            # Basic stats with dataset name
-            f.write(",dataset,#teams,#skills,#experts\n")
-            f.write(
-                f',{dataset_name.upper()},{stats["n_teams"]},{stats["unique_skills"]},{stats["max_experts"]}\n'
-            )
-            f.write(",,,,\n")
-
-            # Zero teams and duplicates stats
-            f.write(
-                ",#zero_skill_teams,#zero_expert_teams,#dup_teams,#unique_team_configs\n"
-            )
-            zero_skill_percent = (stats["zero_skill_teams"] / stats["n_teams"]) * 100
-            zero_expert_percent = (stats["zero_expert_teams"] / stats["n_teams"]) * 100
-            dup_teams_percent = (stats["dup_teams"] / stats["n_teams"]) * 100
-            unique_teams = stats["n_unique_team_configs"]
-            unique_teams_percent = (unique_teams / stats["n_teams"]) * 100
-
-            f.write(
-                f',{stats["zero_skill_teams"]} ({zero_skill_percent:.1f}% of teams),'
-                + f'{stats["zero_expert_teams"]} ({zero_expert_percent:.1f}% of teams),'
-                + f'{stats["dup_teams"]} ({dup_teams_percent:.1f}% of teams),'
-                + f"{unique_teams} ({unique_teams_percent:.1f}% of teams)\n"
-            )
-            f.write(",,,,\n")
-
-            # Team size stats
-            f.write(
-                ",#min_team_experts,#max_team_experts,#min_team_skill,#max_team_skill\n"
-            )
-
-            # Count teams with min/max experts/skills
-            min_expert_teams = sum(
-                1 for x in stats["experts_per_team"] if x == stats["min_experts"]
-            )
-            max_expert_teams = sum(
-                1 for x in stats["experts_per_team"] if x == stats["max_experts"]
-            )
-            min_skill_teams = sum(
-                1 for x in stats["skills_per_team"] if x == stats["min_skills"]
-            )
-            max_skill_teams = sum(
-                1 for x in stats["skills_per_team"] if x == stats["max_skills"]
-            )
-
-            min_expert_percent = (min_expert_teams / stats["n_teams"]) * 100
-            max_expert_percent = (max_expert_teams / stats["n_teams"]) * 100
-            min_skill_percent = (min_skill_teams / stats["n_teams"]) * 100
-            max_skill_percent = (max_skill_teams / stats["n_teams"]) * 100
-
-            f.write(
-                f',{stats["min_experts"]} ({min_expert_teams} teams~{min_expert_percent:.1f}%),'
-                + f'{stats["max_experts"]} ({max_expert_teams} teams~{max_expert_percent:.1f}%),'
-                + f'{stats["min_skills"]} ({min_skill_teams} teams~{min_skill_percent:.1f}%),'
-                + f'{stats["max_skills"]} ({max_skill_teams} teams~{max_skill_percent:.1f}%)\n'
-            )
-
-            # Expert participation stats - fix misaligned column headings
-            f.write(
-                ",min_experts_per_team,max_experts_per_team,min_skills_per_team,max_skills_per_team\n"
-            )
-
-            # Count experts with min/max team participation for the next section
-            # Handle missing lists - use empty lists if not available
-            min_team_experts_list = stats.get("min_team_experts_list", [])
-            max_team_experts_list = stats.get("max_team_experts_list", [])
-            min_team_experts = len(min_team_experts_list)
-            max_team_experts = len(max_team_experts_list)
-            min_exp_percent = (
-                (min_team_experts / stats["unique_experts"]) * 100
-                if stats["unique_experts"] > 0
-                else 0
-            )
-            max_exp_percent = (
-                (max_team_experts / stats["unique_experts"]) * 100
-                if stats["unique_experts"] > 0
-                else 0
-            )
-
-            f.write(
-                f'{stats["min_experts"]} ({min_team_experts} experts ~ {min_exp_percent:.1f}%),'
-                + f'{stats["max_experts"]} ({max_team_experts} experts ~ {max_exp_percent:.1f}%),'
-                + f'{stats["min_skills"]} ({min_skill_teams} teams~{min_skill_percent:.1f}%),'
-                + f'{stats["max_skills"]} ({max_skill_teams} teams~{max_skill_percent:.1f}%)\n'
-            )
-
-            # For detailed section with expert participation stats
-            f.write(f"\n### Expert Participation\n\n")
-            f.write(f"min_teams_per_expert,max_teams_per_expert\n")
-            f.write(
-                f'{stats["min_participation"]} ({min_team_experts} experts ~ {min_exp_percent:.1f}%),'
-                + f'{stats["max_participation"]} ({max_team_experts} experts ~ {max_exp_percent:.1f}%)\n\n'
-            )
-
-            # Write header for detailed stats
-            f.write("dup_index,#skills,#experts,skills,experts\n")
-
-            # Write detailed stats for each team
-            tprint("Writing detailed team statistics...")
-            sys.stdout.flush()
-            with tqdm(
-                total=len(stats["skills_per_team"]),
-                desc="Writing team details",
-                mininterval=0.1,
-                unit="teams",
-                ncols=100,
-            ) as team_pbar:
-                for i in range(len(stats["skills_per_team"])):
-                    # Add 1 to indices to start from 1 instead of 0
-                    skill_indices = [
-                        f"s{idx+1}" for idx in stats["all_skill_indices"][i]
-                    ]
-                    expert_indices = [
-                        f"m{idx+1}" for idx in stats["all_expert_indices"][i]
-                    ]
-
-                    # Use 0 if dup_indices is not available
-                    dup_index = 0
-                    if "dup_indices" in stats:
-                        dup_index = stats["dup_indices"][i]
-
-                    f.write(
-                        f'{dup_index},{stats["skills_per_team"][i]},{len(expert_indices)},'
-                        + f'[{"-".join(skill_indices)}],'
-                        + f'[{"-".join(expert_indices)}]\n'
-                    )
-
-                    # Update progress bar
-                    team_pbar.update(1)
-
-                    # For very large datasets, update less frequently to avoid slowdown
-                    if i % 1000 == 0:
-                        team_pbar.refresh()
-        pbar.update(1)
-
-    # Generate distribution charts
-    tprint("Generating distribution charts...")
-    chart_start_time = time.time()
-    use_gpu = mode == "gpu"
-    if use_gpu:
-        if device_indices == "first":
-            tprint("GPU mode enabled - using first available GPU")
-        elif device_indices == "all":
-            tprint("GPU mode enabled - using all available GPUs")
-        elif isinstance(device_indices, list):
-            gpu_str = ", ".join(map(str, device_indices))
-            tprint(f"GPU mode enabled - using specified GPU(s): {gpu_str}")
-        else:
-            tprint("GPU mode enabled - will try to use GPU acceleration")
-
-    charts = generate_distribution_charts(
-        stats, stats_reports_dir, dataset_name, n_jobs=args.threads, use_gpu=use_gpu
-    )
-
-    chart_time = time.time() - chart_start_time
-    tprint(f"Chart generation completed in {chart_time:.2f} seconds")
+        # Create DataFrame and write to CSV
+        df = pd.DataFrame(report_data)
+        df.to_csv(output_file, index=False)
+        tprint(f"CSV report successfully generated at: {output_file}")
+    except Exception as e:
+        tprint(f"Error generating CSV report: {str(e)}")
+        output_file = None
 
     # Generate markdown report
-    tprint("Generating markdown report...")
+    tprint(f"Generating markdown report at: {md_file_path}")
+    try:
+        report_params = {
+            "dataset_name": domain_name,
+            "filter_info": {},  # Add filtering info if available
+            "removed_items": [],  # Add removed items if available
+        }
 
-    # Create a params dictionary with necessary info for the markdown report
-    report_params = {
-        "dataset_name": dataset_name,
-        "filter_info": filter_info,
-        "removed_items": removed_items,
+        md_file_path = generate_markdown_report(stats, report_params, md_file_path)
+        tprint(f"Markdown report successfully generated at: {md_file_path}")
+    except Exception as e:
+        tprint(f"Error generating markdown report: {str(e)}")
+        md_file_path = None
+
+    # Calculate total execution time
+    total_time = time.time() - start_time
+    tprint(f"Total execution time: {total_time:.2f} seconds")
+
+    # Return dictionary with paths to generated reports and visualizations
+    results = {
+        "csv_report": str(output_file) if output_file else None,
+        "markdown_report": md_file_path,
+        "charts": charts,
+        "stats": stats,
+        "execution_time": total_time,
     }
 
-    # Call with the new signature, providing the output file path
-    md_file_path = os.path.join(
-        stats_reports_dir, f"{dataset_name.lower()}_statistics.md"
-    )
-    md_file_path = generate_markdown_report(stats, report_params, out_file=md_file_path)
-
-    # Calculate execution time
-    end_time = time.time()
-    execution_time = end_time - start_time
-    hours, remainder = divmod(execution_time, 3600)
-    minutes, seconds = divmod(remainder, 60)
-
-    # Analysis complete message
-    tprint(f"Analysis complete! All files saved to {stats_reports_dir}:")
-    tprint(f"- CSV report: {output_file}")
-    tprint(f"- Markdown report: {md_file_path}")
-    tprint(f"- Skills distribution charts:")
-    tprint(f"  - Histogram: {charts['skills_histogram']}")
-    tprint(f"  - Compact: {charts['skills_compact']}")
-    tprint(f"  - Heatmap: {charts['skills_heatmap']}")
-    tprint(f"- Experts distribution charts:")
-    tprint(f"  - Histogram: {charts['experts_histogram']}")
-    tprint(f"  - Compact: {charts['experts_compact']}")
-    tprint(f"  - Heatmap: {charts['experts_heatmap']}")
-
-    # Report on GPU usage if applicable
-    if use_gpu:
-        if CUPY_AVAILABLE:
-            tprint("Used GPU acceleration for distribution charts")
-            # Import cupy here to get memory stats
-            try:
-                import cupy as cp
-
-                mem_info = cp.cuda.runtime.memGetInfo()
-                free_mem_gb = mem_info[0] / (1024**3)
-                total_mem_gb = mem_info[1] / (1024**3)
-                tprint(
-                    f"GPU memory: {free_mem_gb:.1f} GB free / {total_mem_gb:.1f} GB total"
-                )
-            except Exception as e:
-                tprint(f"Could not get GPU memory info: {e}")
-        else:
-            tprint(
-                "GPU acceleration was requested but not available. Used CPU instead."
-            )
-
-    total_time = time.time() - start_time
-    hours, remainder = divmod(total_time, 3600)
-    minutes, seconds = divmod(remainder, 60)
-    tprint(
-        f"Total execution time: {int(hours):02d}h {int(minutes):02d}m {seconds:.2f}s"
-    )
+    return results
 
 
 if __name__ == "__main__":

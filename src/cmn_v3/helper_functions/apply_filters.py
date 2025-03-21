@@ -17,7 +17,8 @@ if project_root not in sys.path:
 
 from utils.tprint import tprint, get_est_time
 
-# Import the modular filter functions using absolute imports
+# Import the modular filter functions using absolute imports instead of relative
+# This prevents the ImportError when running as a script
 from src.cmn_v3.filter_functions.remove_dup_teams import remove_dup_teams
 from src.cmn_v3.filter_functions.remove_empty_skills_teams import (
     remove_empty_skills_teams,

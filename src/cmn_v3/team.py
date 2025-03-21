@@ -15,7 +15,7 @@ import sys
 import gc
 import torch
 from datetime import datetime
-from cmn_v3.helper_functions.get_nthreads import get_nthreads
+from utils.parse_nthreads import parse_nthreads
 
 # Add the project root to the Python path if it's not already there
 project_root = str(Path(__file__).resolve().parent.parent.parent)
@@ -334,8 +334,8 @@ class Team:
         cpu_batch_size = processing.get("cpu_batch_size")
         gpu_batch_size = processing.get("gpu_batch_size")
 
-        # Use get_nthreads() function to determine optimal thread count
-        nthreads = get_nthreads()
+        # Use parse_nthreads() function to determine optimal thread count
+        nthreads = parse_nthreads()
 
         # Try loading existing data first
         teamsvecs_path = output_dir / "teamsvecs.pkl"
@@ -795,7 +795,7 @@ class Team:
             teams: List of teams
             indexes: Dictionary mapping skills and members to indices
             batch_size: Batch size for processing
-            n_threads: Number of threads to use (defaults to get_nthreads() if None)
+            n_threads: Number of threads to use (defaults to parse_nthreads() if None)
 
         Returns:
             Dictionary of sparse vectors
@@ -805,9 +805,9 @@ class Team:
         import multiprocessing
         import gc
 
-        # Use get_nthreads() if n_threads is not specified
+        # Use parse_nthreads() if n_threads is not specified
         if n_threads is None:
-            n_threads = get_nthreads()
+            n_threads = parse_nthreads()
 
         # Extract indexes
         skill_index = indexes["s2i"]
