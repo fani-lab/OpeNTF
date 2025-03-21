@@ -1,1 +1,2 @@
-from param import settings
+from .param import settings
+
