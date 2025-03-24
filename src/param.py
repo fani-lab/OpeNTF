@@ -81,7 +81,7 @@ settings = {
                 # repository creation year
                 "min_year": None,  # None means no filtering
                 "max_year": None,  # None means no filtering
-                "ntop_skills_only": None,  # None means no filtering, enter a number to include only top n skills, ie if 30, only top 30 most common skills will be included in skills set
+                "ntop_skills": 30,  # None means no filtering, enter a number to include only top n skills, ie if 30, only top 30 most common skills will be included in skills set
             },
             "dblp": {
                 # paper publication year

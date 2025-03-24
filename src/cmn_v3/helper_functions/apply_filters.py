@@ -36,6 +36,7 @@ from src.cmn_v3.filter_functions.filter_min_teams_per_expert import (
 from src.cmn_v3.filter_functions.filter_max_teams_per_member import (
     filter_max_teams_per_member,
 )
+from src.cmn_v3.filter_functions.filter_ntop_skills import filter_ntop_skills
 
 # Set default number of threads based on CPU cores
 DEFAULT_THREADS = min(
@@ -171,6 +172,16 @@ def apply_filters(teamsvecs, indexes=None, domain_params=None):
             filtered_teamsvecs, indexes, max_teams_per_member
         )
         # This filter may not change team count, so no need to update 'remaining'
+
+    # 7. Apply top n skills only filter
+    ntop_skills = domain_filters.get("ntop_skills")
+    if ntop_skills is not None and ntop_skills > 0:
+        tprint(f"Filtering teams with fewer than {ntop_skills} skills...")
+        filtered_teamsvecs = filter_ntop_skills(
+            filtered_teamsvecs, indexes, ntop_skills
+        )
+        remaining = filtered_teamsvecs["skill"].shape[0]
+        tprint(f"Remaining teams after top n skills filter: {remaining:,}")
 
     # Calculate final statistics
     final_teams = filtered_teamsvecs["skill"].shape[0]

@@ -241,10 +241,12 @@ class Repository(Team):
             # Process each repository
             with tqdm(
                 total=len(df),
-                desc="Processing repositories",
+                desc=tprint("Processing repositories"),
                 unit="repos",
                 unit_scale=True,
                 miniters=5000,  # Update progress bar less frequently
+                # make bar size 30
+                bar_format="{l_bar}{bar:25}{r_bar}",
             ) as pbar:
                 # Use a list with pre-allocated capacity for better performance
                 repositories = []
