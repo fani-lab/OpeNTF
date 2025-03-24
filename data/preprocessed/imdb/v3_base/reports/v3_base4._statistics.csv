@@ -1,0 +1,14 @@
+Metric,Value
+Total Teams,707972
+Unique Team Configurations,671585
+Duplicate Teams,27348
+Zero Skill Teams,0
+Zero Expert Teams,0
+Min Skills Per Team,1
+Max Skills Per Team,3
+Min Experts Per Team,1
+Max Experts Per Team,40
+Min Teams Per Expert,1
+Max Teams Per Expert,18343
+Unique Skills,28
+Unique Experts,2266743
