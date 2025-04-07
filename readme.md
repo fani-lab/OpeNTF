@@ -239,6 +239,58 @@ For ease of summarization, we put the entire set of average results (over all fo
 ## 5. Acknowledgement:
 We benefit from  bayesian-torch (https://github.com/IntelLabs/bayesian-torch), PyG (https://github.com/pyg-team/pytorch_geometric), [``pytrec_eval``](https://github.com/cvangysel/pytrec_eval), [``gensim``](https://radimrehurek.com/gensim/), [Josh Feldman's blog](https://joshfeldman.net/WeightUncertainty/) and other valuable libraries. We would like to thank the authors of these libraries and helpful resources.
   
-[//]: # (## 6. License:)
+## 6. License:
+©2024. This work is licensed under a [CC BY-NC-SA 4.0](license.txt) license.
+
+## 7. Citation:
+```
+@inproceedings{DBLP:conf/ecir/FaniBDS24,
+  author       = {Hossein Fani and Reza Barzegar and Arman Dashti and Mahdis Saeedi},
+  title        = {A Streaming Approach to Neural Team Formation Training},
+  booktitle    = {Advances in Information Retrieval - 46th European Conference on Information Retrieval, {ECIR} 2024, Glasgow, UK, March 24-28, 2024, Proceedings, Part {I}},
+  series       = {Lecture Notes in Computer Science},
+  volume       = {14608},
+  pages        = {325--340},
+  publisher    = {Springer},
+  year         = {2024},
+  url          = {https://doi.org/10.1007/978-3-031-56027-9\_20},
+  doi          = {10.1007/978-3-031-56027-9\_20},
+  biburl       = {https://dblp.org/rec/conf/ecir/FaniBDS24.bib},
+  bibsource    = {dblp computer science bibliography, https://dblp.org}
+}
+  ```
+
+```
+@inproceedings{DBLP:conf/cikm/DashtiSF22,
+  author    = {Arman Dashti and Saeed Samet and Hossein Fani},
+  title     = {Effective Neural Team Formation via Negative Samples},
+  booktitle = {Proceedings of the 31st {ACM} International Conference on Information {\&} Knowledge Management, Atlanta, GA, USA, October 17-21, 2022},
+  pages     = {3908--3912},
+  publisher = {{ACM}},
+  year      = {2022},
+  url       = {https://doi.org/10.1145/3511808.3557590},
+  doi       = {10.1145/3511808.3557590},
+  biburl    = {https://dblp.org/rec/conf/cikm/DashtiSF22.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+  ```
+  ```
+@inproceedings{DBLP:conf/cikm/DashtiSPF22,
+  author    = {Arman Dashti and Karan Saxena and Dhwani Patel and Hossein Fani},
+  title     = {OpeNTF: {A} Benchmark Library for Neural Team Formation},
+  booktitle = {Proceedings of the 31st {ACM} International Conference on Information {\&} Knowledge Management, Atlanta, GA, USA, October 17-21, 2022},
+  pages     = {3913--3917},
+  publisher = {{ACM}},
+  year      = {2022},
+  url       = {https://doi.org/10.1145/3511808.3557526},
+  doi       = {10.1145/3511808.3557526},
+  biburl    = {https://dblp.org/rec/conf/cikm/DashtiSPF22.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+```
+
+## 8. Awards:
+
+> [CAD$300, Gold medalist, UWill Discover, 2022](https://scholar.uwindsor.ca/uwilldiscover/2022/2022Day3/30/)
 
 [//]: # (©2024. This work is licensed under a [CC BY-NC-SA 4.0]&#40;license.txt&#41; license.)

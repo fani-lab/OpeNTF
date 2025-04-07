@@ -147,6 +147,7 @@ class Team(object):
         skill_vec_dim = len(s2i)
         candidate_vec_dim = len(c2i)
         location_vec_dim = len(l2i)
+
         data = lil_matrix((len(teams), skill_vec_dim + candidate_vec_dim + location_vec_dim), dtype='u1')
         data_ = np.zeros((bucket_size, skill_vec_dim + candidate_vec_dim + location_vec_dim), dtype='u1')
         teamids = []

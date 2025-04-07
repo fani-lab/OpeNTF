@@ -235,6 +235,7 @@ class Fnn(Ntf):
                             y_ = self.forward(X)
 
                             if loss_type == 'normal': loss = self.cross_entropy(y_, y, ns, nns, unigram, weight)
+
                             elif loss_type == 'SL': loss = criterion(y_.squeeze(1), y.squeeze(1), index)
                             elif loss_type == 'DP':
                                 data_parameter_minibatch = torch.exp(class_parameters).view(1, -1)
@@ -250,7 +251,9 @@ class Fnn(Ntf):
                         else:  # valid
                             self.train(False)  # Set model to valid mode
                             y_ = self.forward(X)
+
                             if loss_type == 'normal' or loss_type == 'DP': loss = self.cross_entropy(y_, y, ns, nns, unigram, weight)
+
                             else: loss = criterion(y_.squeeze(), y.squeeze(), index)
                             valid_running_loss += loss.item()
 
@@ -276,7 +279,8 @@ class Fnn(Ntf):
 
             model_path = f"{output}/state_dict_model.f{foldidx}.pt"
 
-            # torch.save(self.state_dict(), model_path, pickle_protocol=4)
+            torch.save(self.state_dict(), model_path, pickle_protocol=4)
+
             train_valid_loss[foldidx]['train'] = train_loss_values
             train_valid_loss[foldidx]['valid'] = valid_loss_values
 

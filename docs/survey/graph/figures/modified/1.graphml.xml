@@ -1,0 +1,465 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--Created by yFiles for HTML 2.6-->
+<graphml xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://www.yworks.com/xml/schema/graphml.html/2.0/ygraphml.xsd " xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:demostyle2="http://www.yworks.com/yFilesHTML/demos/FlatDemoStyle/2.0" xmlns:demostyle="http://www.yworks.com/yFilesHTML/demos/FlatDemoStyle/1.0" xmlns:icon-style="http://www.yworks.com/yed-live/icon-style/1.0" xmlns:bpmn="http://www.yworks.com/xml/yfiles-bpmn/2.0" xmlns:demotablestyle="http://www.yworks.com/yFilesHTML/demos/FlatDemoTableStyle/1.0" xmlns:uml="http://www.yworks.com/yFilesHTML/demos/UMLDemoStyle/1.0" xmlns:GraphvizNodeStyle="http://www.yworks.com/yFilesHTML/graphviz-node-style/1.0" xmlns:VuejsNodeStyle="http://www.yworks.com/demos/yfiles-vuejs-node-style/1.0" xmlns:explorer-style="http://www.yworks.com/data-explorer/1.0" xmlns:y="http://www.yworks.com/xml/yfiles-common/3.0" xmlns:x="http://www.yworks.com/xml/yfiles-common/markup/3.0" xmlns:yjs="http://www.yworks.com/xml/yfiles-for-html/2.0/xaml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<key id="d0" for="node" attr.type="int" attr.name="zOrder" y:attr.uri="http://www.yworks.com/xml/yfiles-z-order/1.0/zOrder"/>
+	<key id="d1" for="node" attr.type="boolean" attr.name="Expanded" y:attr.uri="http://www.yworks.com/xml/yfiles-common/2.0/folding/Expanded">
+		<default>true</default>
+	</key>
+	<key id="d2" for="node" attr.type="string" attr.name="url"/>
+	<key id="d3" for="node" attr.type="string" attr.name="description"/>
+	<key id="d4" for="node" attr.name="NodeLabels" y:attr.uri="http://www.yworks.com/xml/yfiles-common/2.0/NodeLabels"/>
+	<key id="d5" for="node" attr.name="NodeGeometry" y:attr.uri="http://www.yworks.com/xml/yfiles-common/2.0/NodeGeometry"/>
+	<key id="d6" for="all" attr.name="UserTags" y:attr.uri="http://www.yworks.com/xml/yfiles-common/2.0/UserTags"/>
+	<key id="d7" for="node" attr.name="NodeStyle" y:attr.uri="http://www.yworks.com/xml/yfiles-common/2.0/NodeStyle"/>
+	<key id="d8" for="node" attr.name="NodeViewState" y:attr.uri="http://www.yworks.com/xml/yfiles-common/2.0/folding/1.1/NodeViewState"/>
+	<key id="d9" for="edge" attr.type="string" attr.name="url"/>
+	<key id="d10" for="edge" attr.type="string" attr.name="description"/>
+	<key id="d11" for="edge" attr.name="EdgeLabels" y:attr.uri="http://www.yworks.com/xml/yfiles-common/2.0/EdgeLabels"/>
+	<key id="d12" for="edge" attr.name="EdgeGeometry" y:attr.uri="http://www.yworks.com/xml/yfiles-common/2.0/EdgeGeometry"/>
+	<key id="d13" for="edge" attr.name="EdgeStyle" y:attr.uri="http://www.yworks.com/xml/yfiles-common/2.0/EdgeStyle"/>
+	<key id="d14" for="edge" attr.name="EdgeViewState" y:attr.uri="http://www.yworks.com/xml/yfiles-common/2.0/folding/1.1/EdgeViewState"/>
+	<key id="d15" for="port" attr.name="PortLabels" y:attr.uri="http://www.yworks.com/xml/yfiles-common/2.0/PortLabels"/>
+	<key id="d16" for="port" attr.name="PortLocationParameter" y:attr.uri="http://www.yworks.com/xml/yfiles-common/2.0/PortLocationParameter">
+		<default>
+			<x:Static Member="y:FreeNodePortLocationModel.NodeCenterAnchored"/>
+		</default>
+	</key>
+	<key id="d17" for="port" attr.name="PortStyle" y:attr.uri="http://www.yworks.com/xml/yfiles-common/2.0/PortStyle">
+		<default>
+			<x:Static Member="y:VoidPortStyle.Instance"/>
+		</default>
+	</key>
+	<key id="d18" for="port" attr.name="PortViewState" y:attr.uri="http://www.yworks.com/xml/yfiles-common/2.0/folding/1.1/PortViewState"/>
+	<key id="d19" attr.name="SharedData" y:attr.uri="http://www.yworks.com/xml/yfiles-common/2.0/SharedData"/>
+	<data key="d19">
+		<y:SharedData>
+			<sys:String x:Key="1" xmlns:sys="http://www.yworks.com/xml/yfiles-common/markup/primitives/2.0">data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmlld0JveD0iMCAwIDEwODAgMTA4MCIgd2lkdGg9IjEwODAiIGhlaWdodD0iMTA4MCI+Cgk8dGl0bGU+aWNvbjwvdGl0bGU+Cgk8ZGVmcz4KCQk8aW1hZ2UgIHdpZHRoPSIxMDgwIiBoZWlnaHQ9IjEwODAiIGlkPSJpbWcxIiBocmVmPSJkYXRhOmltYWdlL3BuZztiYXNlNjQsaVZCT1J3MEtHZ29BQUFBTlNVaEVVZ0FBQkRnQUFBUTRBUU1BQUFEVzN2N01BQUFBQVhOU1IwSUIyY2tzZndBQUFBTlFURlJGQUFBQXAzbzkyZ0FBQUFGMFVrNVRBRURtMkdZQUFBQ2xTVVJCVkhpYzdjRXhBUUFBQU1LZzlVOXRDVStnQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBSGdhUGQ0QUFUcWR4cElBQUFBQVNVVk9SSzVDWUlJPSIvPgoJCTxpbWFnZSAgd2lkdGg9IjYyMSIgaGVpZ2h0PSI3MzIiIGlkPSJpbWcyIiBocmVmPSJkYXRhOmltYWdlL3BuZztiYXNlNjQsaVZCT1J3MEtHZ29BQUFBTlNVaEVVZ0FBQW0wQUFBTGNBUU1BQUFDUFV4VXRBQUFBQVhOU1IwSUIyY2tzZndBQUFBWlFURlJGQUFBQTRmOGpQQVNQV0FBQUFBSjBVazVUQVA5YmtTSzFBQUFJd0VsRVFWUjRuTzNkVFhyaklBd0c0UGFaUlpjOUFrZmhhUGhvUGdwSDZMS0xQczNNTkhITWp3UUN2b3daUjk2MUlhOE5DRXljV0g1NStmZmIrK1hQdHFLMHQ4dlB0bUMwMTZ0MitjWnc5c1pkUGhEYXI4dDlRM0JtNS95NDlycHJpTlo3RHpoQXNMaVEreHpWZmwyaWJaUjdqN2wxa0hNeE4xamIxMWdiN2R1M2hCc2N1Q2JsL0JDWGFtT045eXZqaGtMbFBlZVdBUzVydXJIR2N6azMwSGhwMUExR1hoWjFZMzFCOU1USXNMVVUxMy9Hb0xUK3ZxQjZZcUF2eUo3bzd3dXlKL3I3Z3V5Si9uSGhhSzYzTDJqdDh0V25FYlBUU05jeUhkczdSekVkMjl1MWh1TjhGMmM1cm0vVWNscGYxOUlqOXUvVzFiVmNuRno2UmkwYkozMlJ3c1pKWDZRWW52TWRuT081bmtqaHRaNDVoWStUcnNBcnhFbFBwQlRpcENkU0NuSFNFeW1teFBsbXpwYTQ5a2h4V0s2a2RRUmVrV3NPdkZJVWQ4eDR4U2h1aitOaUZMZkhjVEdLMitQWWxEbmZ5Tmt5MXhwNHJzeTFCaDZZSzJ1dGNWeU80dVk0cmtSeGF4eFhvcmcxaml0UjNCckhZTTdVT04vRTJSclhOaXhjald1TFl6QlgwOXFHUlcxUU5BNkw2cUJvR3haZ3Jqckcya1paZFZDMERRc3daK3FjYitEc1ArZGFCcTJyY3kyakRNelZ0WlpCV3greVRZTVd6QW1HYk11Z0ZReFpPTGVJT2NHUWJSbTBZTTVJT0g4VVp5V2NmQTRBYzA3Q3llY0FNQ2ZSR3FZVUxDZVpVQnFtRkRBbm1wL2tVd3FZRTgxUDhoa0t6SW5tSnppM0hzTVpHZWVQNGV3aG5IVCtCSE5PeGtubno3azVtU2FlanJHY2JES0djOExaSGN3SjUzWTBKenhaek0wSnp6elNrOFhjblBETUErZldFM0RtSU02ZmdMTUhjYkx6OWxOeFRzckpsZ0hLOVhOU0RjM0oxanpLZFhQUzVSMmNFeTN3bERzckoxNGFUODZKbHU3S0thZmNnem54NTAvbGxCTnVpM0t6Y0FKdDhnbEtPZVdVVSs0RTNBaytnQ3IzSDNJbnVPQ20zQURucE53WnJybWZoRHZETjFGemMwYktlZVhTYmU0djh1Zm01djRCeVZHY1NKdjhsMFpnYnU2ZnBJRzV1WDlzS09YTzhidFBJWGZRVDNEQm5KRnhmbXB1RlhKei84NTk3bHNPNXI1ZFE4WWRkYXVMakR2cU5pRVpkOWd0VmlMdXNOdlRqSVR6UjNGejN4WUp2Z2NVeklIdm41Vnd4OTBzREw0ekdzMjVPZ2UrcTd6bG5uZUw1VXlkODFodWJlREF5UkhBbVNBRVhJT0dUbnNCenZFQnprQ0M1bHlOYTB1M1ltdGNXMjZaS3VlYk9JUGx3R2wrd0RtTndCbVhhbHhqUGlod2VpbHc4aXQwYWk1YjVscnprSmt5NTdIYzJzaUJVOEtCRTlhQjArbUJrLzJCVXhHVzQ3ZzlVYUl0Y2UxcEhFMko4ODBjT0tNbU9OOG5PQnRwS2ZCNnN1b1d1SjZjdjQ3bmVwSk5XNTdyU1Z0cmVNNTNjT0NVdjRYQTY5RFEyWmZCdWFINVNPbExTbTQ1cmk4UnR1RTQzOFdCYzVLemMwcVh4a1pLNndlZXJlY2N6ZTB2Q3lMRzdydTNOUGV4SDN5MWo5K0N0alkwdCtZbDJlMm5najU0UTc2Rk82dEU5SHRZSGFacm82Wlk2d2QzYjJKU2kxOHNIdDUyUEJHZWJKOWswVUpkeTMzaHI2OXREVnVxcll2TGxCNkhzZTJxVU52N09DajF4YTJzdmYxWkdDUDN5TmgyU1doYlQyd1ZLWVRldHNmN0xsM09CV01pK2dleDdlOStpUnNvMkh6YURtempCVlBJa3I0cDNkRStZdGpHQ3diVjdSanl4dHVhTGpqdWhlR0NJbHVEWkkyM3ZXRHpYYWRiOEY3aUlOakQ1aG92S0xJMVNEYXAzUDRmenRUTUpCcTErOVlnaWJhOU5kb056WkdQdjdLUmRtODZ3YU95b25iYTJpaXA3WGJRbGlvYmIxR1JyWDNqMDlrOXhoeDF5UEZHTmxLOGsrMk5yM1RaY0V0T3E5dS9vOXB1ZFkxSEN6a3VtRllpSXl3cFMzSGNzNzdlaWY4WnBteXdKVVgyOWlYYXlNWmxQY0VsUmZhaGN6KzgvU0FjdCtzWHJzaDM5c3IrcG5ReFJJemFiTDBVdkpaVU5ac0dpVWpKWnNvMWVOSEc3Wk9kNFhJdW16c0txeU9ibGwyeUl0a2VDeWRRVjZySmRUTnBFZjRFbWk5TGZiMEMvT29qUHlIbERaTlZnRjk5NUd1TnZHR3lJdnpIaDZ4ZGlFakpPYll2OG9wa0hMSHFaOWZsZWRHczI2akZFcU5KaWxMTDZwWG1xRlhmSWlqRGpBc3IyTE1oeWpDTlI1VE1vb0RhSmQxNDVKSTByUWpKcFZWZ215WGpuS1FRditNMFJxa3laT1BSSDB1L0pJV294cU0vcUNWeHpIejg4amxuSkR0bU9HTFlPZ25IWFViSU5PNEN3UktWNHE1ZnJTa25LMmlZVWxtb01IVk5XcG5qMHBtSHZjNFZjNVlybHRTV3ZhZ1hWNE9yUTlxM3duSnNzYmkyL0RXOW1HT0x4YlhsTDJCK0NibG90MndsWXE1MENYdlppeFV1aDBhTlVyckFIaHdlZjNEeCtDbGVyNzhmWHZGTGdwQXJGcnczUzZsUU5HakxYN0w1YXlGVExMU0t1YXRYMWlLdVV2UlB2MVYvWmVFYk9NRVdjbmFjQytjQU54MFhEc1p4TFJxMFdFNStmekMvZlQrTWE3Z0puOThleGpWa1dPRzM1VkdjK0lhMDByWStpak1JemorS3N3anU0MUdjUTNDZmorSVFXakJEWVRuRS9CVE1VSE56a09sdW4vREFIR1M2MnljOE1BZVo3dllKYjI3T1lEai9HTTVpT09KYnBRazVoK0VxMy85UHdtRzA4aGZzM1J4bU1yNVB4M056b0xrZHpWMytCdzUwNXRuT1BYTnpvRFBQZHU2Wm16TW96ajhmWjFIY3gzL0FPUlQzK1h3Y1NydWR0NStKUXkwQ2J1ZnRwK0pnaTREck11Q3BPTmlhQXM0dHo4YkJWanpYTlk5eS9aekJjVjY1SWM3aXVBL2xoamlINHo2Vm00bkRhVCtyV2VWbTRYQXI3WisxdG5MVGNNRFBBV2p1b3R4NU9lQ0hucjhmZTVRN0t3ZjhTUGIzUTVseXloM0JHU1RubFZOT3VZeXpFM01meWltbm5ISkF6aUc1VCtXVVUwNDU1WlJUVGpubGxGTk9PZVdVVTA0NTVVN0JXU1EzK3hVeTVTYmhadi9xNkttNHViOHFmeXB1N2gvZnpNM04vUXUzaWJucGY1VUs1dWIrY1RXU20vOGVBU0EzLzYwdUJzZk5mWXZWL1BmaXpYM1Q1dHgzOTg1OTMvYmNkK1JQbTJ2aElXa3ZESXJ6aitEQXlXQm16Y3Z6bzZGekdrMmFyZW94bWI3UWFjMHNodHRTd2hrTTU3SGNldVBBcVFqQmFSekJPU3ZCQ1RyUnVWSWRndHN6dVZvRXQ2ZXROUWpPM3psd1FtSnc5bVZ3cW1sd1htMTBUbkkzem9VWjA4MDQ1d01PRUNscndBRWlaUW00OGE2Tkgwd3h6TVVQbkxDalhQeXdEalBLK1lnYjdvc2w0b1pIN1V1OERXcnBvM2pzR0pjKy9XVndYS3dKTjloNEwrazJwT1ZQTWJJalhQNk1wYUhJV3pKdVpCYWdudHRtK3pucWVWSURvWkxYZGFSdjZVZDdkUi9lU25LOWg4Yzl0SzB6VnNpVzY2NXVWTlhmUjAwZFhhRGIzNW9BQUFBQVNVVk9SSzVDWUlJPSIvPgoJPC9kZWZzPgoJPHN0eWxlPgoJPC9zdHlsZT4KCTx1c2UgaWQ9IkJhY2tncm91bmQiIGhyZWY9IiNpbWcxIiB4PSIwIiB5PSIwIi8+Cgk8dXNlIGlkPSJTaGFwZSAxIiBocmVmPSIjaW1nMiIgeD0iMjExIiB5PSIxODQiLz4KPC9zdmc+</sys:String>
+			<yjs:SolidColorFill x:Key="2" color="Black"/>
+			<sys:String x:Key="3" xmlns:sys="http://www.yworks.com/xml/yfiles-common/markup/primitives/2.0">data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmlld0JveD0iMCAwIDEwODAgMTA4MCIgd2lkdGg9IjEwODAiIGhlaWdodD0iMTA4MCI+Cgk8dGl0bGU+aWNvbjwvdGl0bGU+Cgk8ZGVmcz4KCQk8aW1hZ2UgIHdpZHRoPSIxMDgwIiBoZWlnaHQ9IjEwODAiIGlkPSJpbWcxIiBocmVmPSJkYXRhOmltYWdlL3BuZztiYXNlNjQsaVZCT1J3MEtHZ29BQUFBTlNVaEVVZ0FBQkRnQUFBUTRBUU1BQUFEVzN2N01BQUFBQVhOU1IwSUIyY2tzZndBQUFBTlFURlJGQUFBQXAzbzkyZ0FBQUFGMFVrNVRBRURtMkdZQUFBQ2xTVVJCVkhpYzdjRXhBUUFBQU1LZzlVOXRDVStnQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBSGdhUGQ0QUFUcWR4cElBQUFBQVNVVk9SSzVDWUlJPSIvPgoJCTxpbWFnZSAgd2lkdGg9IjYyMSIgaGVpZ2h0PSI3MzIiIGlkPSJpbWcyIiBocmVmPSJkYXRhOmltYWdlL3BuZztiYXNlNjQsaVZCT1J3MEtHZ29BQUFBTlNVaEVVZ0FBQW0wQUFBTGNBUU1BQUFDUFV4VXRBQUFBQVhOU1IwSUIyY2tzZndBQUFBWlFURlJGQUFBQUlWNGNyTkc1alFBQUFBSjBVazVUQVA5YmtTSzFBQUFJd0VsRVFWUjRuTzNkVFhyaklBd0c0UGFaUlpjOUFrZmhhUGhvUGdwSDZMS0xQczNNTkhITWp3UUN2b3daUjk2MUlhOE5DRXljV0g1NStmZmIrK1hQdHFLMHQ4dlB0bUMwMTZ0MitjWnc5c1pkUGhEYXI4dDlRM0JtNS95NDlycHJpTlo3RHpoQXNMaVEreHpWZmwyaWJaUjdqN2wxa0hNeE4xamIxMWdiN2R1M2hCc2N1Q2JsL0JDWGFtT045eXZqaGtMbFBlZVdBUzVydXJIR2N6azMwSGhwMUExR1hoWjFZMzFCOU1USXNMVVUxMy9Hb0xUK3ZxQjZZcUF2eUo3bzd3dXlKL3I3Z3V5Si9uSGhhSzYzTDJqdDh0V25FYlBUU05jeUhkczdSekVkMjl1MWh1TjhGMmM1cm0vVWNscGYxOUlqOXUvVzFiVmNuRno2UmkwYkozMlJ3c1pKWDZRWW52TWRuT081bmtqaHRaNDVoWStUcnNBcnhFbFBwQlRpcENkU0NuSFNFeW1teFBsbXpwYTQ5a2h4V0s2a2RRUmVrV3NPdkZJVWQ4eDR4U2h1aitOaUZMZkhjVEdLMitQWWxEbmZ5Tmt5MXhwNHJzeTFCaDZZSzJ1dGNWeU80dVk0cmtSeGF4eFhvcmcxaml0UjNCckhZTTdVT04vRTJSclhOaXhjald1TFl6QlgwOXFHUlcxUU5BNkw2cUJvR3haZ3Jqckcya1paZFZDMERRc3daK3FjYitEc1ArZGFCcTJyY3kyakRNelZ0WlpCV3greVRZTVd6QW1HYk11Z0ZReFpPTGVJT2NHUWJSbTBZTTVJT0g4VVp5V2NmQTRBYzA3Q3llY0FNQ2ZSR3FZVUxDZVpVQnFtRkRBbm1wL2tVd3FZRTgxUDhoa0t6SW5tSnppM0hzTVpHZWVQNGV3aG5IVCtCSE5PeGtubno3azVtU2FlanJHY2JES0djOExaSGN3SjUzWTBKenhaek0wSnp6elNrOFhjblBETUErZldFM0RtSU02ZmdMTUhjYkx6OWxOeFRzckpsZ0hLOVhOU0RjM0oxanpLZFhQUzVSMmNFeTN3bERzckoxNGFUODZKbHU3S0thZmNnem54NTAvbGxCTnVpM0t6Y0FKdDhnbEtPZVdVVSs0RTNBaytnQ3IzSDNJbnVPQ20zQURucE53WnJybWZoRHZETjFGemMwYktlZVhTYmU0djh1Zm01djRCeVZHY1NKdjhsMFpnYnU2ZnBJRzV1WDlzS09YTzhidFBJWGZRVDNEQm5KRnhmbXB1RlhKei84NTk3bHNPNXI1ZFE4WWRkYXVMakR2cU5pRVpkOWd0VmlMdXNOdlRqSVR6UjNGejN4WUp2Z2NVeklIdm41Vnd4OTBzREw0ekdzMjVPZ2UrcTd6bG5uZUw1VXlkODFodWJlREF5UkhBbVNBRVhJT0dUbnNCenZFQnprQ0M1bHlOYTB1M1ltdGNXMjZaS3VlYk9JUGx3R2wrd0RtTndCbVhhbHhqUGlod2VpbHc4aXQwYWk1YjVscnprSmt5NTdIYzJzaUJVOEtCRTlhQjArbUJrLzJCVXhHVzQ3ZzlVYUl0Y2UxcEhFMko4ODBjT0tNbU9OOG5PQnRwS2ZCNnN1b1d1SjZjdjQ3bmVwSk5XNTdyU1Z0cmVNNTNjT0NVdjRYQTY5RFEyWmZCdWFINVNPbExTbTQ1cmk4UnR1RTQzOFdCYzVLemMwcVh4a1pLNndlZXJlY2N6ZTB2Q3lMRzdydTNOUGV4SDN5MWo5K0N0alkwdCtZbDJlMm5najU0UTc2Rk82dEU5SHRZSGFacm82Wlk2d2QzYjJKU2kxOHNIdDUyUEJHZWJKOWswVUpkeTMzaHI2OXREVnVxcll2TGxCNkhzZTJxVU52N09DajF4YTJzdmYxWkdDUDN5TmgyU1doYlQyd1ZLWVRldHNmN0xsM09CV01pK2dleDdlOStpUnNvMkh6YURtempCVlBJa3I0cDNkRStZdGpHQ3diVjdSanl4dHVhTGpqdWhlR0NJbHVEWkkyM3ZXRHpYYWRiOEY3aUlOakQ1aG92S0xJMVNEYXAzUDRmenRUTUpCcTErOVlnaWJhOU5kb056WkdQdjdLUmRtODZ3YU95b25iYTJpaXA3WGJRbGlvYmIxR1JyWDNqMDlrOXhoeDF5UEZHTmxLOGsrMk5yM1RaY0V0T3E5dS9vOXB1ZFkxSEN6a3VtRllpSXl3cFMzSGNzNzdlaWY4WnBteXdKVVgyOWlYYXlNWmxQY0VsUmZhaGN6KzgvU0FjdCtzWHJzaDM5c3IrcG5ReFJJemFiTDBVdkpaVU5ac0dpVWpKWnNvMWVOSEc3Wk9kNFhJdW16c0txeU9ibGwyeUl0a2VDeWRRVjZySmRUTnBFZjRFbWk5TGZiMEMvT29qUHlIbERaTlZnRjk5NUd1TnZHR3lJdnpIaDZ4ZGlFakpPYll2OG9wa0hMSHFaOWZsZWRHczI2akZFcU5KaWxMTDZwWG1xRlhmSWlqRGpBc3IyTE1oeWpDTlI1VE1vb0RhSmQxNDVKSTByUWpKcFZWZ215WGpuS1FRditNMFJxa3laT1BSSDB1L0pJV294cU0vcUNWeHpIejg4amxuSkR0bU9HTFlPZ25IWFViSU5PNEN3UktWNHE1ZnJTa25LMmlZVWxtb01IVk5XcG5qMHBtSHZjNFZjNVlybHRTV3ZhZ1hWNE9yUTlxM3duSnNzYmkyL0RXOW1HT0x4YlhsTDJCK0NibG90MndsWXE1MENYdlppeFV1aDBhTlVyckFIaHdlZjNEeCtDbGVyNzhmWHZGTGdwQXJGcnczUzZsUU5HakxYN0w1YXlGVExMU0t1YXRYMWlLdVV2UlB2MVYvWmVFYk9NRVdjbmFjQytjQU54MFhEc1p4TFJxMFdFNStmekMvZlQrTWE3Z0puOThleGpWa1dPRzM1VkdjK0lhMDByWStpak1JemorS3N3anU0MUdjUTNDZmorSVFXakJEWVRuRS9CVE1VSE56a09sdW4vREFIR1M2MnljOE1BZVo3dllKYjI3T1lEai9HTTVpT09KYnBRazVoK0VxMy85UHdtRzA4aGZzM1J4bU1yNVB4M056b0xrZHpWMytCdzUwNXRuT1BYTnpvRFBQZHU2Wm16TW96ajhmWjFIY3gzL0FPUlQzK1h3Y1NydWR0NStKUXkwQ2J1ZnRwK0pnaTREck11Q3BPTmlhQXM0dHo4YkJWanpYTlk5eS9aekJjVjY1SWM3aXVBL2xoamlINHo2Vm00bkRhVCtyV2VWbTRYQXI3WisxdG5MVGNNRFBBV2p1b3R4NU9lQ0hucjhmZTVRN0t3ZjhTUGIzUTVseXloM0JHU1RubFZOT3VZeXpFM01meWltbm5ISkF6aUc1VCtXVVUwNDU1WlJUVGpubGxGTk9PZVdVVTA0NTVVN0JXU1EzK3hVeTVTYmhadi9xNkttNHViOHFmeXB1N2gvZnpNM04vUXUzaWJucGY1VUs1dWIrY1RXU20vOGVBU0EzLzYwdUJzZk5mWXZWL1BmaXpYM1Q1dHgzOTg1OTMvYmNkK1JQbTJ2aElXa3ZESXJ6aitEQXlXQm16Y3Z6bzZGekdrMmFyZW94bWI3UWFjMHNodHRTd2hrTTU3SGNldVBBcVFqQmFSekJPU3ZCQ1RyUnVWSWRndHN6dVZvRXQ2ZXROUWpPM3psd1FtSnc5bVZ3cW1sd1htMTBUbkkzem9VWjA4MDQ1d01PRUNscndBRWlaUW00OGE2Tkgwd3h6TVVQbkxDalhQeXdEalBLK1lnYjdvc2w0b1pIN1V1OERXcnBvM2pzR0pjKy9XVndYS3dKTjloNEwrazJwT1ZQTWJJalhQNk1wYUhJV3pKdVpCYWdudHRtK3pucWVWSURvWkxYZGFSdjZVZDdkUi9lU25LOWg4Yzl0SzB6VnNpVzY2NXVWTlhmUjAwZFhhRGIzNW9BQUFBQVNVVk9SSzVDWUlJPSIvPgoJPC9kZWZzPgoJPHN0eWxlPgoJPC9zdHlsZT4KCTx1c2UgaWQ9IkJhY2tncm91bmQiIGhyZWY9IiNpbWcxIiB4PSIwIiB5PSIwIi8+Cgk8dXNlIGlkPSJTaGFwZSAxIiBocmVmPSIjaW1nMiIgeD0iMjExIiB5PSIxODQiLz4KPC9zdmc+</sys:String>
+			<yjs:SolidColorFill x:Key="4" color="Black"/>
+			<sys:String x:Key="5" xmlns:sys="http://www.yworks.com/xml/yfiles-common/markup/primitives/2.0">data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmlld0JveD0iMCAwIDgwOCA4NTUiIHdpZHRoPSI4MDgiIGhlaWdodD0iODU1Ij4KCTx0aXRsZT5pY29uPC90aXRsZT4KCTxkZWZzPgoJCTxpbWFnZSAgd2lkdGg9IjEwODAiIGhlaWdodD0iMTA4MCIgaWQ9ImltZzEiIGhyZWY9ImRhdGE6aW1hZ2UvcG5nO2Jhc2U2NCxpVkJPUncwS0dnb0FBQUFOU1VoRVVnQUFCRGdBQUFRNEFRTUFBQURXM3Y3TUFBQUFBWE5TUjBJQjJja3Nmd0FBQUFOUVRGUkZBQUFBcDNvOTJnQUFBQUYwVWs1VEFFRG0yR1lBQUFDbFNVUkJWSGljN2NFeEFRQUFBTUtnOVU5dENVK2dBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFIZ2FQZDRBQVRxZHhwSUFBQUFBU1VWT1JLNUNZSUk9Ii8+CgkJPGltYWdlICB3aWR0aD0iNjIxIiBoZWlnaHQ9IjczMSIgaWQ9ImltZzIiIGhyZWY9ImRhdGE6aW1hZ2UvcG5nO2Jhc2U2NCxpVkJPUncwS0dnb0FBQUFOU1VoRVVnQUFBbTBBQUFMYkFRTUFBQUNTVmlXVkFBQUFBWE5TUjBJQjJja3Nmd0FBQUFaUVRGUkZBQUFBQ1J4cGVLOEc0UUFBQUFKMFVrNVRBUDlia1NLMUFBQUlva2xFUVZSNG5PM2RTM2JqS2hBRzRQVEpJTU5lQWt0aGFiQTBsc0lTZXBoQm4vaDJFa3ZtVVlVSytIMUY3R0tZbEQ4SktCQ3lMZnp5SWlqbThxOTRTYVNrL0w1OEZaRDIrcTFkL21JNGQrVXVFYUc5YmRybEE4SFpuYnVFZWUzMXBpRmF6eVFjSUZsUzdmSm5WbnZMdU9uT3lPbzZYOXRjbTYzdGE4Rk45dTN2Z3BzY3VMYmt3b3oycTlUbUd1K3Q0cVpTeFZUY1ZPTlZUVGZYZUxVMjAzaGwxazFtWHBWMWMzMUI5TVRNc0hVVUYwZTFPb21uK29McWlZbStvSHBpb2kvSW5oanZDN0lueHNjRnJZMzJCZDJ4bDh2N0dGZlBUbE5kUzNmc1pYU09ZanAydEdzdHg0VWh6bkZjSE5HNGpoM3NXbnJFZnBhaHJ1WHlaSERVc25reWxpbUc1L3dBWjNrdURIQzhOcElwZko0TXpTbDhuZ3dsSHA4blE1blN5Sk9SVERFdHpuZHp0c1dGYnM2MXVOak50YlIrcnBWMkE0blg1cm9UcjVYRkF6TmVLNHNIOHJpWnhmMTViTnFjNytSc213dWRuR3R6c1pOcmE5MkpoK1hhV2R5ZHgrMHM3czdqZGhaMzUvRkJGdmZtc1RuaS9KbWNQZUpDRitlT3VOakZIV21kZVl6bGpnWkY1N0E0R2hTZHcrSm9VSFFPQ3pCM09NYjZScGs1NXZ4NW5EM21RZ2ZuL25jdWRuREhXdGNvdzNMSFE3WnIwQjRQMmE1QkMrYU9oMnpYb0JVTVdUVFhNUWNZQ2VmUDRxeUVDMmR4VHNMRnN6aUoxakVIWURuSmhOSXhwWUE1eVlUU01hV0FPY244MURHbGdEblIvQ1Nmb2NDY09ZWHo1M0JXeG9Wek9IY0tGOC9oWkpwNC9seWFrMDNHNHVrWXpNa21Zemdubk4zQm5HeHVoM1BDaXdXWUUxNHEwSnp3WW1HVUk0cC9BTTZleElVSDROeEpYRlN1TEZKTnVBeFFicGlUcm5qZ25Hak5vOXc0SjEzZXdUblJBays1UitXa0srM1ZPZEhTWFRubGxMc3pKNzQ3Vms0NVlWRnVGZTRCSmlqbGxGTk91UWZnSHVBR1ZMa2Z5RDNBRzI3S2pYTnJ2MG11SEZtaWlIUEtEWE5XeWdYbHltS2tuRmV1TE9Edm96d0dkODQzamRibTF2NUtHcGhiKzh1R1V1NGh2dmNwNWFLUWMwdHpWc2FGcFRrdjVNelMzTnFQSEt6OXVJYU1PK3RSRnhsMzFtTkNNdTZzUjZ4a1hCUnpEc3RaQ1JmTzRveUU4MmR4NEdkQXdSejQrVmtKZDk3RHd1QW5vOEhjQ1UrVnh3N09ZVGw3ekFVczV6czRnK1hBTzBFY2MyZHVld0hlNHdPOEF3bVlRKy9lNG82NGlPVkNGMmV4bkRuaWZCY0gzdE1Jdk9QU0VkZTVIeFI0ZXludzVsZm9uYjVjbTR1ZG5HMXpBY3Y1VHM1Z09mQ0dkZUR0OU1DYi9ZRzNJbXpuY2Y4T25hN0Z4VzdPdHJqUXpaa1c1N3M1OEg2ZjROMUlXNGszc0t0dUsvRkc5dnh0Y0NPYlRUdWVpd09jNWJrd3dCbWU4d01jbjNoRCt4dURkMThHN3czTlo4cllwdVNPNCtJUVp6a3VESEhnUGNtNU9XVnc5M291VTNwdmVMYWVZN2pidndVWjQyNkhkelFYYnljZmo3VGZTVnRibXZOMUpGdStYaENTRjlRbFBkaEJScHUwT25UWGJoM3IwbE50bmR6V3hQU296Zi9aUEwyMy9BUkk3ZzhaMnFocnV5L0M5LysyaG0zVjlwTEhHSXJ6K2FFYXRkM0hRY3dxbEpXOEo1cGpaTStNNnlHcHZ0aEd3djRIbnR1T3VCK1M0R0pSa2NiSXFHcGtheTZVN2NBMlhqS0Z2SlF2S2c5MEd6RnM0eVdENm5vT2RlTnRUWmVjTjhjbElWdURWTnhXTlZjZHVpcnRrMkJQbTJtOE5HUnJFTzdIaWRLWm1wbEUzNGlYbFkyM3ZUUTlERE5zVGZvNlg3ZlJaNG10Mkx4azdSVG8ybTZ4am9yTlN4YXl0VzkrT2R0empEemxyT1ROdExldm8xNzRTc2VtSlEvWjJ6ZXI3ZmJIZkxTUTQ0SnBKVExEOGxpeWEwM09lZUx2Kzk4c0U1dVVJbVJycHVUMGJtM2s4dGhBY0VYSWJlanNwM2M3aVR5VTdOb2k1Ry8xbjl1THlzVVFNV3JMa0tSOWZ4VlZyYVpCSWxPcW1kSW4vM1I1KzVnaWxPamFhdTZnR3VTbTU2VU9LWS9ZdW9DV29VU20yREtFdjREV3k5SndYQUYrOVZGZmtPSnhCZmpWUjlVdWRjTVFGL3k2QnRkU3RVdWRLUVRIOWtVZFduSEVxcDlibHhOcjNLcmJpTVVTMXhkMTA5V2gxTExhMDV3alFnV0g1TVlGeFpWSHRrUU0zWGprQWp3SURrazNIbmw3VUZhRTR1akdvNXFsNHFnWXV2SElBeGM1MnJ3anlRcDlXL291Q2FJYWo3NVJLL0tZdWJNT05XY2xCMlk0WXRqU2dRWEgzR3ZXdGVYZUlNaWpEQlBsUzA0V2FKbW9LS3RyMmNvY1Y4NDg3UHRjT2VlNHNLSzJob3ZMcThGRmxYMHJqR1BEOHRyeTcrbGxYT05kM2F5MmhnMTdGM0xaWWZtd2pHdTloWjJFTmQ2SHp4cWw5UVo3Y25xTnFBOHBkenU5MW9jRUdkZjhOR0ZybHZiSFA3SWUreXpoTzhnMmc3eVkrL2JhV3NZZGhQN3J0OE52V1lRT1RsQlN6czF6TWVIbU5UU1haTHY4T1UyK3ZOK05rejhmekplL2QrUGtUODN6NWVOdVhNZUdMWHk1RzJjUW5MOFhaeEZjdUJmbkVGeThGNGZRa2hrS3l5SG1wMlNHQW5PSStTbVpvZGJtRU5OZE11R0JPY2gwZDV2d3dKekJjUDVIY0JiRGhmdHdEc1BGSDhGaHRLUFAvOWZnTUhQN3dRZnN3eHhtTXQ2bjQ3VTV6TndPNXo1K0FnZTY4bXpYbnJVNWcrTDhEK0FzaWd2UHh6a1VGMzhBaDlLdVY4Wm40bEJYN2V0MSs2azQxQ0xnZXQxK0tnNjFDTGd1QTU2S2c2MHAwTnpsNlRpRDQ3eHlVNXpGY1VHNUtjN2h1S2pjRklmVHZ0YUx5cTNDNGRheVg2dFo1WmJoY0N2dHI3VzJjc3R3dVBzQU9QZWgzT055d0p1ZXo5c2U1UjZWTTBqT0s2ZmNLWnhGY2tFNTVaU3JPTGN3RjVWVFRqbmxnQnhTdS94UlRqbmxsSU9WZCtXVU80RmJlMVFvcDV4eXlpbW5uSExLS2FmYy84azVKTGY2TzJUS0xjS3QvdEhSVTNFR3lhMyt5ZnZhM05wZnZsbWJXL3NiYmd0enkzOHJGY3l0L2VWcUpMZjhNd0pJYnYxSFhTeU9XL3NScS9XZnhWdjdvYzIxbis1ZCs3bnR0Wi9JWDNhdmhidHNlMkZSWExnSFoxQ2NmNEhPQVM5UTdqNTdHaTI2VzlWOWR2cEM3NUxtTUZ5OGNoYkRCU3pucjV6QmN1QnRITUY3Vm9JMzZBUnZib3JlR05ZaHVMaHpGc0dGblRNSXp1OGNlUGRsOEZiVDRIMjF3WnVJZzNkTVIrODJiK1k1bjNDQVRFazBRTmRtdjhFdzM3WDV6N3E0V1M1bW5KM2xRc1pOOTBXbVRZL2E0dWRmWnZ1aS9Da2VOOGZGZ2pOem5DKzR1Y2FyZmpsbnJ2SHFYekZ5TTF6WmRKT1pWMmxUc3dEMXUyMXVuS3ZyT3BVcWhEYlJ0L1JQZXcyZm5pZTUwZFByK05FMlNXRzB3ZXBtVmYwUE5lWSthM216c244QUFBQUFTVVZPUks1Q1lJST0iLz4KCTwvZGVmcz4KCTxzdHlsZT4KCTwvc3R5bGU+Cgk8dXNlIGlkPSJCYWNrZ3JvdW5kIiBocmVmPSIjaW1nMSIgeD0iLTEwNCIgeT0iLTE1NSIvPgoJPHVzZSBpZD0iU2hhcGUgMSIgaHJlZj0iI2ltZzIiIHg9IjEwOCIgeT0iMzAiLz4KPC9zdmc+</sys:String>
+			<yjs:SolidColorFill x:Key="6" color="Black"/>
+			<sys:String x:Key="7" xmlns:sys="http://www.yworks.com/xml/yfiles-common/markup/primitives/2.0">data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmlld0JveD0iMCAwIDgwOCA4NTUiIHdpZHRoPSI4MDgiIGhlaWdodD0iODU1Ij4KCTx0aXRsZT5pY29uPC90aXRsZT4KCTxkZWZzPgoJCTxpbWFnZSAgd2lkdGg9IjEwODAiIGhlaWdodD0iMTA4MCIgaWQ9ImltZzEiIGhyZWY9ImRhdGE6aW1hZ2UvcG5nO2Jhc2U2NCxpVkJPUncwS0dnb0FBQUFOU1VoRVVnQUFCRGdBQUFRNEFRTUFBQURXM3Y3TUFBQUFBWE5TUjBJQjJja3Nmd0FBQUFOUVRGUkZBQUFBcDNvOTJnQUFBQUYwVWs1VEFFRG0yR1lBQUFDbFNVUkJWSGljN2NFeEFRQUFBTUtnOVU5dENVK2dBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFIZ2FQZDRBQVRxZHhwSUFBQUFBU1VWT1JLNUNZSUk9Ii8+CgkJPGltYWdlICB3aWR0aD0iNjIxIiBoZWlnaHQ9IjczMSIgaWQ9ImltZzIiIGhyZWY9ImRhdGE6aW1hZ2UvcG5nO2Jhc2U2NCxpVkJPUncwS0dnb0FBQUFOU1VoRVVnQUFBbTBBQUFMYkNBTUFBQUNmUmtma0FBQUFBWE5TUjBJQjJja3Nmd0FBQUVWUVRGUkZBQUFBL3hjWC94Y1gzaFFVL3hjWC94Y1g5aFlXL3hjWC94Y1gveGNYL3hjWC94Y1gveGNYL3hjWC94Y1grUllXL1JjWC94Y1gveGNYL3hjWC94Y1g5eFlXL3hjWGViKzNWQUFBQUJkMFVrNVRBUDhhK0FrVzhnd0JBelF4ZUFwRi9QOGZJQjR5L0JCVWRnTVJBQUFRSTBsRVFWUjRuTzNZV1pJanlSRUVVVFRYNGI3ei9rZWxUTE9tcFpjcUlJR01NSFgzMUhjQlJMcmFGMjQzUGZMcEVQcVZhdTdZekJ5ZHpubGxaMjVPVHpzN05DZW5ZOVl0emNYcHJ2VlRjM0I2ejY2bHVUaDlaL2ZVSEp6ZVpLYm00QlNkbW9PN3R2elczTnRGTVZOemNGZEViczI5WFF1OXRaL1JOMUFHdmJOZjBIZlFkdlRFdmtFZlExdlI4L29SZlJIdFFpL3JYZlJSdEFlOXE0L1FkOUY2OUtidW9XK2p0ZWc5UFVMZlIrdlFXenFBUHBGV29aZDBESDBsclVDdjZEajZVanFMWHRCVDZHUHBISG8vejZMdnBkZlIyM2tCZlRLOWlsN09hK2lyNlJYMGFsNUdIMDdQb3pkekJuMDdQWWtlekRuMDlmUU1laTJuMFFmVWNmUldWcUJ2cUlQb29heEJYMUdIMEROWmhiNmpEcUJIc2c1OVNUMUNMMlF0K3BxNmk1N0hhdlE5ZFFjOWp2WG9pK3BEOURSMm9HK3FEOUREMklPK3F0NUZ6MklYK3E3NkViMkpqZWpUNm52MElyYWlqNnR2MFh2WWpENnZ2a2F2WVQvNnd2cUNua0lDZldPOW9ZZVFRVjlabjlFelNLSHZyTnQxeHViY0NxQW5FRVNmV3ZRQ291aGpYeDQ5Z0N6NjJoZEg1MCtqNzMxcGRQdzgrdUlYUnFjbjBEZS9MRG84Zzc3NlJkSFpLZlRkTDRtT3pxRXZmMEYwY2hKOSsrdWhpNVBvMjE4T0haeEZYLzlpNk53MCt2NlhRc2ZtMFFVdWhFNWRBZDNnTXVqUU5kQVZyb0x1WEFOZDRTTG96RlhRSFM2Qmpsd0hYZUlDNk1TVjBDM21vd3RYUXJjWWp3NWNDMTFqT0Rwdk5YU1AwZWk0OWRCRkpxUGIxa01YR1l4T1d4SGRaQ3c2YkUxMGxhbm9yalhSVllhaXMxWkZkeG1KamxvV0hXWWtPbXBkZEptQjZLU1YwVzNtb1l0V1JyY1podzVhRzExbkdEcG5kWFNmV2VpYTFkRjlScUZqMWtjWEdvUk8yUUNkYUJBNlpRZDBvekhva0QzUWxhYWdPL1pBVnhxQ3p0Z0YzV2tHdW1JWGRLY1I2SWg5MEtVbW9CdjJRWmNhZ0U3WUNkMnFQN3BnSjNTcjl1aUF2ZEMxdXFQNzlVTFhhbzdPMXczZHF6ZTZYamQwcjlib2VQM1F4VHFqMi9WREYydU1UdGNSM2F3dnVseEhkTE8yNkhBdDBkSGFvc1AxUkZmcml1N1dFMTJ0S1RwYlYzUzNudWhxWGRIZFdxS2p0VVdIYTRtTzFoZGRyaU82V1Y5MHVZYm9aSjNSN2ZxaGkzVkd0K3VITHRZWjNhNGRPbGh2ZEwxdTZGNjkwZldhb1hNMVIrZHJoczdWSGQydkY3cFdkM1MvVnVoWTdkRUJXNkZqOVVjWDdJUnUxUjlkc0pGZi9acU8xUjZkc0JFNjFRUjB3elorUTVlYWdJN1l4bS9wVWhQUUVkdWdRNDFBUjJ5RERqVURYYkVMdXRNTWRNVXU2RTR6MEJXYm9ETU5RV2RzZ3M0MEJkMnhCN3JTRkhUSEh1aEtVOUFkVzZBampVR0hiSUdPTkFkZHNnTzYwUngweVE3b1JuUFFKVHVnRzgxQmwyeUFUalFKM2JJK3V0QWtkTXY2NkVLVDBDM3Jvd3ROUXJlc2p5NDBDZDJ5UERyUUtIVE04dWhBczlBMXE2UDd6RUxYckk3dU13dGRzenE2enl4MHplcm9QclBRTll1ajh3eEQ1eXlPempNTjNiTTJ1czQwZE0vYTZEclQwRDFybyt0TVEvZXNqYTR6RGQyek5yck9OSFRQMnVnNjA5QTlTNlBqakVNSExZMk9NdzRkdERRNnpqeDAwY3JvTnZQUVJTdWoyOHhERjYyTWJqTVBYYlF5dXMwOGROSEs2RGJ6MEVVcm85dk1ReGV0akc0ekQxMjBNcnJOUEhUUnl1ZzI4OUJGSzZQYnpFTVhyWXh1TXc5ZHREQTZ6VUIwMHNMb05BUFJTUXVqMHd4RUp5Mk1Uak1RbmJRd09zMUFkTkxDNkRRRDBVa0xvOU1NUkNjdGpFNHpFZDIwTHJyTVJIVFR1dWd5RTlGTjY2TExURVEzcllzdU14SGR0QzY2ekVCMDBzcm9OdlBRUlN1ajI4eERGNjJNYmpNUFhiUXl1czA4ZE5ISzZEYnowRVVybzl2TVF4ZXRqRzR6RDEyME1yck5QSFRSeXVnMjg5QkZLNlBiekVNWHJZeHVNdzlkdERLNnpUeDAwY3JvTnZQUVJTdWoyOHhERjYyTWJqTVBYYlF5dXMwOGROSEs2RGJ6MEVVcm85dU1Rd2V0amE0ekRkMnpOcnJPTkhUUDJ1ZzYwOUE5YTZQclRFUDNySTJ1TXczZHN6YTZ6alIwejlyb090UFFQV3VqNnd4RDU2eU83ak1MWGJNNnVzOHNkTTNxNkQ2ejBEV3JvL3ZNUXRlc2p1NHpDMTJ6T3JyUExIVE44dWhBazlBdDY2TUxUVUszckk4dU5BbmRzajY2MENSMHkvcm9RcFBRTGV1akN3MUNwK3lBYmpRSFhiSUR1dEVjZE1rTzZFWnowQ1U3b0J2TlFaZHNnWTQwQmQyeEI3clNGSFRISHVoS1U5QWRlNkFyVFVGM2JJTE9OQU5kc1F1NjB3eDB4UzdvVGpQUUZidWdPODFBVjJ5RERqVUIzYkFQdXRRRWRNTSs2RklUMEEzN29Fc05RQ2ZzaEc3VkgxMndFN3BWZjNUQlR1aFcvZEVGVzZGamRVZjM2NFd1MVIzZHJ4ZTZWbmQwdjJib1hMM1I5YnFoZS9WRzErdUc3dFVhSGE4ZnVsaG5kTHQrNkdLZDBlMzZvWXMxUnFmcmlHN1dGMTJ1STdwWlgzUzVsdWhvWGRIZGVxS3JkVVYzNjRtdTFoU2RyU3U2VzA5MHRhN29iajNSMWRxaXczVkVOK3VMTHRjUjNhd3hPbDAvZExITzZIYjkwTVU2bzl1MVF3ZnJqYTdYRGQyck43cGVNM1N1N3VoK3ZkQzF1cVA3dFVMSDZvOHUyQW5kcWorNllDTjBxZ25vaG4zUXBVYWdJM1pCZDVxQnJ0Z0YzV2tJT21NUGRLVXA2STQ5MEpYR29FTjJRRGVhZ3k3WkFkMW9FRHBsZlhTaFNlaVc1ZEdCWnFGclZrZjNHWWJPV1J0ZFp4cTZaMjEwblhIb29KWFJiZWFoaXhaR3A1bUlibG9YWFdZa09tcFZkSmVaNktwRjBWbW1vcnZXUkZjWml3NWJFZDFrTHJwc1FYU1N5ZWkyOWRCRlJxUGpWa1AzR0k3T1d3dGRZenE2YnkxMGpmSG93SlhRTFM2QVRsd0hYZUlLNk1abDBDR3VnYTVjQmQzaEl1ak1OZEFWTG9NT1hRSGQ0RUxvMUR5NndKWFFyWEYwZ0d1aGE5UG8rMThNblp0RlgvOXk2T0FrK3ZZWFJDZm4wSmUvSkRvNmhiNzdOZEhWSWZUWnI0cnV6cUN2ZmxsMGVBSjk4d3VqMCtmUkY3ODBPbjRhZmUrTG8vTm4wZGUrUEhvQVNmU3RkYUc1MFpmVzdUcHpvKytzeitnWlpOQlgxaHQ2Q0FuMGpmVUZQWVg5NkF2cksvUVlkcVB2cTIvUWM5aUx2cTYrUXc5aUovcTIrZ0U5aVgzb3krb2Q5Q2gyb2UrcWQ5R3oySU8rcWo1QUQyTUQrcVM2Z3g3SGF2UTlkUmM5ajdYb2Erb0JlaUFyMGJmVVEvUkUxcUV2cVFQb2theEMzMUhIMER0WmdiNmhEcU9uY2g1OVFUMkJIc3RaOVAyR1czN3o4RHlXS25YSVdYYmRmY2NNTWdvZWM0SzlwMTlTUHEvc1BUdExuUC9WNEtUYUYyMm9Zb0FxT2x5MWtlSU5XRzNPMmdMUTRmV2Z6T3QwMS9LWUVtMzIxdTZ3aFhXTkVRTiszdXVucmVuOFJVNGRaY25QYjlYMnRQVXNPY2k1bTZ4NndoNEZQdXpFRXlwWmRZNlROMW42akxYNkg3ZU1wZmVvVTJhaE9wOTA0aVVsTEQ3SDJZdXNmODVaeFQ3bjFITmc2Njl4K2lKN252U3FncDl5NmttZ1BkYzRlNUJ0cjNyYTczNWY4ME5PdlFxeTdSaW5EN0wxWlUrbyt4R25Ya2JZZW8yejk5ajh1Q04rS3YwRjV4Nlh0dmtZQ3c0U2VHSHJ4NTk4WVZEZ0dBdnVrWGxsMzVlZmZXVkk1aGdyenBGNjZkSlg5M2xwUXV3YUhmZlc2c1huSDd0YjhCaUw3dEhxdGJuSHJucnhUdUZyTExxSEQ5MzY2azNpeDFoM2p3NXZKTzY3NnVuckFjZFllby9pNzl2enZOejcxNEt1c2ZZZVYza1o5QkhMWU5kWWZvL0JqNnJ3SlN1QTE5aHlrRktQR1hmZGM5aHJiRHhJeDFlc3QrdTdYa05mNDJmWU4rNys0VXRjOXduMEtkN1FaOWlEdnVvYitneGYwSWY0Z2o3RUR2Uk52NkFQOFlZK3c5Zm9XNnhHMy9OcjlDMCtvNC93TGZvYWE5SFgvQlo5alZ1MWczd3FjWk5GNkV2K2dENUl2WXNVdU1raTlCM2Y0VW5lUVI5bEJmcUc3L0ltNzRHdmN0WlBmL2dqZmNFUG9HZWhQLzVqNkZsTyt0T2Y2ZXQ5RER3TC9lbDNnWGM1NVM5Ly9mUTMrblozWUhlaFAvd1I3RENuMEZkN3hMTjhCTHJNQ2ZURkR2QXVIMEpPOHpMNldzZDRtWThSdDNrTmZhbWpQTTA5d0hWZVFGL3BDZDdtcnZoNW5rVWY2RWxlNTc3d2ZaNURIK2Q1bnVlUjZJV2VRTi9sSlI3b29lU0pqcUp2OGlJdmRFVHdTZ2ZRMXpqQkd4MFNPOU5EOUNYTzhVakhoTzUwSDMyRTg3elRVWmxMZVVNUDlTWnlMQy9vcVg0Uk9KZjM4MXBmN0wvWGl1djlmZTFITDFQMFhKVnRQNW0zODJKZjIzMDBEK2ZOdnVYVlhySHphb1BQOXBrbmU5cU9rMTNrZEQvelhFOVplYTdyWGUvL1BOVmg1MDkxOVF2K24yYzZaT1hDTG56R1gzaWV1eHpiTnQ3a1I2NU5PWTVOUVk1Tk9hNU5RWTVOUWE1Tk9ZNU5RYTVOT1k1TlFhNU5PWTVOUWE1Tk9ZNU5RYTVOT1k1TlFhNU5PWTVOUWE1Tk9ZNU5RYTVOT1k1TlFhNU5PWTVOUWE1Tk9hNU5PWTVOUWE1Tk9ZNU5RYTVOT1k1TlFhNU5PYTVOT1k1TlFhNU5PWTVOUWE1Tk9hNU5PWTVOUWE1Tk9hNU5PWTVOUWE1Tk9ZNU5RYTVOT2E1Tk9ZNU5PYTVOUWE1Tk9hNU5PWTVOUWE1Tk9hNU5PWTVOUWE1Tk9hNU5PWTVOUWE1Tk9hNU5PYTVOT1k1TlFhNU5PYTVOT1k1TlFhNU5PYTVOT2E1Tk9ZNU5RYTVOT2E1Tk9hNU5PWTVOUWE1Tk9hNU5PYTVOT1k1TlFhNU5PYTVOT2E1Tk9ZNU5PYTVOUWE1Tk9hNU5PYTVOT1k1TlFhNU5PYTVOT2E1Tk9hNU5PWTVOUWE1Tk9hNU5PYTVOT2E1Tk9ZNU5RYTVOT2E1Tk9hNU5PYTVOT1k1TlFhNU5PYTVOT2E1Tk9hNU5PYTVOT1k1TlFhNU5PYTVOT2E1Tk9hNU5PYTVOT1k1TlFhNU5PYTVOT2E1Tk9hNU5PYTVOT1k1Tk9hNU5RYTVOT2E1Tk9hNU5PYTVOT2E1Tk9hNU5PWTVOUWE1Tk9hNU5PYTVOT2E1Tk9hNU5PYTVOT1k1TlFhNU5PYTVOT2E1Tk9hNU5PYTVOT2E1Tk9hNU5PYTVOT1k1TlFhNU5PYTVOT2E1Tk9hNU5PYTVOT2E1Tk9hNU5PYTVOT2E1Tk9hNU5PWTVOT2E1TlFhNU5PYTVOT2E1Tk9hNU5PYTVOT2E1Tk9hNU5PYTVOT2E1Tk9hNU5PYTVOT2E1Tk9hNU5PYTVOT1k1TlFhNU5PYTVOT2E1Tk9hNU5PYTVOT2E1Tk9hNU5PYTVOT2E1Tk9hNU5PYTVOT2E1Tk9hNU5PYTVOT2Y5d2JZcjVwMnRUakd0VHpyOWNtMkwrN2RxVThoL1hwaHpYcHB6L3VqYkYrTyt1Y2x5YmNseWJjbHliY2x5YmNseWJjbHliY2x5YmNseWJjbHliY2x5YmNseWJjbHliY2x5YmNseWJjbHliY2x5YmNseWJjbHliY2x5YmNseWJjbHliY2x5YmNseWJjbHliY2x5YmNseWJjbHliY2x5YmNseWJjbHliY2x5YmNseWJjbHliY2x5YmNseWJjbTdPVFNrMzE2WVkxNlljMTZZYzE2WWMxNlljMTZZYzE2YVkyODI1S2NXMUtjZTFLY2UxS2NlMUtlZm0zSlJ5YzIyS2NXM0tjVzNLY1czS3VUazNwZHhjbTJKY20zSmNtM0p1emswcE45ZW1HTmVtSE5lbW1Odk51U25GdFNuSHRTbm41dHlVY25OdGluRnRpdmwrYk01Tis3ZzI1YmcyeGZ3NE51ZW1YVnliY3Q1Ym0zUFRGdStPemJWcEM5ZW1tUGZINXR5MGcydFR6a2RyYzI1YTdzT3h1VFl0OS9IYW5Kc1d1ek0yMTZiRjdxM051V21wdTJOemJWcnEvdHFjbXhaNk1EYlhwb1VlcmMyNWFabUhZM050V3VYeDJKeWJWam15TnVlbUpRNk56YlZwaVdOcmMyNWE0T0RZbkp2T096dzIxNmF6am8vTnVlbXNaOWJtM0hUS1UyTnpiVHJqdWJFNU41M3g3TnFjbTE3MjlOaWNtMTcxd3RpY20xN3owdGhjbTE3eDJ0aWNtMTd4NnRxY201NzI4dGljbTU1MVltek9UYzg1TlRibnBtZWNISnR6MDNHbngrYmNkTlNDc1RrM0hiTmtiTTVOUnl3YW0zUFRZOHZHNXR6MHlNS3hPVGZkdDNSc3prMzNMQjZiYzlQSGxvL052ZWtETzdibTNQU3VUV056YnZyUnRyRzVOMzFuNTlhY203NnhlV3p1VFYvczM1cHowNXZJMk55YlB1VzI1dHlVSEp0N3U3anMxdHpibGVXMzV0NnVpdG1hZTdzaWJtdnU3V3JZcmJtM0s2R1g5b1krZy9hak4vWTEraGJhaTk3WEQraURhQmQ2V2UranI2SU42RkhkUlI5SEs5RnJPb0sra1ZhZ1YvUU0rbFk2ZzE3UFMraWo2WG4wWms2akQ2Z2pFa3Y0SDlJUXZ5dUkxSVkzQUFBQUFFbEZUa1N1UW1DQyIvPgoJPC9kZWZzPgoJPHN0eWxlPgoJPC9zdHlsZT4KCTx1c2UgaWQ9IkJhY2tncm91bmQiIGhyZWY9IiNpbWcxIiB4PSItMTA0IiB5PSItMTU1Ii8+Cgk8dXNlIGlkPSJTaGFwZSAxIiBocmVmPSIjaW1nMiIgeD0iMTA4IiB5PSIzMCIvPgo8L3N2Zz4=</sys:String>
+			<yjs:SolidColorFill x:Key="8" color="Black"/>
+			<sys:String x:Key="9" xmlns:sys="http://www.yworks.com/xml/yfiles-common/markup/primitives/2.0">data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmlld0JveD0iMCAwIDEwODAgMTA4MCIgd2lkdGg9IjEwODAiIGhlaWdodD0iMTA4MCI+Cgk8dGl0bGU+TmV3IFByb2plY3Q8L3RpdGxlPgoJPGRlZnM+CgkJPGltYWdlICB3aWR0aD0iMTA4MCIgaGVpZ2h0PSIxMDgwIiBpZD0iaW1nMSIgaHJlZj0iZGF0YTppbWFnZS9wbmc7YmFzZTY0LGlWQk9SdzBLR2dvQUFBQU5TVWhFVWdBQUJEZ0FBQVE0QVFNQUFBRFczdjdNQUFBQUFYTlNSMElCMmNrc2Z3QUFBQU5RVEZSRkFBQUFwM285MmdBQUFBRjBVazVUQUVEbTJHWUFBQUNsU1VSQlZIaWM3Y0V4QVFBQUFNS2c5VTl0Q1UrZ0FBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUhnYVBkNEFBVHFkeHBJQUFBQUFTVVZPUks1Q1lJST0iLz4KCTwvZGVmcz4KCTxzdHlsZT4KCQkuczAgeyBmaWxsOiAjMDAwMDAwIH0gCgk8L3N0eWxlPgoJPHVzZSBpZD0iQmFja2dyb3VuZCIgaHJlZj0iI2ltZzEiIHg9IjAiIHk9IjAiLz4KCTxwYXRoIGlkPSJTaGFwZSAxIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsYXNzPSJzMCIgZD0ibTgzMC41IDc0My41cS0xLjYtMjQtNi4yLTUxLjktNC42LTI3LjgtMTEuNy01MS42LTctMjMuOC0xOC45LTQ2LjQtMTEuOS0yMi42LTI3LjMtMzguNi0xNS40LTE1LjktMzcuNy0yNS40LTIyLjItOS42LTQ5LjEtOS42LTMuOSAwLTE4LjUgMTAuMy0xNC41IDEwLjItMzIuOCAyMi44LTE4LjIgMTIuNi00Ny41IDIyLjktMjkuMyAxMC4yLTU4LjggMTAuMi0yOS41IDAtNTguOC0xMC4yLTI5LjMtMTAuMy00Ny41LTIyLjktMTguMy0xMi42LTMyLjgtMjIuOC0xNC42LTEwLjMtMTguNS0xMC4zLTI2LjkgMC00OS4xIDkuNi0yMi4zIDkuNS0zNy43IDI1LjQtMTUuNCAxNi0yNy4zIDM4LjYtMTEuOSAyMi42LTE4LjkgNDYuNC03LjEgMjMuOC0xMS43IDUxLjYtNC42IDI3LjktNi4yIDUxLjktMS41IDI0LTEuNSA0OS4yIDAgNTcuMSAzMi4xIDkwLjIgMzIuMiAzMy4xIDg1LjUgMzMuMWgzODQuOHE1My4zIDAgODUuNS0zMy4xIDMyLjEtMzMuMSAzMi4xLTkwLjIgMC0yNS4yLTEuNS00OS4yem0tMzA4LjUtNTU4LjVxLTcwIDAtMTE5LjYgNTMuNS00OS41IDUzLjYtNDkuNSAxMjkuMiAwIDc1LjcgNDkuNSAxMjkuMyA0OS42IDUzLjUgMTE5LjYgNTMuNSA3MCAwIDExOS42LTUzLjUgNDkuNS01My42IDQ5LjUtMTI5LjMgMC03NS42LTQ5LjUtMTI5LjItNDkuNi01My41LTExOS42LTUzLjV6Ii8+Cjwvc3ZnPg==</sys:String>
+			<yjs:SolidColorFill x:Key="10" color="Black"/>
+			<yjs:Arrow x:Key="11" type="NONE"/>
+		</y:SharedData>
+	</data>
+	<graph id="G" edgedefault="directed">
+		<data key="d6">
+			<y:Json>{"version":"2.0.0","origin":"yed-live","theme":{"name":"light","version":"1.0.0"}}</y:Json>
+		</data>
+		<node id="n0">
+			<data key="d0">0</data>
+			<data key="d4">
+				<x:List>
+					<y:Label>
+						<y:Label.Text><![CDATA[S1, S2]]></y:Label.Text>
+						<y:Label.LayoutParameter>
+							<y:RatioAnchoredLabelModelParameter LayoutOffset="-22.222949981689453,-38"/>
+						</y:Label.LayoutParameter>
+						<y:Label.Style>
+							<yjs:DefaultLabelStyle horizontalTextAlignment="CENTER" autoFlip="false" textFill="{y:GraphMLReference 2}" textSize="28">
+								<yjs:DefaultLabelStyle.font>
+									<yjs:Font fontSize="28"/>
+								</yjs:DefaultLabelStyle.font>
+							</yjs:DefaultLabelStyle>
+						</y:Label.Style>
+					</y:Label>
+				</x:List>
+			</data>
+			<data key="d5">
+				<y:RectD X="-230.17705001831052" Y="-136.97450256347656" Width="40.554100036621094" Height="40.949005126953125"/>
+			</data>
+			<data key="d7">
+				<yjs:ImageNodeStyle image="{y:GraphMLReference 1}"/>
+			</data>
+			<data key="d8">
+				<y:ViewState>
+					<y:FolderNodeState x:Key="c|view" Layout="-190.67705001831052,-157.47450256347656,31.554100036621094,40.949005126953125">
+						<y:FolderNodeState.Labels>
+							<y:Label>
+								<y:Label.Text><![CDATA[S1, S2]]></y:Label.Text>
+								<y:Label.LayoutParameter>
+									<y:RatioAnchoredLabelModelParameter LayoutOffset="-2.234668731689453,46.949005126953125"/>
+								</y:Label.LayoutParameter>
+								<y:Label.Style>
+									<yjs:DefaultLabelStyle horizontalTextAlignment="CENTER" autoFlip="false" textFill="{y:GraphMLReference 2}">
+										<yjs:DefaultLabelStyle.font>
+											<yjs:Font fontSize="12"/>
+										</yjs:DefaultLabelStyle.font>
+									</yjs:DefaultLabelStyle>
+								</y:Label.Style>
+							</y:Label>
+						</y:FolderNodeState.Labels>
+					</y:FolderNodeState>
+				</y:ViewState>
+			</data>
+			<port name="p0">
+				<data key="d18">
+					<y:ViewState>
+						<y:Port x:Key="c|view"/>
+					</y:ViewState>
+				</data>
+			</port>
+			<port name="p1">
+				<data key="d18">
+					<y:ViewState>
+						<y:Port x:Key="c|view"/>
+					</y:ViewState>
+				</data>
+			</port>
+			<port name="p2">
+				<data key="d16">
+					<y:FreeNodePortLocationModelParameter Ratio="0.5982439681817013,0.7075752505744077"/>
+				</data>
+				<data key="d18">
+					<y:ViewState>
+						<y:Port x:Key="c|view"/>
+					</y:ViewState>
+				</data>
+			</port>
+		</node>
+		<node id="n1">
+			<data key="d0">1</data>
+			<data key="d4">
+				<x:List>
+					<y:Label>
+						<y:Label.Text><![CDATA[S1, S3, S4]]></y:Label.Text>
+						<y:Label.LayoutParameter>
+							<y:RatioAnchoredLabelModelParameter LayoutOffset="-47.22500000000001,-32"/>
+						</y:Label.LayoutParameter>
+						<y:Label.Style>
+							<yjs:DefaultLabelStyle horizontalTextAlignment="CENTER" autoFlip="false" textFill="{y:GraphMLReference 4}" textSize="28">
+								<yjs:DefaultLabelStyle.font>
+									<yjs:Font fontSize="28"/>
+								</yjs:DefaultLabelStyle.font>
+							</yjs:DefaultLabelStyle>
+						</y:Label.Style>
+					</y:Label>
+				</x:List>
+			</data>
+			<data key="d5">
+				<y:RectD X="-38.480000000000004" Y="-170.76999999999998" Width="40.55" Height="40.95"/>
+			</data>
+			<data key="d7">
+				<yjs:ImageNodeStyle image="{y:GraphMLReference 3}"/>
+			</data>
+			<data key="d8">
+				<y:ViewState>
+					<y:FolderNodeState x:Key="c|view" Layout="-31.477050018310536,-183.56792907714845,32.554100036621094,41.535858154296875">
+						<y:FolderNodeState.Labels>
+							<y:Label>
+								<y:Label.Text><![CDATA[S1, S3, S4]]></y:Label.Text>
+								<y:Label.LayoutParameter>
+									<y:RatioAnchoredLabelModelParameter LayoutOffset="-12.407520294189453,47.535858154296875"/>
+								</y:Label.LayoutParameter>
+								<y:Label.Style>
+									<yjs:DefaultLabelStyle horizontalTextAlignment="CENTER" autoFlip="false" textFill="{y:GraphMLReference 4}">
+										<yjs:DefaultLabelStyle.font>
+											<yjs:Font fontSize="12"/>
+										</yjs:DefaultLabelStyle.font>
+									</yjs:DefaultLabelStyle>
+								</y:Label.Style>
+							</y:Label>
+						</y:FolderNodeState.Labels>
+					</y:FolderNodeState>
+				</y:ViewState>
+			</data>
+			<port name="p0">
+				<data key="d18">
+					<y:ViewState>
+						<y:Port x:Key="c|view"/>
+					</y:ViewState>
+				</data>
+			</port>
+			<port name="p1">
+				<data key="d18">
+					<y:ViewState>
+						<y:Port x:Key="c|view"/>
+					</y:ViewState>
+				</data>
+			</port>
+			<port name="p2">
+				<data key="d18">
+					<y:ViewState>
+						<y:Port x:Key="c|view"/>
+					</y:ViewState>
+				</data>
+			</port>
+			<port name="p3">
+				<data key="d16">
+					<y:FreeNodePortLocationModelParameter Ratio="0.7021678300758265,0.6466747520195598"/>
+				</data>
+				<data key="d18">
+					<y:ViewState>
+						<y:Port x:Key="c|view"/>
+					</y:ViewState>
+				</data>
+			</port>
+		</node>
+		<node id="n2">
+			<data key="d0">2</data>
+			<data key="d4">
+				<x:List>
+					<y:Label>
+						<y:Label.Text><![CDATA[S2, S4]]></y:Label.Text>
+						<y:Label.LayoutParameter>
+							<y:RatioAnchoredLabelModelParameter LayoutOffset="-25.537499999999994,35.575"/>
+						</y:Label.LayoutParameter>
+						<y:Label.Style>
+							<yjs:DefaultLabelStyle horizontalTextAlignment="CENTER" autoFlip="false" textFill="{y:GraphMLReference 6}" textSize="28">
+								<yjs:DefaultLabelStyle.font>
+									<yjs:Font fontSize="28"/>
+								</yjs:DefaultLabelStyle.font>
+							</yjs:DefaultLabelStyle>
+						</y:Label.Style>
+					</y:Label>
+				</x:List>
+			</data>
+			<data key="d5">
+				<y:RectD X="-171.28" Y="-68.77000000000001" Width="33.925" Height="35.575"/>
+			</data>
+			<data key="d7">
+				<yjs:ImageNodeStyle image="{y:GraphMLReference 5}"/>
+			</data>
+			<data key="d8">
+				<y:ViewState>
+					<y:FolderNodeState x:Key="c|view" Layout="-89.27949905395508,-63.76792907714844,30.558998107910156,36.535858154296875">
+						<y:FolderNodeState.Labels>
+							<y:Label>
+								<y:Label.Text><![CDATA[S2, S4]]></y:Label.Text>
+								<y:Label.LayoutParameter>
+									<y:RatioAnchoredLabelModelParameter LayoutOffset="-2.732219696044922,42.535858154296875"/>
+								</y:Label.LayoutParameter>
+								<y:Label.Style>
+									<yjs:DefaultLabelStyle horizontalTextAlignment="CENTER" autoFlip="false" textFill="{y:GraphMLReference 6}">
+										<yjs:DefaultLabelStyle.font>
+											<yjs:Font fontSize="12"/>
+										</yjs:DefaultLabelStyle.font>
+									</yjs:DefaultLabelStyle>
+								</y:Label.Style>
+							</y:Label>
+						</y:FolderNodeState.Labels>
+					</y:FolderNodeState>
+				</y:ViewState>
+			</data>
+			<port name="p0">
+				<data key="d18">
+					<y:ViewState>
+						<y:Port x:Key="c|view"/>
+					</y:ViewState>
+				</data>
+			</port>
+			<port name="p1">
+				<data key="d18">
+					<y:ViewState>
+						<y:Port x:Key="c|view"/>
+					</y:ViewState>
+				</data>
+			</port>
+			<port name="p2">
+				<data key="d18">
+					<y:ViewState>
+						<y:Port x:Key="c|view"/>
+					</y:ViewState>
+				</data>
+			</port>
+		</node>
+		<node id="n3">
+			<data key="d0">3</data>
+			<data key="d4">
+				<x:List>
+					<y:Label>
+						<y:Label.Text><![CDATA[S2, S3, S4]]></y:Label.Text>
+						<y:Label.LayoutParameter>
+							<y:RatioAnchoredLabelModelParameter LayoutOffset="-33.57500000000002,42.762"/>
+						</y:Label.LayoutParameter>
+						<y:Label.Style>
+							<yjs:DefaultLabelStyle horizontalTextAlignment="CENTER" autoFlip="false" textFill="{y:GraphMLReference 8}" textSize="28">
+								<yjs:DefaultLabelStyle.font>
+									<yjs:Font fontSize="28"/>
+								</yjs:DefaultLabelStyle.font>
+							</yjs:DefaultLabelStyle>
+						</y:Label.Style>
+					</y:Label>
+				</x:List>
+			</data>
+			<data key="d5">
+				<y:RectD X="97.72" Y="-79.9241762158322" Width="33.925" Height="35.575"/>
+			</data>
+			<data key="d7">
+				<yjs:ImageNodeStyle image="{y:GraphMLReference 7}"/>
+			</data>
+			<data key="d8">
+				<y:ViewState>
+					<y:FolderNodeState x:Key="c|view" Layout="31.722949981689453,-89.88100051879883,31.554100036621094,36.762001037597656">
+						<y:FolderNodeState.Labels>
+							<y:Label>
+								<y:Label.Text><![CDATA[S2, S3, S4]]></y:Label.Text>
+								<y:Label.LayoutParameter>
+									<y:RatioAnchoredLabelModelParameter LayoutOffset="-12.907520294189453,42.762001037597656"/>
+								</y:Label.LayoutParameter>
+								<y:Label.Style>
+									<yjs:DefaultLabelStyle horizontalTextAlignment="CENTER" autoFlip="false" textFill="{y:GraphMLReference 8}">
+										<yjs:DefaultLabelStyle.font>
+											<yjs:Font fontSize="12"/>
+										</yjs:DefaultLabelStyle.font>
+									</yjs:DefaultLabelStyle>
+								</y:Label.Style>
+							</y:Label>
+						</y:FolderNodeState.Labels>
+					</y:FolderNodeState>
+				</y:ViewState>
+			</data>
+			<port name="p0">
+				<data key="d16">
+					<y:FreeNodePortLocationModelParameter Ratio="0.1928724884599342,0.7072695571600617"/>
+				</data>
+				<data key="d18">
+					<y:ViewState>
+						<y:Port x:Key="c|view"/>
+					</y:ViewState>
+				</data>
+			</port>
+			<port name="p1">
+				<data key="d16">
+					<y:FreeNodePortLocationModelParameter Ratio="0.10532262656172638,0.7723852555758776"/>
+				</data>
+				<data key="d18">
+					<y:ViewState>
+						<y:Port x:Key="c|view"/>
+					</y:ViewState>
+				</data>
+			</port>
+			<port name="p2">
+				<data key="d18">
+					<y:ViewState>
+						<y:Port x:Key="c|view"/>
+					</y:ViewState>
+				</data>
+			</port>
+		</node>
+		<node id="n4">
+			<data key="d0">4</data>
+			<data key="d4">
+				<x:List>
+					<y:Label>
+						<y:Label.Text><![CDATA[S1, S4]]></y:Label.Text>
+						<y:Label.LayoutParameter>
+							<y:RatioAnchoredLabelModelParameter LayoutOffset="-22.224999999999966,-44.964141845703125"/>
+						</y:Label.LayoutParameter>
+						<y:Label.Style>
+							<yjs:DefaultLabelStyle horizontalTextAlignment="CENTER" autoFlip="false" textFill="{y:GraphMLReference 10}" textSize="28">
+								<yjs:DefaultLabelStyle.font>
+									<yjs:Font fontSize="28"/>
+								</yjs:DefaultLabelStyle.font>
+							</yjs:DefaultLabelStyle>
+						</y:Label.Style>
+					</y:Label>
+				</x:List>
+			</data>
+			<data key="d5">
+				<y:RectD X="173.42000000000002" Y="-120.87417621583225" Width="40.55" Height="40.95"/>
+			</data>
+			<data key="d7">
+				<yjs:ImageNodeStyle image="{y:GraphMLReference 9}"/>
+			</data>
+			<data key="d8">
+				<y:ViewState>
+					<y:FolderNodeState x:Key="c|view" Layout="106.92250175476067,-170.76792907714844,31.554996490478516,34.535858154296875">
+						<y:FolderNodeState.Labels>
+							<y:Label>
+								<y:Label.Text><![CDATA[S1, S4]]></y:Label.Text>
+								<y:Label.LayoutParameter>
+									<y:RatioAnchoredLabelModelParameter LayoutOffset="-2.234220504760742,40.535858154296875"/>
+								</y:Label.LayoutParameter>
+								<y:Label.Style>
+									<yjs:DefaultLabelStyle horizontalTextAlignment="CENTER" autoFlip="false" textFill="{y:GraphMLReference 10}">
+										<yjs:DefaultLabelStyle.font>
+											<yjs:Font fontSize="12"/>
+										</yjs:DefaultLabelStyle.font>
+									</yjs:DefaultLabelStyle>
+								</y:Label.Style>
+							</y:Label>
+						</y:FolderNodeState.Labels>
+					</y:FolderNodeState>
+				</y:ViewState>
+			</data>
+			<port name="p0">
+				<data key="d16">
+					<y:FreeNodePortLocationModelParameter Ratio="0.21060625045193274,0.7858164847693303"/>
+				</data>
+				<data key="d18">
+					<y:ViewState>
+						<y:Port x:Key="c|view"/>
+					</y:ViewState>
+				</data>
+			</port>
+		</node>
+		<edge id="e0" source="n0" target="n0" sourceport="p0" targetport="p1">
+			<data key="d13">
+				<yjs:ArcEdgeStyle height="0.25" targetArrow="{y:GraphMLReference 11}" sourceArrow="{y:GraphMLReference 11}">
+					<yjs:ArcEdgeStyle.stroke>
+						<yjs:Stroke fill="#FF000000" miterLimit="1.45"/>
+					</yjs:ArcEdgeStyle.stroke>
+				</yjs:ArcEdgeStyle>
+			</data>
+		</edge>
+		<edge id="e1" source="n1" target="n1" sourceport="p0" targetport="p1">
+			<data key="d13">
+				<yjs:ArcEdgeStyle height="0.25" targetArrow="{y:GraphMLReference 11}" sourceArrow="{y:GraphMLReference 11}">
+					<yjs:ArcEdgeStyle.stroke>
+						<yjs:Stroke fill="#FF000000" miterLimit="1.45"/>
+					</yjs:ArcEdgeStyle.stroke>
+				</yjs:ArcEdgeStyle>
+			</data>
+		</edge>
+		<edge id="e2" source="n2" target="n1" sourceport="p0" targetport="p2">
+			<data key="d13">
+				<yjs:ArcEdgeStyle height="0.10954014956951141" targetArrow="{y:GraphMLReference 11}" sourceArrow="{y:GraphMLReference 11}">
+					<yjs:ArcEdgeStyle.stroke>
+						<yjs:Stroke fill="#FF0000FF" miterLimit="1.45" thickness="2"/>
+					</yjs:ArcEdgeStyle.stroke>
+				</yjs:ArcEdgeStyle>
+			</data>
+		</edge>
+		<edge id="e3" source="n3" target="n1" sourceport="p0" targetport="p3">
+			<data key="d13">
+				<yjs:ArcEdgeStyle height="-0.13561582565307617" targetArrow="{y:GraphMLReference 11}" sourceArrow="{y:GraphMLReference 11}">
+					<yjs:ArcEdgeStyle.stroke>
+						<yjs:Stroke fill="#FFFF00FF" miterLimit="1.45" thickness="2"/>
+					</yjs:ArcEdgeStyle.stroke>
+				</yjs:ArcEdgeStyle>
+			</data>
+		</edge>
+		<edge id="e4" source="n2" target="n3" sourceport="p1" targetport="p1">
+			<data key="d13">
+				<yjs:ArcEdgeStyle height="-0.06246655806899071" targetArrow="{y:GraphMLReference 11}" sourceArrow="{y:GraphMLReference 11}">
+					<yjs:ArcEdgeStyle.stroke>
+						<yjs:Stroke fill="#FFFF6600" miterLimit="1.45" thickness="2"/>
+					</yjs:ArcEdgeStyle.stroke>
+				</yjs:ArcEdgeStyle>
+			</data>
+		</edge>
+		<edge id="e5" source="n3" target="n4" sourceport="p2" targetport="p0">
+			<data key="d13">
+				<yjs:ArcEdgeStyle height="0.09602143615484238" targetArrow="{y:GraphMLReference 11}" sourceArrow="{y:GraphMLReference 11}">
+					<yjs:ArcEdgeStyle.stroke>
+						<yjs:Stroke fill="#FF993366" miterLimit="1.45" thickness="2"/>
+					</yjs:ArcEdgeStyle.stroke>
+				</yjs:ArcEdgeStyle>
+			</data>
+		</edge>
+		<edge id="e6" source="n2" target="n0" sourceport="p2" targetport="p2">
+			<data key="d13">
+				<yjs:ArcEdgeStyle height="-0.10896028578281403" targetArrow="{y:GraphMLReference 11}" sourceArrow="{y:GraphMLReference 11}">
+					<yjs:ArcEdgeStyle.stroke>
+						<yjs:Stroke fill="#FFFF0000" miterLimit="1.45" thickness="2"/>
+					</yjs:ArcEdgeStyle.stroke>
+				</yjs:ArcEdgeStyle>
+			</data>
+		</edge>
+	</graph>
+</graphml>

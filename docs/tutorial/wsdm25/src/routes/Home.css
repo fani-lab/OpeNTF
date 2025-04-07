@@ -1,0 +1,167 @@
+.home-content {
+  padding-bottom: 36em;
+}
+
+section {
+  color: #a0a0a0;
+}
+
+section.active {
+  color: inherit;
+}
+
+section.active .section-title {
+  color: #b83b21;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: larger;
+}
+
+section:not(:first-child) {
+  padding-top: 2em;
+}
+
+section.active .section-body {
+  /*transition: 0.5s all ease;*/
+  border-left: 2px double;
+  border-color: #b83b21;
+  padding-left: 1.5em;
+}
+
+section.active .section-list {
+  list-style: none;
+}
+
+.section-list li {
+  padding: 0.2rem 0;
+}
+
+section.active .section-list li::before {
+  content: "●";
+  color: #b83b21;
+  padding-right: 0.7rem;
+}
+
+section .section-list > ul > li {
+  list-style: circle;
+}
+
+section.active .section-list > ul > li {
+  list-style: none;
+}
+
+section .section-date {
+  color: #a0a0a0;
+  clear: both;
+  display: inline-block;
+  width: 100%;
+  font-size: smaller;
+  font-weight: bold;
+}
+
+section .presenter span {
+  clear: both;
+  display: block; 
+  width: 100%;
+}
+
+section .presenter {
+  padding-left: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+section .presenter:not(:last-child) {
+  border-right: 1px solid #b83b21;
+}
+
+.email-link,
+.external-link {
+  color: #b83b21;
+  text-decoration: none;
+  /* font-size: small; */
+}
+
+.email-link:hover,
+.external-link:hover,
+.email-link:active,
+.external-link:active {
+  color: #b83b21;
+  text-decoration: underline;
+}
+
+section .outline-topic {
+  padding: 0.5rem 0.2rem;
+}
+
+section .outline-topic:not(:last-child) {
+  border-bottom: #b83b21 1px solid;
+}
+
+section .topic-item {
+  padding-top: 0.4rem;
+}
+
+img {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+a {
+  color: forestgreen;
+  text-decoration: none;
+}
+
+a:hover {
+  color: forestgreen;
+  text-decoration: underline;
+}
+
+.plain-link {
+  color: #b3dfda;
+  text-decoration: none;
+}
+
+.plain-link:hover {
+  color: #b3dfda;
+}
+
+.justify-paragraph {
+  text-align: justify;
+}
+
+.footnote:hover {
+  font-size: larger;
+  color: #b83b21;
+  padding: none;
+}
+
+.presenter-img {
+  position: relative;
+}
+
+.presenter-img .front {
+  width: 100%;
+  object-fit: cover;
+}
+
+.presenter-img .back {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: none;
+}
+
+.presenter-img:hover .back {
+  display: block;
+  width: 100%;
+  object-fit: fill;
+}
+
+#section-location {
+    color: #b83b21;
+}
+
+.fs-10{
+    font-size: 0.5rem !important;
+}

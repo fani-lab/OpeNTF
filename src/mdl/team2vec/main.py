@@ -1,3 +1,4 @@
+
 import argparse, pickle, os, time, sys
 
 sys.path.append("..")
@@ -56,8 +57,9 @@ def run(teamsvecs_file, indexes_file, model, output, emb_output = None):
         # general init section for any
         # gnn methods
         import gnn
-        output_ = output + f'{params.settings["graph"]["edge_types"][1]}.{"dir" if params.settings["graph"]["dir"] else "undir"}.{str(params.settings["graph"]["dup_edge"]).lower()}.'
+        output_ = output + f'{params.settings["graph"]["edge_types"][1]}.{"dir" if params.settings["graph"]["dir"] else "undir"}.{str(params.settings["graph"]["dup_edge"]).lower()}/'
         t2v = gnn.Gnn(teamsvecs, indexes, params.settings['graph'], output_)
+
         t2v.init() # call the team2vec's init, this will lazy load the graph data e.g = "{domain}/gnn/stm.undir.mean.data.pkl"
 
         # replace the 1 dimensional node features with pretrained d2v skill vectors of required dimension
@@ -72,6 +74,7 @@ def run(teamsvecs_file, indexes_file, model, output, emb_output = None):
         if(args.graph_only):
             return
 
+
         if model == 'gnn.n2v':
             from torch_geometric.nn import Node2Vec
             t2v.device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -82,13 +85,16 @@ def run(teamsvecs_file, indexes_file, model, output, emb_output = None):
                                  walks_per_node=params.settings['model'][model]['walks_per_node'],
                                  num_negative_samples=params.settings['model'][model]['num_negative_samples']).to(t2v.device)
 
+
             t2v.loader = t2v.model.loader(batch_size=params.settings['model']['b'],
+
                                        shuffle=params.settings['model']['loader_shuffle'],
                                        num_workers=params.settings['model']['num_workers'])
             t2v.optimizer = torch.optim.Adam(list(t2v.model.parameters()), lr=params.settings['model']['lr'])
             t2v.model_name = 'n2v'
 
         elif model == 'gnn.m2v':
+
             from m2v import M2V
             from torch_geometric.nn import MetaPath2Vec
 
@@ -140,6 +146,7 @@ def test_toys(args):
                            './../../../data/preprocessed/uspt/toy.patent.tsv/']:
         args.output = args.teamsvecs
         args.model = 'gnn.n2v'
+
         # for edge_type in [('member', 'm')]: #n2v is only for homo, [([('skill', '-', 'team'), ('member', '-', 'team')], 'stm'), ([('skill', '-', 'member')], 'sm')]:
         for edge_type in [([('skill', 'to', 'team'), ('member', 'to', 'team')], 'stm')]:
             # for dir in [True, False]:
@@ -154,12 +161,14 @@ def test_toys(args):
 # with gnn args
 #python -u main.py -teamsvecs ./../../../data/preprocessed/dblp/toy.dblp.v12.json/ -model gnn.gs --agg mean --e 100 --d 8
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Team Embedding')
     addargs(parser)
     args = parser.parse_args()
 
     # run(f'{args.teamsvecs}teamsvecs.pkl', f'{args.teamsvecs}indexes.pkl', args.model, f'{args.output}/{args.model.split(".")[0]}/')
+
 
     for teamsvecs in args.teamsvecs:
         args.output = teamsvecs
@@ -204,3 +213,4 @@ if __name__ == "__main__":
 
                         run(f'{teamsvecs}teamsvecs.pkl', f'{teamsvecs}indexes.pkl', args.model,
                             f'{args.output}/{args.model.split(".")[0]}/', f'{args.output}/emb/')
+

@@ -6,6 +6,7 @@ the edge_type identifier "sm" or "stm" will have to be included as "sm.en" or "s
 
 settings = {
     'graph':{
+
         'edge_types':                   # this is an array holding the edge_type info in the form [('edge_type1', 'edge_type1_code'), ('edge_type2', 'edge_type2_code') ... ]
             # [('member', 'm')],
             # [([('skill', 'to', 'member')], 'sm')],
@@ -21,10 +22,12 @@ settings = {
         'custom_supervision' : False, # if false, it will take all the forward edge_types as supervision edges
         # 'supervision_edge_types': [([('skill', 'to', 'skill'), ('member', 'to', 'member'), ('skill', 'to', 'member')], 'sm'), ([('skill', 'to', 'skill'), ('member', 'to', 'member'), ('skill', 'to', 'team'), ('member', 'to', 'team'), ('skill', 'to', 'member')], 'stm')], # sm stm strongly connected
         'supervision_edge_types': [([('skill', 'to', 'member')], 'sm.en'), ([('skill', 'to', 'team'), ('member', 'to', 'team')], 'stm.en')],
+
         'dir': False,
         'dup_edge': ['add', 'mean', 'min', 'max', 'mul'],         #None: keep the duplicates, else: reduce by 'add', 'mean', 'min', 'max', 'mul'
     },
     'model': {
+
         'd' : 8,                    # embedding dim array
         'b' : 128,                  # batch_size for loaders
         'e' : 100,                  # num epochs
@@ -34,6 +37,7 @@ settings = {
         'num_workers': 0,
         'save_per_epoch': False,
         'pt' : 0,                   # 1 -> use pretrained d2v skill vectors as initial node features of graph data
+
         'w2v': {
             'd' : 8,
             'max_epochs' : 100,

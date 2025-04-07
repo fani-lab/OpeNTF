@@ -1,5 +1,7 @@
 import numpy as np, math, os, itertools, pickle, time, json
+
 import torch_geometric.data
+
 from matplotlib import pyplot as plt
 from tqdm import tqdm
 from sklearn.metrics import roc_auc_score
@@ -22,10 +24,11 @@ class Gnn(Team2Vec):
 
         self.loader = None
         self.optimizer = None
+
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
         # this line enables to produce separate directories for separate graph_types
-        # if not os.path.isdir(self.output): os.makedirs(self.output)
+        if not os.path.isdir(self.output): os.makedirs(self.output)
 
     def create(self, file):
         # https://pytorch-geometric.readthedocs.io/en/latest/modules/utils.html#torch_geometric.utils.remove_self_loops
@@ -95,6 +98,7 @@ class Gnn(Team2Vec):
         self.data.validate(raise_on_error=True)
         with open(file, 'wb') as f: pickle.dump(self.data, f)
         return self.data
+
 
     # settings = the settings for this particular gnn model
     # emb_output = the path for the embedding output and model output storage
@@ -422,3 +426,4 @@ class Gnn(Team2Vec):
         print(f"Val AUC: {auc:.6f}\n")
         # print(f'................... ending eval...................\n')
         return loss, auc
+

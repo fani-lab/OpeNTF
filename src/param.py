@@ -57,8 +57,10 @@ settings = {
                 'ns' : 2,
             }
         },
+
         'cmd':['train', 'test', 'eval'],
         # 'cmd': ['eval'],  # 'train', 'test', 'eval', 'plot', 'agg', 'fair'
+
         'nfolds': 3,
         'train_test_split': 0.85,
         'step_ahead': 2,#for now, it means that whatever are in the last [step_ahead] time interval will be the test set!

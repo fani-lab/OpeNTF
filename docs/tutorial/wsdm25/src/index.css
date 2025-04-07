@@ -1,0 +1,32 @@
+body {
+  margin: 0;
+  font-family: "Montserrat", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.sidebar {
+  height: 100vh;
+  position: relative;
+}
+
+.main-content {
+  padding-top: 1rem;
+}
+
+.top-menu {
+  height: 40rem;
+  background-image: url("./img/banner.jpg");
+  background-position: center top;
+  background-size: cover;
+}
+
+.title-text {
+  color: #b3dfda;
+}
+
+.title-box {
+  background: #000000d4;
+  margin-top: 200px !important;
+
+}
