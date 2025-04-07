@@ -21,29 +21,25 @@ class Team(object):
     def get_one_hot(self, s2i, c2i, l2i, location_type):
         # Generating one hot encoded vector for skills of team
         skill_vec_dim = len(s2i)
-        x = np.zeros((1, skill_vec_dim))
+        x = np.zeros((1, skill_vec_dim), dtype='u1')
         for field in self.skills: x[0, s2i[field]] = 1
 
         # Generating one hot encoded vector for members of team
         candidate_vec_dim = len(c2i)
-        y = np.zeros((1, candidate_vec_dim))
+        y = np.zeros((1, candidate_vec_dim), dtype='u1')
         idnames = [f'{m.id}_{m.name}' for m in self.members]
-        for idname in idnames:
-            y[0, c2i[idname]] = 1
-        id = np.zeros((1, 1))
-        id[0, 0] = self.id
+        for idname in idnames: y[0, c2i[idname]] = 1
 
         # Generating one hot encoded vector for locations of team members
         loc_vec_dim = len(l2i)
-        z = np.zeros((1, loc_vec_dim))
+        z = np.zeros((1, loc_vec_dim), dtype='u1')
         for loc in self.members_locations:
             loc = loc[0] + loc[1] + loc[2] if location_type == 'city' else \
                   loc[1] + loc[2] if location_type == 'state' else \
                   loc[2]  # if location_type == 'country'
-            if loc in l2i.keys():
-                z[0, l2i[loc]] = 1
+            if loc in l2i.keys(): z[0, l2i[loc]] = 1
 
-        return np.hstack([id, x, z, y])
+        return np.hstack([x, z, y])
 
     @staticmethod
     def build_index_location(teams, location_type):
@@ -151,13 +147,16 @@ class Team(object):
         skill_vec_dim = len(s2i)
         candidate_vec_dim = len(c2i)
         location_vec_dim = len(l2i)
-        data = lil_matrix((len(teams), 1 + skill_vec_dim + candidate_vec_dim + location_vec_dim), dtype='u1')
-        data_ = np.zeros((bucket_size, 1 + skill_vec_dim + candidate_vec_dim + location_vec_dim), dtype='u1')
+
+        data = lil_matrix((len(teams), skill_vec_dim + candidate_vec_dim + location_vec_dim), dtype='u1')
+        data_ = np.zeros((bucket_size, skill_vec_dim + candidate_vec_dim + location_vec_dim), dtype='u1')
+        teamids = []
         j = -1
         st = time()
         for i, team in enumerate(teams):
             try:
                 j += 1
+                teamids.append(team.id)
                 data_[j] = team.get_one_hot(s2i, c2i, l2i, location_type)
             except IndexError as ex:
                 s = int(((i / bucket_size) - 1) * bucket_size)
@@ -171,7 +170,7 @@ class Team(object):
             # if (i % bucket_size == 0): print(f'Loading {i}/{len(teams)} instances by {multiprocessing.current_process()}! {time() - st}')
 
         if j > -1: data[-(j+1):] = data_[0:j+1]
-        return data
+        return data, teamids
 
     @classmethod
     def generate_sparse_vectors(cls, datapath, output, filter, settings):
@@ -189,6 +188,7 @@ class Team(object):
             st = time()
             # parallel
             if settings['parallel']:
+                teamids = []
                 with multiprocessing.Pool() as p:
                     n_core = multiprocessing.cpu_count() if settings['ncore'] <= 0 else settings['ncore']
                     subteams = np.array_split(teams, n_core)
@@ -196,11 +196,22 @@ class Team(object):
                     data = p.map(func, subteams)
                     #It took 12156.825613975525 seconds to generate and store the sparse matrices of size (1729691, 818915) at ./../data/preprocessed/uspt/patent.tsv.filtered.mt5.ts3/teamsvecs.pkl
                     #It took 11935.809179782867 seconds to generate and store the sparse matrices of size (661335, 1444501) at ./../data/preprocessed/gith/data.csv/teamsvecs.pkl
+
+                #TODO: for Jamil, optimize and make it oneliner please.
+                matrix_splits = []
+                id_splits = []
+                for (d, id) in data:
+                    matrix_splits.append(d)
+                    id_splits.append(id)
+
+                data = scipy.sparse.vstack(matrix_splits, 'lil')#{'bsr', 'coo', 'csc', 'csr', 'dia', 'dok', 'lil'}, By default an appropriate sparse matrix format is returned!!
+                for id_split in id_splits: teamids += id_split
+
             # serial
             else:
-                data = Team.bucketing(settings['bucket_size'], indexes['s2i'], indexes['c2i'], teams)
-            data = scipy.sparse.vstack(data, 'lil')#{'bsr', 'coo', 'csc', 'csr', 'dia', 'dok', 'lil'}, By default an appropriate sparse matrix format is returned!!
-            vecs = {'id': data[:, 0], 'skill': data[:, 1:len(indexes['s2i']) + 1], 'loc': data[:, len(indexes['s2i']) + 1: len(indexes['s2i']) + 1 + len(indexes['l2i'])], 'member': data[:, - len(indexes['c2i']):]}
+                data, teamids = Team.bucketing(settings['bucket_size'], indexes['s2i'], indexes['c2i'], indexes['l2i'], settings['location_type'], teams)
+            # vecs = {'id': teamids, 'skill': data[:, 1:len(indexes['s2i']) + 1], 'loc': data[:, len(indexes['s2i']) + 1: len(indexes['s2i']) + 1 + len(indexes['l2i'])], 'member': data[:, - len(indexes['c2i']):]}
+            vecs = {'id': lil_matrix(np.array(teamids).reshape(-1, 1)), 'skill': data[:, 1:len(indexes['s2i']) + 1], 'loc': data[:, len(indexes['s2i']) + 1: len(indexes['s2i']) + 1 + len(indexes['l2i'])], 'member': data[:, - len(indexes['c2i']):]}
 
             with open(pkl, 'wb') as outfile: pickle.dump(vecs, outfile)
             print(f"It took {time() - st} seconds to generate and store the sparse matrices of size {data.shape} at {pkl}")
@@ -213,10 +224,51 @@ class Team(object):
     def remove_outliers(teams, settings):
         print(f'Removing outliers {settings["filter"]} ...')
         for id in list(teams.keys()):
+            print(f'Removing team {id}')
             teams[id].members = [member for member in teams[id].members if len(member.teams) > settings['filter']['min_nteam']]
             if len(teams[id].members) < settings['filter']['min_team_size']: del teams[id]
 
         return teams
+
+    '''
+    a 1-hot vector containing skills that each member has in total
+    by transposing 'member' and then doing dot product with 'skill'
+    gives us the co-occurrence matrix of member vs skills. In this way
+    we get the number of times member x co-occurs with skill y. Then,
+    each row of the es_vecs will give us all the skills a member has
+    if the matrix is like this :
+     
+    0 4 2
+    0 0 1
+    2 1 0
+    0 5 0
+    
+    then, the skills of the members are 
+    
+    e0 -> s1, s2
+    e1 -> s2
+    e2 -> s0, s1
+    e3 -> s2
+    
+    '''
+    @classmethod
+    def generate_es_vectors(cls, teamsvecs, output):
+        filepath = f'{output}/es_vecs.pkl'
+        try :
+            with open(filepath, 'rb') as f:
+                es_vecs = pickle.load(f)
+                print(f'loaded expert-skill co-occurrence matrix es_vecs')
+            return es_vecs
+
+        except FileNotFoundError as e:
+            print(f'{filepath} was not found, generating expert-skill co-occurrence matrix es_vecs ...')
+            es_vecs = {}
+            es_vecs['skill'] = scipy.sparse._lil.lil_matrix(np.dot(teamsvecs['member'].transpose(), teamsvecs['skill']))
+
+            with open(filepath, 'wb') as f:
+                pickle.dump(es_vecs, f)
+                print(f'saved es_vecs to {filepath}')
+            return es_vecs
 
     @classmethod
     def get_stats(cls, teamsvecs, obj, output, cache=True, plot=False, plot_title=None):

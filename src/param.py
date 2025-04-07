@@ -3,11 +3,6 @@ import torch
 import numpy as np
 
 random.seed(0)
-torch.manual_seed(0)
-torch.cuda.manual_seed_all(0)
-
-np.random.seed(0)
-
 settings = {
     'model':{
         'baseline': {
@@ -15,23 +10,36 @@ settings = {
                 'b': 128
             },
             'fnn':{
-                'l': [100],  # list of number of nodes in each layer
-                'lr': 0.001,  # learning rate
-                'b': 128,  # batch size
-                'e': 10,  # epoch
+                'b': 2048,  # batch size
+                'e': 25,  # epoch
+                'l': [128],  # list of number of nodes in each layer
+                'loss': 'normal', # 'SL'-> superloss, 'DP' -> Data Parameters, 'normal' -> Binary Cross Entropy 'pos-ce' -> positive ce, 'weighted' -> weighted ce
+                'lr': 0.0001,  # learning rate
                 'nns': 3,  # number of negative samples
-                'ns': 'none',  # 'none', 'uniform', 'unigram', 'unigram_b'
-                'loss': 'SL',  # 'SL'-> superloss, 'DP' -> Data Parameters, 'normal' -> Binary Cross Entropy
+                'ns': 'uniform',  # 'none', 'uniform', 'unigram', 'unigram_b'
+                'weight': 2.5, # weight if ns == 'weighted'
+            },
+            'bnn_old':{
+                'l': [128],  # list of number of nodes in each layer
+                'lr': 0.01,  # learning rate
+                'b': 2048,  # batch size
+                'e': 25,  # epoch
+                'nns': 3,  # number of negative samples
+                'ns': 'uniform',  # 'uniform', 'unigram', 'unigram_b'
+                'weight': 5, # weight if ns == 'weighted'
+                's': 1,  # # sample_elbo for bnn
+                'loss': 'normal',  # 'SL'-> superloss, 'DP' -> Data Parameters, 'normal' -> Binary Cross Entropy
             },
             'bnn':{
+                'b': 2048,  # batch size
+                'e': 25,  # epoch
                 'l': [128],  # list of number of nodes in each layer
-                'lr': 0.1,  # learning rate
-                'b': 128,  # batch size
-                'e': 5,  # epoch
+                'loss': 'normal',  # 'SL'-> superloss, 'DP' -> Data Parameters, 'normal' -> Binary Cross Entropy
+                'lr': 0.01,  # learning rate
                 'nns': 3,  # number of negative samples
-                'ns': 'unigram_b',  # 'uniform', 'unigram', 'unigram_b'
+                'ns': 'uniform',  # 'uniform', 'unigram', 'unigram_b'
                 's': 1,  # # sample_elbo for bnn
-                'loss': 'SL',  # 'SL'-> superloss, 'DP' -> Data Parameters, 'normal' -> Binary Cross Entropy
+                'weight': 2.5, # weight if ns == 'weighted'
             },
             'nmt': {
                 'base_config': './mdl/nmt_config.yaml'
@@ -41,13 +49,18 @@ settings = {
                 'with_zero': True
             },
             'emb':{
-                'd': 100,# embedding dimension
-                'e': 100,# epoch
+                'e': 100,# max epoch
+                'd': 128,# embedding dimension
                 'dm': 1,# training algorithm. 1: distributed memory (PV-DM), 0: distributed bag of words (PV-DBOW)
-                'w': 1 #cooccurrence window
+                'w': 1, #cooccurrence window
+                'b' : 128, # 0 means no batching
+                'ns' : 2,
             }
         },
-        'cmd': ['train', 'test', 'eval'],  # 'train', 'test', 'eval', 'plot', 'agg', 'fair'
+
+        'cmd':['train', 'test', 'eval'],
+        # 'cmd': ['eval'],  # 'train', 'test', 'eval', 'plot', 'agg', 'fair'
+
         'nfolds': 3,
         'train_test_split': 0.85,
         'step_ahead': 2,#for now, it means that whatever are in the last [step_ahead] time interval will be the test set!
@@ -77,3 +90,8 @@ settings = {
               'core': -1,
               'attribute': ['gender', 'popularity']},
 }
+torch.manual_seed(0)
+torch.cuda.manual_seed_all(0)
+
+np.random.seed(0)
+
