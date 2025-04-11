@@ -1,17 +1,15 @@
-import os, scipy.sparse, pickle, multiprocessing
-import matplotlib.pyplot as plt
+import os, scipy.sparse, pickle, numpy as np, logging
 from collections import Counter
-from scipy.sparse import lil_matrix
-import numpy as np
-from time import time
 from functools import partial
-import pandas as pd
 from dateutil import parser
 
+log = logging.getLogger(__name__)
+
+from .pkgmgr import *
 class Team(object):
     def __init__(self, id, members, skills, datetime, location=None):
         self.id = int(id)
-        self.datetime = parser.parse(str(datetime)).year if not pd.isna(datetime) else None
+        self.datetime = parser.parse(str(datetime)).year if datetime else None
         self.members = members
         self.skills = skills
         self.location = location
@@ -36,10 +34,21 @@ class Team(object):
         for loc in self.members_locations:
             loc = loc[0] + loc[1] + loc[2] if location_type == 'city' else \
                   loc[1] + loc[2] if location_type == 'state' else \
-                  loc[2]  # if location_type == 'country'
+                  loc[2]  # if location_type == 'country' or 'venue'
             if loc in l2i.keys(): z[0, l2i[loc]] = 1
 
-        return np.hstack([x, z, y])
+        return np.hstack([x, y, z])
+
+    @staticmethod
+    def remove_outliers(teams, cfg):
+        log.info(f'Removing outliers {cfg} ...')
+        for id in list(teams.keys()):
+            teams[id].members = [member for member in teams[id].members if len(member.teams) > cfg.min_nteam]
+            # this may lead to a team with empty 0 members, which will be removed next line
+            if len(teams[id].members) < cfg.min_team_size: del teams[id]
+            # this may lead to skills that has no teams but the index creating is after this step. It relies on teams' skills for the remained teams
+
+        return teams
 
     @staticmethod
     def build_index_location(teams, location_type):
@@ -49,7 +58,7 @@ class Team(object):
             for loc in t.members_locations:
                 loc = loc[0] + loc[1] + loc[2] if location_type == 'city' else \
                       loc[1] + loc[2] if location_type == 'state' else \
-                      loc[2] #if location_type == 'country'
+                      loc[2] #if location_type == 'country' or 'venue'
                 if loc not in l2i.keys():
                     l2i[loc] = idx
                     i2l[idx] = loc
@@ -90,20 +99,20 @@ class Team(object):
             i2t[idx] = t.id
             t2i[t.id] = idx
         return i2t, t2i
-    
+
     @staticmethod
-    def read_data(teams, output, filter, settings):
+    def read_data(teams, output, cfg):
         # should be overridden by the children classes, customize their loading data
         # read data from file
-        # apply filtering
-        if filter: teams = Team.remove_outliers(teams, settings)
+        # apply filtering. this should be before creating (1) indexes, and (2) teamsvecs
+        if 'filter' in cfg: teams = Team.remove_outliers(teams, cfg.filter)
 
         for k in list(teams.keys()):
-            if pd.isna(teams[k].datetime): del teams[k]
+            if not teams[k].datetime: del teams[k]
 
         teams = sorted(teams.values(), key=lambda x: x.datetime)
 
-        year_idx = [] #e.g, [(0, 1900), (6, 1903), (14, 1906)] => the i shows the starting index for movies of the year
+        year_idx = [] #e.g, [(0, 1900), (6, 1903), (14, 1906)] => the i shows the starting index for teams of the year
         start_year = None
         for i, v in enumerate(teams):
             if v.datetime != start_year:
@@ -115,31 +124,26 @@ class Team(object):
         indexes['i2c'], indexes['c2i'] = Team.build_index_candidates(teams)
         indexes['i2s'], indexes['s2i'] = Team.build_index_skills(teams)
         indexes['i2t'], indexes['t2i'] = Team.build_index_teams(teams)
-        indexes['i2l'], indexes['l2i'] = Team.build_index_location(teams, settings["location_type"])
+        indexes['i2l'], indexes['l2i'] = Team.build_index_location(teams, cfg.location)
         indexes['i2y'] = year_idx
-        st = time()
 
         try: os.makedirs(output)
         except FileExistsError as ex: pass
 
         with open(f'{output}/teams.pkl', "wb") as outfile: pickle.dump(teams, outfile)
         with open(f'{output}/indexes.pkl', "wb") as outfile: pickle.dump(indexes, outfile)
-        print(f"It took {time() - st} seconds to pickle the data into {output}")
+        log.info(f'Teams and indexes are pickled into {output}')
         return indexes, teams
 
     @staticmethod
-    def load_data(output, index):
-        st = time()
-        print(f"Loading indexes pickle from {output}/indexes.pkl ...")
+    def load_data(output, indexes_only):
+        log.info(f'Loading indexes pickle from {output}/indexes.pkl ...')
         with open(f'{output}/indexes.pkl', 'rb') as infile: indexes = pickle.load(infile)
-        print(f"It took {time() - st} seconds to load from the pickles.")
         teams = None
-        if not index:
-            st = time()
-            print(f"Loading teams pickle from {output}/teams.pkl ...")
+        if not indexes_only:
+            log.info(f'Loading teams pickle from {output}/teams.pkl ...')
             with open(f'{output}/teams.pkl', 'rb') as tfile: teams = pickle.load(tfile)
-            print(f"It took {time() - st} seconds to load from the pickles.")
-
+        log.info('Indexes pickle is loaded.' if indexes_only else 'Teams and indexes pickles are loaded.')
         return indexes, teams
 
     @staticmethod
@@ -148,15 +152,12 @@ class Team(object):
         candidate_vec_dim = len(c2i)
         location_vec_dim = len(l2i)
 
-        data = lil_matrix((len(teams), skill_vec_dim + candidate_vec_dim + location_vec_dim), dtype='u1')
+        data = scipy.sparse.lil_matrix((len(teams), skill_vec_dim + candidate_vec_dim + location_vec_dim), dtype='u1')
         data_ = np.zeros((bucket_size, skill_vec_dim + candidate_vec_dim + location_vec_dim), dtype='u1')
-        teamids = []
         j = -1
-        st = time()
         for i, team in enumerate(teams):
             try:
                 j += 1
-                teamids.append(team.id)
                 data_[j] = team.get_one_hot(s2i, c2i, l2i, location_type)
             except IndexError as ex:
                 s = int(((i / bucket_size) - 1) * bucket_size)
@@ -170,110 +171,124 @@ class Team(object):
             # if (i % bucket_size == 0): print(f'Loading {i}/{len(teams)} instances by {multiprocessing.current_process()}! {time() - st}')
 
         if j > -1: data[-(j+1):] = data_[0:j+1]
-        return data, teamids
+        return data
 
+    @staticmethod
+    def validate(teamsvecs):
+        if (any(not row for row in teamsvecs['skill'].rows)): # teams with empty skills
+            zero_row_indices = [i for i, row in enumerate(teamsvecs['skill'].rows) if not row]
+            log.info(f'Following teams have no skills!\n{zero_row_indices}')
+            return False
+        if (any(not row for row in teamsvecs['member'].rows)): # teams with empty members
+            zero_row_indices = [i for i, row in enumerate(teamsvecs['member'].rows) if not row]
+            log.info(f'Following teams have no members!\n{zero_row_indices}')
+            return False
+
+        teamsvecs_csc = teamsvecs['skill'].tocsc()
+        if((teamsvecs_csc.getnnz(axis=0) == 0).any()):
+            zero_col_indices = (teamsvecs_csc['skill'].getnnz(axis=0) == 0).nonzero()[0]
+            log.info(f'Following skills are used in no teams!\n{zero_col_indices}')
+            return False
+
+        teamsvecs_csc = teamsvecs['member'].tocsc()
+        if ((teamsvecs_csc.getnnz(axis=0) == 0).any()):
+            zero_col_indices = (teamsvecs_csc['member'].getnnz(axis=0) == 0).nonzero()[0]
+            log.info(f'Following skills are used in no teams!\n{zero_col_indices}')
+            return False
+        return True
     @classmethod
-    def generate_sparse_vectors(cls, datapath, output, filter, settings):
+    def gen_teamsvecs(cls, datapath, output, cfg):
         pkl = f'{output}/teamsvecs.pkl'
         try:
-            st = time()
-            print(f"Loading sparse matrices from {pkl} ...")
+            log.info(f"Loading teamsvecs matrices from {pkl} ...")
             with open(pkl, 'rb') as infile: vecs = pickle.load(infile)
-            indexes, _ = cls.read_data(datapath, output, index=True, filter=filter, settings=settings)
-            print(f"It took {time() - st} seconds to load the sparse matrices.")
+            indexes, _ = cls.read_data(datapath, output, cfg, indexes_only=True)
+            log.info(f"Teamsvecs matrices for skills {vecs['skill'].shape}, members {vecs['member'].shape}, and locations {vecs['loc'].shape if vecs['loc'] else None} are loaded.")
             return vecs, indexes
         except FileNotFoundError as e:
-            print("File not found! Generating the sparse matrices ...")
-            indexes, teams = cls.read_data(datapath, output, index=False, filter=filter, settings=settings)
-            st = time()
-            # parallel
-            if settings['parallel']:
-                teamids = []
+            log.info("Teamsvecs matrices not found! Generating ...")
+            indexes, teams = cls.read_data(datapath, output, cfg, indexes_only=False)
+
+            if 'acceleration' in cfg and 'cpu' in cfg.acceleration:
+                import multiprocessing
                 with multiprocessing.Pool() as p:
-                    n_core = multiprocessing.cpu_count() if settings['ncore'] <= 0 else settings['ncore']
+                    n_core = multiprocessing.cpu_count() if cfg.acceleration == 'cpu' else int(cfg.acceleration.split(':')[1])
                     subteams = np.array_split(teams, n_core)
-                    func = partial(Team.bucketing, settings['bucket_size'], indexes['s2i'], indexes['c2i'], indexes['l2i'], settings['location_type'])
+                    func = partial(Team.bucketing, cfg.bucket_size, indexes['s2i'], indexes['c2i'], indexes['l2i'], cfg.location)
                     data = p.map(func, subteams)
                     #It took 12156.825613975525 seconds to generate and store the sparse matrices of size (1729691, 818915) at ./../data/preprocessed/uspt/patent.tsv.filtered.mt5.ts3/teamsvecs.pkl
                     #It took 11935.809179782867 seconds to generate and store the sparse matrices of size (661335, 1444501) at ./../data/preprocessed/gith/data.csv/teamsvecs.pkl
 
-                #TODO: for Jamil, optimize and make it oneliner please.
-                matrix_splits = []
-                id_splits = []
-                for (d, id) in data:
-                    matrix_splits.append(d)
-                    id_splits.append(id)
+                data = scipy.sparse.vstack(data, 'lil')#{'bsr', 'coo', 'csc', 'csr', 'dia', 'dok', 'lil'}, By default an appropriate sparse matrix format is returned!!
 
-                data = scipy.sparse.vstack(matrix_splits, 'lil')#{'bsr', 'coo', 'csc', 'csr', 'dia', 'dok', 'lil'}, By default an appropriate sparse matrix format is returned!!
-                for id_split in id_splits: teamids += id_split
-
+            #TODO: elif 'acceleration' in cfg and 'gpu' in cfg.acceleration:
+            #device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+            # model = CreateModel()
+            # model= nn.DataParallel(model)
+            # model.to(device)
+            # If you want to use specific GPUs: (For example, using 2 out of 4 GPUs)
+            # device = torch.device("cuda:1,3" if torch.cuda.is_available() else "cpu") ## specify the GPU id's, GPU id's start from 0.
+            # model= nn.DataParallel(model,device_ids = [1, 3])
+            # model.to(device)
             # serial
-            else:
-                data, teamids = Team.bucketing(settings['bucket_size'], indexes['s2i'], indexes['c2i'], indexes['l2i'], settings['location_type'], teams)
-            # vecs = {'id': teamids, 'skill': data[:, 1:len(indexes['s2i']) + 1], 'loc': data[:, len(indexes['s2i']) + 1: len(indexes['s2i']) + 1 + len(indexes['l2i'])], 'member': data[:, - len(indexes['c2i']):]}
-            vecs = {'id': lil_matrix(np.array(teamids).reshape(-1, 1)), 'skill': data[:, 1:len(indexes['s2i']) + 1], 'loc': data[:, len(indexes['s2i']) + 1: len(indexes['s2i']) + 1 + len(indexes['l2i'])], 'member': data[:, - len(indexes['c2i']):]}
+            else: data = Team.bucketing(cfg.bucket_size, indexes['s2i'], indexes['c2i'], indexes['l2i'], cfg.location, teams)
 
+            vecs = {'skill': data[:, :len(indexes['s2i'])],
+                    'member': data[:, len(indexes['s2i']): len(indexes['s2i']) + len(indexes['c2i'])],
+                    'loc': data[:, - len(indexes['l2i']):] if len(indexes['l2i']) > 0 else None}
+
+            # unit test on toy.dblp.v12.json
+            # data[:, 0:len(indexes['s2i'])].todense()[5]
+            # matrix([[0, 0, 0, 0, 1, 1, 0, 0, 0, 0]], dtype=uint8)
+            # teams[5].skills
+            # {'deep_learning', 'object_detection'}
+            # indexes['i2s'][4]
+            # 'object_detection'
+            # indexes['i2s'][5]
+            # 'deep_learning'
+            # check no rows (teams) with empty skills, or empty members
+            # check no columns (skills or members) with no value (no team)
+            assert Team.validate(vecs)
             with open(pkl, 'wb') as outfile: pickle.dump(vecs, outfile)
-            print(f"It took {time() - st} seconds to generate and store the sparse matrices of size {data.shape} at {pkl}")
+            log.info(f"Teamsvecs matrices for skills {vecs['skill'].shape}, members {vecs['member'].shape}, and locations {vecs['loc'].shape if vecs['loc'] else None} saved at {pkl}")
             return vecs, indexes
 
-        except Exception as e:
-            raise e
+        except Exception as e: raise e
 
-    @staticmethod
-    def remove_outliers(teams, settings):
-        print(f'Removing outliers {settings["filter"]} ...')
-        for id in list(teams.keys()):
-            print(f'Removing team {id}')
-            teams[id].members = [member for member in teams[id].members if len(member.teams) > settings['filter']['min_nteam']]
-            if len(teams[id].members) < settings['filter']['min_team_size']: del teams[id]
-
-        return teams
-
-    '''
-    a 1-hot vector containing skills that each member has in total
-    by transposing 'member' and then doing dot product with 'skill'
-    gives us the co-occurrence matrix of member vs skills. In this way
-    we get the number of times member x co-occurs with skill y. Then,
-    each row of the es_vecs will give us all the skills a member has
-    if the matrix is like this :
-     
-    0 4 2
-    0 0 1
-    2 1 0
-    0 5 0
-    
-    then, the skills of the members are 
-    
-    e0 -> s1, s2
-    e1 -> s2
-    e2 -> s0, s1
-    e3 -> s2
-    
-    '''
     @classmethod
-    def generate_es_vectors(cls, teamsvecs, output):
-        filepath = f'{output}/es_vecs.pkl'
+    def gen_member_skill_vecs(cls, teamsvecs, output):
+        '''
+        a 1-hot vector containing skills that each member has in total by transposing 'member' and then doing dot product with 'skill'
+        gives us the co-occurrence matrix of member vs skills. In this way we get the number of times member x co-occurs with skill y. Then,
+        each row of the es_vecs will give us all the skills a member has if the matrix is like this :
+        0 4 2
+        0 0 1
+        2 1 0
+        0 5 0
+        then, the skills of the members are
+        e0 -> s1 (4 times), s2 (2 times)
+        e1 -> s2 (1 times)
+        e2 -> s0 (2 times), s1 (1 time)
+        e3 -> s2 (5 times)
+        '''
+
+        filepath = f'{output}/member_skill_vecs.pkl'
         try :
-            with open(filepath, 'rb') as f:
-                es_vecs = pickle.load(f)
-                print(f'loaded expert-skill co-occurrence matrix es_vecs')
-            return es_vecs
-
+            log.info(f'Loading member-skill co-occurrence matrix ({teamsvecs["member"].shape[1]}, {teamsvecs["skill"].shape[1]}) loaded from {filepath} ...')
+            with open(filepath, 'rb') as f: member_skill_co = pickle.load(f)
+            assert member_skill_co.shape == (teamsvecs["member"].shape[1], teamsvecs["skill"].shape[1])
         except FileNotFoundError as e:
-            print(f'{filepath} was not found, generating expert-skill co-occurrence matrix es_vecs ...')
-            es_vecs = {}
-            es_vecs['skill'] = scipy.sparse._lil.lil_matrix(np.dot(teamsvecs['member'].transpose(), teamsvecs['skill']))
-
+            log.info(f'Member-skill co-occurrence matrix not found! Generating ...')
+            member_skill_co = scipy.sparse.lil_matrix(np.dot(teamsvecs['member'].transpose(), teamsvecs['skill']))
             with open(filepath, 'wb') as f:
-                pickle.dump(es_vecs, f)
-                print(f'saved es_vecs to {filepath}')
-            return es_vecs
+                pickle.dump(member_skill_co, f)
+                log.info(f'Member-skill co-occurrence matrix {member_skill_co.shape} saved at {filepath}.')
+            return member_skill_co
 
     @classmethod
     def get_stats(cls, teamsvecs, obj, output, cache=True, plot=False, plot_title=None):
         try:
-            print("Loading the stats pickle ...")
+            log.info(f'Loading the stats pickle ...')
             if not cache: raise FileNotFoundError
             with open(f'{output}/stats.pkl', 'rb') as infile:
                 stats = pickle.load(infile)
@@ -281,7 +296,7 @@ class Team(object):
                 return stats
 
         except FileNotFoundError:
-            print("File not found! Generating stats ...")
+            log.info(f'File not found! Generating stats ...')
             stats = {}
             teamids, skillvecs, membervecs = teamsvecs['id'], teamsvecs['skill'], teamsvecs['member']
 
@@ -376,6 +391,7 @@ class Team(object):
 
     @staticmethod
     def plot_stats(stats, output, plot_title):
+        plt = install_import('matplotlib==3.7.5', 'matplotlib.pyplot')
         plt.rcParams.update({'font.family': 'Consolas'})
         for k, v in stats.items():
             if '*' in k:
