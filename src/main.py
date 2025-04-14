@@ -91,7 +91,8 @@ def run(cfg):
         # this will call the Team.generate_sparse_vectors(), which itself may (lazy) call Team.read_data(), which itself may (lazy) call {Publication|Movie|Repo|Patent}.read_data()
         vecs, indexes = domain_cls.gen_teamsvecs(cfg.data.source, f'{cfg.data.output}{filter_str}', cfg.data)
 
-        # skill coverage, all skills of each expert, all expert of each skills (supports of each skill, like in RarestFirst)
+        #TODO? move this call for evaluation part?
+        # skill coverage metric, all skills of each expert, all expert of each skills (supports of each skill, like in RarestFirst)
         vecs['es_vecs'] = domain_cls.gen_member_skill_vecs(vecs, f'{cfg.data.output}{filter_str}') # after we have a sparse vector, we create es_vecs from that
 
     if 'train' in cfg.cmd:

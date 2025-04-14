@@ -1,39 +1,40 @@
-import pandas as pd
-from time import time
-from tqdm import tqdm
 import pickle
+from tqdm import tqdm
+import logging
 
-from cmn.team import Team
-from cmn.inventor import Inventor
+log = logging.getLogger(__name__)
+
+from .pkgmgr import *
+from .team import Team
+from .inventor import Inventor
 
 class Patent(Team):
-    def __init__(self, id, members, date, title, country, subgroups, withdrawn, members_locations):
-        super().__init__(id, members, set(subgroups.split(',')), date, country)
+    def __init__(self, id, inventors, date, title, country, subgroups, withdrawn, members_locations):
+        super().__init__(id, members=inventors, skills=set(), datetime=date, location=country)
         self.title = title
         self.subgroups = subgroups
         self.withdrawn = withdrawn
         self.members_locations = members_locations
 
+        self.skills = {g.replace(' ', '_').lower() for g in subgroups.split(',')}  # TODO: ordered skills based on order of subgroups
         for i, member in enumerate(self.members):
             member.teams.append(self.id)
             member.skills.update(set(self.skills))
             #member.locations.append(self.members_details[i])
 
     @staticmethod
-    def read_data(datapath, output, index, filter, settings):
-        st = time()
-        try:
-            return super(Patent, Patent).load_data(output, index)
+    def read_data(datapath, output, cfg, indexes_only=False):
+        try: return super(Patent, Patent).load_data(output, indexes_only)
         except (FileNotFoundError, EOFError) as e:
-            print(f"Pickles not found! Reading raw data from {datapath} ...")
-
+            log.info(f'Pickles not found! Reading raw data from {datapath} ...')
+            pd = install_import('pandas>=2.0.0', 'pandas')
             #data dictionary can be find at: https://patentsview.org/download/data-download-dictionary
-            print("Reading patents ...")
+            log.info('Reading patents ...')
             patents = pd.read_csv(datapath, sep='\t', header=0, dtype={'id':'object'}, usecols=['id', 'type', 'country', 'date', 'title', 'withdrawn'], low_memory=False)#withdrawn may imply success or failure
             patents.rename(columns={'id': 'patent_id', 'country':'patent_country'}, inplace=True)
             patents = patents[patents['type'].isin(['utility', ''])]
 
-            print("Reading patents' subgroups ...")
+            log.info('Reading patents subgroups ...')
             patents_cpc = pd.read_csv(datapath.replace('patent', 'cpc_current'), sep='\t', dtype={'patent_id':'object'}, usecols=['patent_id', 'subgroup_id', 'sequence'])
             patents_cpc.sort_values(by=['patent_id', 'sequence'], inplace=True)#to keep the order of subgroups
             patents_cpc.reset_index(drop=True, inplace=True)
@@ -42,23 +43,24 @@ class Patent(Team):
 
             #TODO: filter the patent based on subgroup e.g., cpc_subgroup: "Y10S706/XX"	"Data processing: artificial intelligence"
 
-            print("Reading patents' inventors ...")
+            log.info('Reading patents inventors ...')
             patents_inventors = pd.read_csv(datapath.replace('patent', 'patent_inventor'), sep='\t', header=0, dtype={'patent_id':'object'})
             patents_cpc_inventors = pd.merge(patents_cpc, patents_inventors, on='patent_id', how='inner', copy=False)
 
-            print("Reading inventors ...")
+            log.info('Reading inventors ...')
             inventors = pd.read_csv(datapath.replace('patent', 'inventor'), sep='\t', header=0, dtype={'male_flag':'boolean'}, usecols=['id', 'name_first', 'name_last', 'male_flag'])
             patents_cpc_inventors = pd.merge(patents_cpc_inventors, inventors, left_on='inventor_id', right_on='id', how='inner', copy=False)
             patents.rename(columns={'id': 'inv_id'}, inplace=True)
 
-            print("Reading location data ...")
+            log.info('Reading location data ...')
             locations = pd.read_csv(datapath.replace('patent', 'location'), sep='\t', header=0, usecols=['id', 'city', 'state', 'country'])
             patents_cpc_inventors_location = pd.merge(patents_cpc_inventors, locations, left_on='location_id', right_on='id', how='inner', copy=False)
 
             patents_cpc_inventors_location.sort_values(by=['patent_id'], inplace=True)
-            patents_cpc_inventors_location = patents_cpc_inventors_location.append(pd.Series(), ignore_index=True)
+            patents_cpc_inventors_location.loc[len(patents_cpc_inventors_location)] = [None] * len(patents_cpc_inventors_location.columns) #last empty row to break the following loop
 
-            print("Reading data to objects ...")
+
+            log.info('Reading data to objects ...')
             teams = {}; candidates = {}; n_row = 0
             current = None
             patents_cpc_inventors_location['date'] = pd.to_datetime(patents_cpc_inventors_location['date'])
@@ -91,14 +93,13 @@ class Patent(Team):
                     candidates[idname].teams.append(team.id)
                     candidates[idname].locations.append(team.members_locations[-1])
 
-                except Exception as e:
-                    raise e
-            return super(Patent, Patent).read_data(teams, output, filter, settings)
+                except Exception as e: raise e
+            return super(Patent, Patent).read_data(teams, output, cfg)
 
     @classmethod
     def get_stats(cls, teams, teamsvecs, output, plot=False):
         try:
-            print("Loading the stats pickle ...")
+            log.info('Loading the stats pickle ...')
             with open(f'{output}/stats.pkl', 'rb') as infile:
                 stats = pickle.load(infile)
                 if plot: Team.plot_stats(stats, output)

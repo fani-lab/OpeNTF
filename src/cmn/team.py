@@ -222,7 +222,7 @@ class Team(object):
             log.info(f"Loading teamsvecs matrices from {pkl} ...")
             with open(pkl, 'rb') as infile: vecs = pickle.load(infile)
             indexes, _ = cls.read_data(datapath, output, cfg, indexes_only=True)
-            log.info(f"Teamsvecs matrices for skills {vecs['skill'].shape}, members {vecs['member'].shape}, and locations {vecs['loc'].shape if vecs['loc'] else None} are loaded.")
+            log.info(f"Teamsvecs matrices for skills {vecs['skill'].shape}, members {vecs['member'].shape}, and locations {vecs['loc'].shape if vecs['loc'] is not None else None} are loaded.")
             return vecs, indexes
         except FileNotFoundError as e:
             log.info("Teamsvecs matrices not found! Generating ...")
@@ -269,7 +269,7 @@ class Team(object):
             # check no columns (skills or members) with no value (no team)
             assert Team.validate(vecs)
             with open(pkl, 'wb') as outfile: pickle.dump(vecs, outfile)
-            log.info(f"Teamsvecs matrices for skills {vecs['skill'].shape}, members {vecs['member'].shape}, and locations {vecs['loc'].shape if vecs['loc'] else None} saved at {pkl}")
+            log.info(f"Teamsvecs matrices for skills {vecs['skill'].shape}, members {vecs['member'].shape}, and locations {vecs['loc'].shape if vecs['loc'] is not None else None} saved at {pkl}")
             return vecs, indexes
 
         except Exception as e: raise e
@@ -296,6 +296,7 @@ class Team(object):
             log.info(f'Loading member-skill co-occurrence matrix ({teamsvecs["member"].shape[1]}, {teamsvecs["skill"].shape[1]}) loaded from {filepath} ...')
             with open(filepath, 'rb') as f: member_skill_co = pickle.load(f)
             assert member_skill_co.shape == (teamsvecs["member"].shape[1], teamsvecs["skill"].shape[1])
+            return member_skill_co
         except FileNotFoundError as e:
             log.info(f'Member-skill co-occurrence matrix not found! Generating ...')
             member_skill_co = scipy.sparse.lil_matrix(np.dot(teamsvecs['member'].transpose(), teamsvecs['skill']))
