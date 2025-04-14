@@ -8,6 +8,7 @@ from .team import Team
 from .developer import Developer
 
 class Repository(Team):
+    # we assume the skill set is fixed and from the top-100 prog. langs. in github.
     # https://madnight.github.io/githut/#/pull_requests/2024/1
     top_100_langs = {
         'python', 'java', 'go', 'javascript', 'c++', 'typescript', 'php', 'ruby', 'c', 'c#',
@@ -36,11 +37,12 @@ class Repository(Team):
         self.ncontributions = ncontributions
         self.releases = releases
         self.languages_lines = languages_lines
-        for (language, _) in self.languages_lines.items(): self.skills.add(language.replace(' ', '_'))
 
+        self.skills = {l.replace(' ', '_').lower() for (l, _) in self.languages_lines.items()} #[(lang, line#)] TODO: ordered skills based on line#
         for dev in self.members:
             dev.teams.add(self.id)
             dev.skills.update(set(self.skills))
+        self.members_locations = [(None, None, None)] * len(self.members)
 
     @staticmethod
     def read_data(datapath, output, cfg, indexes_only=False):

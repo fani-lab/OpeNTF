@@ -1,0 +1,38 @@
+python -m venv opentf_venv
+source opentf_venv/bin/activate on Unix/macOS 
+opentf_venv\Scripts\activate on Windows. 
+
+
+python main.py domain=cmn.publication.Publication source=../data/dblp/toy.dblp.v12.json output=../output/dblp/toy.dblp.v12.json
+python main.py domain=cmn.movie.Movie source=../data/imdb/toy.title.basics.tsv output=../output/imdb/toy.title.basics.tsv
+python main.py domain=cmn.repository.Repository source=../data/gith/toy.data.csv output=../output/gith/toy.data.csv
+python main.py domain=cmn.patent.Patent source=../data/uspt/toy.patent.tsv output=../output/uspt/toy.patent.tsv
+
+pip install hydra-core --upgrade
+
+pip install tqdm
+pip install scipy
+
+
+to do:
+
+test filtering with different criteria like min_teamsize > 0 ...
+update to class hierarchy of datasets 
+
+new change to the skill subset >> skill list for each team, ordered skills
+- dblp based on fos score
+- gith based on line numbers of the langs
+- imdb based on the genre, subgenre, ... the actual order in the dataset
+
+
+update/check cmn.team.Team.get_stats()
+
+make cmn.team.Team.get_stats() gpu-friendly
+
+
+
+- embeddings for skills (no need for embeddings for experts for now. in future may want to do skill-experts in input ...)
+
+-- d2v >> docs is collection of skills 
+-- contextual >> llm-based
+-- gnn-transferred

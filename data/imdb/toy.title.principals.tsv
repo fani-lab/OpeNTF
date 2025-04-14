@@ -105,10 +105,12 @@ tt0000417	9	nm4491570	composer	\N	\N
 tt0496232	1	nm1375877	actor	\N	\N
 tt0496232	2	nm0593917	director	\N	\N
 tt0496232	3	nm0585955	cinematographer	\N	\N
-tt12427530	1	nm11625684	actor	\N	\N
-tt12427530	2	nm11625683	director	\N	\N
-tt12427530	3	nm11625689	producer	producer	\N
-tt12427530	4	nm11625686	producer	producer	\N
+tt0496232	4	nm0721526	cinematographer	\N	\N
+tt2427530	1	nm11625684	actor	\N	\N
+tt2427530	2	nm11625683	director	\N	\N
+tt2427530	3	nm11625689	producer	producer	\N
+tt2427530	4	nm11625686	producer	producer	\N
+tt2427530	5	nm0721526	producer	producer	\N
 tt1099601	1	nm1122677	self	\N	["Self - Co-Host"]
 tt0000003	1	nm0721526	director	\N	\N
 tt0000003	2	nm1770680	producer	producer	\N

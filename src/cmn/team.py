@@ -43,7 +43,7 @@ class Team(object):
     def remove_outliers(teams, cfg):
         log.info(f'Removing outliers {cfg} ...')
         for id in list(teams.keys()):
-            teams[id].members = [member for member in teams[id].members if len(member.teams) > cfg.min_nteam]
+            teams[id].members = [member for member in teams[id].members if len(member.teams) >= cfg.min_nteam]
             # this may lead to a team with empty 0 members, which will be removed next line
             if len(teams[id].members) < cfg.min_team_size: del teams[id]
             # this may lead to skills that has no teams but the index creating is after this step. It relies on teams' skills for the remained teams
@@ -55,10 +55,11 @@ class Team(object):
         print('Indexing locations ...')
         idx = 0; l2i = {}; i2l = {};
         for t in teams:
-            for loc in t.members_locations:
-                loc = loc[0] + loc[1] + loc[2] if location_type == 'city' else \
-                      loc[1] + loc[2] if location_type == 'state' else \
-                      loc[2] #if location_type == 'country' or 'venue'
+            for l in t.members_locations:
+                loc = l[0] + l[1] + l[2] if location_type == 'city' and all(l) else \
+                      l[1] + l[2] if location_type == 'state' and all(l[1:]) else \
+                      l[2] if (location_type == 'country' or 'venue') and l[2] else None
+                if not loc: continue
                 if loc not in l2i.keys():
                     l2i[loc] = idx
                     i2l[idx] = loc
@@ -175,13 +176,17 @@ class Team(object):
 
     @staticmethod
     def validate(teamsvecs):
+        if (teamsvecs['skill'].shape[0] < 1):
+            log.info(f'No teams in skill metrix!')
+            return False
+
+        if (teamsvecs['skill'].shape[1] < 1):
+            log.info(f'No skills in skill metrix!')
+            return False
+
         if (any(not row for row in teamsvecs['skill'].rows)): # teams with empty skills
             zero_row_indices = [i for i, row in enumerate(teamsvecs['skill'].rows) if not row]
             log.info(f'Following teams have no skills!\n{zero_row_indices}')
-            return False
-        if (any(not row for row in teamsvecs['member'].rows)): # teams with empty members
-            zero_row_indices = [i for i, row in enumerate(teamsvecs['member'].rows) if not row]
-            log.info(f'Following teams have no members!\n{zero_row_indices}')
             return False
 
         teamsvecs_csc = teamsvecs['skill'].tocsc()
@@ -190,11 +195,25 @@ class Team(object):
             log.info(f'Following skills are used in no teams!\n{zero_col_indices}')
             return False
 
+        if (teamsvecs['member'].shape[0] < 1):
+            log.info(f'No teams in member metrix!')
+            return False
+
+        if (teamsvecs['member'].shape[1] < 1):
+            log.info(f'No member in member metrix!')
+            return False
+
+        if (any(not row for row in teamsvecs['member'].rows)):  # teams with empty members
+            zero_row_indices = [i for i, row in enumerate(teamsvecs['member'].rows) if not row]
+            log.info(f'Following teams have no members!\n{zero_row_indices}')
+            return False
+
         teamsvecs_csc = teamsvecs['member'].tocsc()
         if ((teamsvecs_csc.getnnz(axis=0) == 0).any()):
             zero_col_indices = (teamsvecs_csc['member'].getnnz(axis=0) == 0).nonzero()[0]
             log.info(f'Following skills are used in no teams!\n{zero_col_indices}')
             return False
+
         return True
     @classmethod
     def gen_teamsvecs(cls, datapath, output, cfg):
@@ -371,19 +390,16 @@ class Team(object):
             col_sums_ml = locationvecs.sum(axis=0)
             nmembers_nlocation  = Counter(row_sums_ml.A1.astype(int))
             stats['*nmembers_nlocation'] = {k: v for k, v in sorted(nmembers_nlocation.items(), reverse=True)}
-            
-            
+
             #how many skills are from a particular location, ....
             row_sums_sl = locationvecs.sum(axis=1)
             col_sums_sl = locationvecs.sum(axis=0)
             nskills_nlocation  = Counter(row_sums_sl.A1.astype(int))
             stats['*nskills_nlocation'] = {k: v for k, v in sorted(nskills_nlocation.items(), reverse=True)}
-            
-            
+
             #average number of people from each location
             stats['*avg_nmembers_location'] = row_sums_ml.mean()
             stats['*avg_nskills_location'] = row_sums_sl.mean()
-
 
             with open(f'{output}/stats.pkl', 'wb') as outfile: pickle.dump(stats, outfile)
             if plot: Team.plot_stats(stats, output, plot_title)
@@ -394,9 +410,7 @@ class Team(object):
         plt = install_import('matplotlib==3.7.5', 'matplotlib.pyplot')
         plt.rcParams.update({'font.family': 'Consolas'})
         for k, v in stats.items():
-            if '*' in k:
-                print(f'{k} : {v}')
-                continue
+            if '*' in k: print(f'{k} : {v}'); continue
             fig = plt.figure(figsize=(2, 2))
             ax = fig.add_subplot(1, 1, 1)
             ax.loglog(*zip(*stats[k].items()), marker='x', linestyle='None', markeredgecolor='b')

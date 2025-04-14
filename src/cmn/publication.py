@@ -16,7 +16,7 @@ class Publication(Team):
         self.fos = fos #field of study, e.g., [{"name":"Deep Learning","w":0.41115},{"name":"Image Segmentation","w":0.49814}]
         self.keywords = keywords
 
-        for skill in self.fos: self.skills.add(skill['name'].replace(' ', '_').lower())  # TODO: ordered skills based on skill["w"]
+        self.skills = {f['name'].replace(' ', '_').lower() for f in self.fos}  # TODO: ordered skills based on skill["w"]
         # Extend the skills with keywords
         # if len(self.keywords): skills.union(set([keyword.replace(" ", "_") for keyword in self.keywords]))
 

@@ -18,11 +18,11 @@ In this dataset, `title` stands for any type of moving pictures and id is ``tcon
 |#Movie w/ Single CastnCrew|322,918|
 |#Movie w/ Single Genre |315,503|
 
-|titleType Stat| Value|
-|-----|------|
-|#Short| 263029|
-|#Video|129554|
-|#TV Movie|65318|
-|#Video Game|9959|
-|#TV Episode|2027640|
-|#Other|119567|
+|titleType Stat| Value     |
+|-----|-----------|
+|#Short| 263,029   |
+|#Video| 129,554   |
+|#TV Movie| 65,318    |
+|#Video Game| 9,959     |
+|#TV Episode| 2,027,640 |
+|#Other| 119,567   |
