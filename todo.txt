@@ -2,16 +2,10 @@ python -m venv opentf_venv
 source opentf_venv/bin/activate on Unix/macOS 
 opentf_venv\Scripts\activate on Windows. 
 
-
-python main.py domain=cmn.publication.Publication source=../data/dblp/toy.dblp.v12.json output=../output/dblp/toy.dblp.v12.json
-python main.py domain=cmn.movie.Movie source=../data/imdb/toy.title.basics.tsv output=../output/imdb/toy.title.basics.tsv
-python main.py domain=cmn.repository.Repository source=../data/gith/toy.data.csv output=../output/gith/toy.data.csv
-python main.py domain=cmn.patent.Patent source=../data/uspt/toy.patent.tsv output=../output/uspt/toy.patent.tsv
-
-pip install hydra-core --upgrade
-
-pip install tqdm
-pip install scipy
+python main.py data.domain=cmn.publication.Publication data.source=../data/dblp/toy.dblp.v12.json data.output=../output/dblp/toy.dblp.v12.json
+python main.py data.domain=cmn.movie.Movie data.source=../data/imdb/toy.title.basics.tsv data.output=../output/imdb/toy.title.basics.tsv
+python main.py data.domain=cmn.repository.Repository data.source=../data/gith/toy.data.csv data.output=../output/gith/toy.data.csv
+python main.py data.domain=cmn.patent.Patent data.source=../data/uspt/toy.patent.tsv data.output=../output/uspt/toy.patent.tsv
 
 
 to do:
@@ -26,10 +20,11 @@ new change to the skill subset >> skill list for each team, ordered skills
 
 
 update/check cmn.team.Team.get_stats()
+update/check cmn.patent.Patent.get_stats()
 
 make cmn.team.Team.get_stats() gpu-friendly
 
-
+--------------------------------------------------------
 
 - embeddings for skills (no need for embeddings for experts for now. in future may want to do skill-experts in input ...)
 

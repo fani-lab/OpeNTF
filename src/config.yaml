@@ -1,7 +1,8 @@
 hydra:
   output_subdir: null
   run:
-    dir: /dev/null
+    dir: . #unix
+    #dir: /dev/null # windows
 
 cmd: ['prep'] #  ['prep', 'train', 'test', 'eval', 'plot', 'agg', 'fair']
 data:
