@@ -21,12 +21,10 @@ WORKDIR /app/src
 #docker pull ghcr.io/fani-lab/opentf/toy-dblp:main
 
 #CMD ["python", "main.py", "data.domain=cmn.movie.Movie", "data.source=../data/imdb/toy.title.basics.tsv", "data.output=../output/imdb/toy.title.basics.tsv", "~data.filter"]
-# error Unable to parse string "Reality-TV" at position 1101455
-CMD ["python", "main.py", "data.domain=cmn.movie.Movie", "data.source=../data/imdb/title.basics.tsv", "data.output=../output/imdb/title.basics.tsv", "~data.filter"]
+#CMD ["python", "main.py", "data.domain=cmn.movie.Movie", "data.source=../data/imdb/title.basics.tsv", "data.output=../output/imdb/title.basics.tsv", "~data.filter"]
 
-#CMD ["python", "main.py", "data.domain=cmn.repository.Repository", "data.source=../data/gith/toy.data.csv", "data.output=../output/gith/toy.data.csv", "~data.filter"]
-# error teams have no members!
-#CMD ["python", "main.py", "data.domain=cmn.repository.Repository", "data.source=../data/gith/data.csv", "data.output=../output/gith/data.csv", "~data.filter"]
+#CMD ["python", "main.py", "data.domain=cmn.repository.Repository", "data.source=../data/gith/toy.repos.csv", "data.output=../output/gith/toy.repos.csv", "~data.filter"]
+CMD ["python", "main.py", "data.domain=cmn.repository.Repository", "data.source=../data/gith/repos.csv", "data.output=../output/gith/repos.csv", "~data.filter"]
 
 #CMD ["python", "main.py", "data.domain=cmn.patent.Patent", "data.source=../data/uspt/toy.patent.tsv", "data.output=../output/uspt/toy.patent.tsv", "~data.filter"]
 #CMD ["python", "main.py", "data.domain=cmn.patent.Patent", "data.source=../data/uspt/patent.tsv", "data.output=../output/uspt/patent.tsv", "~data.filter"]

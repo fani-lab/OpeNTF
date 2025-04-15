@@ -51,6 +51,7 @@ class Repository(Team):
             log.info(f'Pickles not found! Reading raw data from {datapath} ...')
             pd = install_import('pandas>=2.0.0', 'pandas')
             ds = pd.read_csv(datapath, converters={'collabs': eval, 'langs': lambda x: {k.lower(): v for k, v in eval(x).items()}, 'rels': eval}, encoding='latin-1')
+            ds = ds[ds['collabs'].map(type) != dict] # remove repos with error in contributors like "{'message': 'The history or contributor list ....
             # memory demand but fast
             ds = ds[ds.explode('langs').assign(keep=lambda d: d['langs'].isin(Repository.top_100_langs)).groupby(level=0)['keep'].any()]
             # slow but no memory demand

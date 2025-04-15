@@ -38,8 +38,11 @@ class Movie(Team):
             text = lambda x : x.lower().replace(' ', '_')
             pd = install_import('pandas>=2.0.0', 'pandas')
             log.info('Reading movie data ...')
-            title_basics = pd.read_csv(datapath, sep='\t', header=0, na_values='\\N', converters={'tconst': strid2int, 'primaryTitle': text, 'originalTitle': text}, dtype={'startYear': 'UInt16', 'endYear': 'UInt16', 'runtimeMinutes': 'UInt16'}, low_memory=False)  # title.basics.tsv
+            title_basics = pd.read_csv(datapath, sep='\t', header=0, na_values='\\N', converters={'tconst': strid2int, 'primaryTitle': text, 'originalTitle': text}, dtype={'startYear': 'UInt16', 'endYear': 'UInt16'}, low_memory=False)  # title.basics.tsv
             title_basics = title_basics[title_basics['titleType'].isin(['movie', ''])]
+            #due to this buggy line, first keep movies only, then change dtype
+            #buggy line >> no closing double quotation >> tt10233364	tvEpisode	"Rolling in the Deep Dish	"Rolling in the Deep Dish	0	2019	\N	\N	Reality-TV
+            title_basics['runtimeMinutes'] = title_basics['runtimeMinutes'].astype('UInt16')
             log.info('Reading castncrew data ...')
             title_principals = pd.read_csv(datapath.replace('title.basics', 'title.principals'), sep='\t', header=0, na_values='\\N', converters={'tconst': strid2int, 'nconst': strid2int}, low_memory=False)  # movie-crew association for top-10 cast
             name_basics = pd.read_csv(datapath.replace('title.basics', 'name.basics'), sep='\t', header=0, na_values='\\N', converters={'nconst': strid2int,'primaryName': text},dtype={'birthYear': 'UInt16', 'deathYear': 'UInt16'}, low_memory=False)  # name.basics.tsv
@@ -66,7 +69,7 @@ class Movie(Team):
                                      [],#empty members!
                                      movie_crew.primaryTitle,
                                      movie_crew.originalTitle,
-                                     movie_crew.startYear,
+                                     movie_crew.startYear if pd.notna(movie_crew.startYear) else None,
                                      movie_crew.endYear,
                                      movie_crew.runtimeMinutes,
                                      movie_crew.genres,

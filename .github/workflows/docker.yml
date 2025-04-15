@@ -1,0 +1,25 @@
+name: Docker CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - id: extract
+        run: echo "IMAGE_NAME=ghcr.io/${{ github.repository }}/toy-dblp" >> $GITHUB_OUTPUT
+
+      - run: docker build -t ${{ steps.extract.outputs.IMAGE_NAME }}:latest .
+      - run: docker run --rm ${{ steps.extract.outputs.IMAGE_NAME }}:latest
+      - run: docker push ${{ steps.extract.outputs.IMAGE_NAME }}:latest

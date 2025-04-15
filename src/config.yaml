@@ -9,18 +9,18 @@ data:
   domain:
     #cmn.publication.Publication
     #cmn.movie.Movie
-    #cmn.repository.Repository
-    cmn.patent.Patent
+    cmn.repository.Repository
+    #cmn.patent.Patent
   source:
     #../data/dblp/toy.dblp.v12.json
     #../data/imdb/toy.title.basics.tsv
-    #../data/gith/toy.data.csv
-    ../data/uspt/toy.patent.tsv
+    ../data/gith/toy.repos.csv
+    #../data/uspt/toy.patent.tsv
   output:
     #../output/dblp/toy.dblp.v12.json
     #../output/imdb/toy.title.basics.tsv
-    #../output/gith/toy.data.csv
-    ../output/uspt/toy.patent.tsv
+    ../output/gith/toy.repos.csv
+    #../output/uspt/toy.patent.tsv
 
   filter:
     min_nteam: 10 # as this may yield empty teams, min_team_size should be set to at least 1
