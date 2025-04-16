@@ -5,7 +5,19 @@ opentf_venv\Scripts\activate on Windows.
 to do:
 
 update to class hierarchy of datasets 
+update to readme for cmn layer and main readme 
 
+
+Document Construction (team2vec as d2v)
+Graph Construction (team2vec as gnn)
+
+- embeddings for skills (no need for embeddings for experts for now. in future may want to do skill-experts in input ...)
+
+-- d2v >> docs is collection of skills 
+-- contextual >> llm-based
+-- gnn-transferred
+
+=======================================================
 new change to the skill subset >> skill list for each team, ordered skills
 - dblp based on fos score
 - gith based on line numbers of the langs
@@ -21,8 +33,6 @@ make cmn.team.Team.get_stats() gpu-friendly
 
 --------------------------------------------------------
 
-- embeddings for skills (no need for embeddings for experts for now. in future may want to do skill-experts in input ...)
 
--- d2v >> docs is collection of skills 
--- contextual >> llm-based
--- gnn-transferred
+
+
