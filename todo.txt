@@ -4,7 +4,6 @@ opentf_venv\Scripts\activate on Windows.
 
 to do:
 
-update to class hierarchy of datasets 
 update to readme for cmn layer and main readme 
 
 

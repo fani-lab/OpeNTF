@@ -18,8 +18,8 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - id: extract
-        run: echo "IMAGE_NAME=ghcr.io/fani-lab/opentf/toy-dblp" >> $GITHUB_OUTPUT
+        run: echo "IMAGE_NAME=ghcr.io/fani-lab/opentf/toy" >> $GITHUB_OUTPUT
 
-      - run: docker build -t ${{ steps.extract.outputs.IMAGE_NAME }}:latest .
-      - run: docker run --rm -v ./data:/app/data:ro ${{ steps.extract.outputs.IMAGE_NAME }}:latest
-      - run: docker push ${{ steps.extract.outputs.IMAGE_NAME }}:latest
+      - run: docker build -t ${{ steps.extract.outputs.IMAGE_NAME }}:main .
+      - run: docker run --rm -v ./data:/app/data:ro ${{ steps.extract.outputs.IMAGE_NAME }}:main
+      - run: docker push ${{ steps.extract.outputs.IMAGE_NAME }}:main
