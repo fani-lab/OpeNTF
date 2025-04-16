@@ -10,5 +10,3 @@ link to temporal papers
 
 link to evaluation metric
 - https://ils.unc.edu/courses/2013_spring/inls509_001/lectures/10-EvaluationMetrics.pdf
-
-links to cl paper
