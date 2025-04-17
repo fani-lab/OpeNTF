@@ -6,15 +6,19 @@ to do:
 
 update to readme for cmn layer and main readme 
 
-
-Document Construction (team2vec as d2v)
 Graph Construction (team2vec as gnn)
 
 - embeddings for skills (no need for embeddings for experts for now. in future may want to do skill-experts in input ...)
 
 -- d2v >> docs is collection of skills 
--- contextual >> llm-based
 -- gnn-transferred
+
+-- contextual >> llm-based >> sentencetranformer
+
+update/check cmn.team.Team.get_stats()
+update/check cmn.patent.Patent.get_stats()
+
+make cmn.team.Team.get_stats() gpu-friendly
 
 =======================================================
 new change to the skill subset >> skill list for each team, ordered skills
@@ -23,12 +27,7 @@ new change to the skill subset >> skill list for each team, ordered skills
 - imdb based on the genre, subgenre, ... the actual order in the dataset
 
 lazy load update 
--- when doing the filtering, we read from scratch. We can load the teams.pkl and filter, and update it. 
-
-update/check cmn.team.Team.get_stats()
-update/check cmn.patent.Patent.get_stats()
-
-make cmn.team.Team.get_stats() gpu-friendly
+-- when doing the filtering, we read from scratch. We can load the teams.pkl and filter, and update it. >> messy and confusing, not worth it
 
 --------------------------------------------------------
 

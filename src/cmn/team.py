@@ -275,7 +275,7 @@ class Team(object):
         except Exception as e: raise e
 
     @classmethod
-    def gen_member_skill_vecs(cls, teamsvecs, output):
+    def gen_skill_coverage(cls, teamsvecs, output):
         '''
         a 1-hot vector containing skills that each member has in total by transposing 'member' and then doing dot product with 'skill'
         gives us the co-occurrence matrix of member vs skills. In this way we get the number of times member x co-occurs with skill y. Then,
@@ -291,7 +291,7 @@ class Team(object):
         e3 -> s2 (5 times)
         '''
 
-        filepath = f'{output}/member_skill_vecs.pkl'
+        filepath = f'{output}/skillcoverage.pkl'
         try :
             log.info(f'Loading member-skill co-occurrence matrix ({teamsvecs["member"].shape[1]}, {teamsvecs["skill"].shape[1]}) loaded from {filepath} ...')
             with open(filepath, 'rb') as f: member_skill_co = pickle.load(f)

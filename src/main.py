@@ -96,7 +96,7 @@ def run(cfg):
 
         #TODO? move this call for evaluation part?
         # skill coverage metric, all skills of each expert, all expert of each skills (supports of each skill, like in RarestFirst)
-        vecs['es_vecs'] = domain_cls.gen_member_skill_vecs(vecs, f'{cfg.data.output}{filter_str}') # after we have a sparse vector, we create es_vecs from that
+        vecs['skillcoverage'] = domain_cls.gen_skill_coverage(vecs, f'{cfg.data.output}{filter_str}') # after we have a sparse vector, we create es_vecs from that
 
         dnn = install_import('', 'mdl.emb.dnn')
         cfg.data.embedding = OmegaConf.load("mdl/emb/config.yml")

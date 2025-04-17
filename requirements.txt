@@ -7,7 +7,7 @@ python-dateutil>=2.9
 # dynamic packages
 # cmn.repository.Repository.read_data() pandas>=2.0.0
 # cmn.team.Team.plot_stats() matplotlib==3.7.5
-# mdl.team2vec.dnn.train() gensim==4.3.3
+# mdl.team2vec.dnn.train() gensim==4.3.3 #needs numpy 1.24.4
 
 #torch>=1.9.0
 #PyYAML==6.0.1

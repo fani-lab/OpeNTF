@@ -3,12 +3,9 @@ FROM python:3.8-slim
 WORKDIR /app
 
 COPY requirements.txt .
-
-RUN pip install --upgrade pip setuptools wheel
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY src/ ./src/
-
 WORKDIR /app/src
 
 #CMD ["python", "main.py", "data.domain=cmn.publication.Publication", "data.source=../data/dblp/toy.dblp.v12.json", "data.output=../output/dblp/toy.dblp.v12.json", "~data.filter"]
