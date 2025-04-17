@@ -1,4 +1,4 @@
-from cmn.member import Member
+from .member import Member
 
 class Developer(Member):
 

@@ -14,8 +14,11 @@ import numpy as np; np.random.seed(0)
 # from scipy.sparse import lil_matrix
 
 # from omegaconf import DictConfig, OmegaConf
+from omegaconf import OmegaConf
 import hydra
 from hydra.utils import get_class
+
+from pkgmgr import *
 
 # from cmn.tools import NumpyArrayEncoder, popular_nonpopular_ratio
 # from mdl.fnn import Fnn
@@ -94,6 +97,23 @@ def run(cfg):
         #TODO? move this call for evaluation part?
         # skill coverage metric, all skills of each expert, all expert of each skills (supports of each skill, like in RarestFirst)
         vecs['es_vecs'] = domain_cls.gen_member_skill_vecs(vecs, f'{cfg.data.output}{filter_str}') # after we have a sparse vector, we create es_vecs from that
+
+        dnn = install_import('', 'mdl.emb.dnn')
+        cfg.data.embedding = OmegaConf.load("mdl/emb/config.yml")
+        cfg.data.embedding.output = cfg.data.output
+        t2v = dnn.Dnn(cfg.data.embedding.dim, cfg.data.output, cfg.data.embedding.model.d2v)
+        t2v.train(cfg.data.embedding.model.epochs, vecs, indexes)
+
+        # # unit tests :D
+        # if cfg.model.d2v.embtype == 'skill': print(t2v.model['s5'])
+        # if cfg.model.d2v.embtype == 'member': print(t2v.model['m5'])
+        # if cfg.model.d2v.embtype == 'joint':
+        #     print(t2v.model['s5'])
+        #     print(t2v.model['m5'])
+        # print(t2v.model.docvecs[10])#teamid
+        # print(t2v.infer_skillsubsetvec(['s1', 's5']))
+        # print(t2v.skillsubsetvecs().shape)
+
 
     if 'train' in cfg.cmd:
 

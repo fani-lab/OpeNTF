@@ -1,4 +1,4 @@
-from cmn.member import Member
+from .member import Member
 
 class CastnCrew(Member):
     def __init__(self, id, name, birth, death, p_prof, knownfor):

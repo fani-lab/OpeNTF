@@ -4,7 +4,7 @@ import logging
 
 log = logging.getLogger(__name__)
 
-from .pkgmgr import *
+from pkgmgr import *
 from .team import Team
 from .inventor import Inventor
 

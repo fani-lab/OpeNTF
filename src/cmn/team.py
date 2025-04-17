@@ -5,7 +5,7 @@ from dateutil import parser
 
 log = logging.getLogger(__name__)
 
-from .pkgmgr import *
+from pkgmgr import *
 class Team(object):
     def __init__(self, id, members, skills, datetime, location=None):
         self.id = int(id)

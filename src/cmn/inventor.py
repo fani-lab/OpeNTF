@@ -1,4 +1,4 @@
-from cmn.author import Author
+from .author import Author
 
 class Inventor(Author):
     def __init__(self, id, name, gender):

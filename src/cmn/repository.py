@@ -3,7 +3,7 @@ from tqdm import tqdm
 
 log = logging.getLogger(__name__)
 
-from .pkgmgr import *
+from pkgmgr import *
 from .team import Team
 from .developer import Developer
 

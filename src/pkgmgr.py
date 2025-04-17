@@ -21,7 +21,7 @@ def install_import(install_name, import_path=None, from_module=None):
     return module
 
 # #samples
-install_import('hydra-core==1.3.2', 'hydra')
+# install_import('hydra-core==1.3.2', 'hydra')
 # # Importing a submodule/class/function: from bs4 import BeautifulSoup
 # BeautifulSoup = install_and_import('beautifulsoup4', 'bs4', 'BeautifulSoup')
 # soup = BeautifulSoup('<html><body><p>Hello</p></body></html>', 'html.parser')
