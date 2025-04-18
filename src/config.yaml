@@ -6,7 +6,7 @@ hydra:
   run:
     dir: . #unix or macos
     #dir: /dev/null # windows
-pytorch: torch>=2.5 --index-url https://download.pytorch.org/whl/cu124
+pytorch: torch>=2.5.1 --index-url https://download.pytorch.org/whl/cu124
 
 cmd: ['prep'] #  ['prep', 'train', 'test', 'eval', 'plot', 'agg', 'fair']
 data: #required for 'prep' step
