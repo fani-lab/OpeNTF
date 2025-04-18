@@ -23,11 +23,11 @@ class Dnn(Team2Vec):
     def _prep(self, teamsvecs, indexes):
         datafile = self.output + f'/{self.cfg.embtype}docs.pkl'
         try:
-            log.info(f"Loading teams as docs {datafile}  ...")
+            log.info(f'Loading teams as docs {datafile}  ...')
             with open(datafile, 'rb') as infile: self.data = pickle.load(infile)
             return self.data
         except FileNotFoundError:
-            log.info(f"File not found! Creating the documents out of teams ...")
+            log.info(f'File not found! Creating the documents out of teams ...')
             self.data = []
             j = 0
             year = indexes['i2y'][0][1]
@@ -50,7 +50,7 @@ class Dnn(Team2Vec):
             assert teamsvecs['skill'].shape[0] == len(self.data)
             log.info(f'{len(self.data)} documents with word type of {self.cfg.embtype} have created. Saving ...')
             with open(datafile, 'wb') as f: pickle.dump(self.data, f)
-        return self.data
+            return self.data
 
     def train(self, epochs, teamsvecs, indexes):
         # to select/create correct model file in the output directory
