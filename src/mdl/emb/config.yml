@@ -40,7 +40,7 @@ model:
         add #mean, min, max, mul
       'pre': False # use pretrained Dnn skill vectors as initial node features of graph data
 
-    pytorch: torch>=2.5.1 #--index-url https://download.pytorch.org/whl/cu124' #will be set dynamically in ./src/main.py from root config.yml
+    pytorch: #will be set dynamically in ./src/main.py from root ./config.yml
 
     #Grover, Aditya, and Jure Leskovec. "node2vec: Scalable feature learning for networks." Proceedings of the 22nd ACM SIGKDD international conference on Knowledge discovery and data mining. 2016.
     n2v:
