@@ -2,22 +2,6 @@ dim : 8 # embedding dim. it matters for skill vectors if the skill set is small 
 #these are folders
 output:
   ../../../output/dblp/toy.dblp.v12.json #will be set dynamically in ./src/main.py
-graph:
-  types: # this is an array holding the edge_type info in the form [('edge_type1', 'edge_type1_code'), ('edge_type2', 'edge_type2_code') ... ]
-    # ('member', 'm')
-    # ([('skill', 'to', 'member')], 'sm')
-    # ([('skill', 'to', 'team'), ('member', 'to', 'team')], 'stm')
-    # ('skill', 'to', 'team'), ('member', 'to', 'team'), ('loc', 'to', 'team')], 'stml')
-
-  supervision_edge_types:
-    None # it will take all the forward edge_types as supervision edges
-    #([('member', 'to', 'team')], 'stm')
-
-  dir: False
-  dup_edge:
-    #None # keep the duplicates, else: reduce by 'add', 'mean', 'min', 'max', or 'mul'
-    'add' #'mean', 'min', 'max', 'mul'
-  'pre': False # use pretrained w2v skill vectors as initial node features of graph data
 
 model:
   batch_size : 128 # batch_size for loaders
@@ -28,7 +12,7 @@ model:
   save_per_epoch: False
 
   # Quoc V. Le, Tomás Mikolov: Distributed Representations of Sentences and Documents. ICML 2014: 1188-1196
-  d2v: # we use gensim
+  dnn: # we use gensim
     dm: 1 # training algorithm. 1: distributed memory (PV-DM), 0: distributed bag of words (PV-DBOW)
     # NOTE: As the input is a skill subset, so either the sum/avg of skill vectors individually >> embtype = 'skill' or 'joint' and  dbow_words = True
     # OR the team vecs when the words are only skills. So, embtype = 'skill' and  dbow_words = False
@@ -38,14 +22,34 @@ model:
     window: 10 # cooccurrence window. In OpeNTF (for teams), depends on the average team size (n_members) plus n_skills per teams
     nworkers: 16 #this is for gensim
 
-  #Grover, Aditya, and Jure Leskovec. "node2vec: Scalable feature learning for networks." Proceedings of the 22nd ACM SIGKDD international conference on Knowledge discovery and data mining. 2016.
-  gnn.n2v:
-    walk_length: 5
-    context_size: 2
-    walks_per_node: 10
-    num_negative_samples': 10
-    p: 1.0
-    q: 1.0
+  gnn:
+    graph:
+      structure:
+        #('member', 'm') #homo
+        #([('skill', 'to', 'member')], 'sm') #hetero
+        ([('skill', 'to', 'team'), ('member', 'to', 'team')], 'stm')
+        #([('skill', 'to', 'team'), ('member', 'to', 'team'), ('loc', 'to', 'team')], 'stml')
+        #([('skill', 'to', 'skill'), ('skill', 'to', 'team'), ('member', 'to', 'team'), ('loc', 'to', 'team')], 'sstml')
+
+      supervision_edge_types:
+        null # it will take all the forward edge_types as supervision edges
+        #([('member', 'to', 'team')], 'stm')
+
+      dup_edge:
+        #null # keep the duplicates, else: reduce by 'add', 'mean', 'min', 'max', or 'mul'
+        add #'mean', 'min', 'max', 'mul'
+      'pre': False # use pretrained Dnn skill vectors as initial node features of graph data
+
+    pytorch: 'torch==2.5.1 --index-url https://download.pytorch.org/whl/cu124' #will be set dynamically in ./src/main.py from root config.yml
+
+    #Grover, Aditya, and Jure Leskovec. "node2vec: Scalable feature learning for networks." Proceedings of the 22nd ACM SIGKDD international conference on Knowledge discovery and data mining. 2016.
+    n2v:
+      walk_length: 5
+      context_size: 2
+      walks_per_node: 10
+      num_negative_samples': 10
+      p: 1.0
+      q: 1.0
 
   #Thomas N. Kipf, Max Welling: Semi-Supervised Classification with Graph Convolutional Networks. ICLR (Poster) 2017
   gnn.gcn:

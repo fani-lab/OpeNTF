@@ -98,22 +98,15 @@ def run(cfg):
         # skill coverage metric, all skills of each expert, all expert of each skills (supports of each skill, like in RarestFirst)
         vecs['skillcoverage'] = domain_cls.gen_skill_coverage(vecs, f'{cfg.data.output}{filter_str}') # after we have a sparse vector, we create es_vecs from that
 
-        dnn = install_import('', 'mdl.emb.dnn')
-        cfg.data.embedding = OmegaConf.load("mdl/emb/config.yml")
-        cfg.data.embedding.output = cfg.data.output
-        t2v = dnn.Dnn(cfg.data.embedding.dim, cfg.data.output, cfg.data.embedding.model.d2v)
-        t2v.train(cfg.data.embedding.model.epochs, vecs, indexes)
-
-        # # unit tests :D
-        # if cfg.model.d2v.embtype == 'skill': print(t2v.model['s5'])
-        # if cfg.model.d2v.embtype == 'member': print(t2v.model['m5'])
-        # if cfg.model.d2v.embtype == 'joint':
-        #     print(t2v.model['s5'])
-        #     print(t2v.model['m5'])
-        # print(t2v.model.docvecs[10])#teamid
-        # print(t2v.infer_skillsubsetvec(['s1', 's5']))
-        # print(t2v.skillsubsetvecs().shape)
-
+        if cfg.data.embedding:
+            embs = cfg.data.embedding
+            cfg.data.embedding = OmegaConf.load("mdl/emb/config.yml")
+            cfg.data.embedding.output = cfg.data.output
+            cfg.data.embedding.model.gnn.pytorch = cfg.pytorch
+            for emb in embs.split():
+                cls = get_class(emb)
+                t2v = cls(cfg.data.embedding.dim, cfg.data.output, cfg.data.acceleration, cfg.data.embedding.model[emb.split('.')[-1].lower()])
+                t2v.train(cfg.data.embedding.model.epochs, vecs, indexes)
 
     if 'train' in cfg.cmd:
 

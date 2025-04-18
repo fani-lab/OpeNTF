@@ -49,7 +49,7 @@ def run(teamsvecs_file, indexes_file, model, output, emb_output = None):
             output_ = output + f'{settings["embtype"]}.'
             # wnn.run(teamsvecs_file, indexes_file, settings, output_)
 
-            t2v = wnn.Wnn(teamsvecs, indexes, settings, output_)
+            t2v = dnn.Dnn(teamsvecs, indexes, settings, output_)
             t2v.init()
             t2v.train()
             return

@@ -8,10 +8,13 @@ update to readme for cmn layer and main readme
 
 Graph Construction (team2vec as gnn)
 
-- embeddings for skills (no need for embeddings for experts for now. in future may want to do skill-experts in input ...)
-
--- d2v >> docs is collection of skills 
 -- gnn-transferred
+node2vec
+metapath2vec
+gs
+gat
+gin
+
 
 -- contextual >> llm-based >> sentencetranformer
 
@@ -28,6 +31,9 @@ new change to the skill subset >> skill list for each team, ordered skills
 
 lazy load update 
 -- when doing the filtering, we read from scratch. We can load the teams.pkl and filter, and update it. >> messy and confusing, not worth it
+
+- embeddings for experts. in future may want to do skill-experts in input ...)
+
 
 --------------------------------------------------------
 

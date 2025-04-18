@@ -7,19 +7,18 @@ python-dateutil>=2.9
 # dynamic packages
 # cmn.repository.Repository.read_data() pandas>=2.0.0
 # cmn.team.Team.plot_stats() matplotlib==3.7.5
-# mdl.team2vec.dnn.train() gensim==4.3.3 #needs numpy 1.24.4
+# mdl.emb.dnn.Dnn.train() gensim==4.3.3 #needs numpy 1.24.4
+# mdl.emb.gnn.Gnn.__init__() config.yml.pytorch: torch>=2.5 --index-url https://download.pytorch.org/whl/cu124
+# mdl.emb.gnn.Gnn.__init__() torch_geometric==2.6.1
 
 #torch>=1.9.0
-#PyYAML==6.0.1
 #scikit-learn>=1.2.2
-#gensim>=4.3.1
 #pytrec-eval-terrier==0.5.2
 ## opennmtpy requires 2.1 < torch < 2.3 and raises conflict with other versions when installed with pyg
 ## OpenNMT-py>=3.3
 #reranking==0.3.6 # required by Adila submodule
 #fairsearchcore==1.0.4 # required by Adila submodule
 ##schedule
-#python-dateutil==2.8.2
 #bayesian-torch
 
 #-f https://download.pytorch.org/whl/cpu

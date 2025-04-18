@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import pickle, hydra, logging, os
+import pickle, logging
 from tqdm import tqdm
 
 log = logging.getLogger(__name__)
@@ -16,11 +16,9 @@ from pkgmgr import *
 from .team2vec import Team2Vec
 #Document-based neural net (Dnn) vs. Graph neural net (Gnn) :)
 
-gensim = None
-
 class Dnn(Team2Vec):
-    def __init__(self, dim, output, cgf):
-        super().__init__(dim, output, cgf)
+    gensim = None
+    def __init__(self, dim, output, device, cgf): super().__init__(dim, output, device, cgf)
 
     def _prep(self, teamsvecs, indexes):
         datafile = self.output + f'/{self.cfg.embtype}docs.pkl'
@@ -29,7 +27,6 @@ class Dnn(Team2Vec):
             with open(datafile, 'rb') as infile: self.data = pickle.load(infile)
             return self.data
         except FileNotFoundError:
-            global gensim # already set in the train()
             log.info(f"File not found! Creating the documents out of teams ...")
             self.data = []
             j = 0
@@ -45,10 +42,10 @@ class Dnn(Team2Vec):
                     j += 1
                 datetime_doc = [f'dt{str(year)}']
 
-                if   self.cfg.embtype == 'skill': td = gensim.models.doc2vec.TaggedDocument(skill_doc, [str(i)])
-                elif self.cfg.embtype == 'member': td = gensim.models.doc2vec.TaggedDocument(member_doc, [str(i)])
-                elif self.cfg.embtype == 'skillmember': td = gensim.models.doc2vec.TaggedDocument(skill_doc + member_doc, [str(i)])
-                elif self.cfg.embtype == 'skilltime': td = gensim.models.doc2vec.TaggedDocument(skill_doc + datetime_doc, [str(i)])
+                if   self.cfg.embtype == 'skill': td = Dnn.gensim.models.doc2vec.TaggedDocument(skill_doc, [str(i)])
+                elif self.cfg.embtype == 'member': td = Dnn.gensim.models.doc2vec.TaggedDocument(member_doc, [str(i)])
+                elif self.cfg.embtype == 'skillmember': td = Dnn.gensim.models.doc2vec.TaggedDocument(skill_doc + member_doc, [str(i)])
+                elif self.cfg.embtype == 'skilltime': td = Dnn.gensim.models.doc2vec.TaggedDocument(skill_doc + datetime_doc, [str(i)])
                 self.data.append(td)
             assert teamsvecs['skill'].shape[0] == len(self.data)
             log.info(f'{len(self.data)} documents with word type of {self.cfg.embtype} have created. Saving ...')
@@ -60,16 +57,15 @@ class Dnn(Team2Vec):
         output = self.output + f'/{self.cfg.embtype}.d{self.dim}.w{self.cfg.window}.dm{self.cfg.dm}.e{epochs}.mdl'
         try:
             log.info(f"Loading the model {output} for {(teamsvecs['skill'].shape[0], self.dim)}  embeddings ...")
-            global gensim
-            gensim = install_import('gensim==4.3.3', 'gensim')
-            self.model = gensim.models.Doc2Vec.load(output)
+            Dnn.gensim = install_import('gensim==4.3.3', 'gensim')
+            self.model = Dnn.gensim.models.Doc2Vec.load(output)
             assert self.model.docvecs.vectors.shape[0] == teamsvecs['skill'].shape[0] # correct number of embeddings per team
             log.info(f'Model of {self.model.docvecs.vectors.shape} embeddings loaded.')
             return self.model
         except FileNotFoundError:
             log.info(f'File not found! Training the embedding model from scratch ...')
             self._prep(teamsvecs, indexes)
-            self.model = gensim.models.Doc2Vec(dm=self.cfg.dm, vector_size=self.dim,
+            self.model = Dnn.gensim.models.Doc2Vec(dm=self.cfg.dm, vector_size=self.dim,
                                                window=self.cfg.window, dbow_words=1, min_alpha=0.025, min_count=1, seed=0, workers=self.cfg.nworkers)
 
             self.model.build_vocab(self.data)
@@ -95,4 +91,12 @@ class Dnn(Team2Vec):
         return iv, self.model.docvecs.most_similar([iv])
 
 
-
+# # unit tests :D
+# if cfg.model.d2v.embtype == 'skill': print(t2v.model['s5'])
+# if cfg.model.d2v.embtype == 'member': print(t2v.model['m5'])
+# if cfg.model.d2v.embtype == 'joint':
+#     print(t2v.model['s5'])
+#     print(t2v.model['m5'])
+# print(t2v.model.docvecs[10])#teamid
+# print(t2v.infer_skillsubsetvec(['s1', 's5']))
+# print(t2v.skillsubsetvecs().shape)
