@@ -14,14 +14,13 @@ log = logging.getLogger(__name__)
 
 from pkgmgr import *
 from .team2vec import Team2Vec
-#Document-based neural net (Dnn) vs. Graph neural net (Gnn) :)
 
-class Dnn(Team2Vec):
+class D2v(Team2Vec):
     gensim = None
     def __init__(self, dim, output, device, cgf): super().__init__(dim, output, device, cgf)
 
     def _prep(self, teamsvecs, indexes):
-        datafile = self.output + f'/{self.cfg.embtype}docs.pkl'
+        datafile = self.output + f'/{self.cfg.embtype}.docs.pkl'
         try:
             log.info(f'Loading teams as docs {datafile}  ...')
             with open(datafile, 'rb') as infile: self.data = pickle.load(infile)
@@ -42,10 +41,10 @@ class Dnn(Team2Vec):
                     j += 1
                 datetime_doc = [f'dt{str(year)}']
 
-                if   self.cfg.embtype == 'skill': td = Dnn.gensim.models.doc2vec.TaggedDocument(skill_doc, [str(i)])
-                elif self.cfg.embtype == 'member': td = Dnn.gensim.models.doc2vec.TaggedDocument(member_doc, [str(i)])
-                elif self.cfg.embtype == 'skillmember': td = Dnn.gensim.models.doc2vec.TaggedDocument(skill_doc + member_doc, [str(i)])
-                elif self.cfg.embtype == 'skilltime': td = Dnn.gensim.models.doc2vec.TaggedDocument(skill_doc + datetime_doc, [str(i)])
+                if   self.cfg.embtype == 'skill': td = self.gensim.models.doc2vec.TaggedDocument(skill_doc, [str(i)])
+                elif self.cfg.embtype == 'member': td = self.gensim.models.doc2vec.TaggedDocument(member_doc, [str(i)])
+                elif self.cfg.embtype == 'skillmember': td = self.gensim.models.doc2vec.TaggedDocument(skill_doc + member_doc, [str(i)])
+                elif self.cfg.embtype == 'skilltime': td = self.gensim.models.doc2vec.TaggedDocument(skill_doc + datetime_doc, [str(i)])
                 self.data.append(td)
             assert teamsvecs['skill'].shape[0] == len(self.data)
             log.info(f'{len(self.data)} documents with word type of {self.cfg.embtype} have created. Saving ...')
@@ -57,15 +56,15 @@ class Dnn(Team2Vec):
         output = self.output + f'/{self.cfg.embtype}.d{self.dim}.w{self.cfg.window}.dm{self.cfg.dm}.e{epochs}.mdl'
         try:
             log.info(f"Loading the model {output} for {(teamsvecs['skill'].shape[0], self.dim)}  embeddings ...")
-            Dnn.gensim = install_import('gensim==4.3.3', 'gensim')
-            self.model = Dnn.gensim.models.Doc2Vec.load(output)
+            self.__class__.gensim = install_import('gensim==4.3.3', 'gensim')
+            self.model = self.gensim.models.Doc2Vec.load(output)
             assert self.model.docvecs.vectors.shape[0] == teamsvecs['skill'].shape[0] # correct number of embeddings per team
             log.info(f'Model of {self.model.docvecs.vectors.shape} embeddings loaded.')
             return self.model
         except FileNotFoundError:
             log.info(f'File not found! Training the embedding model from scratch ...')
             self._prep(teamsvecs, indexes)
-            self.model = Dnn.gensim.models.Doc2Vec(dm=self.cfg.dm, vector_size=self.dim,
+            self.model = self.gensim.models.Doc2Vec(dm=self.cfg.dm, vector_size=self.dim,
                                                window=self.cfg.window, dbow_words=1, min_alpha=0.025, min_count=1, seed=0, workers=self.cfg.nworkers)
 
             self.model.build_vocab(self.data)

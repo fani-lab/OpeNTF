@@ -33,10 +33,11 @@ data: #required for 'prep' step
   location: 'venue' #should be one of 'city', 'state', 'country', represents the location of team members, or 'venue' represents the location of team like in dblp
   acceleration: 'cpu' #cpu for all cores, cpu:3 for 3 cores, 'cuda' for all gpus, 'cuda:1,3' for gpu1 and gpu3
   bucket_size: 1000
-  embedding: # if set, will be set dynamically in main.py to ./mdl/emb/config.yml after loading the respective class
-    mdl.emb.dnn.Dnn
-    mdl.emb.gnn.Gnn
-
+  embedding:
+    config: ./mdl/emb/config.yml
+    class_method: # the name directs to the correct part of the embedding config file
+      #mdl.emb.d2v.D2v_d2v
+      mdl.emb.gnn.Gnn_n2v
 
 model:
     baseline:

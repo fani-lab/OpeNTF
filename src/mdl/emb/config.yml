@@ -12,7 +12,7 @@ model:
   save_per_epoch: False
 
   # Quoc V. Le, Tomás Mikolov: Distributed Representations of Sentences and Documents. ICML 2014: 1188-1196
-  dnn: # we use gensim
+  d2v: # we use gensim
     dm: 1 # training algorithm. 1: distributed memory (PV-DM), 0: distributed bag of words (PV-DBOW)
     # NOTE: As the input is a skill subset, so either the sum/avg of skill vectors individually >> embtype = 'skill' or 'joint' and  dbow_words = True
     # OR the team vecs when the words are only skills. So, embtype = 'skill' and  dbow_words = False
@@ -35,8 +35,8 @@ model:
         null # it will take all the forward edge_types as supervision edges
         #([('member', 'to', 'team')], 'stm')
 
-      dup_edge:
-        #null # keep the duplicates, else: merged by 'add', 'mean', 'min', 'max', or 'mul'
+      dup_edge: #https://pytorch-geometric.readthedocs.io/en/2.6.1/generated/torch_geometric.transforms.ToUndirected.html
+        #null # keep the duplicates, else: merged by 'add', 'mean', 'min', 'max', or 'mul' >> for now, a single edge feature of value 1, so, mean, max, min should have all same effect
         add #mean, min, max, mul
       'pre': False # use pretrained Dnn skill vectors as initial node features of graph data
 
@@ -51,11 +51,9 @@ model:
       p: 1.0
       q: 1.0
 
-  #Thomas N. Kipf, Max Welling: Semi-Supervised Classification with Graph Convolutional Networks. ICLR (Poster) 2017
-  gnn.gcn:
-    hidden_dim: 10
-    p: 1.0
-    q: 1.0
+    #Thomas N. Kipf, Max Welling: Semi-Supervised Classification with Graph Convolutional Networks. ICLR (Poster) 2017
+    gcn:
+      hidden_dim: 10
 
 #  'gnn.gs': {
 #      'e' : 100,                # number of epochs

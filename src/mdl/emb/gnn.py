@@ -21,9 +21,10 @@ class Gnn(Team2Vec):
         # from mdl.earlystopping import EarlyStopping
         # from lant_encoder import Encoder as LANT_Encoder
 
+    #NOTE: for any change, unit test using https://github.com/fani-lab/OpeNTF/issues/280
     def _prep(self, teamsvecs, indexes): # https://pytorch-geometric.readthedocs.io/en/latest/modules/utils.html#torch_geometric.utils.remove_self_loops
         structure = eval(self.cfg.graph.structure)
-        file = self.output + f'/{structure[1]}graph.pkl'
+        file = self.output + f'/{structure[1]}.{self.cfg.graph.dup_edge if self.cfg.graph.dup_edge else "dup"}.graph.pkl'
         try:
             log.info(f'Loading graph of {structure} from {file}  ...')
             with open(file, 'rb') as infile: self.data = pickle.load(infile)
@@ -37,12 +38,12 @@ class Gnn(Team2Vec):
                 edges = []
                 for i, row in enumerate(tqdm(teams, total=teams.shape[0])):
                     for t in itertools.combinations(row.nonzero()[1], 2): edges += [t]
-                edge_index = Gnn.torch.tensor(edges, dtype=Gnn.torch.long).t().contiguous() #[1,2][1,3][2,4] >> [1,1,2][2,3,4]
-                nodes = Gnn.torch.tensor([[0]] * teams.shape[1], dtype=Gnn.torch.float)
-                self.data = Gnn.pyg.data.Data(x=nodes, edge_index=edge_index, edge_attr=Gnn.torch.tensor([1] * len(edges), dtype=Gnn.torch.long))
+                edge_index = self.torch.tensor(edges, dtype=self.torch.long).t().contiguous() #[1,2][1,3][2,4] >> [1,1,2][2,3,4]
+                nodes = self.torch.tensor([[0]] * teams.shape[1], dtype=self.torch.float)
+                self.data = self.pyg.data.Data(x=nodes, edge_index=edge_index, edge_attr=self.torch.tensor([1] * len(edges), dtype=self.torch.long))
             else:
                 log.info(f'Creating a hetero graph of type {structure[0]} ...')
-                self.data = Gnn.pyg.data.HeteroData()
+                self.data = self.pyg.data.HeteroData()
                 node_types = set()
                 #edges
                 for edge_type in structure[0]:
@@ -63,31 +64,20 @@ class Gnn(Team2Vec):
                     so we need to only consider combinations for the s-s or m-m edges. In this case, [(0, 0), (0, 1), (1, 0), (1, 1)] >> [(0, 0), (0, 1), (1, 1)] for one single team
                     '''
 
-                    self.data[edge_type].edge_index = Gnn.torch.tensor(edges, dtype=Gnn.torch.long).t().contiguous()
-                    self.data[edge_type].edge_attr = Gnn.torch.tensor([1] * len(edges), dtype=Gnn.torch.long)
+                    self.data[edge_type].edge_index = self.torch.tensor(edges, dtype=self.torch.long).t().contiguous()
+                    self.data[edge_type].edge_attr = self.torch.tensor([1] * len(edges), dtype=self.torch.long)
                     node_types = node_types.union({edge_type[0], edge_type[2]})
                 #nodes
-                for node_type in node_types: self.data[node_type].x = Gnn.torch.tensor([[0]] * (teamsvecs[node_type].shape[1] if node_type != 'team' else teamsvecs['skill'].shape[0]), dtype=Gnn.torch.float)
+                for node_type in node_types: self.data[node_type].x = self.torch.tensor([[0]] * (teamsvecs[node_type].shape[1] if node_type != 'team' else teamsvecs['skill'].shape[0]), dtype=self.torch.float)
 
             # if not self.settings['dir']:
             log.info('To undirected graph ...')
-            transform = Gnn.pyg.transforms.ToUndirected(reduce=self.cfg.graph.dup_edge) # this will also aggregate the edge features
-
-            # # we will only create reverse edges if the graph is undirected
-            # # create reverse edges for s-s and m-m edge_types
-            # for edge_type in self.data.edge_types:
-            #     # add reverse edge_types for s-s and e-e edge_types
-            #     if edge_type[0] == edge_type[2]:
-            #         rev_edge_type = (edge_type[0], f'rev_{edge_type[1]}', edge_type[2])  # reverse the relation
-            #         log.info(f'Creating {rev_edge_type} manually')
-            #         self.data[rev_edge_type].edge_index = self.data[edge_type].edge_index  # basically the same edge_index
-            #         self.data[rev_edge_type].edge_attr = self.data[edge_type].edge_attr  # basically the same edge_attr
-            # # apply the final transform
+            transform = self.pyg.transforms.ToUndirected(merge=False)
             self.data = transform(self.data)
 
             if self.cfg.graph.dup_edge:
                 log.info(f'To merge duplicate edges by {self.cfg.graph.dup_edge} weights/features ...')
-                transform = Gnn.pyg.transforms.RemoveDuplicatedEdges(key=['edge_attr'], reduce=self.cfg.graph.dup_edge)
+                transform = self.pyg.transforms.RemoveDuplicatedEdges(key=['edge_attr'], reduce=self.cfg.graph.dup_edge)
                 self.data = transform(self.data)
 
             self.data.validate(raise_on_error=True)
@@ -96,7 +86,8 @@ class Gnn(Team2Vec):
             return self.data
 
     def train(self, epochs, teamsvecs, indexes):
-        self._prep(teamsvecs, indexes)
+        self._prep(teamsvecs, None)
+
     # # settings = the settings for this particular gnn model
     # # emb_output = the path for the embedding output and model output storage
     # def init_model(self, emb_output):

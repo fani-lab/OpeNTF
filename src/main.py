@@ -99,14 +99,14 @@ def run(cfg):
         vecs['skillcoverage'] = domain_cls.gen_skill_coverage(vecs, f'{cfg.data.output}{filter_str}') # after we have a sparse vector, we create es_vecs from that
 
         if cfg.data.embedding:
-            embs = cfg.data.embedding
-            cfg.data.embedding = OmegaConf.load("mdl/emb/config.yml")
-            cfg.data.embedding.output = cfg.data.output
-            cfg.data.embedding.model.gnn.pytorch = cfg.pytorch
-            for emb in embs.split():
-                cls = get_class(emb)
-                t2v = cls(cfg.data.embedding.dim, cfg.data.output, cfg.data.acceleration, cfg.data.embedding.model[emb.split('.')[-1].lower()])
-                t2v.train(cfg.data.embedding.model.epochs, vecs, indexes)
+            cfg.data.embedding.config = OmegaConf.load("mdl/emb/config.yml")
+            cfg.data.embedding.config.output = cfg.data.output
+            cfg.data.embedding.config.model.gnn.pytorch = cfg.pytorch
+            cls, method = cfg.data.embedding.class_method.split('_')
+            cls = get_class(cls)
+            t2v = cls(cfg.data.embedding.config.dim, cfg.data.output, cfg.data.acceleration, cfg.data.embedding.config.model[cls.__name__.lower()])
+            t2v.model = method # for now just a name as str, but inside the class will become an instance of the model obj
+            t2v.train(cfg.data.embedding.config.model.epochs, vecs, indexes)
 
     if 'train' in cfg.cmd:
 

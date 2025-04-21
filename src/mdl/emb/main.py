@@ -36,7 +36,7 @@ def run(teamsvecs_file, indexes_file, model, output, emb_output = None):
         teamsvecs, indexes = pickle.load(teamsvecs_f), pickle.load(indexes_f)
 
         if model == 'w2v':
-            import dnn
+            import d2v
             # for d in params.settings['model'][model]['d']: # this is specific to w2v for now
             settings = {'d': params.settings['model'][model]['d'],
                         'e': params.settings['model']['e'],

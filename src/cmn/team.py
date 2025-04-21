@@ -214,6 +214,10 @@ class Team(object):
             log.info(f'Following skills are used in no teams!\n{zero_col_indices}')
             return False
 
+        if teamsvecs['loc'] and [i for i in range(teamsvecs['loc'].shape[0]) if len(teamsvecs['loc'].rows[i]) != 1 or len(teamsvecs['loc'].data[i] != 1)]:
+            log.info(f'Following teams are NOT one-hot in location!\n{e}')
+            return False
+
         return True
     @classmethod
     def gen_teamsvecs(cls, datapath, output, cfg):
