@@ -21,8 +21,16 @@ class Gnn(Team2Vec):
         # from mdl.earlystopping import EarlyStopping
         # from lant_encoder import Encoder as LANT_Encoder
 
-    #NOTE: for any change, unit test using https://github.com/fani-lab/OpeNTF/issues/280
-    def _prep(self, teamsvecs, indexes): # https://pytorch-geometric.readthedocs.io/en/latest/modules/utils.html#torch_geometric.utils.remove_self_loops
+
+    def _prep(self, teamsvecs, indexes):
+        #NOTE: for any change, unit test using https://github.com/fani-lab/OpeNTF/issues/280
+        # import numpy as np
+        # from scipy.sparse import lil_matrix
+        # teamsvecs = {}
+        # teamsvecs['skill']=lil_matrix(np.array([[1,1,0],[1,0,1],[1,1,1]]))
+        # teamsvecs['member']=lil_matrix(np.array([[1,0,1,0],[1,1,0,0],[0,1,0,1]]))
+        # teamsvecs['loc']=lil_matrix(np.array([[1,0],[0,1],[1,0]]))
+
         structure = eval(self.cfg.graph.structure)
         file = self.output + f'/{structure[1]}.{self.cfg.graph.dup_edge if self.cfg.graph.dup_edge else "dup"}.graph.pkl'
         try:
@@ -53,17 +61,10 @@ class Gnn(Team2Vec):
                     edges = []
                     for i, row1 in enumerate(tqdm(teams, total=teams.shape[0])):
                         row2 = teamsvecs[edge_type[2]][i] if edge_type[2] != 'team' else [i] # take the other part of the edge from here
-                        if edge_type[0] == edge_type[2]:
-                            for t in itertools.combinations(row1.nonzero()[1], 2): edges += [t] # now add edges from all members of part 1 to part 2 (in this case, both are the same, so we take combinations of 2)
-                        else:
-                            for t in itertools.product(row1.nonzero()[1], row2.nonzero()[1] if edge_type[2] != 'team' else row2): edges += [t] # now add edges from all members of part 1 to part 2
-
-                    '''
-                    For edge_type ('skill', 'to', 'skill') and edges = [(0, 0), (0, 1), (1, 0), (1, 1)] from the previous step for one single team, we are looking at two identical edges
-                    s-s (0,1)
-                    s-s (1,0)
-                    so we need to only consider combinations for the s-s or m-m edges. In this case, [(0, 0), (0, 1), (1, 0), (1, 1)] >> [(0, 0), (0, 1), (1, 1)] for one single team
-                    '''
+                        # now add edges from all members of part 1 to part 2 (in this case, both are the same, so we take combinations of 2)
+                        if edge_type[0] == edge_type[2]: edges += [t for t in itertools.combinations(row1.nonzero()[1], 2)]
+                        # now add edges from all members of part 1 to part 2
+                        else: edges += [t for t in itertools.product(row1.nonzero()[1], row2.nonzero()[1] if edge_type[2] != 'team' else row2)]
 
                     self.data[edge_type].edge_index = self.torch.tensor(edges, dtype=self.torch.long).t().contiguous()
                     self.data[edge_type].edge_attr = self.torch.tensor([1] * len(edges), dtype=self.torch.long)
@@ -80,6 +81,8 @@ class Gnn(Team2Vec):
                 log.info(f'To merge duplicate edges by {self.cfg.graph.dup_edge} weights/features ...')
                 transform = self.pyg.transforms.RemoveDuplicatedEdges(key=['edge_attr'], reduce=self.cfg.graph.dup_edge)
                 self.data = transform(self.data)
+
+            # https://pytorch-geometric.readthedocs.io/en/latest/modules/utils.html#torch_geometric.utils.remove_self_loops
 
             self.data.validate(raise_on_error=True)
             log.info(f'Saving graph at {file} ...')
