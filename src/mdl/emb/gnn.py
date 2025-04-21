@@ -48,6 +48,7 @@ class Gnn(Team2Vec):
                 #edges
                 for edge_type in structure[0]:
                     log.info(f'Adding edges of type {edge_type} ...')
+                    assert edge_type[0] in teamsvecs.keys() and teamsvecs[edge_type[0]] is not None
                     teams = teamsvecs[edge_type[0]] # take one part of an edge from here
                     edges = []
                     for i, row1 in enumerate(tqdm(teams, total=teams.shape[0])):

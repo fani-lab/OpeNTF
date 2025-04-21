@@ -4,9 +4,13 @@ opentf_venv\Scripts\activate on Windows.
 
 to do:
 
-update to readme for cmn layer and main readme 
+update to readme for cmn layer and main readme
 
-Graph Construction (team2vec as gnn)
+script to unit test at docker
+ teamsvec creation for {dblp,imdb,gith,uspt}
+ graph creation for
+    stm.{dup,add,mean} for {dblp,imdb,gith,uspt}
+    stml.{dup,add,mean} for {dblp,uspt}
 
 -- gnn-transferred
 node2vec

@@ -37,7 +37,11 @@ model:
 
       dup_edge: #https://pytorch-geometric.readthedocs.io/en/2.6.1/generated/torch_geometric.transforms.ToUndirected.html
         #null # keep the duplicates, else: merged by 'add', 'mean', 'min', 'max', or 'mul' >> for now, a single edge feature of value 1, so, mean, max, min should have all same effect
-        add #mean, min, max, mul
+        add
+        #mean
+        #min
+        #max
+        #mul
       'pre': False # use pretrained Dnn skill vectors as initial node features of graph data
 
     pytorch: #will be set dynamically in ./src/main.py from root ./config.yml
