@@ -1,4 +1,4 @@
-name: Docker CI
+name: non-inclusive-test-toy-main
 
 on:
   push:
