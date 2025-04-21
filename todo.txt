@@ -5,6 +5,12 @@ opentf_venv\Scripts\activate on Windows.
 to do:
 
 update to readme for cmn layer and main readme
+--- explain about 'location'
+            #in dblp, the 'loc' is the replica of the paper venue, so it should be 1-hot for each team
+            #in uspt, the 'loc' is the actual location of the inventor, so it can be multihot.
+            e = [i for i in range(teamsvecs['loc'].shape[0]) if (len(teamsvecs['loc'].rows[i]) != 1) or (sum(teamsvecs['loc'].data[3]) != 1)]
+            if e: log.info(f'Following teams are not one-hot in the location of team members. '
+                           f'Based on the underlying dataset/domain, it may be valid like in uspt, or invalid like dblp.\n{e}')
 
 script to unit test at docker
  teamsvec creation for {dblp,imdb,gith,uspt}

@@ -6,7 +6,7 @@ hydra:
   run:
     dir: . #unix or macos
     #dir: /dev/null # windows
-pytorch: torch>=2.4.1 #--index-url https://download.pytorch.org/whl/cu124
+pytorch: torch>=2.2.2 #--index-url https://download.pytorch.org/whl/cu124
 
 cmd: ['prep'] #  ['prep', 'train', 'test', 'eval', 'plot', 'agg', 'fair']
 data: #required for 'prep' step
@@ -30,7 +30,7 @@ data: #required for 'prep' step
   filter:
     min_nteam: 10 # as this may yield empty teams, min_team_size should be set to at least 1
     min_team_size: 2 #no filter -> no key 'filter' or ~data.filter in the command line
-  location: 'venue' #should be one of 'city', 'state', 'country', represents the location of team members, or 'venue' represents the location of team like in dblp
+  location: 'venue' #should be one of 'city', 'state', 'country', represents the *location of team members*, or 'venue' represents the location of team members as replica of the location of team like in dblp
   acceleration: 'cpu' #cpu for all cores, cpu:3 for 3 cores, 'cuda' for all gpus, 'cuda:1,3' for gpu1 and gpu3
   bucket_size: 1000
   embedding:
