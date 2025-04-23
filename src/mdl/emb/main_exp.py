@@ -1,5 +1,5 @@
 import params
-import main
+import _main
 def run_entire_ds(args):
     # generate for valid combinations on entire datasets
         args.output = args.teamsvecs

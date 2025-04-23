@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import pickle, logging
+import pickle, logging, os
 from tqdm import tqdm
 
 log = logging.getLogger(__name__)
@@ -12,19 +12,21 @@ log = logging.getLogger(__name__)
 # embtype = 'skilltime' --> doc_list = ['s1 s2 dt1988','s3 dt1990']
 # label_list = ['t1','t2','t3']
 
-from pkgmgr import *
+from pkgmgr import install_import
 from .team2vec import Team2Vec
 
 class D2v(Team2Vec):
     gensim = None
-    def __init__(self, dim, output, device, cgf): super().__init__(dim, output, device, cgf)
+    def __init__(self, output, device, cgf):
+        super().__init__(output, device, cgf)
+        self.name = 'd2v'
 
     def _prep(self, teamsvecs, indexes):
         datafile = self.output + f'/{self.cfg.embtype}.docs.pkl'
         try:
             log.info(f'Loading teams as docs {datafile}  ...')
             with open(datafile, 'rb') as infile: self.data = pickle.load(infile)
-            return self.data
+            return self
         except FileNotFoundError:
             log.info(f'File not found! Creating the documents out of teams ...')
             self.data = []
@@ -49,26 +51,28 @@ class D2v(Team2Vec):
             assert teamsvecs['skill'].shape[0] == len(self.data)
             log.info(f'{len(self.data)} documents with word type of {self.cfg.embtype} have created. Saving ...')
             with open(datafile, 'wb') as f: pickle.dump(self.data, f)
-            return self.data
+            return self
 
-    def train(self, epochs, teamsvecs, indexes):
+    def train(self, teamsvecs, indexes):
         # to select/create correct model file in the output directory
-        output = self.output + f'/{self.cfg.embtype}.d{self.dim}.w{self.cfg.window}.dm{self.cfg.dm}.e{epochs}.mdl'
+        output = self.output + f'/{self.cfg.embtype}.d{self.cfg.d}.w{self.cfg.w}.dm{self.cfg.dm}.e{self.cfg.e}.{self.name}'
         try:
-            log.info(f"Loading the model {output} for {(teamsvecs['skill'].shape[0], self.dim)}  embeddings ...")
+            log.info(f"Loading the model {output} for {(teamsvecs['skill'].shape[0], self.cfg.d)}  embeddings ...")
             self.__class__.gensim = install_import('gensim==4.3.3', 'gensim')
             self.model = self.gensim.models.Doc2Vec.load(output)
             assert self.model.docvecs.vectors.shape[0] == teamsvecs['skill'].shape[0] # correct number of embeddings per team
             log.info(f'Model of {self.model.docvecs.vectors.shape} embeddings loaded.')
-            return self.model
+            return self
         except FileNotFoundError:
             log.info(f'File not found! Training the embedding model from scratch ...')
             self._prep(teamsvecs, indexes)
-            self.model = self.gensim.models.Doc2Vec(dm=self.cfg.dm, vector_size=self.dim,
-                                               window=self.cfg.window, dbow_words=1, min_alpha=0.025, min_count=1, seed=0, workers=self.cfg.nworkers)
+            self.model = self.gensim.models.Doc2Vec(min_alpha=0.025, min_count=1, seed=0,
+                                                    dm=self.cfg.dm, vector_size=self.cfg.d, window=self.cfg.w,
+                                                    dbow_words=1, # keep it always one as it may be needed for gnn-based method for 'pre' config, i.e., initial node features
+                                                    workers=self.device.split(':')[1] if 'cpu:' in self.device else os.cpu_count())
 
             self.model.build_vocab(self.data)
-            for e in tqdm(range(epochs)):
+            for e in tqdm(range(self.cfg.e)):
                 self.model.train(self.data, total_examples=self.model.corpus_count, epochs=self.model.epochs)
                 self.model.alpha -= 0.002  # decrease the learning rate
                 self.model.min_alpha = self.model.alpha  # fix the learning rate, no decay
@@ -77,7 +81,7 @@ class D2v(Team2Vec):
             self.model.save(output)
             # self.model.save_word2vec_format(f'{output}.w2v')
             # self.model.docvecs.save_word2vec_format(f'{output}.d2v')
-            return self.model
+            return self
         except Exception as e: raise e
 
     # NOTE: As the input is a skill subset, the team<->doc vecs is used

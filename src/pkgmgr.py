@@ -20,6 +20,21 @@ def install_import(install_name, import_path=None, from_module=None):
     if from_module: return getattr(module, from_module)
     return module
 
+def cfg2str(cfg):
+    from omegaconf import OmegaConf
+    tree = OmegaConf.to_container(cfg, resolve=True)
+    return '.'.join([f'{k}{v}' for k, v in tree.items()])
+
+def str2cfg(s): #dot seperated kv, e.g., x1.y2.z3 --> x:1 y:2 z:3
+    from omegaconf import OmegaConf
+    items = s.split(".")
+    config = {}
+    for item in items:
+        key = ''.join(filter(str.isalpha, item))
+        value = ''.join(filter(str.isdigit, item))
+        config[key] = int(value) if value.isdigit() else value
+    return OmegaConf.create(config)
+
 # #samples
 # install_import('hydra-core==1.3.2', 'hydra')
 # # Importing a submodule/class/function: from bs4 import BeautifulSoup

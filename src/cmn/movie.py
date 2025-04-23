@@ -3,7 +3,7 @@ import logging
 
 log = logging.getLogger(__name__)
 
-from pkgmgr import *
+from pkgmgr import
 from .team import Team
 from .castncrew import CastnCrew
 
@@ -36,7 +36,7 @@ class Movie(Team):
             # in imdb, title.* represent movies and name.* represent crew members
             strid2int = lambda x : int(x[2:])
             text = lambda x : x.lower().replace(' ', '_')
-            pd = install_import('pandas>=2.0.0', 'pandas')
+            pd = install_import('pandas==2.0.0', 'pandas')
             log.info('Reading movie data ...')
             title_basics = pd.read_csv(datapath, sep='\t', header=0, na_values='\\N', converters={'tconst': strid2int, 'primaryTitle': text, 'originalTitle': text}, dtype={'startYear': 'UInt16', 'endYear': 'UInt16'}, low_memory=False)  # title.basics.tsv
             title_basics = title_basics[title_basics['titleType'].isin(['movie', ''])]

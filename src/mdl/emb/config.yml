@@ -1,26 +1,24 @@
-dim : 8 # embedding dim. it matters for skill vectors if the skill set is small (e.g., in imdb or gith) or large (e.g., in dblp or uspt)
+dim: 8 # embedding dim. it matters for skill vectors if the skill set is small (e.g., in imdb or gith) or large (e.g., in dblp or uspt)
 #these are folders
-output:
-  ../../../output/dblp/toy.dblp.v12.json #will be set dynamically in ./src/main.py
 
 model:
-  batch_size : 128 # batch_size for loaders
-  epochs : 100 # num max epochs
-  ns : 5 # number of negative samples
+  batch_size: 128 # batch_size for loaders
+  epochs: 100 # num max epochs
+  ns: 5 # number of negative samples
   lr: 0.001 #learning rate
-  shuffle: True
   save_per_epoch: False
 
   # Quoc V. Le, Tomás Mikolov: Distributed Representations of Sentences and Documents. ICML 2014: 1188-1196
   d2v: # we use gensim
+    embtype: skill # skill, member, skillmember, skilltime
     dm: 1 # training algorithm. 1: distributed memory (PV-DM), 0: distributed bag of words (PV-DBOW)
     # NOTE: As the input is a skill subset, so either the sum/avg of skill vectors individually >> embtype = 'skill' or 'joint' and  dbow_words = True
     # OR the team vecs when the words are only skills. So, embtype = 'skill' and  dbow_words = False
     # let's remove this and do for always
     # dbow_words: True # train word-vectors in skip-gram fashion; 0: no (default, faster), 1: yes.
-    embtype: 'skill' # 'skill', 'member', 'skillmember', 'skilltime'
-    window: 10 # cooccurrence window. In OpeNTF (for teams), depends on the average team size (n_members) plus n_skills per teams
-    nworkers: 16 #this is for gensim
+    w: 10 # cooccurrence window. In OpeNTF (for teams), depends on the average team size (n_members) plus n_skills per teams
+    d: ${dim}
+    e: ${model.epochs}
 
   gnn:
     graph:
@@ -42,34 +40,42 @@ model:
         #min
         #max
         #mul
-      'pre': False # use pretrained Dnn skill vectors as initial node features of graph data
+      pre:
+        null # use pretrained D2v vectors as initial node features of graph data
+        #../output/dblp/toy.dblp.v12.json/skillmember.d8.w10.dm1.e100.d2v  # skill, member, team
+        #../output/dblp/toy.dblp.v12.json/skill.d8.w10.dm1.e100.d2v  # skill, team
+        #../output/dblp/toy.dblp.v12.json/skill.d800.w1000.dm1.e10000.d2v  # if not exists, train from scratch!
 
     pytorch: #will be set dynamically in ./src/main.py from root ./config.yml
+    save_per_epochs: ${save_per_epoch}
 
     #Grover, Aditya, and Jure Leskovec. "node2vec: Scalable feature learning for networks." Proceedings of the 22nd ACM SIGKDD international conference on Knowledge discovery and data mining. 2016.
     n2v:
-      walk_length: 5
-      context_size: 2
-      walks_per_node: 10
-      num_negative_samples': 10
+      w: ${model.d2v.w}
+      d: ${dim}
+      e: ${model.epochs}
+      b: ${model.batch_size}
+      lr: ${model.lr}
+      ns: ${model.ns}
+      wl: 5  #walk_length
+      wn: 10 #walks_per_node
       p: 1.0
       q: 1.0
 
     #Thomas N. Kipf, Max Welling: Semi-Supervised Classification with Graph Convolutional Networks. ICLR (Poster) 2017
     gcn:
-      hidden_dim: 10
+      hd: 10 # hidden dimension? isn't the same as emb dim here?
 
-#  'gnn.gs': {
-#      'e' : 100,                # number of epochs
-#      'b' : 128,              # batch size
-#      'd' : 8,                # embedding dimension
-#      'ns' : 5,               # number of negative samples
-#      'h' : 2,                # number of attention heads (if applicable)
-#      'nn' : [30, 20],        # number of neighbors in each hop ([20, 10] -> 20 neighbors in first hop, 10 neighbors in second hop)
-#      'graph_types' : 'stm',   # graph type used for a single run (stm -> ste -> skill-team-expert)
-#      'agg' : 'mean',         # aggregation method used for merging multiple edges between the same source and destination node
-#      'dir' : False,          # whether the graph is directed
-#  },
+    #Hamilton, Will, Zhitao Ying, and Jure Leskovec. "Inductive representation learning on large graphs." NIPS (2017).
+    gs:
+      d: ${dim}
+      e: ${model.epochs}
+      b: ${model.batch_size}
+      lr: ${model.lr}
+      ns: ${model.ns}
+      ah: 2 # number of attention heads (if applicable)
+      nn: [30, 20] # number of neighbors in each hop ([20, 10] -> 20 neighbors in first hop, 10 neighbors in second hop)
+
 #  'gnn.gin': {
 #      'e': 100,
 #      'b': 128,

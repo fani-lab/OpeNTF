@@ -1,6 +1,4 @@
 import numpy as np
-import torch
-
 
 """
 Code snippet copied from: https://github.com/Bjarten/early-stopping-pytorch
@@ -9,11 +7,11 @@ Description: This is an implementation of early stopping in pytorch
 """
 class EarlyStopping:
     """Early stops the training if validation loss doesn't improve after a given patience."""
-    def __init__(self, patience=7, verbose=False, delta=0, path='checkpoint.pt', trace_func=print, save_model = True):
+    def __init__(self, patience=5, verbose=False, delta=0, path='checkpoint.pt', trace_func=print, save_model=True):
         """
         Args:
             patience (int): How long to wait after last time validation loss improved.
-                            Default: 7
+                            Default: 5
             verbose (bool): If True, prints a message for each validation loss improvement. 
                             Default: False
             delta (float): Minimum change in the monitored quantity to qualify as an improvement.
@@ -52,9 +50,8 @@ class EarlyStopping:
             self.save_checkpoint(val_loss, model)
             self.counter = 0
 
-    def save_checkpoint(self, val_loss, model):
+    def save_checkpoint(self, val_loss, model, torch):
         '''Saves model when validation loss decrease.'''
-        if self.verbose:
-            self.trace_func(f'Validation loss decreased ({self.val_loss_min:.6f} --> {val_loss:.6f})')
+        if self.verbose: self.trace_func(f'Validation loss decreased ({self.val_loss_min:.6f} --> {val_loss:.6f})')
         if self.save_model : torch.save(model.state_dict(), self.path)
         self.val_loss_min = val_loss

@@ -18,7 +18,7 @@ from omegaconf import OmegaConf
 import hydra
 from hydra.utils import get_class
 
-from pkgmgr import *
+from pkgmgr import install_import
 
 # from cmn.tools import NumpyArrayEncoder, popular_nonpopular_ratio
 # from mdl.fnn import Fnn
@@ -99,14 +99,13 @@ def run(cfg):
         vecs['skillcoverage'] = domain_cls.gen_skill_coverage(vecs, f'{cfg.data.output}{filter_str}') # after we have a sparse vector, we create es_vecs from that
 
         if cfg.data.embedding:
-            cfg.data.embedding.config = OmegaConf.load("mdl/emb/config.yml")
-            cfg.data.embedding.config.output = cfg.data.output
+            cfg.data.embedding.config = OmegaConf.load('mdl/emb/config.yml')
             cfg.data.embedding.config.model.gnn.pytorch = cfg.pytorch
             cls, method = cfg.data.embedding.class_method.split('_')
             cls = get_class(cls)
-            t2v = cls(cfg.data.embedding.config.dim, cfg.data.output, cfg.data.acceleration, cfg.data.embedding.config.model[cls.__name__.lower()])
-            t2v.model = method # for now just a name as str, but inside the class will become an instance of the model obj
-            t2v.train(cfg.data.embedding.config.model.epochs, vecs, indexes)
+            t2v = cls(cfg.data.output, cfg.data.acceleration, cfg.data.embedding.config.model[cls.__name__.lower()])
+            t2v.name = method
+            t2v.train(vecs, indexes)
 
     if 'train' in cfg.cmd:
 
