@@ -306,26 +306,27 @@ class Gnn(Team2Vec):
 
         return data_type
 
-    @torch.no_grad
     def eval(self, loader):
         import torch.nn.functional as F
         preds = []; ground_truths = []
         total_loss = 0; total_examples = 0
-        for seed_edge_type in self.cfg.graph.supervision_edge_types:
-            for sampled_data in loader[seed_edge_type]:
-                sampled_data.to(self.device)
-                tmp_pred = self.model(sampled_data, seed_edge_type, self.is_directed)
-                if (type(sampled_data) == Gnn.pyg.data.HeteroData): # we have ground_truths per edge_label_index
-                    tmp_ground_truth = sampled_data[seed_edge_type].edge_label
-                else: tmp_ground_truth = sampled_data.edge_label
+        self.model.eval()
+        with Gnn.torch.no_grad():
+            for seed_edge_type in self.cfg.graph.supervision_edge_types:
+                for sampled_data in loader[seed_edge_type]:
+                    sampled_data.to(self.device)
+                    tmp_pred = self.model(sampled_data, seed_edge_type, self.is_directed)
+                    if (type(sampled_data) == Gnn.pyg.data.HeteroData): # we have ground_truths per edge_label_index
+                        tmp_ground_truth = sampled_data[seed_edge_type].edge_label
+                    else: tmp_ground_truth = sampled_data.edge_label
 
-                assert tmp_pred.shape == tmp_ground_truth.shape
-                loss = F.binary_cross_entropy_with_logits(tmp_pred, tmp_ground_truth)
-                total_loss += float(loss) * tmp_pred.numel()
-                total_examples += tmp_pred.numel()
+                    assert tmp_pred.shape == tmp_ground_truth.shape
+                    loss = F.binary_cross_entropy_with_logits(tmp_pred, tmp_ground_truth)
+                    total_loss += float(loss) * tmp_pred.numel()
+                    total_examples += tmp_pred.numel()
 
-                preds.append(tmp_pred)
-                ground_truths.append(tmp_ground_truth)
+                    preds.append(tmp_pred)
+                    ground_truths.append(tmp_ground_truth)
 
         pred = Gnn.torch.cat(preds, dim=0).cpu().numpy()
         ground_truth = Gnn.torch.cat(ground_truths, dim=0).cpu().numpy()
