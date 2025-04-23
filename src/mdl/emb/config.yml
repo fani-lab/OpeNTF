@@ -45,10 +45,9 @@ model:
         #../output/dblp/toy.dblp.v12.json/skillmember.d8.w10.dm1.e100.d2v  # skill, member, team
         #../output/dblp/toy.dblp.v12.json/skill.d8.w10.dm1.e100.d2v  # skill, team
         #../output/dblp/toy.dblp.v12.json/skill.d800.w1000.dm1.e10000.d2v  # if not exists, train from scratch!
-
     pytorch: #will be set dynamically in ./src/main.py from root ./config.yml
     save_per_epochs: ${save_per_epoch}
-
+    model: null #dummy tag
     #Grover, Aditya, and Jure Leskovec. "node2vec: Scalable feature learning for networks." Proceedings of the 22nd ACM SIGKDD international conference on Knowledge discovery and data mining. 2016.
     n2v:
       w: ${model.d2v.w}

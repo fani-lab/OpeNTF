@@ -87,7 +87,8 @@ class Gnn(Team2Vec):
 
     def train(self, teamsvecs, indexes):
         self._prep(teamsvecs, None)
-        self.cfg.model = OmegaConf.load(self.cfg[self.name]) #gnn.n2v or gnn.gs --> gnn.model
+        self.cfg.model = self.cfg[self.name] #gnn.n2v or gnn.gs --> gnn.model
+        return
         output_ = self.output + f'{self.cfg.graph.structure[1]}.{self.cfg.graph.dup_edge}/'
 
         # replace the 1 dimensional node features with pretrained d2v skill vectors of required dimension
@@ -191,7 +192,7 @@ class Gnn(Team2Vec):
         #     model = Encoder(hidden_channels=self.d, data=train_data)
         self.optimizer = Gnn.torch.optim.Adam(self.model.parameters(), lr=self.cfg.model.lr)
 
-    def train(self):
+    def _train(self):
         if self.model_name == 'lant': self.model.learn(self, self.cfg.model.e) # built-in validation inside lant_encoder class
         else:
             self.learn(self.train_loader, self.cfg.model.e)
