@@ -1,12 +1,11 @@
 dim: 8 # embedding dim. it matters for skill vectors if the skill set is small (e.g., in imdb or gith) or large (e.g., in dblp or uspt)
-#these are folders
 
 model:
   batch_size: 128 # batch_size for loaders
   epochs: 100 # num max epochs
   ns: 5 # number of negative samples
   lr: 0.001 #learning rate
-  save_per_epoch: False
+  save_per_epoch:
 
   # Quoc V. Le, Tomás Mikolov: Distributed Representations of Sentences and Documents. ICML 2014: 1188-1196
   d2v: # we use gensim
@@ -22,32 +21,31 @@ model:
 
   gnn:
     graph:
-      structure:
+      structure: #hydra doesn't understand tuple. So, inside code, explicit cast to tuple(...)
         #('member', 'm') #homo
         #([('skill', 'to', 'member')], 'sm') #hetero
-        ([('skill', 'to', 'team'), ('member', 'to', 'team')], 'stm')
-        #([('skill', 'to', 'team'), ('member', 'to', 'team'), ('loc', 'to', 'team')], 'stml')
+        #([('skill', 'to', 'team'), ('member', 'to', 'team')], 'stm')
+        ([('skill', 'to', 'team'), ('member', 'to', 'team'), ('loc', 'to', 'team')], 'stml')
         #([('skill', 'to', 'skill'), ('skill', 'to', 'team'), ('member', 'to', 'team'), ('loc', 'to', 'team')], 'sstml')
 
       supervision_edge_types:
-        null # it will take all the forward edge_types as supervision edges
+        # if not set, it will take all the forward edge_types as supervision edges
         #([('member', 'to', 'team')], 'stm')
 
       dup_edge: #https://pytorch-geometric.readthedocs.io/en/2.6.1/generated/torch_geometric.transforms.ToUndirected.html
-        #null # keep the duplicates, else: merged by 'add', 'mean', 'min', 'max', or 'mul' >> for now, a single edge feature of value 1, so, mean, max, min should have all same effect
+        # if not set, keep the duplicates, else: merged by 'add', 'mean', 'min', 'max', or 'mul' >> for now, a single edge feature of value 1, so, mean, max, min should have all same effect
         add
         #mean
         #min
         #max
         #mul
-      pre:
-        null # use pretrained D2v vectors as initial node features of graph data
-        #../output/dblp/toy.dblp.v12.json/skillmember.d8.w10.dm1.e100.d2v  # skill, member, team
-        #../output/dblp/toy.dblp.v12.json/skill.d8.w10.dm1.e100.d2v  # skill, team
-        #../output/dblp/toy.dblp.v12.json/skill.d800.w1000.dm1.e10000.d2v  # if not exists, train from scratch!
+      pre: # if set, use pretrained D2v vectors as initial node features of graph data
+        #../output/uspt/toy.patent.tsv/skillmember.d8.w10.dm1.e100.d2v  # skill, member, team
+        ../output/uspt/toy.patent.tsv/skill.d8.w10.dm1.e100.d2v  # skill, team
+        #../output/uspt/toy.patent.tsv/skill.d9.w10.dm1.e100.d2v  # if not exists, train from scratch!
     pytorch: #will be set dynamically in ./src/main.py from root ./config.yml
-    save_per_epochs: ${save_per_epoch}
-    model: null #dummy tag
+    save_per_epochs: ${model.save_per_epoch}
+    model: #dummy tag. don't worry or touch it.
     #Grover, Aditya, and Jure Leskovec. "node2vec: Scalable feature learning for networks." Proceedings of the 22nd ACM SIGKDD international conference on Knowledge discovery and data mining. 2016.
     n2v:
       w: ${model.d2v.w}

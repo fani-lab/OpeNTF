@@ -3,7 +3,7 @@ import logging
 
 log = logging.getLogger(__name__)
 
-from pkgmgr import
+from pkgmgr import install_import
 from .team import Team
 from .castncrew import CastnCrew
 

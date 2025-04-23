@@ -93,6 +93,15 @@ class D2v(Team2Vec):
         iv = self.model.infer_vector(words)
         return iv, self.model.docvecs.most_similar([iv])
 
+    @staticmethod
+    def natsortvecs(d2v_model_wv):
+        import numpy as np
+        natsorted = install_import('natsort==8.4.0', 'natsort', 'natsorted')
+        sorted_words = natsorted(d2v_model_wv.index_to_key)  # ['m3', 's10', 's2', 's1'] --> ['m3', 's1', 's2', 's10']
+        sorted_indices = np.array([d2v_model_wv.key_to_index[word] for word in sorted_words])
+        return d2v_model_wv.vectors[sorted_indices]
+
+
 
 # # unit tests :D
 # if cfg.model.d2v.embtype == 'skill': print(t2v.model['s5'])

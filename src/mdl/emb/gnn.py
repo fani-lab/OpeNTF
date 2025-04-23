@@ -1,6 +1,5 @@
-import os, itertools, pickle, logging
+import os, itertools, pickle, logging, numpy as np
 from tqdm import tqdm
-from omegaconf import OmegaConf
 
 log = logging.getLogger(__name__)
 
@@ -12,7 +11,7 @@ class Gnn(Team2Vec):
     def __init__(self, output, device, cgf):
         super().__init__(output, device, cgf)
         self.name = 'n2v' #default model
-        self.cfg.graph.structure = eval(self.cfg.graph.structure) #seems hydra does not understand tuples
+        self.cfg.graph.structure = eval(self.cfg.graph.structure) #hydra does not understand tuples!
         Gnn.torch = install_import(cgf.pytorch, 'torch')
         Gnn.pyg = install_import('torch_geometric==2.6.1', 'torch_geometric')
 
@@ -30,13 +29,13 @@ class Gnn(Team2Vec):
 
         file = self.output + f'/{self.cfg.graph.structure[1]}.{self.cfg.graph.dup_edge if self.cfg.graph.dup_edge else "dup"}.graph.pkl'
         try:
-            log.info(f'Loading graph of {self.cfg.graph.structure} from {file}  ...')
+            log.info(f'Loading graph of {tuple(self.cfg.graph.structure)} from {file}  ...')
             with open(file, 'rb') as infile: self.data = pickle.load(infile)
             return self.data
         except FileNotFoundError:
             log.info(f'File not found! Constructing the graph ...')
 
-            if not isinstance(self.cfg.graph.structure[0], list):#homo
+            if isinstance(self.cfg.graph.structure[0], str):#homo
                 log.info(f'Creating a homo graph with {self.cfg.graph.structure[0]} node type ...')
                 teams = teamsvecs[self.cfg.graph.structure[0]] #TODO: if node_type == 'team'
                 edges = []
@@ -62,8 +61,8 @@ class Gnn(Team2Vec):
                         # now add edges from all members of part 1 to part 2
                         else: edges += [t for t in itertools.product(row1.nonzero()[1], row2.nonzero()[1] if edge_type[2] != 'team' else row2)]
 
-                    self.data[edge_type].edge_index = self.torch.tensor(edges, dtype=self.torch.long).t().contiguous()
-                    self.data[edge_type].edge_attr = self.torch.tensor([1] * len(edges), dtype=self.torch.long)
+                    self.data[tuple(edge_type)].edge_index = self.torch.tensor(edges, dtype=self.torch.long).t().contiguous()
+                    self.data[tuple(edge_type)].edge_attr = self.torch.tensor([1] * len(edges), dtype=self.torch.long)
                     node_types = node_types.union({edge_type[0], edge_type[2]})
                 #nodes
                 for node_type in node_types: self.data[node_type].x = self.torch.tensor([[0]] * (teamsvecs[node_type].shape[1] if node_type != 'team' else teamsvecs['skill'].shape[0]), dtype=self.torch.float)
@@ -88,25 +87,12 @@ class Gnn(Team2Vec):
     def train(self, teamsvecs, indexes):
         self._prep(teamsvecs, None)
         self.cfg.model = self.cfg[self.name] #gnn.n2v or gnn.gs --> gnn.model
-        return
         output_ = self.output + f'{self.cfg.graph.structure[1]}.{self.cfg.graph.dup_edge}/'
 
         # replace the 1 dimensional node features with pretrained d2v skill vectors of required dimension
-        if self.cfg.graph.pre:
-            from .d2v import D2v
-            #Doc2Vec = install_import('gensim==4.3.3', 'gensim', 'Doc2Vec')
-            for node_type in self.data.node_types:
-                d2v_embtype = 'joint' if self.cfg.graph.structure[1] == 'stm' and node_type == 'team' else node_type
-                d2v_filename = os.path.basename(self.cfg.graph.pre)
-                d2v_cfg = str2cfg(d2v_filename)
-                d2v_cfg.embtype = d2v_filename.split('.')[0]
-                # simple lazy load, or train from scratch if the file not found!
-                d2v_obj = D2v(os.path.dirname(self.cfg.graph.pre), None, d2v_cfg).train(teamsvecs, indexes)
-                #d2v = Doc2Vec.load(self.cfg.graph.pre)
-                assert d2v_obj.model.docvecs.vectors.shape[0] == teamsvecs['skill'].shape[0]  # correct number of embeddings per team
-                node_type_vecs = d2v_obj.model.docvecs.vectors if d2v_embtype == 'skillmember' else d2v_obj.model.wordvecs.vectors  # team vectors (dv) for 'team' nodes, else individual node vectors (wv)
-                self.data[node_type].x = Gnn.torch.tensor(node_type_vecs)
+        if self.cfg.graph.pre: self.d2v_node_features(indexes, teamsvecs)
 
+        return
         self.loader = self.model.loader(batch_size=self.cfg.model.b, num_workers=os.cpu_count())
         if self.name == 'n2v':
             from torch_geometric.nn import Node2Vec
@@ -154,6 +140,33 @@ class Gnn(Team2Vec):
         self.train(self.cfg.model.e, self.cfg.save_per_epoch)
         self.plot_points()
         log.info(self)
+
+    def d2v_node_features(self, indexes, teamsvecs):
+        log.info(f'Loading pretrained d2v embeddings {self.cfg.graph.pre} to initialize node features, or if not exist, train d2v embeddings from scratch ...')
+        from .d2v import D2v
+        d2v_filename = os.path.basename(self.cfg.graph.pre)
+        d2v_cfg = str2cfg(d2v_filename)
+        d2v_cfg.embtype = d2v_filename.split('.')[0]
+        # simple lazy load, or train from scratch if the file not found!
+        d2v_obj = D2v(os.path.dirname(self.cfg.graph.pre), self.device, d2v_cfg).train(teamsvecs, indexes)
+        # the order is NOT correct in d2v, i.e., vecs[0] may be for vecs['s20']. Call D2v.natsortvecs(d2v_obj.model.wv)
+        # d2v = Doc2Vec.load(self.cfg.graph.pre)
+        for node_type in self.data.node_types:
+            if node_type == 'team':
+                # no issue as the docs are 0-based indexed 0 --> '0'
+                assert d2v_obj.model.docvecs.vectors.shape[0] == teamsvecs['skill'].shape[0]  # correct number of embeddings per team
+                indices = [d2v_obj.model.docvecs.key_to_index[str(i)] for i in range(len(d2v_obj.model.docvecs))]
+                assert np.allclose(d2v_obj.model.docvecs.vectors, d2v_obj.model.docvecs.vectors[indices])
+                # assert np.array_equal(d2v_obj.model.docvecs.vectors, d2v_obj.model.docvecs.vectors[indices])
+                # (d2v_obj.model.docvecs.vectors[2] == d2v_obj.model.docvecs['2']).all()
+                self.data[node_type].x = Gnn.torch.tensor(d2v_obj.model.docvecs.vectors)  # team vectors (dv) for 'team' nodes, else individual node vectors (wv)
+            else:  # either 'skill' or 'member'
+                if d2v_obj.model.wv.vectors.shape[0] == teamsvecs[node_type].shape[1]:  # correct number of embeddings per skills xor members
+                    self.data[node_type].x = Gnn.torch.tensor(D2v.natsortvecs(d2v_obj.model.wv))
+        if d2v_obj.model.wv.vectors.shape[0] == teamsvecs['skill'].shape[1] + teamsvecs['member'].shape[1]:
+            ordered_vecs = Gnn.torch.tensor(D2v.natsortvecs(d2v_obj.model.wv))
+            if 'member' in self.data.node_types: self.data['member'].x = ordered_vecs[:teamsvecs['member'].shape[1]]  # the first part is all m*
+            if 'skill' in self.data.node_types: self.data['skill'].x = ordered_vecs[teamsvecs['member'].shape[1]:]  # the remaining is s*
 
     # settings = the settings for this particular gnn model
     # emb_output = the path for the embedding output and model output storage

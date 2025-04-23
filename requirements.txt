@@ -9,11 +9,13 @@ python-dateutil>=2.9
 # cmn.movie.Movie.read_data() pandas==2.0.0
 # cmn.patent.Patent.read_data() pandas==2.0.0
 # cmn.team.Team.plot_stats() matplotlib==3.7.5
+# mdl.emb.d2v.D2v.order() natsort==8.4.0
 # mdl.emb.d2v.D2v.train() gensim==4.3.3 #needs numpy 1.24.4
 # mdl.emb.gnn.Gnn.train() gensim==4.3.3 #needs numpy 1.24.4 --> can be removed
 # mdl.emb.gnn.Gnn.__init__() config.yml.pytorch: torch==2.2.2 --index-url https://download.pytorch.org/whl/cu124
 # mdl.emb.gnn.Gnn.__init__() torch_geometric==2.6.1
 # mdl.emb.gnn.Gnn.eval() scikit-learn==1.2.2
+
 
 #pytrec-eval-terrier==0.5.2
 ## opennmtpy requires 2.1 < torch < 2.3 and raises conflict with other versions when installed with pyg

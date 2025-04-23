@@ -99,7 +99,8 @@ def run(cfg):
         vecs['skillcoverage'] = domain_cls.gen_skill_coverage(vecs, f'{cfg.data.output}{filter_str}') # after we have a sparse vector, we create es_vecs from that
 
         if cfg.data.embedding:
-            cfg.data.embedding.config = OmegaConf.load('mdl/emb/config.yml')
+            OmegaConf.resolve(embcgf := OmegaConf.load('mdl/emb/config.yml'))
+            cfg.data.embedding.config = embcgf
             cfg.data.embedding.config.model.gnn.pytorch = cfg.pytorch
             cls, method = cfg.data.embedding.class_method.split('_')
             cls = get_class(cls)
