@@ -17,6 +17,8 @@
 #SBATCH --mail-type=ALL
 #nvidia-smi
 
-python -u main.py -data ../data/raw/dblp/dblp.v12.json -domain dblp -model bnn -filter 1
-#python -u main.py -data ../data/raw/imdb/title.basics.tsv -domain imdb -model bnn -filter 1
-#python -u main.py -data ../data/raw/uspt/patent.tsv -domain uspt -model bnn -filter 1
+python -u main.py data.domain=cmn.publication.Publication data.source=../data/dblp/toy.dblp.v12.json data.output=../output/dblp/toy.dblp.v12.json ~data.filter
+
+#python -u main.py data.domain=cmn.movie.Movie data.source=../data/imdb/toy.title.basics.tsv data.output=../output/imdb/toy.title.basics.tsv ~data.filter
+#python -u main.py data.domain=cmn.repository.Repository data.source=../data/gith/toy.repos.csv data.output=../output/gith/toy.repos.csv ~data.filter
+#python -u main.py data.domain=cmn.patent.Patent data.source=../data/uspt/toy.patent.tsv data.output=../output/uspt/toy.patent.tsv ~data.filter
