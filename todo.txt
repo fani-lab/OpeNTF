@@ -12,12 +12,6 @@ update to readme for cmn layer and main readme
             if e: log.info(f'Following teams are not one-hot in the location of team members. '
                            f'Based on the underlying dataset/domain, it may be valid like in uspt, or invalid like dblp.\n{e}')
 
-script to unit test at docker
- teamsvec creation for {dblp,imdb,gith,uspt}
- graph creation for
-    stm.{dup,add,mean} for {dblp,imdb,gith,uspt}
-    stml.{dup,add,mean} for {dblp,uspt}
-
 -- gnn-transferred
 node2vec
 metapath2vec

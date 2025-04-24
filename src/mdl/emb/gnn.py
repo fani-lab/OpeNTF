@@ -11,7 +11,6 @@ class Gnn(Team2Vec):
     def __init__(self, output, device, cgf):
         super().__init__(output, device, cgf)
         self.name = 'n2v' #default model
-        self.cfg.graph.structure = eval(self.cfg.graph.structure) #hydra does not understand tuples!
         Gnn.torch = install_import(cgf.pytorch, 'torch')
         Gnn.pyg = install_import('torch_geometric==2.6.1', 'torch_geometric')
 
