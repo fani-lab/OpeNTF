@@ -13,8 +13,8 @@ jobs:
     strategy:
       matrix:
         config:
-          - "data.domain=cmn.publication.Publication, data.source=../data/dblp/toy.dblp.v12.json, data.output=../output/dblp/toy.dblp.v12.json, ~data.filter"
-          - "data.domain=cmn.publication.Publication, data.source=../data/dblp/toy.dblp.v12.json, data.output=../output/dblp/toy.dblp.v12.json, data.filter.min_nteam=1, data.filter.min_team_size=2"
+          - "data.domain=cmn.publication.Publication data.source=../data/dblp/toy.dblp.v12.json data.output=../output/dblp/toy.dblp.v12.json ~data.filter"
+          - "data.domain=cmn.publication.Publication data.source=../data/dblp/toy.dblp.v12.json data.output=../output/dblp/toy.dblp.v12.json data.filter.min_nteam=1 data.filter.min_team_size=2"
 
       # Set to false if you want parallel runs:
       fail-fast: false
