@@ -1,0 +1,38 @@
+name: inclusive-tests-toys-main
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test-configs:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        config:
+          - "data.domain=cmn.publication.Publication, data.source=../data/dblp/toy.dblp.v12.json, data.output=../output/dblp/toy.dblp.v12.json, ~data.filter"
+          - "data.domain=cmn.publication.Publication, data.source=../data/dblp/toy.dblp.v12.json, data.output=../output/dblp/toy.dblp.v12.json, data.filter.min_nteam=1, data.filter.min_team_size=2"
+
+      # Set to false if you want parallel runs:
+      fail-fast: false
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run config ${{ matrix.config }}
+        run: |
+          python main.py ${{ matrix.config }} 
