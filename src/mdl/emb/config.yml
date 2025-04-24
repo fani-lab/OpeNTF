@@ -40,9 +40,9 @@ model:
         #max
         #mul
       pre: # if set, use pretrained D2v vectors as initial node features of graph data
-        #../output/uspt/toy.patent.tsv/skillmember.d8.w10.dm1.e100.d2v  # skill, member, team
-        #../output/uspt/toy.patent.tsv/skill.d8.w10.dm1.e100.d2v  # skill, team
-        #../output/uspt/toy.patent.tsv/skill.d9.w10.dm1.e100.d2v  # if not exists, train from scratch!
+        #../output/{domain}/toy.{data}/skillmember.d8.w10.dm1.e100.d2v  # skill, member, team
+        #../output/{domain}/toy.{data}/skill.d8.w10.dm1.e100.d2v  # skill, team
+        ../output/uspt/toy.patent.tsv/skill.d9.w10.dm1.e100.d2v  # if not exists, train from scratch!
     pytorch: #will be set dynamically in ./src/main.py from root ./config.yml
     save_per_epochs: ${model.save_per_epoch}
     model: #dummy tag. don't worry or touch it.

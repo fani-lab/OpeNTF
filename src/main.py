@@ -13,9 +13,10 @@ import numpy as np; np.random.seed(0)
 # from sklearn.model_selection import KFold, train_test_split
 # from scipy.sparse import lil_matrix
 
-# from omegaconf import DictConfig, OmegaConf
-from omegaconf import OmegaConf
 import hydra
+from omegaconf import OmegaConf #,DictConfig
+from hydra.core.hydra_config import HydraConfig
+from hydra.core.override_parser.overrides_parser import OverridesParser
 from hydra.utils import get_class
 
 from pkgmgr import install_import
@@ -86,7 +87,7 @@ def aggregate(output):
 def run(cfg):
 
     if 'prep' in cfg.cmd:
-        filter_str = f'.mt{cfg.data.filter.min_nteam}.ts{cfg.data.filter.min_team_size}' if 'filter' in cfg.data else ''
+        filter_str = f'.mt{cfg.data.filter.min_nteam}.ts{cfg.data.filter.min_team_size}' if 'filter' in cfg.data and cfg.data.filter else ''
         if not os.path.isdir(cfg.data.output): os.makedirs(cfg.data.output)
 
         domain_cls = get_class(cfg.data.domain)
@@ -98,9 +99,14 @@ def run(cfg):
         # skill coverage metric, all skills of each expert, all expert of each skills (supports of each skill, like in RarestFirst)
         vecs['skillcoverage'] = domain_cls.gen_skill_coverage(vecs, f'{cfg.data.output}{filter_str}') # after we have a sparse vector, we create es_vecs from that
 
-        if cfg.data.embedding:
+        if 'embedding' in cfg.data and cfg.data.embedding:
             OmegaConf.resolve(embcgf := OmegaConf.load('mdl/emb/config.yml'))
-            cfg.data.embedding.config = embcgf
+            # Get command-line overrides for embedding.
+            # Kinda tricky as we dynamically override a subconfig.
+            # Use '+data.embedding.{...}=value' to override
+            # Use '+data.embedding.{...}=null' to drop. The '~data.embedding.{...}' cannot be used here.
+            emb_overrides = [o.replace('+data.embedding.', '') for o in HydraConfig.get().overrides.task if '+data.embedding.' in o]
+            cfg.data.embedding.config = OmegaConf.merge(embcgf, OmegaConf.from_dotlist(emb_overrides))
             cfg.data.embedding.config.model.gnn.pytorch = cfg.pytorch
             cls, method = cfg.data.embedding.class_method.split('_')
             cls = get_class(cls)
