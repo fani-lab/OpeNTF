@@ -30,9 +30,12 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
           pip install -r requirements.txt
+
+      - name: Clean up previous outputs
+        run: rm -rf output/
 
       - name: Run config ${{ matrix.config }}
         run: |
           python main.py ${{ matrix.config }} 
+        working-directory: ./src
