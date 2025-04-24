@@ -22,11 +22,11 @@ model:
   gnn:
     graph:
       structure: #hydra doesn't understand tuple. So, inside code, explicit cast to tuple(...)
-        #('member', 'm') #homo
-        #([('skill', 'to', 'member')], 'sm') #hetero
-        ([('skill', 'to', 'team'), ('member', 'to', 'team')], 'stm')
-        #([('skill', 'to', 'team'), ('member', 'to', 'team'), ('loc', 'to', 'team')], 'stml')
-        #([('skill', 'to', 'skill'), ('skill', 'to', 'team'), ('member', 'to', 'team'), ('loc', 'to', 'team')], 'sstml')
+        #[member, m] #homo
+        #[[[skill, to, member]], sm) #hetero
+        [[[skill, to, team], [member, to, team]], stm]
+        #[[[skill, to, team], [member, to, team], [loc, to, team]], stml]
+        #[[[skill, to, skill], [skill, to, team], [member, to, team], [loc, to, team]], sstml]
 
       supervision_edge_types:
         # if not set, it will take all the forward edge_types as supervision edges
