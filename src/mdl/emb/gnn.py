@@ -12,7 +12,7 @@ class Gnn(T2v):
         super().__init__(output, device, cgf)
         self.name = 'n2v' #default model
         Gnn.torch = install_import(cgf.pytorch, 'torch')
-        Gnn.pyg = install_import('torch_geometric==2.6.1', 'torch_geometric')
+        Gnn.pyg = install_import(f'torch_geometric==2.6.1 torch_cluster==1.6.3 -f https://data.pyg.org/whl/torch-{Gnn.torch.__version__}.html', 'torch_geometric')
 
         self.loader = None
         self.optimizer = None
@@ -96,10 +96,10 @@ class Gnn(T2v):
         loader = None; optimizer = None
         if self.name == 'n2v':
             output = f'.w{self.cfg.model.w}.wl{self.cfg.model.wl}.wn{self.cfg.model.wn}'
-            from torch_geometric.nn import Node2Vec
             # ImportError: 'Node2Vec' requires either the 'pyg-lib' or 'torch-cluster' package
-            install_import(f'torch-cluster==1.6.3 --index-url https://data.pyg.org/whl/torch-{Gnn.torch.__version__}.html', 'torch_cluster')
-            self.model = Node2Vec((data:=(self.data.to_homogeneous() if isinstance(self.data, Gnn.pyg.data.HeteroData) else self.data)).edge_index,
+            # install_import(f'torch-cluster==1.6.3 -f https://data.pyg.org/whl/torch-{Gnn.torch.__version__}.html', 'torch_cluster')
+            # import importlib; importlib.reload(Gnn.pyg);importlib.reload(Gnn.pyg.typing);importlib.reload(Gnn.pyg.nn)
+            self.model = Gnn.pyg.nn.Node2Vec((data:=(self.data.to_homogeneous() if isinstance(self.data, Gnn.pyg.data.HeteroData) else self.data)).edge_index,
                                  embedding_dim=self.cfg.model.d,
                                  walk_length=self.cfg.model.wl,
                                  context_size=self.cfg.model.w,
