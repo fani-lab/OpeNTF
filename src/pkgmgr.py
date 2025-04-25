@@ -12,7 +12,7 @@ def install_import(install_name, import_path=None, from_module=None):
     try: module = importlib.import_module(import_path)
     except ImportError:
         log.info(f'{import_path} not found. Installing {install_name}...')
-        process = subprocess.run([sys.executable, '-m', 'pip', 'install', install_name], text=True, capture_output=True)#-m makes the pip to work as module inside env, not the system pip!
+        process = subprocess.run([sys.executable, '-m', 'pip', 'install'] + install_name.split(), text=True, capture_output=True)#-m makes the pip to work as module inside env, not the system pip!
         log.info(process.stdout)
         #if process.stderr: log.info(process.stderr)
         if process.returncode != 0: raise ImportError(f'Failed to install package: {install_name}\n{process.stderr}')

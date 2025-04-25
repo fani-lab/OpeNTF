@@ -12,7 +12,7 @@ class Gnn(T2v):
         super().__init__(output, device, cgf)
         self.name = 'n2v' #default model
         Gnn.torch = install_import(cgf.pytorch, 'torch')
-        Gnn.pyg = install_import('torch_geometric==2.6.1', 'torch_geometric')
+        Gnn.pyg = install_import(f'torch_geometric==2.6.1 torch_cluster==1.6.3 -f https://data.pyg.org/whl/torch-{Gnn.torch.__version__}.html', 'torch_geometric')
 
         self.loader = None
         self.optimizer = None
@@ -43,6 +43,8 @@ class Gnn(T2v):
                 edge_index = self.torch.tensor(edges, dtype=self.torch.long).t().contiguous() #[1,2][1,3][2,4] >> [1,1,2][2,3,4]
                 nodes = self.torch.tensor([[0]] * teams.shape[1], dtype=self.torch.float)
                 self.data = self.pyg.data.Data(x=nodes, edge_index=edge_index, edge_attr=self.torch.tensor([1] * len(edges), dtype=self.torch.long))
+                # to make it consistent with hetero
+                if not hasattr(self.data, 'node_types'): setattr(self.data, 'node_types', [self.cfg.graph.structure[0]]) # safer than --> self.data.node_types = [self.cfg.graph.structure[0]]
             else:
                 log.info(f'Creating a hetero graph of type {self.cfg.graph.structure[0]} ...')
                 self.data = self.pyg.data.HeteroData()
@@ -88,18 +90,17 @@ class Gnn(T2v):
         self.cfg.model = self.cfg[self.name] #gnn.n2v or gnn.gs --> gnn.model
         prefix = self.output + f'/d{self.cfg.model.d}.e{self.cfg.model.e}.ns{self.cfg.model.ns}.{self.name}'
         postfix = f'{".pre" if self.cfg.graph.pre else ""}.{self.cfg.graph.dup_edge}.{self.cfg.graph.structure[1]}'
-
         # replace the 1 dimensional node features with pretrained d2v skill vectors of required dimension
-        if self.cfg.graph.pre: self.d2v_node_features(indexes, teamsvecs)
+        if self.cfg.graph.pre: self.init_d2v_node_features(indexes, teamsvecs)
 
         log.info(f'Training {self.name} ... ')
         loader = None; optimizer = None
         if self.name == 'n2v':
             output = f'.w{self.cfg.model.w}.wl{self.cfg.model.wl}.wn{self.cfg.model.wn}'
-            from torch_geometric.nn import Node2Vec
             # ImportError: 'Node2Vec' requires either the 'pyg-lib' or 'torch-cluster' package
-            install_import(f'torch-cluster==1.6.3 --index-url https://data.pyg.org/whl/torch-{Gnn.torch.__version__}.html', 'torch_cluster')
-            self.model = Node2Vec((data:=(self.data.to_homogeneous() if isinstance(self.data, Gnn.pyg.data.HeteroData) else self.data)).edge_index,
+            # install_import(f'torch-cluster==1.6.3 -f https://data.pyg.org/whl/torch-{Gnn.torch.__version__}.html', 'torch_cluster')
+            # import importlib; importlib.reload(Gnn.pyg);importlib.reload(Gnn.pyg.typing);importlib.reload(Gnn.pyg.nn)
+            self.model = Gnn.pyg.nn.Node2Vec((data:=(self.data.to_homogeneous() if isinstance(self.data, Gnn.pyg.data.HeteroData) else self.data)).edge_index,
                                  embedding_dim=self.cfg.model.d,
                                  walk_length=self.cfg.model.wl,
                                  context_size=self.cfg.model.w,
@@ -134,7 +135,9 @@ class Gnn(T2v):
                 for i, type_name in enumerate(node_type_names):
                     mask = (node_type_tensor == i)
                     type_embeddings = embeddings[mask]  # shape: [num_nodes_of_type, 128]
-                    print(f"Node type: {type_name}, Shape: {type_embeddings.shape}")
+                    log.info(f"Node type: {type_name}, Shape: {type_embeddings.shape}")
+            else: log.info(f"Node type: {self.cfg.graph.structure[0]}, Shape: {embeddings.shape}")
+
             return
 
         # elif self.name in {'gs', 'gin', 'gat', 'gatv2', 'han', 'gine', 'lant'}:
@@ -176,7 +179,8 @@ class Gnn(T2v):
         # self.plot_points()
         # log.info(self)
 
-    def d2v_node_features(self, indexes, teamsvecs):
+    def init_d2v_node_features(self, indexes, teamsvecs):
+        flag = False
         log.info(f'Loading pretrained d2v embeddings {self.cfg.graph.pre} to initialize node features, or if not exist, train d2v embeddings from scratch ...')
         from .d2v import D2v
         d2v_filename = os.path.basename(self.cfg.graph.pre)
@@ -195,14 +199,14 @@ class Gnn(T2v):
                 assert np.allclose(d2v_obj.model.docvecs.vectors, d2v_obj.model.docvecs.vectors[indices])
                 # assert np.array_equal(d2v_obj.model.docvecs.vectors, d2v_obj.model.docvecs.vectors[indices])
                 # (d2v_obj.model.docvecs.vectors[2] == d2v_obj.model.docvecs['2']).all()
-                self.data[node_type].x = Gnn.torch.tensor(d2v_obj.model.docvecs.vectors)  # team vectors (dv) for 'team' nodes, else individual node vectors (wv)
-            else:  # either 'skill' or 'member'
-                if d2v_obj.model.wv.vectors.shape[0] == teamsvecs[node_type].shape[1]:  # correct number of embeddings per skills xor members
-                    self.data[node_type].x = Gnn.torch.tensor(D2v.natsortvecs(d2v_obj.model.wv))
+                self.data[node_type].x = Gnn.torch.tensor(d2v_obj.model.docvecs.vectors); flag = True  # team vectors (dv) for 'team' nodes, else individual node vectors (wv)
+            # either 'skill' or 'member', correct number of embeddings per skills xor members
+            elif d2v_obj.model.wv.vectors.shape[0] == teamsvecs[node_type].shape[1]: self.data[node_type].x = Gnn.torch.tensor(D2v.natsortvecs(d2v_obj.model.wv)); flag = False
         if d2v_obj.model.wv.vectors.shape[0] == teamsvecs['skill'].shape[1] + teamsvecs['member'].shape[1]:
             ordered_vecs = Gnn.torch.tensor(D2v.natsortvecs(d2v_obj.model.wv))
-            if 'member' in self.data.node_types: self.data['member'].x = ordered_vecs[:teamsvecs['member'].shape[1]]  # the first part is all m*
-            if 'skill' in self.data.node_types: self.data['skill'].x = ordered_vecs[teamsvecs['member'].shape[1]:]  # the remaining is s*
+            if 'member' in self.data.node_types: self.data['member'].x = ordered_vecs[:teamsvecs['member'].shape[1]] ;flag = False # the first part is all m*
+            if 'skill' in self.data.node_types: self.data['skill'].x = ordered_vecs[teamsvecs['member'].shape[1]:]; flag = False  # the remaining is s*
+        assert flag
 
     # # settings = the settings for this particular gnn model
     # # emb_output = the path for the embedding output and model output storage

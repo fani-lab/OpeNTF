@@ -23,9 +23,9 @@ model:
   gnn:
     graph:
       structure: #hydra doesn't understand tuple. So, inside code, explicit cast to tuple(...)
-        #[member, m] #homo
+        [member, m] #homo
         #[[[skill, to, member]], sm) #hetero
-        [[[skill, to, team], [member, to, team]], stm]
+        #[[[skill, to, team], [member, to, team]], stm]
         #[[[skill, to, team], [member, to, team], [loc, to, team]], stml]
         #[[[skill, to, skill], [skill, to, team], [member, to, team], [loc, to, team]], sstml]
 
@@ -43,7 +43,7 @@ model:
       pre: # if set, use pretrained D2v vectors as initial node features of graph data
         #../output/{domain}/toy.{data}/d8.e100.w10.d2v.dm1.skillmember  # skill, member, team
         #../output/{domain}/toy.{data}/d8.e100.w10.d2v.dm1.skill  # skill, team
-        ../output/uspt/toy.patent.tsv/d9.e100.w10.d2v.dm1.skill  # if not exists, train from scratch!
+        #../output/uspt/toy.patent.tsv/d9.e100.w10.d2v.dm1.skill  # if not exists, train from scratch!
     pytorch: #will be set dynamically in ./src/main.py from root ./config.yml
     save_per_epochs: ${model.save_per_epoch}
     model: #dummy tag. don't worry or touch it.

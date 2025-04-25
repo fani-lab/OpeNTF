@@ -100,7 +100,7 @@ def run(cfg):
         vecs['skillcoverage'] = domain_cls.gen_skill_coverage(vecs, f'{cfg.data.output}{filter_str}') # after we have a sparse vector, we create es_vecs from that
 
         if 'embedding' in cfg.data and cfg.data.embedding:
-            OmegaConf.resolve(embcgf := OmegaConf.load('mdl/emb/config.yml'))
+            OmegaConf.resolve(embcgf := OmegaConf.load('mdl/emb/config.yaml'))
             # Get command-line overrides for embedding.
             # Kinda tricky as we dynamically override a subconfig.
             # Use '+data.embedding.{...}=value' to override
