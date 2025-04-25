@@ -4,7 +4,7 @@
 #
 # import params
 # import src.mdl.gnn.graph
-# from src.mdl.team2vec.data_handler import DataHandler
+# from src.mdl.t2v.data_handler import DataHandler
 #
 # import os
 # import torch

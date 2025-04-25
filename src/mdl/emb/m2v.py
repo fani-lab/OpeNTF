@@ -2,7 +2,7 @@ import torch
 from torch_geometric.nn import MetaPath2Vec
 from gnn import Gnn
 from tqdm import tqdm
-from src.mdl.team2vec.params import settings
+from .t2v.params import settings
 import os
 
 class M2V(Gnn):
@@ -24,8 +24,7 @@ class M2V(Gnn):
         self.emb_output = emb_output + f'{self.model_name}.{self.settings["graph_types"]}.undir.mean.e{self.settings["e"]}.ns{self.settings["ns"]}.b{self.settings["b"]}.d{self.settings["d"]}'  # output path of emb files
         if not os.path.exists(emb_output): os.makedirs(emb_output)
 
-    def init(self):
-        super().init() # create or load the graph data using team2vec's init
+    def init(self): super().init() # create or load the graph data using t2v's init
 
     # it is separated because these params are needed to set up after the model declaration
     def init_model(self):

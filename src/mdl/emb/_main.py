@@ -7,7 +7,7 @@ sys.path.append("../../..")
 import torch
 
 import params
-from team2vec import Team2Vec
+from t2v import T2v
 
 def addargs(parser):
     embedding = parser.add_argument_group('Team Embedding')
@@ -60,7 +60,7 @@ def run(teamsvecs_file, indexes_file, model, output, emb_output = None):
         output_ = output + f'{params.settings["graph"]["edge_types"][1]}.{"dir" if params.settings["graph"]["dir"] else "undir"}.{str(params.settings["graph"]["dup_edge"]).lower()}/'
         t2v = gnn.Gnn(teamsvecs, indexes, params.settings['graph'], output_)
 
-        t2v.init() # call the team2vec's init, this will lazy load the graph data e.g = "{domain}/gnn/stm.undir.mean.data.pkl"
+        t2v.init() # call the t2v's init, this will lazy load the graph data e.g = "{domain}/gnn/stm.undir.mean.data.pkl"
 
         # replace the 1 dimensional node features with pretrained d2v skill vectors of required dimension
         if params.settings['model']['pt']:

@@ -1,4 +1,4 @@
-class Team2Vec:
+class T2v:
     def __init__(self, output, device, cgf):
         self.name = 't2v'
         self.data = None #prepared by the _prep() like docs or a graph

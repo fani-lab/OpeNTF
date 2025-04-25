@@ -11,9 +11,9 @@ python-dateutil>=2.9
 # cmn.team.Team.plot_stats() matplotlib==3.7.5
 # mdl.emb.d2v.D2v.order() natsort==8.4.0
 # mdl.emb.d2v.D2v.train() gensim==4.3.3 #needs numpy 1.24.4
-# mdl.emb.gnn.Gnn.train() gensim==4.3.3 #needs numpy 1.24.4 --> can be removed
 # mdl.emb.gnn.Gnn.__init__() config.yml.pytorch: torch==2.2.2 --index-url https://download.pytorch.org/whl/cu124
 # mdl.emb.gnn.Gnn.__init__() torch_geometric==2.6.1
+# mdl.emb.gnn.Gnn.tran().Node2Vec torch-cluster==1.6.3 -f https://data.pyg.org/whl/torch-${torch}+${CUDA}.html --> see https://pypi.org/project/torch-cluster/
 # mdl.emb.gnn.Gnn.eval() scikit-learn==1.2.2
 
 

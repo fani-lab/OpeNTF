@@ -13,9 +13,9 @@ log = logging.getLogger(__name__)
 # label_list = ['t1','t2','t3']
 
 from pkgmgr import install_import
-from .team2vec import Team2Vec
+from .t2v import T2v
 
-class D2v(Team2Vec):
+class D2v(T2v):
     gensim = None
     def __init__(self, output, device, cgf):
         super().__init__(output, device, cgf)
@@ -55,7 +55,7 @@ class D2v(Team2Vec):
 
     def train(self, teamsvecs, indexes):
         # to select/create correct model file in the output directory
-        output = self.output + f'/{self.cfg.embtype}.d{self.cfg.d}.w{self.cfg.w}.dm{self.cfg.dm}.e{self.cfg.e}.{self.name}'
+        output = self.output + f'/d{self.cfg.d}.e{self.cfg.e}.{self.name}.w{self.cfg.w}.dm{self.cfg.dm}.{self.cfg.embtype}'
         try:
             log.info(f"Loading the model {output} for {(teamsvecs['skill'].shape[0], self.cfg.d)}  embeddings ...")
             self.__class__.gensim = install_import('gensim==4.3.3', 'gensim')
@@ -66,17 +66,12 @@ class D2v(Team2Vec):
         except FileNotFoundError:
             log.info(f'File not found! Training the embedding model from scratch ...')
             self._prep(teamsvecs, indexes)
-            self.model = self.gensim.models.Doc2Vec(min_alpha=0.025, min_count=1, seed=0,
-                                                    dm=self.cfg.dm, vector_size=self.cfg.d, window=self.cfg.w,
-                                                    dbow_words=1, # keep it always one as it may be needed for gnn-based method for 'pre' config, i.e., initial node features
+            self.model = self.gensim.models.Doc2Vec(min_count=1, seed=0, dbow_words=1, # keep it always one as it may be needed for gnn-based method for 'pre' config, i.e., initial node features
+                                                    dm=self.cfg.dm, vector_size=self.cfg.d, window=self.cfg.w, alpha=self.cfg.lr,
                                                     workers=self.device.split(':')[1] if 'cpu:' in self.device else os.cpu_count())
 
             self.model.build_vocab(self.data)
-            for e in tqdm(range(self.cfg.e)):
-                self.model.train(self.data, total_examples=self.model.corpus_count, epochs=self.model.epochs)
-                self.model.alpha -= 0.002  # decrease the learning rate
-                self.model.min_alpha = self.model.alpha  # fix the learning rate, no decay
-
+            self.model.train(self.data, total_examples=self.model.corpus_count, epochs=self.cfg.e)
             log.info(f'Saving model at {output} ...')
             self.model.save(output)
             # self.model.save_word2vec_format(f'{output}.w2v')

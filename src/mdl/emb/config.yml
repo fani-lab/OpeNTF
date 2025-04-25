@@ -1,4 +1,4 @@
-dim: 8 # embedding dim. it matters for skill vectors if the skill set is small (e.g., in imdb or gith) or large (e.g., in dblp or uspt)
+dim: 128 # embedding dim. it matters for skill vectors if the skill set is small (e.g., in imdb or gith) or large (e.g., in dblp or uspt)
 
 model:
   batch_size: 128 # batch_size for loaders
@@ -15,9 +15,10 @@ model:
     # OR the team vecs when the words are only skills. So, embtype = 'skill' and  dbow_words = False
     # let's remove this and do for always
     # dbow_words: True # train word-vectors in skip-gram fashion; 0: no (default, faster), 1: yes.
-    w: 10 # cooccurrence window. In OpeNTF (for teams), depends on the average team size (n_members) plus n_skills per teams
+    w: 5 # cooccurrence window. In OpeNTF (for teams), depends on the average team size (n_members) plus n_skills per teams
     d: ${dim}
     e: ${model.epochs}
+    lr: ${model.lr}
 
   gnn:
     graph:
@@ -40,13 +41,22 @@ model:
         #max
         #mul
       pre: # if set, use pretrained D2v vectors as initial node features of graph data
-        #../output/{domain}/toy.{data}/skillmember.d8.w10.dm1.e100.d2v  # skill, member, team
-        #../output/{domain}/toy.{data}/skill.d8.w10.dm1.e100.d2v  # skill, team
-        ../output/uspt/toy.patent.tsv/skill.d9.w10.dm1.e100.d2v  # if not exists, train from scratch!
+        #../output/{domain}/toy.{data}/d8.e100.w10.d2v.dm1.skillmember  # skill, member, team
+        #../output/{domain}/toy.{data}/d8.e100.w10.d2v.dm1.skill  # skill, team
+        ../output/uspt/toy.patent.tsv/d9.e100.w10.d2v.dm1.skill  # if not exists, train from scratch!
     pytorch: #will be set dynamically in ./src/main.py from root ./config.yml
     save_per_epochs: ${model.save_per_epoch}
     model: #dummy tag. don't worry or touch it.
+
     #Grover, Aditya, and Jure Leskovec. "node2vec: Scalable feature learning for networks." Proceedings of the 22nd ACM SIGKDD international conference on Knowledge discovery and data mining. 2016.
+    #p: Return parameter, controls likelihood of revisiting the previous node. high p → discourages going back, low p → encourages backtracking
+    #q: In-out (exploration) parameter, controls likelihood of visiting distant vs nearby nodes. high q → BFS-like (stick to local neighborhood), low q → DFS-like (explore outward)
+    #p q	Behavior
+    #1 1	Unbiased random walk (vanilla DeepWalk)
+    #1 0.5	DFS-like (explore outward, communities)
+    #1 2	BFS-like (stay local, structural roles)
+    #0.2 4	Very local walks
+    #4 0.25	Very exploratory
     n2v:
       w: ${model.d2v.w}
       d: ${dim}

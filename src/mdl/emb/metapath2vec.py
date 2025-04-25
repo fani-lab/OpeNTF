@@ -4,7 +4,7 @@ import torch_geometric.data
 
 import params
 import src.mdl.gnn.graph
-from src.mdl.team2vec import data_handler
+from .t2v import data_handler
 
 import os
 import torch
