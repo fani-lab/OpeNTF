@@ -23,9 +23,9 @@ model:
   gnn:
     graph:
       structure: #hydra doesn't understand tuple. So, inside code, explicit cast to tuple(...)
-        [member, m] #homo
+        #[member, m] #homo
         #[[[skill, to, member]], sm) #hetero
-        #[[[skill, to, team], [member, to, team]], stm]
+        [[[skill, to, team], [member, to, team]], stm]
         #[[[skill, to, team], [member, to, team], [loc, to, team]], stml]
         #[[[skill, to, skill], [skill, to, team], [member, to, team], [loc, to, team]], sstml]
 
