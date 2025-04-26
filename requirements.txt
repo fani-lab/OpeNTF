@@ -4,7 +4,7 @@ tqdm==4.65.0
 hydra-core>=1.3.2
 python-dateutil>=2.9
 
-# dynamic packages
+# on-demand package installations
 # cmn.repository.Repository.read_data() pandas==2.0.0
 # cmn.movie.Movie.read_data() pandas==2.0.0
 # cmn.patent.Patent.read_data() pandas==2.0.0
@@ -12,11 +12,11 @@ python-dateutil>=2.9
 # mdl.emb.d2v.D2v.order() natsort==8.4.0
 # mdl.emb.d2v.D2v.train() gensim==4.3.3 #needs numpy 1.24.4
 # mdl.emb.gnn.Gnn.__init__() config.yml.pytorch: torch==2.2.2 --index-url https://download.pytorch.org/whl/cu124
-# mdl.emb.gnn.Gnn.__init__() torch_geometric==2.6.1
-# mdl.emb.gnn.Gnn.tran().Node2Vec torch-cluster==1.6.3 -f https://data.pyg.org/whl/torch-${torch}+${CUDA}.html --> see https://pypi.org/project/torch-cluster/
+# mdl.emb.gnn.Gnn.__init__() torch_geometric==2.6.1 torch_cluster==1.6.3 -f https://data.pyg.org/whl/torch-{Gnn.torch.__version__}.html
 # mdl.emb.gnn.Gnn.eval() scikit-learn==1.2.2
 
 
+# yet to be reached and checked
 #pytrec-eval-terrier==0.5.2
 ## opennmtpy requires 2.1 < torch < 2.3 and raises conflict with other versions when installed with pyg
 ## OpenNMT-py>=3.3
@@ -24,8 +24,3 @@ python-dateutil>=2.9
 #fairsearchcore==1.0.4 # required by Adila submodule
 ##schedule
 #bayesian-torch
-#pyg_lib
-#torch_scatter
-#torch_sparse
-#torch_cluster
-#torch_spline_conv
