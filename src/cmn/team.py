@@ -176,31 +176,31 @@ class Team(object):
 
     @staticmethod
     def validate(teamsvecs):
-        if (teamsvecs['skill'].shape[0] < 1): return False, f'No teams in skill metrix!'
+        if (teamsvecs['skill'].shape[0] < 1): return (False, f'No teams in skill metrix!')
 
-        if (teamsvecs['skill'].shape[1] < 1): return False, f'No skills in skill metrix!'
+        if (teamsvecs['skill'].shape[1] < 1): return (False, f'No skills in skill metrix!')
 
         if (any(not row for row in teamsvecs['skill'].rows)): # teams with empty skills
             zero_row_indices = [i for i, row in enumerate(teamsvecs['skill'].rows) if not row]
-            return False, f'Following teams have no skills!\n{zero_row_indices}'
+            return (False, f'Following teams have no skills!\n{zero_row_indices}')
 
         teamsvecs_csc = teamsvecs['skill'].tocsc()
         if((teamsvecs_csc.getnnz(axis=0) == 0).any()):
             zero_col_indices = (teamsvecs_csc['skill'].getnnz(axis=0) == 0).nonzero()[0]
-            return False, f'Following skills are used in no teams!\n{zero_col_indices}'
+            return (False, f'Following skills are used in no teams!\n{zero_col_indices}')
 
-        if (teamsvecs['member'].shape[0] < 1): return False, f'No teams in member metrix!'
+        if (teamsvecs['member'].shape[0] < 1): return (False, f'No teams in member metrix!')
 
-        if (teamsvecs['member'].shape[1] < 1): return False, f'No member in member metrix!'
+        if (teamsvecs['member'].shape[1] < 1): return (False, f'No member in member metrix!')
 
         if (any(not row for row in teamsvecs['member'].rows)):  # teams with empty members
             zero_row_indices = [i for i, row in enumerate(teamsvecs['member'].rows) if not row]
-            return False, f'Following teams have no members!\n{zero_row_indices}'
+            return (False, f'Following teams have no members!\n{zero_row_indices}')
 
         teamsvecs_csc = teamsvecs['member'].tocsc()
         if ((teamsvecs_csc.getnnz(axis=0) == 0).any()):
             zero_col_indices = (teamsvecs_csc['member'].getnnz(axis=0) == 0).nonzero()[0]
-            return False, f'Following skills are used in no teams!\n{zero_col_indices}'
+            return (False, f'Following skills are used in no teams!\n{zero_col_indices}')
 
         if teamsvecs['loc'] is not None:
             #in dblp, the 'loc' is the replica of the paper venue, so it should be 1-hot for each team
@@ -209,7 +209,7 @@ class Team(object):
             if e: log.info(f'Following teams are not one-hot in the location of team members. '
                            f'Based on the underlying dataset/domain, it may be valid like in uspt, or invalid like dblp.\n{e}')
 
-        return True
+        return (True, '')
     @classmethod
     def gen_teamsvecs(cls, datapath, output, cfg):
         pkl = f'{output}/teamsvecs.pkl'
@@ -263,7 +263,7 @@ class Team(object):
             # check no rows (teams) with empty skills, or empty members
             # check no columns (skills or members) with no value (no team)
             # assert Team.validate(vecs) --> not working! as a tuple is True :D
-            assert (a := Team.validate(vecs))[0], a[1]
+            assert (r := Team.validate(vecs))[0], r[1]
             with open(pkl, 'wb') as outfile: pickle.dump(vecs, outfile)
             log.info(f"Teamsvecs matrices for skills {vecs['skill'].shape}, members {vecs['member'].shape}, and locations {vecs['loc'].shape if vecs['loc'] is not None else None} saved at {pkl}")
             return vecs, indexes
