@@ -176,43 +176,31 @@ class Team(object):
 
     @staticmethod
     def validate(teamsvecs):
-        if (teamsvecs['skill'].shape[0] < 1):
-            log.info(f'No teams in skill metrix!')
-            return False
+        if (teamsvecs['skill'].shape[0] < 1): return False, f'No teams in skill metrix!'
 
-        if (teamsvecs['skill'].shape[1] < 1):
-            log.info(f'No skills in skill metrix!')
-            return False
+        if (teamsvecs['skill'].shape[1] < 1): return False, f'No skills in skill metrix!'
 
         if (any(not row for row in teamsvecs['skill'].rows)): # teams with empty skills
             zero_row_indices = [i for i, row in enumerate(teamsvecs['skill'].rows) if not row]
-            log.info(f'Following teams have no skills!\n{zero_row_indices}')
-            return False
+            return False, f'Following teams have no skills!\n{zero_row_indices}'
 
         teamsvecs_csc = teamsvecs['skill'].tocsc()
         if((teamsvecs_csc.getnnz(axis=0) == 0).any()):
             zero_col_indices = (teamsvecs_csc['skill'].getnnz(axis=0) == 0).nonzero()[0]
-            log.info(f'Following skills are used in no teams!\n{zero_col_indices}')
-            return False
+            return False, f'Following skills are used in no teams!\n{zero_col_indices}'
 
-        if (teamsvecs['member'].shape[0] < 1):
-            log.info(f'No teams in member metrix!')
-            return False
+        if (teamsvecs['member'].shape[0] < 1): return False, f'No teams in member metrix!'
 
-        if (teamsvecs['member'].shape[1] < 1):
-            log.info(f'No member in member metrix!')
-            return False
+        if (teamsvecs['member'].shape[1] < 1): return False, f'No member in member metrix!'
 
         if (any(not row for row in teamsvecs['member'].rows)):  # teams with empty members
             zero_row_indices = [i for i, row in enumerate(teamsvecs['member'].rows) if not row]
-            log.info(f'Following teams have no members!\n{zero_row_indices}')
-            return False
+            return False, f'Following teams have no members!\n{zero_row_indices}'
 
         teamsvecs_csc = teamsvecs['member'].tocsc()
         if ((teamsvecs_csc.getnnz(axis=0) == 0).any()):
             zero_col_indices = (teamsvecs_csc['member'].getnnz(axis=0) == 0).nonzero()[0]
-            log.info(f'Following skills are used in no teams!\n{zero_col_indices}')
-            return False
+            return False, f'Following skills are used in no teams!\n{zero_col_indices}'
 
         if teamsvecs['loc'] is not None:
             #in dblp, the 'loc' is the replica of the paper venue, so it should be 1-hot for each team

@@ -201,12 +201,12 @@ class Gnn(T2v):
                 # (d2v_obj.model.docvecs.vectors[2] == d2v_obj.model.docvecs['2']).all()
                 self.data[node_type].x = Gnn.torch.tensor(d2v_obj.model.docvecs.vectors); flag = True  # team vectors (dv) for 'team' nodes, else individual node vectors (wv)
             # either 'skill' or 'member', correct number of embeddings per skills xor members
-            elif d2v_obj.model.wv.vectors.shape[0] == teamsvecs[node_type].shape[1]: self.data[node_type].x = Gnn.torch.tensor(D2v.natsortvecs(d2v_obj.model.wv)); flag = False
+            elif d2v_obj.model.wv.vectors.shape[0] == teamsvecs[node_type].shape[1]: self.data[node_type].x = Gnn.torch.tensor(D2v.natsortvecs(d2v_obj.model.wv)); flag = True
         if d2v_obj.model.wv.vectors.shape[0] == teamsvecs['skill'].shape[1] + teamsvecs['member'].shape[1]:
             ordered_vecs = Gnn.torch.tensor(D2v.natsortvecs(d2v_obj.model.wv))
-            if 'member' in self.data.node_types: self.data['member'].x = ordered_vecs[:teamsvecs['member'].shape[1]] ;flag = False # the first part is all m*
-            if 'skill' in self.data.node_types: self.data['skill'].x = ordered_vecs[teamsvecs['member'].shape[1]:]; flag = False  # the remaining is s*
-        assert flag
+            if 'member' in self.data.node_types: self.data['member'].x = ordered_vecs[:teamsvecs['member'].shape[1]] ;flag = True # the first part is all m*
+            if 'skill' in self.data.node_types: self.data['skill'].x = ordered_vecs[teamsvecs['member'].shape[1]:]; flag = True  # the remaining is s*
+        assert flag, f'Nodes features initialization with d2v embeddings NOT applied! Check the consistency of d2v {self.cfg.graph.pre} and graph node types {self.cfg.graph.structure}'
 
     # # settings = the settings for this particular gnn model
     # # emb_output = the path for the embedding output and model output storage
