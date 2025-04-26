@@ -1,4 +1,4 @@
-name: inclusive-tests-toys-main
+name: inclusive-tests-asserts-toys-main
 
 on:
   push:
