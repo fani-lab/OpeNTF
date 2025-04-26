@@ -262,7 +262,8 @@ class Team(object):
             # 'deep_learning'
             # check no rows (teams) with empty skills, or empty members
             # check no columns (skills or members) with no value (no team)
-            assert Team.validate(vecs)
+            # assert Team.validate(vecs) --> not working! as a tuple is True :D
+            assert (a := Team.validate(vecs))[0], a[1]
             with open(pkl, 'wb') as outfile: pickle.dump(vecs, outfile)
             log.info(f"Teamsvecs matrices for skills {vecs['skill'].shape}, members {vecs['member'].shape}, and locations {vecs['loc'].shape if vecs['loc'] is not None else None} saved at {pkl}")
             return vecs, indexes
