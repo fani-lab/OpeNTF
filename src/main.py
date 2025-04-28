@@ -87,17 +87,17 @@ def aggregate(output):
 def run(cfg):
 
     if 'prep' in cfg.cmd:
-        filter_str = f'.mt{cfg.data.filter.min_nteam}.ts{cfg.data.filter.min_team_size}' if 'filter' in cfg.data and cfg.data.filter else ''
+        cfg.data.output += f'.mt{cfg.data.filter.min_nteam}.ts{cfg.data.filter.min_team_size}' if 'filter' in cfg.data and cfg.data.filter else ''
         if not os.path.isdir(cfg.data.output): os.makedirs(cfg.data.output)
 
         domain_cls = get_class(cfg.data.domain)
 
         # this will call the Team.generate_sparse_vectors(), which itself may (lazy) call Team.read_data(), which itself may (lazy) call {Publication|Movie|Repo|Patent}.read_data()
-        vecs, indexes = domain_cls.gen_teamsvecs(cfg.data.source, f'{cfg.data.output}{filter_str}', cfg.data)
+        vecs, indexes = domain_cls.gen_teamsvecs(cfg.data.source, cfg.data.output, cfg.data)
 
         #TODO? move this call for evaluation part?
         # skill coverage metric, all skills of each expert, all expert of each skills (supports of each skill, like in RarestFirst)
-        vecs['skillcoverage'] = domain_cls.gen_skill_coverage(vecs, f'{cfg.data.output}{filter_str}') # after we have a sparse vector, we create es_vecs from that
+        vecs['skillcoverage'] = domain_cls.gen_skill_coverage(vecs, cfg.data.output) # after we have a sparse vector, we create es_vecs from that
 
         if 'embedding' in cfg.data and cfg.data.embedding:
             OmegaConf.resolve(embcgf := OmegaConf.load('mdl/emb/config.yaml'))
