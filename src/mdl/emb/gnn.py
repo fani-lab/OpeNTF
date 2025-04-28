@@ -106,39 +106,28 @@ class Gnn(T2v):
                                  context_size=self.cfg.model.w,
                                  walks_per_node=self.cfg.model.wn,
                                  num_negative_samples=self.cfg.model.ns).to(self.device)
-            loader = self.model.loader(batch_size=self.cfg.model.b, shuffle=True, num_workers=0)#os.cpu_count()) not working in windows!
-            optimizer = Gnn.torch.optim.Adam(list(self.model.parameters()), lr=self.cfg.model.lr)
+            self._train(prefix+output+postfix)
+            #test/log purpose
+            self.get_n2v_node_emb(to_homo_data=data)
 
-            self.model.train()
-            for epoch in range(1, self.cfg.model.e + 1):
-                b_loss = 0
-                for pos_rw, neg_rw in loader:
-                    optimizer.zero_grad()
-                    loss = self.model.loss(pos_rw.to(self.device), neg_rw.to(self.device))
-                    loss.backward(); optimizer.step(); b_loss += loss.item()
-                b_loss /= len(loader)
-                log.info(f'Epoch {epoch}, Loss: {b_loss:.4f}')
+        elif self.name == 'm2v':
+            assert isinstance(self.data, Gnn.pyg.data.HeteroData), f'Hetero graph is needed for m2v. {self.cfg.graph.structure} is NOT hetero!'
+            output = f'.w{self.cfg.model.w}.wl{self.cfg.model.wl}.wn{self.cfg.model.wn}.mp{self.cfg.model.metapath}' #should be fixed
+            #TODO: check with jamil's class of M2V in _m2v.py --> from m2v import M2V
+            self.model = Gnn.pyg.nn.MetaPath2Vec(self.data.edge_index_dict,
+                                     metapath=[tuple(mp) for mp in self.cfg.model.metapath],
+                                     embedding_dim=self.cfg.model.d,
+                                     walk_length=self.cfg.model.wl,
+                                     context_size=self.cfg.model.w,
+                                     walks_per_node=self.cfg.model.wn,
+                                     num_negative_samples=self.cfg.model.ns).to(self.device)
 
-            self.model.eval()
-            Gnn.torch.save({
-                'model_state_dict': self.model.state_dict(),
-                'edge_index': data.edge_index,  # to re-init the model
-                'params': {'d': self.model.embedding_dim,'wl': self.model.walk_length,'w': self.model.context_size,'wn': self.model.walks_per_node,'ns': self.model.num_negative_samples,'sparse': True},
-                'node_type': getattr(data, 'node_type', None),  # required to know the node_type after to_homo()
-                'node_type_names': getattr(self.data, 'node_types', None) #the HeteroData has node_types but not the Data!
-            }, prefix + output + postfix)
+            self._train(prefix+output+postfix)
 
-            embeddings = self.model.embedding.weight.data.cpu()
-            if isinstance(self.data, Gnn.pyg.data.HeteroData):
-                node_type_names = self.data.node_types  # ['a', 'b', 'c']
-                node_type_tensor = data.node_type  # tensor of shape [num_nodes]
-                for i, type_name in enumerate(node_type_names):
-                    mask = (node_type_tensor == i)
-                    type_embeddings = embeddings[mask]  # shape: [num_nodes_of_type, 128]
-                    log.info(f"Node type: {type_name}, Shape: {type_embeddings.shape}")
-            else: log.info(f"Node type: {self.cfg.graph.structure[0]}, Shape: {embeddings.shape}")
-
-            return
+        # for m2v part
+        # node_types = t2v.data._node_store_dict.keys()
+        #TODO: is it different from n2v? ideally shouldn't
+        #for node_type in node_types: emb[node_type] = t2v.model(node_type)  # output of embeddings
 
         # elif self.name in {'gs', 'gin', 'gat', 'gatv2', 'han', 'gine', 'lant'}:
         #     self.init_model(emb_output)
@@ -149,28 +138,6 @@ class Gnn(T2v):
         # elif self.name == 'gcn':
         #     from gcn_old import Gcn as GCNModel
         #     self.model = GCNModel(hidden_channels=10, data=t2v.data)
-        # elif self.model == 'm2v':
-        #     from m2v import M2V
-        #     from torch_geometric.nn import MetaPath2Vec
-        #     t2v = M2V(teamsvecs, indexes, params.settings, output_, emb_output)
-        #     t2v.name = 'm2v'
-        #     t2v.init()  # call the m2v's init
-        #     t2v.model = MetaPath2Vec(t2v.data.edge_index_dict, embedding_dim=t2v.settings['d'],
-        #                              metapath=t2v.settings['metapath'][edge_type[1]],
-        #                              walk_length=t2v.settings['walk_length'],
-        #                              context_size=t2v.settings['context_size'],
-        #                              walks_per_node=t2v.settings['walks_per_node'],
-        #                              num_negative_samples=t2v.settings['ns'],
-        #                              sparse=True).to(t2v.device)
-        #     t2v.init_model()
-        #     t2v.train(t2v.settings['e'])
-        #     t2v.model.eval()
-        #     emb = {}
-        #     node_types = t2v.data._node_store_dict.keys()
-        #     for node_type in node_types: emb[node_type] = t2v.model(node_type)  # output of embeddings
-        #     embedding_output = f'{t2v.emb_output}.emb.pt'
-        #     Gnn.torch.save(emb, embedding_output, pickle_protocol=4)
-        #     return
         #
         # self.optimizer = Gnn.torch.optim.Adam(list(self.model.parameters()), lr=self.cfg.model.lr)
         # self.train(self.cfg.model.e, self.cfg.save_per_epoch)
@@ -178,6 +145,26 @@ class Gnn(T2v):
         #
         # self.plot_points()
         # log.info(self)
+
+    def _train(self, output):
+        loader = self.model.loader(batch_size=self.cfg.model.b,
+                                   shuffle=True)  # num_workers=os.cpu_count() not working in windows! also, cuda won't engage for the loader if num_workers param is passed
+        optimizer = Gnn.torch.optim.Adam(list(self.model.parameters()), lr=self.cfg.model.lr)
+        self.model.train()
+        Gnn.torch.cuda.empty_cache()
+        for epoch in range(1, self.cfg.model.e + 1):
+            b_loss = 0
+            for pos_rw, neg_rw in loader:
+                optimizer.zero_grad()
+                loss = self.model.loss(pos_rw.to(self.device), neg_rw.to(self.device))
+                loss.backward();
+                optimizer.step();
+                b_loss += loss.item()
+            b_loss /= len(loader)
+            log.info(f'Epoch {epoch}, Loss: {b_loss:.4f}')
+        self.model.eval()
+        Gnn.torch.save({'model_state_dict': self.model.state_dict(), 'cfg': self.cfg}, output)
+        log.info(f'{self.name} model with {cfg2str(self.cfg.model)} saved at {output}.')
 
     def init_d2v_node_features(self, indexes, teamsvecs):
         flag = False
@@ -207,6 +194,21 @@ class Gnn(T2v):
             if 'member' in self.data.node_types: self.data['member'].x = ordered_vecs[:teamsvecs['member'].shape[1]] ;flag = True # the first part is all m*
             if 'skill' in self.data.node_types: self.data['skill'].x = ordered_vecs[teamsvecs['member'].shape[1]:]; flag = True  # the remaining is s*
         assert flag, f'Nodes features initialization with d2v embeddings NOT applied! Check the consistency of d2v {self.cfg.graph.pre} and graph node types {self.cfg.graph.structure}'
+
+    def get_n2v_node_emb(self, to_homo_data=None):
+        # in n2v, the weights are indeed the embeddings, like w2v or d2v
+        # in other models, self.model(self.data), that is the forward-pass produces the embedding
+        # this part is not needed, as having a model, we always can have the embedding
+        # but note that, if hetrodata and n2v, first to_homo(self.data) is needed to get the node_type tensor
+        embeddings = self.model.embedding.weight.data.cpu()
+        if isinstance(self.data, Gnn.pyg.data.HeteroData):
+            node_type_names = self.data.node_types  # ['a', 'b', 'c']
+            node_type_tensor = to_homo_data.node_type if to_homo_data else self.data.to_homogeneous().node_type # tensor of shape [num_nodes]
+            for i, type_name in enumerate(node_type_names):
+                mask = (node_type_tensor == i)
+                type_embeddings = embeddings[mask]  # shape: [num_nodes_of_type, self.cfg.model.d]
+                log.info(f'Node type: {type_name}, Shape: {type_embeddings.shape}')
+        else: log.info(f'Node type: {self.cfg.graph.structure[0]}, Shape: {embeddings.shape}')
 
     # # settings = the settings for this particular gnn model
     # # emb_output = the path for the embedding output and model output storage

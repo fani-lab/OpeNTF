@@ -43,8 +43,9 @@ data: #required for 'prep' step
   embedding: #if not set, will be skipped
     config: ./mdl/emb/config.yml
     class_method: # the name directs to the correct part of the embedding config file
-      #mdl.emb.d2v.D2v_d2v
-      mdl.emb.gnn.Gnn_n2v
+      #mdl.emb.d2v.D2v_d2v #Doc2Vec
+      mdl.emb.gnn.Gnn_n2v #Node2Vec
+      #mdl.emb.gnn.Gnn_m2v  #Metapath2Vec
 
 model:
     baseline:
