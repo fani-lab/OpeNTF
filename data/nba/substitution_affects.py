@@ -10,7 +10,7 @@ pbp_log = client.play_by_play(
     home_team=Team.PHOENIX_SUNS, 
     year=2018, month=11, day=8, 
     output_type=OutputType.JSON
-    output_file_path="./web-scraping/2018_11_08_PHO_PBP.json"
+    output_file_path="2018_11_08_PHO_PBP.json"
 )
 
 # Define regex patterns for player names and substitutions
