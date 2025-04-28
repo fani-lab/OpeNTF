@@ -58,16 +58,31 @@ model:
     #0.2 4	Very local walks
     #4 0.25	Very exploratory
     n2v:
-      w: ${model.d2v.w}
-      d: ${dim}
-      e: ${model.epochs}
-      b: ${model.batch_size}
+      d:  ${dim}
+      w:  ${model.d2v.w}
+      e:  ${model.epochs}
+      b:  ${model.batch_size}
       lr: ${model.lr}
       ns: ${model.ns}
       wl: 5  #walk_length
       wn: 10 #walks_per_node
-      p: 1.0
-      q: 1.0
+      p:  1.0
+      q:  1.0
+
+    #TODO: citation
+    m2v:
+      metapath:
+          #[[member, rev_to, skill], [skill, to, member]], #sm
+          [[member, to, team], [team, rev_to, skill], [skill, to, team], [team, rev_to, member]] #m->t->s, s->t->m for stm. Note: when we build the graph, m->t, s->t, l->t. So, make it undirected, t->m, t->s get 'rev_to' label
+          #[[member, to, team],[team, rev_to, loc], [loc, to, team], [team, rev_to, member]] #stml
+      d:  ${dim}
+      w:  ${model.d2v.w}
+      e:  ${model.epochs}
+      b:  ${model.batch_size}
+      lr: ${model.lr}
+      ns: ${model.gnn.n2v.ns}
+      wl: ${model.gnn.n2v.wl} #walk_length
+      wn: ${model.gnn.n2v.wn} #walks_per_node
 
     #Thomas N. Kipf, Max Welling: Semi-Supervised Classification with Graph Convolutional Networks. ICLR (Poster) 2017
     gcn:
@@ -178,46 +193,5 @@ model:
 #      'agg': 'mean',
 #      'dir': False,
 #  },
-#  'gnn.m2v': {
-#      'graph_types':'stm', # this value will be changed during runtime in each loop according to the graph_type and then be used in the embedding_output var
-#      'metapath' : {
-#          'sm' : [
-#              ('member','rev_to','skill'),
-#              ('skill', 'to', 'member'),
-#          ],
-#          'stm' : [
-#              ('member','to','team'),
-#              ('team', 'rev_to', 'skill'),
-#              ('skill','to','team'),
-#              ('team', 'rev_to', 'member'),
-#          ],
-#          'stml' : [
-#              ('member','to','team'),
-#              ('team', 'rev_to', 'loc'),
-#              ('loc','to','team'),
-#              ('team', 'rev_to', 'member'),
-#          ],
-#
-#          # experimental section
-#          'sm.en' : [
-#              ('member','rev_to','skill'),
-#              # ('skill', 'to', 'skill'),           # additional s-s connection
-#              ('skill', 'to', 'member'),
-#          ],
-#          'stm.en' : [
-#              ('member','to','team'),
-#              ('team', 'rev_to', 'skill'),
-#              # ('skill', 'to', 'skill'),           # additional s-s connection
-#              ('skill','to','team'),
-#              ('team', 'rev_to', 'member'),
-#          ],
-#      },
-#      'walk_length': 10,
-#      'context_size': 10,
-#      'walks_per_node': 20,
-#      'ns' : 5,
-#      'd': 8,
-#      'b': 128,
-#      'e': 100,
-#  },
+
 #},

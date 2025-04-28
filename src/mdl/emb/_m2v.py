@@ -71,8 +71,7 @@ class M2V(Gnn):
         train_perm = perm[:int(z.size(0) * train_ratio)]
         test_perm = perm[int(z.size(0) * train_ratio):]
 
-        return self.model.test(z[train_perm], y[train_perm], z[test_perm], y[test_perm],
-                          max_iter=150)
+        return self.model.test(z[train_perm], y[train_perm], z[test_perm], y[test_perm], max_iter=150)
 
 
 # -teamsvecs= ./../../../data/preprocessed/dblp/dblp.v12.json.filtered.mt75.ts3/
