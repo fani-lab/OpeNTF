@@ -95,7 +95,7 @@ def run(teamsvecs_file, indexes_file, model, output, emb_output = None):
 
         elif model == 'gnn.m2v':
 
-            from m2v import M2V
+            from _m2v import M2V
             from torch_geometric.nn import MetaPath2Vec
 
             # initialize all settings inside m2v class
