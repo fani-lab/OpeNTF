@@ -100,8 +100,7 @@ jobs:
 
       - name: Run config ${{ matrix.config }}
         run: |
-          python main.py ${{ matrix.config }} 
-          if [ ${{ matrix.label }} = 'warn.m2v.validate' ]; then echo 'Warning for m2v run'; fi
+          python main.py ${{ matrix.config }}
         working-directory: ./src
         continue-on-error: ${{ matrix.label == 'fail.teamsvecs.validate' || matrix.label == 'fail.pre.validate' }}
 
