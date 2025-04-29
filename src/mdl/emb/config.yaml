@@ -25,8 +25,8 @@ model:
       structure: #hydra doesn't understand tuple. So, inside code, explicit cast to tuple(...)
         #[member, m] #homo
         #[[[skill, to, member]], sm) #hetero
-        [[[skill, to, team], [member, to, team]], stm]
-        #[[[skill, to, team], [member, to, team], [loc, to, team]], stml]
+        #[[[skill, to, team], [member, to, team]], stm]
+        [[[skill, to, team], [member, to, team], [loc, to, team]], stml]
         #[[[skill, to, skill], [skill, to, team], [member, to, team], [loc, to, team]], sstml]
 
       supervision_edge_types:
@@ -71,10 +71,10 @@ model:
 
     #TODO: citation
     m2v:
-      metapath:
-          #[[member, rev_to, skill], [skill, to, member]], #sm
-          [[member, to, team], [team, rev_to, skill], [skill, to, team], [team, rev_to, member]] #m->t->s, s->t->m for stm. Note: when we build the graph, m->t, s->t, l->t. So, make it undirected, t->m, t->s get 'rev_to' label
-          #[[member, to, team],[team, rev_to, loc], [loc, to, team], [team, rev_to, member]] #stml
+      metapath_name: # to have an embedding for a node type, it should be part of the metapath, e.g., for locations
+          #[[[member, rev_to, skill], [skill, to, member]], ms-sm] # for sm graph structure
+          [[[member, to, team], [team, rev_to, skill], [skill, to, team], [team, rev_to, member]], 'mts-stm'] #m->t->s, s->t->m for stm. Note: when we build the graph, m->t, s->t, l->t. So, make it undirected, t->m, t->s get 'rev_to' label
+          #[[[member, to, team],[team, rev_to, loc], [loc, to, team], [team, rev_to, member]], mtl-ltm] #stml
       d:  ${dim}
       w:  ${model.d2v.w}
       e:  ${model.epochs}
