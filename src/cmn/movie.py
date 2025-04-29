@@ -30,13 +30,13 @@ class Movie(Team):
 
     @staticmethod
     def read_data(datapath, output, cfg, indexes_only=False):
+        pd = install_import('pandas==2.0.0', 'pandas')# should be here as pickle uses references to existing modules when serialize the objects!
         try: return super(Movie, Movie).load_data(output, indexes_only)
         except (FileNotFoundError, EOFError) as e:
             log.info(f'Pickles not found! Reading raw data from {datapath} ...')
             # in imdb, title.* represent movies and name.* represent crew members
             strid2int = lambda x : int(x[2:])
             text = lambda x : x.lower().replace(' ', '_')
-            pd = install_import('pandas==2.0.0', 'pandas')
             log.info('Reading movie data ...')
             title_basics = pd.read_csv(datapath, sep='\t', header=0, na_values='\\N', converters={'tconst': strid2int, 'primaryTitle': text, 'originalTitle': text}, dtype={'startYear': 'UInt16', 'endYear': 'UInt16'}, low_memory=False)  # title.basics.tsv
             title_basics = title_basics[title_basics['titleType'].isin(['movie', ''])]

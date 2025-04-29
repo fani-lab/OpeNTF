@@ -107,15 +107,16 @@ class Gnn(T2v):
                                  walks_per_node=self.cfg.model.wn,
                                  num_negative_samples=self.cfg.model.ns).to(self.device)
             self._train(prefix+output+postfix)
-            #test/log purpose
-            self.get_n2v_node_emb(to_homo_data=data)
+            self.model.eval() #just in case :)
+            #test/log purposes
+            self.get_node_emb(to_homo_data=data)
 
         elif self.name == 'm2v':
             assert isinstance(self.data, Gnn.pyg.data.HeteroData), f'Hetero graph is needed for m2v. {self.cfg.graph.structure} is NOT hetero!'
-            output = f'.w{self.cfg.model.w}.wl{self.cfg.model.wl}.wn{self.cfg.model.wn}.mp{self.cfg.model.metapath}' #should be fixed
+            output = f'.w{self.cfg.model.w}.wl{self.cfg.model.wl}.wn{self.cfg.model.wn}.{self.cfg.model.metapath_name[1]}' #should be fixed
             #TODO: check with jamil's class of M2V in _m2v.py --> from m2v import M2V
             self.model = Gnn.pyg.nn.MetaPath2Vec(self.data.edge_index_dict,
-                                     metapath=[tuple(mp) for mp in self.cfg.model.metapath],
+                                     metapath=[tuple(mp) for mp in self.cfg.model.metapath_name[0]],
                                      embedding_dim=self.cfg.model.d,
                                      walk_length=self.cfg.model.wl,
                                      context_size=self.cfg.model.w,
@@ -123,6 +124,9 @@ class Gnn(T2v):
                                      num_negative_samples=self.cfg.model.ns).to(self.device)
 
             self._train(prefix+output+postfix)
+            self.model.eval()  # just in case :)
+            # test/log purposes
+            self.get_node_emb()
 
         # for m2v part
         # node_types = t2v.data._node_store_dict.keys()
@@ -147,8 +151,7 @@ class Gnn(T2v):
         # log.info(self)
 
     def _train(self, output):
-        loader = self.model.loader(batch_size=self.cfg.model.b,
-                                   shuffle=True)  # num_workers=os.cpu_count() not working in windows! also, cuda won't engage for the loader if num_workers param is passed
+        loader = self.model.loader(batch_size=self.cfg.model.b, shuffle=True)  # num_workers=os.cpu_count() not working in windows! also, cuda won't engage for the loader if num_workers param is passed
         optimizer = Gnn.torch.optim.Adam(list(self.model.parameters()), lr=self.cfg.model.lr)
         self.model.train()
         Gnn.torch.cuda.empty_cache()
@@ -157,9 +160,7 @@ class Gnn(T2v):
             for pos_rw, neg_rw in loader:
                 optimizer.zero_grad()
                 loss = self.model.loss(pos_rw.to(self.device), neg_rw.to(self.device))
-                loss.backward();
-                optimizer.step();
-                b_loss += loss.item()
+                loss.backward(); optimizer.step(); b_loss += loss.item()
             b_loss /= len(loader)
             log.info(f'Epoch {epoch}, Loss: {b_loss:.4f}')
         self.model.eval()
@@ -195,26 +196,31 @@ class Gnn(T2v):
             if 'skill' in self.data.node_types: self.data['skill'].x = ordered_vecs[teamsvecs['member'].shape[1]:]; flag = True  # the remaining is s*
         assert flag, f'Nodes features initialization with d2v embeddings NOT applied! Check the consistency of d2v {self.cfg.graph.pre} and graph node types {self.cfg.graph.structure}'
 
-    def get_n2v_node_emb(self, to_homo_data=None):
+    def get_node_emb(self, to_homo_data=None):
         # in n2v, the weights are indeed the embeddings, like w2v or d2v
         # in other models, self.model(self.data), that is the forward-pass produces the embedding
         # this part is not needed, as having a model, we always can have the embedding
         # but note that, if hetrodata and n2v, first to_homo(self.data) is needed to get the node_type tensor
-        embeddings = self.model.embedding.weight.data.cpu()
-        if isinstance(self.data, Gnn.pyg.data.HeteroData):
-            node_type_names = self.data.node_types  # ['a', 'b', 'c']
-            node_type_tensor = to_homo_data.node_type if to_homo_data else self.data.to_homogeneous().node_type # tensor of shape [num_nodes]
-            for i, type_name in enumerate(node_type_names):
-                mask = (node_type_tensor == i)
-                type_embeddings = embeddings[mask]  # shape: [num_nodes_of_type, self.cfg.model.d]
-                log.info(f'Node type: {type_name}, Shape: {type_embeddings.shape}')
-        else: log.info(f'Node type: {self.cfg.graph.structure[0]}, Shape: {embeddings.shape}')
+        if self.name == 'n2v':
+            embeddings = self.model.embedding.weight.data.cpu()
+            if isinstance(self.data, Gnn.pyg.data.HeteroData):
+                node_type_tensor = to_homo_data.node_type if to_homo_data else self.data.to_homogeneous().node_type # tensor of shape [num_nodes]
+                for i, node_type in enumerate(self.data.node_types):
+                    mask = (node_type_tensor == i)
+                    type_embeddings = embeddings[mask]  # shape: [num_nodes_of_type, self.cfg.model.d]
+                    log.info(f'Node type: {node_type}, Shape: {type_embeddings.shape}')
+            else: log.info(f'Node type: {self.cfg.graph.structure[0]}, Shape: {embeddings.shape}')
+        elif self.name == 'm2v':
+            for node_type in self.data.node_types: # self.model.start or self.model.end could be used for MetaPath2Vec model but ...
+                try: log.info(f'Node type: {node_type}, Shape: {self.model(node_type).shape}')
+                except KeyError: log.warning(f'No vectors for {node_type}. Check if it is part of metapath -> {self.cfg.model.metapath_name}' )
+
 
     # # settings = the settings for this particular gnn model
     # # emb_output = the path for the embedding output and model output storage
     # def init_model(self):
     #
-    #     #if self.model_name == 'han': self.metapaths = self.settings['metapaths'][self.graph_type]
+    #     #if self.model_name == 'han': self.metapath_name = self.settings['metapaths'][self.graph_type]
     #
     #     train_data, val_data, test_data, self.edge_types, self.rev_edge_types = self.split(self.data)
     #     # create separate loaders for separate seed edge_types

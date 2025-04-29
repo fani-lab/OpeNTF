@@ -24,10 +24,10 @@ class Patent(Team):
 
     @staticmethod
     def read_data(datapath, output, cfg, indexes_only=False):
+        pd = install_import('pandas==2.0.0', 'pandas') # should be here as pickle uses references to existing modules when serialize the objects!
         try: return super(Patent, Patent).load_data(output, indexes_only)
         except (FileNotFoundError, EOFError) as e:
             log.info(f'Pickles not found! Reading raw data from {datapath} ...')
-            pd = install_import('pandas==2.0.0', 'pandas')
             #data dictionary can be find at: https://patentsview.org/download/data-download-dictionary
             log.info('Reading patents ...')
             patents = pd.read_csv(datapath, sep='\t', header=0, dtype={'id':'object'}, usecols=['id', 'type', 'country', 'date', 'title', 'withdrawn'], low_memory=False)#withdrawn may imply success or failure

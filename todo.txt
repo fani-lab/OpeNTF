@@ -4,43 +4,39 @@ opentf_venv\Scripts\activate on Windows.
 
 to do:
 
-update to readme for cmn layer and main readme
---- explain about 'location'
-            #in dblp, the 'loc' is the replica of the paper venue, so it should be 1-hot for each team
-            #in uspt, the 'loc' is the actual location of the inventor, so it can be multihot.
-            e = [i for i in range(teamsvecs['loc'].shape[0]) if (len(teamsvecs['loc'].rows[i]) != 1) or (sum(teamsvecs['loc'].data[3]) != 1)]
-            if e: log.info(f'Following teams are not one-hot in the location of team members. '
-                           f'Based on the underlying dataset/domain, it may be valid like in uspt, or invalid like dblp.\n{e}')
+update to readme for cmn layer and main readme 
+
+d2v >> run on entire datasets
+- dblp.v12.json >> done 
+- dblp.v12.json.mt10.ts2 >> done 
+- title.basics.tsv >> running
+- title.basics.tsv.mt10.ts2 >> running
 
 -- gnn-transferred
-node2vec
-metapath2vec
+node2vec >> done >> yet to be run on entire datasets >> also check to engage cuda
+metapath2vec 
+
 gs
 gat
 gin
 
-
--- contextual >> llm-based >> sentencetranformer
+-- end2end
+node2vec >> we didnot have it! but we can, right?
+metapath2vec >> we didnot have it! but we can, right?
+why not d2v when we have team, skill, and member vectors?
 
 update/check cmn.team.Team.get_stats()
 update/check cmn.patent.Patent.get_stats()
-
 make cmn.team.Team.get_stats() gpu-friendly
 
 =======================================================
+-- contextual embeddings (transfer or preinit e2e)>> llm-based >> sentencetranformer
+
 new change to the skill subset >> skill list for each team, ordered skills
 - dblp based on fos score
 - gith based on line numbers of the langs
 - imdb based on the genre, subgenre, ... the actual order in the dataset
 
-lazy load update 
--- when doing the filtering, we read from scratch. We can load the teams.pkl and filter, and update it. >> messy and confusing, not worth it
-
+lazy load update -- when doing the filtering, we read from scratch. We can load the teams.pkl and filter, and update it. >> messy and confusing, not worth it
 - embeddings for experts. in future may want to do skill-experts in input ...)
-
-
 --------------------------------------------------------
-
-
-
-
