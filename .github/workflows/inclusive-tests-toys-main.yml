@@ -100,7 +100,7 @@ jobs:
 
       - name: Echo config index
         run: |
-          echo "Config index: ${{ matrix.index + 1 }}"
+          echo 'Config index: ${{ matrix.index }}'
 
       - name: Run config ${{ matrix.config }}
         run: |
