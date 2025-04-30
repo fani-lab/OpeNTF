@@ -28,12 +28,14 @@ WORKDIR /app/src
 #CMD ["python", "main.py", "data.domain=cmn.repository.Repository", "data.source=../data/gith/repos.csv", "data.output=../output/gith/repos.csv"]
 # Generate d2v embeddings
 #CMD ["python", "main.py", "data.domain=cmn.repository.Repository", "data.source=../data/gith/repos.csv", "data.output=../output/gith/repos.csv", "~data.filter", "data.embedding.class_method=mdl.emb.d2v.D2v_d2v"]
-CMD ["python", "main.py", "data.domain=cmn.repository.Repository", "data.source=../data/gith/repos.csv", "data.output=../output/gith/repos.csv", "data.filter.min_nteam=10", "data.filter.min_team_size=2", "data.embedding.class_method=mdl.emb.d2v.D2v_d2v"]
+#CMD ["python", "main.py", "data.domain=cmn.repository.Repository", "data.source=../data/gith/repos.csv", "data.output=../output/gith/repos.csv", "data.filter.min_nteam=10", "data.filter.min_team_size=2", "data.embedding.class_method=mdl.emb.d2v.D2v_d2v"]
 
 # Generate teamsvecs, indexes, ...
 #CMD ["python", "main.py", "data.domain=cmn.patent.Patent", "data.source=../data/uspt/toy.patent.tsv", "data.output=../output/uspt/toy.patent.tsv", "~data.filter"]
 #CMD ["python", "main.py", "data.domain=cmn.patent.Patent", "data.source=../data/uspt/patent.tsv", "data.output=../output/uspt/patent.tsv"]
 # Generate d2v embeddings
+#CMD ["python", "main.py", "data.domain=cmn.patent.Patent", "data.source=../data/uspt/patent.tsv", "data.output=../output/uspt/patent.tsv", "~data.filter", "data.embedding.class_method=mdl.emb.d2v.D2v_d2v"]
+#CMD ["python", "main.py", "data.domain=cmn.patent.Patent", "data.source=../data/uspt/patent.tsv", "data.output=../output/uspt/patent.tsv", "data.filter.min_nteam=10", "data.filter.min_team_size=2", "data.embedding.class_method=mdl.emb.d2v.D2v_d2v"]
 
 #========================================================
 #docker build -t ghcr.io/fani-lab/opentf/toy-{###}:main .

@@ -6,15 +6,11 @@ to do:
 
 update to readme for cmn layer and main readme 
 
-d2v >> run on entire datasets
-- dblp.v12.json >> done 
-- dblp.v12.json.mt10.ts2 >> done 
-- title.basics.tsv >> running
-- title.basics.tsv.mt10.ts2 >> running
+d2v >> run on entire datasets >> done 
 
 -- gnn-transferred
 node2vec >> done >> yet to be run on entire datasets >> also check to engage cuda
-metapath2vec 
+metapath2vec >> done >> yet to be run on entire datasets >> also check to engage cuda
 
 gs
 gat
@@ -30,6 +26,7 @@ update/check cmn.patent.Patent.get_stats()
 make cmn.team.Team.get_stats() gpu-friendly
 
 =======================================================
+
 -- contextual embeddings (transfer or preinit e2e)>> llm-based >> sentencetranformer
 
 new change to the skill subset >> skill list for each team, ordered skills
