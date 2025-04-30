@@ -122,7 +122,7 @@ class Gnn(T2v):
                                      context_size=self.cfg.model.w,
                                      walks_per_node=self.cfg.model.wn,
                                      num_negative_samples=self.cfg.model.ns).to(self.device)
-
+            log.info(self.cfg.model.metapath_name)
             self._train(prefix+output+postfix)
             self.model.eval()  # just in case :)
             # test/log purposes
