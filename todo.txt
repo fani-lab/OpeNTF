@@ -28,6 +28,9 @@ make cmn.team.Team.get_stats() gpu-friendly
 =======================================================
 
 -- contextual embeddings (transfer or preinit e2e)>> llm-based >> sentencetranformer
+--- we can train it from scratch using our own customize skill,member vocabs
+--- uses gpu
+--- we can also pretrain on skill and members real names (to capture natural meaning of words and people names!)
 
 new change to the skill subset >> skill list for each team, ordered skills
 - dblp based on fos score
