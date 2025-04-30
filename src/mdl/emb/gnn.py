@@ -95,6 +95,8 @@ class Gnn(T2v):
 
         log.info(f'Training {self.name} ... ')
         loader = None; optimizer = None
+
+        # random-walk-based
         if self.name == 'n2v':
             output = f'.w{self.cfg.model.w}.wl{self.cfg.model.wl}.wn{self.cfg.model.wn}'
             # ImportError: 'Node2Vec' requires either the 'pyg-lib' or 'torch-cluster' package
@@ -126,20 +128,15 @@ class Gnn(T2v):
             # test/log purposes
             self.get_node_emb()
 
-        # for m2v part
-        # node_types = t2v.data._node_store_dict.keys()
-        #TODO: is it different from n2v? ideally shouldn't
-        #for node_type in node_types: emb[node_type] = t2v.model(node_type)  # output of embeddings
+        # message-passing-based
+        elif self.name == 'gcn': # like n2v, needs to_homo()
+            from gcn_old import Gcn as GCNModel
+            self.model = GCNModel(hidden_channels=10, data=t2v.data)
 
-        # elif self.name in {'gs', 'gin', 'gat', 'gatv2', 'han', 'gine', 'lant'}:
-        #     self.init_model(emb_output)
-        #     self.train(self.self.cfg.model.e)
-        #     return
-        # # gcn (for homogeneous only)
-        # # TODO: make hetreo of any type to homo
-        # elif self.name == 'gcn':
-        #     from gcn_old import Gcn as GCNModel
-        #     self.model = GCNModel(hidden_channels=10, data=t2v.data)
+        elif self.name in {'gs', 'gin', 'gat', 'gatv2', 'han', 'gine', 'lant'}:
+            self.init_model(emb_output)
+            self.train(self.self.cfg.model.e)
+
         #
         # self.optimizer = Gnn.torch.optim.Adam(list(self.model.parameters()), lr=self.cfg.model.lr)
         # self.train(self.cfg.model.e, self.cfg.save_per_epoch)
@@ -408,3 +405,24 @@ class Gnn(T2v):
     #     plt.savefig(fig_output)
     #     plt.clf()
     #     # plot.show()
+
+
+# @torch.no_grad()
+# def plot_points(colors):
+#     model.eval()
+#     z = model().cpu().numpy()
+#     z = TSNE(n_components=2).fit_transform(z)
+#     y = data.y.cpu().numpy()
+#
+#     plt.figure(figsize=(8, 8))
+#     for i in range(dataset.num_classes):
+#         plt.scatter(z[y == i, 0], z[y == i, 1], s=20, color=colors[i])
+#     # plt.scatter(z[:, 0], z[:, 1], s=20)
+#     plt.axis('off')
+#     plt.show()
+#
+#
+# colors = [
+#     '#ffc0cb', '#bada55', '#008080', '#420420', '#7fe5f0', '#065535', '#ffd700'
+# ]
+# plot_points(colors)
