@@ -114,7 +114,6 @@ class Gnn(T2v):
         elif self.name == 'm2v':
             assert isinstance(self.data, Gnn.pyg.data.HeteroData), f'Hetero graph is needed for m2v. {self.cfg.graph.structure} is NOT hetero!'
             output = f'.w{self.cfg.model.w}.wl{self.cfg.model.wl}.wn{self.cfg.model.wn}.{self.cfg.model.metapath_name[1]}' #should be fixed
-            #TODO: check with jamil's class of M2V in _m2v.py --> from m2v import M2V
             self.model = Gnn.pyg.nn.MetaPath2Vec(self.data.edge_index_dict,
                                      metapath=[tuple(mp) for mp in self.cfg.model.metapath_name[0]],
                                      embedding_dim=self.cfg.model.d,
