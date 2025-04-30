@@ -110,7 +110,6 @@ def run(cfg):
             cfg.data.embedding.config.model.gnn.pytorch = cfg.pytorch
             cls, method = cfg.data.embedding.class_method.split('_')
             cls = get_class(cls)
-            print(cfg.data.embedding.model.gnn.model.m2v.metapath_name)
             t2v = cls(cfg.data.output, cfg.data.acceleration, cfg.data.embedding.config.model[cls.__name__.lower()])
             t2v.name = method
             t2v.train(vecs, indexes)
