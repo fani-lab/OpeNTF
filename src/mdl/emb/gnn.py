@@ -169,14 +169,13 @@ class Gnn(T2v):
 
     def init_d2v_node_features(self, indexes, teamsvecs):
         flag = False
-        log.info(f'Loading pretrained d2v embeddings {self.cfg.graph.pre} to initialize node features, or if not exist, train d2v embeddings from scratch ...')
+        log.info(f'Loading pretrained d2v embeddings {self.cfg.graph.pre} in {self.output} to initialize node features, or if not exist, train d2v embeddings from scratch ...')
         from .d2v import D2v
-        d2v_filename = os.path.basename(self.cfg.graph.pre)
-        d2v_cfg = str2cfg(d2v_filename)
-        d2v_cfg.embtype = d2v_filename.split('.')[-1] # Check emb.d2v.D2v.train()
+        d2v_cfg = str2cfg(self.cfg.graph.pre)
+        d2v_cfg.embtype = self.cfg.graph.pre.split('.')[-1] # Check emb.d2v.D2v.train() for filename pattern
         d2v_cfg.lr = self.cfg.model.lr
         # simple lazy load, or train from scratch if the file not found!
-        d2v_obj = D2v(os.path.dirname(self.cfg.graph.pre), self.device, d2v_cfg).train(teamsvecs, indexes)
+        d2v_obj = D2v(self.output, self.device, d2v_cfg).train(teamsvecs, indexes)
         # the order is NOT correct in d2v, i.e., vecs[0] may be for vecs['s20']. Call D2v.natsortvecs(d2v_obj.model.wv)
         # d2v = Doc2Vec.load(self.cfg.graph.pre)
         for node_type in self.data.node_types:
