@@ -11,11 +11,9 @@ class Gnn(T2v):
     def __init__(self, output, device, cgf):
         super().__init__(output, device, cgf)
         self.name = 'n2v' #default model
+        self.decoder = None
         Gnn.torch = install_import(cgf.pytorch, 'torch')
         Gnn.pyg = install_import(f'torch_geometric==2.6.1 torch_cluster==1.6.3 -f https://data.pyg.org/whl/torch-{Gnn.torch.__version__}.html', 'torch_geometric')
-
-        self.loader = None
-        self.optimizer = None
 
     def _prep(self, teamsvecs, indexes):
         #NOTE: for any change, unit test using https://github.com/fani-lab/OpeNTF/issues/280
@@ -32,41 +30,27 @@ class Gnn(T2v):
             with open(file, 'rb') as infile: self.data = pickle.load(infile)
             return self.data
         except FileNotFoundError:
-            log.info(f'File not found! Constructing the graph ...')
-
-            if isinstance(self.cfg.graph.structure[0], str):#homo
-                log.info(f'Creating a homo graph with {self.cfg.graph.structure[0]} node type ...')
-                teams = teamsvecs[self.cfg.graph.structure[0]] #TODO: if node_type == 'team'
+            log.info(f'File not found! Constructing the graph of type {self.cfg.graph.structure[0]} ...')
+            self.data = self.pyg.data.HeteroData()
+            node_types = set()
+            #edges
+            for edge_type in self.cfg.graph.structure[0]:
+                log.info(f'Adding edges of type {edge_type} ...')
+                assert edge_type[0] in teamsvecs.keys() and teamsvecs[edge_type[0]] is not None
+                teams = teamsvecs[edge_type[0]] # take one part of an edge from here
                 edges = []
-                for i, row in enumerate(tqdm(teams, total=teams.shape[0])):
-                    for t in itertools.combinations(row.nonzero()[1], 2): edges += [t]
-                edge_index = self.torch.tensor(edges, dtype=self.torch.long).t().contiguous() #[1,2][1,3][2,4] >> [1,1,2][2,3,4]
-                nodes = self.torch.tensor([[0]] * teams.shape[1], dtype=self.torch.float)
-                self.data = self.pyg.data.Data(x=nodes, edge_index=edge_index, edge_attr=self.torch.tensor([1] * len(edges), dtype=self.torch.long))
-                # to make it consistent with hetero
-                if not hasattr(self.data, 'node_types'): setattr(self.data, 'node_types', [self.cfg.graph.structure[0]]) # safer than --> self.data.node_types = [self.cfg.graph.structure[0]]
-            else:
-                log.info(f'Creating a hetero graph of type {self.cfg.graph.structure[0]} ...')
-                self.data = self.pyg.data.HeteroData()
-                node_types = set()
-                #edges
-                for edge_type in self.cfg.graph.structure[0]:
-                    log.info(f'Adding edges of type {edge_type} ...')
-                    assert edge_type[0] in teamsvecs.keys() and teamsvecs[edge_type[0]] is not None
-                    teams = teamsvecs[edge_type[0]] # take one part of an edge from here
-                    edges = []
-                    for i, row1 in enumerate(tqdm(teams, total=teams.shape[0])):
-                        row2 = teamsvecs[edge_type[2]][i] if edge_type[2] != 'team' else [i] # take the other part of the edge from here
-                        # now add edges from all members of part 1 to part 2 (in this case, both are the same, so we take combinations of 2)
-                        if edge_type[0] == edge_type[2]: edges += [t for t in itertools.combinations(row1.nonzero()[1], 2)]
-                        # now add edges from all members of part 1 to part 2
-                        else: edges += [t for t in itertools.product(row1.nonzero()[1], row2.nonzero()[1] if edge_type[2] != 'team' else row2)]
+                for i, row1 in enumerate(tqdm(teams, total=teams.shape[0])):
+                    row2 = teamsvecs[edge_type[2]][i] if edge_type[2] != 'team' else [i] # take the other part of the edge from here
+                    # now add edges from all members of part 1 to part 2 (in this case, both are the same, so we take combinations of 2)
+                    if edge_type[0] == edge_type[2]: edges += [t for t in itertools.combinations(row1.nonzero()[1], 2)]
+                    # now add edges from all members of part 1 to part 2
+                    else: edges += [t for t in itertools.product(row1.nonzero()[1], row2.nonzero()[1] if edge_type[2] != 'team' else row2)]
 
-                    self.data[tuple(edge_type)].edge_index = self.torch.tensor(edges, dtype=self.torch.long).t().contiguous()
-                    self.data[tuple(edge_type)].edge_attr = self.torch.tensor([1] * len(edges), dtype=self.torch.long)
-                    node_types = node_types.union({edge_type[0], edge_type[2]})
-                #nodes
-                for node_type in node_types: self.data[node_type].x = self.torch.tensor([[0]] * (teamsvecs[node_type].shape[1] if node_type != 'team' else teamsvecs['skill'].shape[0]), dtype=self.torch.float)
+                self.data[tuple(edge_type)].edge_index = self.torch.tensor(edges, dtype=self.torch.long).t().contiguous()
+                self.data[tuple(edge_type)].edge_attr = self.torch.tensor([1] * len(edges), dtype=self.torch.long)
+                node_types = node_types.union({edge_type[0], edge_type[2]})
+            #nodes
+            for node_type in node_types: self.data[node_type].x = self.torch.tensor([[0]] * (teamsvecs[node_type].shape[1] if node_type != 'team' else teamsvecs['skill'].shape[0]), dtype=self.torch.float)
 
             # if not self.settings['dir']:
             log.info('To undirected graph ...')
@@ -91,30 +75,33 @@ class Gnn(T2v):
         prefix = self.output + f'/d{self.cfg.model.d}.e{self.cfg.model.e}.ns{self.cfg.model.ns}.{self.name}'
         postfix = f'{".pre" if self.cfg.graph.pre else ""}.{self.cfg.graph.dup_edge}.{self.cfg.graph.structure[1]}'
         # replace the 1 dimensional node features with pretrained d2v skill vectors of required dimension
-        if self.cfg.graph.pre: self.init_d2v_node_features(indexes, teamsvecs)
+        if self.cfg.graph.pre: self._init_d2v_node_features(indexes, teamsvecs)
 
         log.info(f'Training {self.name} ... ')
         loader = None; optimizer = None
 
-        # random-walk-based
+        # random-walk-based including n2v and m2v
+        # such methods are unsupervised and learn node embeddings from scratch, using random initialization internally.
+        # no need to manually create and initialize node embeddgins as in message-passing-based methods.
+        # such models do not consume node attributes or features like message-passing-based methods do
+        # they only use the graph structure.
+        # the learned embeddings are inside an nn.Embedding layer that is initialized randomly and optimized during training.
         if self.name == 'n2v':
             output = f'.w{self.cfg.model.w}.wl{self.cfg.model.wl}.wn{self.cfg.model.wn}'
             # ImportError: 'Node2Vec' requires either the 'pyg-lib' or 'torch-cluster' package
             # install_import(f'torch-cluster==1.6.3 -f https://data.pyg.org/whl/torch-{Gnn.torch.__version__}.html', 'torch_cluster')
             # import importlib; importlib.reload(Gnn.pyg);importlib.reload(Gnn.pyg.typing);importlib.reload(Gnn.pyg.nn)
-            self.model = Gnn.pyg.nn.Node2Vec((data:=(self.data.to_homogeneous() if isinstance(self.data, Gnn.pyg.data.HeteroData) else self.data)).edge_index,
+            self.model = Gnn.pyg.nn.Node2Vec((homo_data:=(self.data.to_homogeneous())).edge_index,
                                  embedding_dim=self.cfg.model.d,
                                  walk_length=self.cfg.model.wl,
                                  context_size=self.cfg.model.w,
                                  walks_per_node=self.cfg.model.wn,
                                  num_negative_samples=self.cfg.model.ns).to(self.device)
-            self._train(prefix+output+postfix)
-            self.model.eval() #just in case :)
-            #test/log purposes
-            self.get_node_emb(to_homo_data=data)
+            self._train_rw(prefix+output+postfix) #TODO: valid and test sets
+            self.get_node_emb(homo_data=homo_data) #logging purposes
 
         elif self.name == 'm2v':
-            assert isinstance(self.data, Gnn.pyg.data.HeteroData), f'Hetero graph is needed for m2v. {self.cfg.graph.structure} is NOT hetero!'
+            assert len(self.data.node_types) > 1, f'Hetero graph is needed for m2v. {self.cfg.graph.structure} is NOT hetero!'
             output = f'.w{self.cfg.model.w}.wl{self.cfg.model.wl}.wn{self.cfg.model.wn}.{self.cfg.model.metapath_name[1]}' #should be fixed
             self.model = Gnn.pyg.nn.MetaPath2Vec(self.data.edge_index_dict,
                                      metapath=[tuple(mp) for mp in self.cfg.model.metapath_name[0]],
@@ -123,46 +110,186 @@ class Gnn(T2v):
                                      context_size=self.cfg.model.w,
                                      walks_per_node=self.cfg.model.wn,
                                      num_negative_samples=self.cfg.model.ns).to(self.device)
-            self._train(prefix+output+postfix)
-            self.model.eval()  # just in case :)
-            # test/log purposes
-            self.get_node_emb()
+            self._train_rw(prefix+output+postfix) #TODO: valid and test sets
+            self.get_node_emb() #logging purposes
 
-        # message-passing-based
-        elif self.name == 'gcn': # like n2v, needs to_homo()
-            from gcn_old import Gcn as GCNModel
-            self.model = GCNModel(hidden_channels=10, data=t2v.data)
+        # message-passing-based >> default on homo, but can be wrapped into HeteroConv
+        elif self.name in {'gcn', 'gs', 'gat'}:#, 'gin', 'gatv2', 'han', 'gine', 'lant'}:
+            # by default, gnn methods are for homo data.
+            # we can wrap it by HeteroConv >> future
+            # or manually simulate it >> I think Jamil did this >> future
+            homo_data = self.data.to_homogeneous()
+            self.model = self._built_model_mp().to(self.device) # building multilayer gnn-based model. Shouldn't depend on data
+            train_l, valid_l, test_l = self._build_loader_mp(homo_data=homo_data) # building train/valid/test splits and loaders. Should depend on data
+            self._train_mp(train_l, valid_l, test_l)
 
-        elif self.name in {'gs', 'gin', 'gat', 'gatv2', 'han', 'gine', 'lant'}:
-            self.init_model(emb_output)
-            self.train(self.self.cfg.model.e)
-
-        #
-        # self.optimizer = Gnn.torch.optim.Adam(list(self.model.parameters()), lr=self.cfg.model.lr)
-        # self.train(self.cfg.model.e, self.cfg.save_per_epoch)
         # if self.name == 'lant': self.model.learn(self, self.cfg.model.e)  # built-in validation inside lant_encoder class
         #
         # self.plot_points()
-        # log.info(self)
 
-    def _train(self, output):
-        loader = self.model.loader(batch_size=self.cfg.model.b, shuffle=True)  # num_workers=os.cpu_count() not working in windows! also, cuda won't engage for the loader if num_workers param is passed
-        optimizer = Gnn.torch.optim.Adam(list(self.model.parameters()), lr=self.cfg.model.lr)
-        self.model.train()
+    def _built_model_mp(self):
+        class Model(Gnn.torch.nn.Module):
+            def __init__(self, cfg, name, num_nodes):
+                super().__init__()
+                self.node_emb = Gnn.torch.nn.Embedding(num_nodes, cfg.model.d)
+                Gnn.torch.nn.init.xavier_uniform_(self.node_emb.weight)
+                conv_cls = None
+                if   name == 'gcn': conv_cls = Gnn.pyg.nn.GCNConv
+                elif name == 'gs' : conv_cls = Gnn.pyg.nn.SAGEConv
+                elif name == 'gat': conv_cls = lambda in_ch, out_ch: Gnn.pyg.nn.GATConv(in_ch, out_ch, heads=cfg.model.ah, concat=cfg.model.cat)
+                self.encoder = Gnn.torch.nn.ModuleList()
+                if 'hd' in cfg.model and cfg.model.hd is not None and len(cfg.model.hd) > 0:
+                    for i, l in enumerate(cfg.model.h): self.encoder.append(conv_cls(cfg.model.d if i == 0 else cfg.model.h[i - 1], cfg.model.h[i]))
+                else: self.encoder = Gnn.torch.nn.ModuleList([conv_cls(cfg.model.d, cfg.model.d)])
+            def forward(self, edge_index):
+                x = self.embedding.weight
+                for conv in self.encoder: x = Gnn.torch.nn.functional.relu(conv(x, edge_index))
+                return x
+
+            # decoder part: as simple as dot-product or as complex as a MLP-based binary classifier (indeed another end2end approach with fnn and bnn!)
+            # decoder = torch.nn.Linear(hidden_dims[-1], 2)
+            def decode(self, x_i, x_j): return (x_i * x_j).sum(dim=-1) # we use binary_cross_entropy_with_logits for loss calc
+        return Model(self.cfg, self.name)
+    def _build_loader_mp(self, homo_data):
+        # (1)
+        # transductive (for opentf, only edges matter)
+        # - during the training, all graph structure is seen, but the loss is based on the edge prediction of edges in training set.
+        # So, the message passing for nodes connected to the edges of the val/test sets won't be affected.
+        # - during val/test, the loss is for edge prediction of edges in val/test set based on the final embeddings of incident nodes.
+        #
+        # in sum, the splits are based on edges, not nodes. Also, edges of all splits are available in training for message passing.
+        #
+        # inductive
+        # - during the training, the edges of val/test is not available at all, BOTH for message passing and loss calculation, i.e., strict splits
+        # this means the data's edge_index should be only based on the training teams
+
+        # for now, transductive
+
+        # (2)
+        # supervision edges
+        # if originally homo, ideally, all edges can be used
+        # if hetero, or to_homo(), we can further say what type of edges for supervision (loss calculation) during training
+
+        train_data, valid_data, test_data = Gnn.pyg.transforms.RandomLinkSplit(is_undirected=True,
+            num_val=0.1, num_test=0.0, # just for now. later, this should be based on the main splits of teams
+            add_negative_train_samples=True, neg_sampling_ratio=self.cfg.model.ns)(homo_data)
+        # for manually using a homo gnn method for hetero like gcn/gs, or a hetero gnn like heterogcn
+        # transform = T.RandomLinkSplit(num_val=0.1, num_test=0.0, disjoint_train_ratio=0.3, neg_sampling_ratio=0.0,             # we leave negative sampling to the mini_batch_loaders
+        #     add_negative_train_samples=False, , neg_sampling_ratio=self.cfg.model.ns,
+        #     edge_types=edge_types, rev_edge_types=rev_edge_types)
+        train_data.validate(raise_on_error=True); valid_data.validate(raise_on_error=True); test_data.validate(raise_on_error=True)
+
+        # edge masks for the selected edge type in homogeneous graph
+        if 'supervision_edge_types' in self.cfg.model and self.cfg.model.supervision_edge_types is not None:
+            for t in self.cfg.model.supervision_edge_types:
+                etype_id = train_data.edge_type_names.index('__'.join(self.cfg.model.supervision_edge_types))
+                etype_mask = train_data.edge_type == etype_id
+                train_edge_index = train_data.edge_index[:, etype_mask]
+
+        train_loader = Gnn.pyg.loader.LinkNeighborLoader(data=homo_data, # the transductive part: full graph for message passing
+                                                         edge_label_index=train_data.edge_label_index, # the transductive part: only the train edges for loss calc
+                                                         edge_label=train_data.edge_label,
+                                                         num_neighbors=self.cfg.model.nn, # this should match the number of hops/layers
+                                                         batch_size=self.cfg.model.b, shuffle=True)
+        valid_loader = Gnn.pyg.loader.LinkNeighborLoader(data=homo_data, # the transductive part: full graph for message passing
+                                                         edge_label_index=valid_data.edge_label_index, # the transductive part: only the valid edges for loss calc
+                                                         edge_label=valid_data.edge_label,
+                                                         num_neighbors=self.cfg.model.nn, # this should match the number of hops/layers
+                                                         batch_size=self.cfg.model.b, shuffle=False)
+        test_loader = Gnn.pyg.loader.LinkNeighborLoader(data=homo_data, # the transductive part: full graph for message passing
+                                                         edge_label_index=train_data.edge_label_index, # the transductive part: only the test edges for loss calc
+                                                         edge_label=train_data.edge_label,
+                                                         num_neighbors=self.cfg.model.nn, # this should match the number of hops/layers
+                                                         batch_size=self.cfg.model.b, shuffle=False)
+        return train_loader, valid_loader, test_loader
+        # the rest is for per edge type, per split loaders by jamil.
+        # not sure we need per edge type loader
+        # but per split is needed based on transductive/inductive train/valid/test teams
+
+        #     #if self.model_name == 'han': self.metapath_name = self.settings['metapaths'][self.graph_type]
+        #
+        #     train_data, val_data, test_data, self.edge_types, self.rev_edge_types = self.split(self.data)
+        #     # create separate loaders for separate seed edge_types
+        #     self.train_loader, self.val_loader, self.test_loader = {}, {}, {}
+        #     from torch_geometric.loader import LinkNeighborLoader
+        #     for edge_type in self.cfg.graph.supervision_edge_types:
+        #         # create a mbatch for a given split_data (mode = train / val / test)
+        #         self.train_loader[edge_type] = LinkNeighborLoader(data=train_data, num_neighbors=self.cfg.model.nn, neg_sampling='binary',
+        #                                                neg_sampling_ratio=self.cfg.model.ns,  # prev : neg_sampling = None
+        #                                                edge_label_index=(edge_type, train_data[edge_type].edge_label_index),
+        #                                                edge_label=train_data[edge_type].edge_label,
+        #                                                batch_size=self.b , shuffle=True,)
+        #
+        #         self.val_loader[edge_type] = LinkNeighborLoader(data=val_data, num_neighbors=self.cfg.model.nn, neg_sampling='binary',
+        #                                                neg_sampling_ratio=self.cfg.model.ns,  # prev : neg_sampling = None
+        #                                                edge_label_index=(edge_type, val_data[edge_type].edge_label_index),
+        #                                                edge_label=val_data[edge_type].edge_label,
+        #                                                batch_size=3 * self.b , shuffle=True,)
+        #
+        #         # self.test_loader[edge_type] = self.create_mini_batch_loader(test_data, edge_type, 'test') # we dont need a test loader as of now
+        #
+        #     log.info(f'Device: {self.device}')
+        #     Gnn.torch.cuda.empty_cache()
+        #     train_data.to(self.device)
+        #     # the train_data is needed to collect info about the metadata
+        #     from encoder import Encoder
+        #     self.model = Encoder(hidden_channels=self.d, data=train_data, model_name=self.model).to(self.device)
+        #     # if self.model_name == 'lant':
+        #     #     from lant_encoder import Encoder
+        #     #     model = Encoder(hidden_channels=self.d, data=train_data)
+        #     self.optimizer = Gnn.torch.optim.Adam(self.model.parameters(), lr=self.cfg.model.lr)
+    def _train_mp(self, output, train_l, valid_l, test_l):
+        def _(loader, optimizer=None):
+            if optimizer: self.model.train()
+            else: self.model.eval()
+            loss = 0
+            for batch in loader:
+                batch = batch.to(self.device)
+                if optimizer: optimizer.zero_grad()
+                x = self.model.forward(batch.edge_index)
+                pred = self.model.decode(x[batch.edge_label_index[0]], x[batch.edge_label_index[1]])
+                loss = Gnn.torch.binary_cross_entropy_with_logits(pred, batch.edge_label.float())
+                if optimizer: loss.backward(); optimizer.step();
+                loss += loss.item()
+            loss /= len(loader)
+            return loss
+
+        optimizer = Gnn.torch.optim.Adam(self.model.parameters(), lr=self.cfg.model.lr)
         Gnn.torch.cuda.empty_cache()
         for epoch in range(1, self.cfg.model.e + 1):
-            b_loss = 0
+            log.info(f'Epoch {epoch}, Train Loss: {(t_loss:=_(train_l, optimizer)):.4f}')
+            log.info(f'Epoch {epoch}, Valid Loss: {(v_loss:=_(valid_l)):.4f}')
+            if self.cfg.model.save_per_epoch:
+                #self.model.eval()
+                Gnn.torch.save({'model_state_dict': self.model.state_dict(), 'cfg': self.cfg, 'e': epoch, 't_loss': t_loss, 'v_loss': v_loss}, f'{output}.e{epoch}')
+                log.info(f'{self.name} model with {cfg2str(self.cfg.model)} saved at {output}.e{epoch}')
+
+        log.info(f'Test Loss: {(tst_loss:=_(test_l)):.4f}')
+        #self.model.eval()
+        Gnn.torch.save({'model_state_dict': self.model.state_dict(), 'cfg': self.cfg, 'e': epoch, 't_loss': t_loss, 'v_loss': v_loss, 'tst_loss': tst_loss}, output)
+        log.info(f'{self.name} model with {cfg2str(self.cfg.model)} saved at {output}.')
+
+    def _train_rw(self, output):
+        optimizer = Gnn.torch.optim.Adam(self.model.parameters(), lr=self.cfg.model.lr)
+        loader = self.model.loader(batch_size=self.cfg.model.b, shuffle=True)  # num_workers=os.cpu_count() not working in windows! also, cuda won't engage for the loader if num_workers param is passed
+        Gnn.torch.cuda.empty_cache()
+        for epoch in range(1, self.cfg.model.e + 1):
+            e_loss = 0; self.model.train()
             for pos_rw, neg_rw in loader:
                 optimizer.zero_grad()
                 loss = self.model.loss(pos_rw.to(self.device), neg_rw.to(self.device))
-                loss.backward(); optimizer.step(); b_loss += loss.item()
-            b_loss /= len(loader)
-            log.info(f'Epoch {epoch}, Loss: {b_loss:.4f}')
-        self.model.eval()
-        Gnn.torch.save({'model_state_dict': self.model.state_dict(), 'cfg': self.cfg}, output)
-        log.info(f'{self.name} model with {cfg2str(self.cfg.model)} saved at {output}.')
+                loss.backward(); optimizer.step(); e_loss += loss.item()
+            e_loss /= len(loader)
+            log.info(f'Epoch {epoch}, Loss: {e_loss:.4f}')
+            if self.cfg.model.save_per_epoch:
+                self.model.eval()
+                Gnn.torch.save({'model_state_dict': self.model.state_dict(), 'cfg': self.cfg, 'e': epoch, 't_loss': e_loss}, f'{output}.e{epoch}')
+                log.info(f'{self.name} model with {cfg2str(self.cfg.model)} saved at {output}.e{epoch}')
 
-    def init_d2v_node_features(self, indexes, teamsvecs):
+        self.model.eval()
+        Gnn.torch.save({'model_state_dict': self.model.state_dict(), 'cfg': self.cfg, 'e': epoch, 't_loss': e_loss}, output)
+        log.info(f'{self.name} model with {cfg2str(self.cfg.model)} saved at {output}.')
+    def _init_d2v_node_features(self, indexes, teamsvecs):
         flag = False
         log.info(f'Loading pretrained d2v embeddings {self.cfg.graph.pre} in {self.output} to initialize node features, or if not exist, train d2v embeddings from scratch ...')
         from .d2v import D2v
@@ -190,62 +317,23 @@ class Gnn(T2v):
             if 'skill' in self.data.node_types: self.data['skill'].x = ordered_vecs[teamsvecs['member'].shape[1]:]; flag = True  # the remaining is s*
         assert flag, f'Nodes features initialization with d2v embeddings NOT applied! Check the consistency of d2v {self.cfg.graph.pre} and graph node types {self.cfg.graph.structure}'
 
-    def get_node_emb(self, to_homo_data=None):
+    def get_node_emb(self, homo_data=None):
         # in n2v, the weights are indeed the embeddings, like w2v or d2v
         # in other models, self.model(self.data), that is the forward-pass produces the embedding
         # this part is not needed, as having a model, we always can have the embedding
-        # but note that, if hetrodata and n2v, first to_homo(self.data) is needed to get the node_type tensor
-        if self.name == 'n2v':
-            embeddings = self.model.embedding.weight.data.cpu()
-            if isinstance(self.data, Gnn.pyg.data.HeteroData):
-                node_type_tensor = to_homo_data.node_type if to_homo_data else self.data.to_homogeneous().node_type # tensor of shape [num_nodes]
-                for i, node_type in enumerate(self.data.node_types):
-                    mask = (node_type_tensor == i)
-                    type_embeddings = embeddings[mask]  # shape: [num_nodes_of_type, self.cfg.model.d]
-                    log.info(f'Node type: {node_type}, Shape: {type_embeddings.shape}')
-            else: log.info(f'Node type: {self.cfg.graph.structure[0]}, Shape: {embeddings.shape}')
-        elif self.name == 'm2v':
+        self.model.eval()
+        if self.name == 'm2v':
             for node_type in self.data.node_types: # self.model.start or self.model.end could be used for MetaPath2Vec model but ...
                 try: log.info(f'Node type: {node_type}, Shape: {self.model(node_type).shape}')
                 except KeyError: log.warning(f'No vectors for {node_type}. Check if it is part of metapath -> {self.cfg.model.metapath_name}' )
-
-
-    # # settings = the settings for this particular gnn model
-    # # emb_output = the path for the embedding output and model output storage
-    # def init_model(self):
-    #
-    #     #if self.model_name == 'han': self.metapath_name = self.settings['metapaths'][self.graph_type]
-    #
-    #     train_data, val_data, test_data, self.edge_types, self.rev_edge_types = self.split(self.data)
-    #     # create separate loaders for separate seed edge_types
-    #     self.train_loader, self.val_loader, self.test_loader = {}, {}, {}
-    #     from torch_geometric.loader import LinkNeighborLoader
-    #     for edge_type in self.cfg.graph.supervision_edge_types:
-    #         # create a mbatch for a given split_data (mode = train / val / test)
-    #         self.train_loader[edge_type] = LinkNeighborLoader(data=train_data, num_neighbors=self.cfg.model.nn, neg_sampling='binary',
-    #                                                neg_sampling_ratio=self.cfg.model.ns,  # prev : neg_sampling = None
-    #                                                edge_label_index=(edge_type, train_data[edge_type].edge_label_index),
-    #                                                edge_label=train_data[edge_type].edge_label,
-    #                                                batch_size=self.b , shuffle=True,)
-    #
-    #         self.val_loader[edge_type] = LinkNeighborLoader(data=val_data, num_neighbors=self.cfg.model.nn, neg_sampling='binary',
-    #                                                neg_sampling_ratio=self.cfg.model.ns,  # prev : neg_sampling = None
-    #                                                edge_label_index=(edge_type, val_data[edge_type].edge_label_index),
-    #                                                edge_label=val_data[edge_type].edge_label,
-    #                                                batch_size=3 * self.b , shuffle=True,)
-    #
-    #         # self.test_loader[edge_type] = self.create_mini_batch_loader(test_data, edge_type, 'test') # we dont need a test loader as of now
-    #
-    #     log.info(f'Device: {self.device}')
-    #     Gnn.torch.cuda.empty_cache()
-    #     train_data.to(self.device)
-    #     # the train_data is needed to collect info about the metadata
-    #     from encoder import Encoder
-    #     self.model = Encoder(hidden_channels=self.d, data=train_data, model_name=self.model).to(self.device)
-    #     # if self.model_name == 'lant':
-    #     #     from lant_encoder import Encoder
-    #     #     model = Encoder(hidden_channels=self.d, data=train_data)
-    #     self.optimizer = Gnn.torch.optim.Adam(self.model.parameters(), lr=self.cfg.model.lr)
+        else:
+            if homo_data is None: homo_data = self.data.to_homogeneous()
+            embeddings = self.model.embedding.weight.data.cpu() if self.name == 'n2v' else self.model(homo_data)
+            node_type_tensor = homo_data.node_type # tensor of shape [num_nodes]
+            for i, node_type in enumerate(self.data.node_types):
+                mask = (node_type_tensor == i)
+                type_embeddings = embeddings[mask]  # shape: [num_nodes_of_type, self.cfg.model.d]
+                log.info(f'Node type: {node_type}, Shape: {type_embeddings.shape}')
 
     # def save_emb(self):
     #     with Gnn.torch.no_grad():

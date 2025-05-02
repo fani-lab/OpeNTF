@@ -1,8 +1,13 @@
-scipy>=1.10.1
+#python3.8
+#python -m venv opentf_venv
+#source opentf_venv/bin/activate  (non-windows), opentf_venv\Scripts\activate (windows)
+#pip install -r requirement.txt
+
+scipy==1.10.1
 numpy==1.24.4 #cannot go above for gensim
 tqdm==4.65.0
-hydra-core>=1.3.2
-python-dateutil>=2.9
+hydra-core==1.3.2
+python-dateutil==2.9
 
 # on-demand package installations
 # cmn.repository.Repository.read_data() pandas==2.0.0
