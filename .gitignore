@@ -8,3 +8,17 @@
 docs/tutorial/*/node_modules/
 docs/tutorial/*/.idea/
 docs/tutorial/*/build/
+node_modules
+
+# Kap's ignore
+.cursor
+kap_scripts
+node_modules
+opentf-main
+scripts
+tasks
+.env*
+.windsurfrules
+package*
+README-task-master.md
+docs/taskmaster-usage.md
