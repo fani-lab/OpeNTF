@@ -1,4 +1,4 @@
-name: inclusive-tests-asserts-toys-main
+name: inclusive-tests-embs-toys-main
 
 on:
   push:
@@ -14,10 +14,6 @@ jobs:
     strategy:
       matrix:
         include:
-          - config: '+id=000 cmd=prep data.domain=cmn.publication.Publication data.source=../data/dblp/toy.dblp.v12.json data.output=../output/dblp/toy.dblp.v12.json ~data.filter ~data.embedding'
-          - config: '+id=001 cmd=prep data.domain=cmn.publication.Publication data.source=../data/dblp/toy.dblp.v12.json data.output=../output/dblp/toy.dblp.v12.json data.filter.min_nteam=1 data.filter.min_team_size=2 ~data.embedding'
-          - config: '+id=002 cmd=prep data.domain=cmn.publication.Publication data.source=../data/dblp/toy.dblp.v12.json data.output=../output/dblp/toy.dblp.v12.json data.filter.min_nteam=9 data.filter.min_team_size=9 ~data.embedding'
-            label: fail.teamsvecs.validate
           - config: '+id=003 cmd=prep data.domain=cmn.publication.Publication data.source=../data/dblp/toy.dblp.v12.json data.output=../output/dblp/toy.dblp.v12.json ~data.filter data.embedding.class_method=mdl.emb.d2v.D2v_d2v'
           - config: '+id=004 cmd=prep data.domain=cmn.publication.Publication data.source=../data/dblp/toy.dblp.v12.json data.output=../output/dblp/toy.dblp.v12.json data.filter.min_nteam=1 data.filter.min_team_size=2 data.embedding.class_method=mdl.emb.d2v.D2v_d2v'
           - config: '+id=005 cmd=prep data.domain=cmn.publication.Publication data.source=../data/dblp/toy.dblp.v12.json data.output=../output/dblp/toy.dblp.v12.json ~data.filter data.embedding.class_method=mdl.emb.gnn.Gnn_n2v +data.embedding.model.gnn.graph.pre=null'
@@ -32,11 +28,10 @@ jobs:
             label: warn.loc.m2v.validate
           - config: '+id=013 cmd=prep data.domain=cmn.publication.Publication data.source=../data/dblp/toy.dblp.v12.json data.output=../output/dblp/toy.dblp.v12.json data.filter.min_nteam=1 data.filter.min_team_size=2 data.embedding.class_method=mdl.emb.gnn.Gnn_m2v +data.embedding.model.gnn.graph.pre=null "+data.embedding.model.gnn.graph.structure=[[[skill, to, team], [member, to, team], [loc, to, team]], stml]" "+data.embedding.model.gnn.m2v.metapath_name=[[[member, to, team],[team, rev_to, loc], [loc, to, team], [team, rev_to, member]], mtl-ltm]"'
             label: warn.skill.m2v.validate
+          - config: '+id=014 cmd=prep data.domain=cmn.publication.Publication data.source=../data/dblp/toy.dblp.v12.json data.output=../output/dblp/toy.dblp.v12.json data.filter.min_nteam=1 data.filter.min_team_size=2 data.embedding.class_method=mdl.emb.gnn.Gnn_gcn +data.embedding.model.gnn.graph.pre=null'
+          - config: '+id=015 cmd=prep data.domain=cmn.publication.Publication data.source=../data/dblp/toy.dblp.v12.json data.output=../output/dblp/toy.dblp.v12.json data.filter.min_nteam=1 data.filter.min_team_size=2 data.embedding.class_method=mdl.emb.gnn.Gnn_gs +data.embedding.model.gnn.graph.pre=null'
+          - config: '+id=016 cmd=prep data.domain=cmn.publication.Publication data.source=../data/dblp/toy.dblp.v12.json data.output=../output/dblp/toy.dblp.v12.json data.filter.min_nteam=1 data.filter.min_team_size=2 data.embedding.class_method=mdl.emb.gnn.Gnn_gs +data.embedding.model.gnn.graph.pre=d9.e100.w10.d2v.dm1.skill'
 
-          - config: '+id=014 cmd=prep data.domain=cmn.movie.Movie data.source=../data/imdb/toy.title.basics.tsv data.output=../output/imdb/toy.title.basics.tsv ~data.filter ~data.embedding'
-          - config: '+id=015 cmd=prep data.domain=cmn.movie.Movie data.source=../data/imdb/toy.title.basics.tsv data.output=../output/imdb/toy.title.basics.tsv data.filter.min_nteam=1 data.filter.min_team_size=2 ~data.embedding'
-          - config: '+id=016 cmd=prep data.domain=cmn.movie.Movie data.source=../data/imdb/toy.title.basics.tsv data.output=../output/dblp/toy.title.basics.tsv data.filter.min_nteam=9 data.filter.min_team_size=9 ~data.embedding'
-            label: fail.teamsvecs.validate
           - config: '+id=017 cmd=prep data.domain=cmn.movie.Movie data.source=../data/imdb/toy.title.basics.tsv data.output=../output/imdb/toy.title.basics.tsv ~data.filter data.embedding.class_method=mdl.emb.d2v.D2v_d2v'
           - config: '+id=018 cmd=prep data.domain=cmn.movie.Movie data.source=../data/imdb/toy.title.basics.tsv data.output=../output/imdb/toy.title.basics.tsv data.filter.min_nteam=1 data.filter.min_team_size=2 data.embedding.class_method=mdl.emb.d2v.D2v_d2v'
           - config: '+id=019 cmd=prep data.domain=cmn.movie.Movie data.source=../data/imdb/toy.title.basics.tsv data.output=../output/imdb/toy.title.basics.tsv ~data.filter data.embedding.class_method=mdl.emb.gnn.Gnn_n2v +data.embedding.model.gnn.graph.pre=null'
@@ -46,11 +41,10 @@ jobs:
             label: fail.pre.validate
           - config: '+id=023 cmd=prep data.domain=cmn.movie.Movie data.source=../data/imdb/toy.title.basics.tsv data.output=../output/imdb/toy.title.basics.tsv ~data.filter data.embedding.class_method=mdl.emb.gnn.Gnn_m2v +data.embedding.model.gnn.graph.pre=null'
           - config: '+id=024 cmd=prep data.domain=cmn.movie.Movie data.source=../data/imdb/toy.title.basics.tsv data.output=../output/imdb/toy.title.basics.tsv data.filter.min_nteam=1 data.filter.min_team_size=2 data.embedding.class_method=mdl.emb.gnn.Gnn_m2v +data.embedding.model.gnn.graph.pre=null'
+          - config: '+id=024 cmd=prep data.domain=cmn.movie.Movie data.source=../data/imdb/toy.title.basics.tsv data.output=../output/imdb/toy.title.basics.tsv ~data.filter data.embedding.class_method=mdl.emb.gnn.Gnn_gcn +data.embedding.model.gnn.graph.pre=null'
+          - config: '+id=025 cmd=prep data.domain=cmn.movie.Movie data.source=../data/imdb/toy.title.basics.tsv data.output=../output/imdb/toy.title.basics.tsv data.filter.min_nteam=1 data.filter.min_team_size=2 data.embedding.class_method=mdl.emb.gnn.Gnn_gs +data.embedding.model.gnn.graph.pre=null'
+          - config: '+id=026 cmd=prep data.domain=cmn.movie.Movie data.source=../data/imdb/toy.title.basics.tsv data.output=../output/imdb/toy.title.basics.tsv data.filter.min_nteam=1 data.filter.min_team_size=2 data.embedding.class_method=mdl.emb.gnn.Gnn_gs +data.embedding.model.gnn.graph.pre=d9.e100.w10.d2v.dm1.skill'
 
-          - config: '+id=025 cmd=prep data.domain=cmn.repository.Repository data.source=../data/gith/toy.repos.csv data.output=../output/gith/toy.repos.csv ~data.filter ~data.embedding'
-          - config: '+id=026 cmd=prep data.domain=cmn.repository.Repository data.source=../data/gith/toy.repos.csv data.output=../output/gith/toy.repos.csv data.filter.min_nteam=1 data.filter.min_team_size=2 ~data.embedding'
-          - config: '+id=027 cmd=prep data.domain=cmn.repository.Repository data.source=../data/gith/toy.repos.csv data.output=../output/gith/toy.repos.csv data.filter.min_nteam=9 data.filter.min_team_size=9 ~data.embedding'
-            label: fail.teamsvecs.validate
           - config: '+id=028 cmd=prep data.domain=cmn.repository.Repository data.source=../data/gith/toy.repos.csv data.output=../output/gith/toy.repos.csv ~data.filter data.embedding.class_method=mdl.emb.d2v.D2v_d2v'
           - config: '+id=029 cmd=prep data.domain=cmn.repository.Repository data.source=../data/gith/toy.repos.csv data.output=../output/gith/toy.repos.csv data.filter.min_nteam=1 data.filter.min_team_size=2 data.embedding.class_method=mdl.emb.d2v.D2v_d2v'
           - config: '+id=030 cmd=prep data.domain=cmn.repository.Repository data.source=../data/gith/toy.repos.csv data.output=../output/gith/toy.repos.csv ~data.filter data.embedding.class_method=mdl.emb.gnn.Gnn_n2v +data.embedding.model.gnn.graph.pre=null'
@@ -60,11 +54,10 @@ jobs:
             label: fail.pre.validate
           - config: '+id=034 cmd=prep data.domain=cmn.repository.Repository data.source=../data/gith/toy.repos.csv data.output=../output/gith/toy.repos.csv ~data.filter data.embedding.class_method=mdl.emb.gnn.Gnn_m2v +data.embedding.model.gnn.graph.pre=null'
           - config: '+id=035 cmd=prep data.domain=cmn.repository.Repository data.source=../data/gith/toy.repos.csv data.output=../output/gith/toy.repos.csv data.filter.min_nteam=1 data.filter.min_team_size=2 data.embedding.class_method=mdl.emb.gnn.Gnn_m2v +data.embedding.model.gnn.graph.pre=null'
+          - config: '+id=036 cmd=prep data.domain=cmn.repository.Repository data.source=../data/gith/toy.repos.csv data.output=../output/gith/toy.repos.csv ~data.filter data.embedding.class_method=mdl.emb.gnn.Gnn_gcn +data.embedding.model.gnn.graph.pre=null'
+          - config: '+id=037 cmd=prep data.domain=cmn.repository.Repository data.source=../data/gith/toy.repos.csv data.output=../output/gith/toy.repos.csv data.filter.min_nteam=1 data.filter.min_team_size=2 data.embedding.class_method=mdl.emb.gnn.Gnn_gs +data.embedding.model.gnn.graph.pre=null'
+          - config: '+id=038 cmd=prep data.domain=cmn.repository.Repository data.source=../data/gith/toy.repos.csv data.output=../output/gith/toy.repos.csv data.filter.min_nteam=1 data.filter.min_team_size=2 data.embedding.class_method=mdl.emb.gnn.Gnn_gs +data.embedding.model.gnn.graph.pre=d9.e100.w10.d2v.dm1.skill'
 
-          - config: '+id=036 cmd=prep data.domain=cmn.patent.Patent data.source=../data/uspt/toy.patent.tsv data.output=../output/uspt/toy.patent.tsv ~data.filter ~data.embedding'
-          - config: '+id=037 cmd=prep data.domain=cmn.patent.Patent data.source=../data/uspt/toy.patent.tsv data.output=../output/uspt/toy.patent.tsv data.filter.min_nteam=1 data.filter.min_team_size=2 ~data.embedding'
-          - config: '+id=038 cmd=prep data.domain=cmn.patent.Patent data.source=../data/uspt/toy.patent.tsv data.output=../output/uspt/toy.patent.tsv data.filter.min_nteam=9 data.filter.min_team_size=9 ~data.embedding'
-            label: fail.teamsvecs.validate
           - config: '+id=039 cmd=prep data.domain=cmn.patent.Patent data.source=../data/uspt/toy.patent.tsv data.output=../output/uspt/toy.patent.tsv ~data.filter data.embedding.class_method=mdl.emb.d2v.D2v_d2v'
           - config: '+id=040 cmd=prep data.domain=cmn.patent.Patent data.source=../data/uspt/toy.patent.tsv data.output=../output/uspt/toy.patent.tsv data.filter.min_nteam=1 data.filter.min_team_size=2 data.embedding.class_method=mdl.emb.d2v.D2v_d2v'
           - config: '+id=041 cmd=prep data.domain=cmn.patent.Patent data.source=../data/uspt/toy.patent.tsv data.output=../output/uspt/toy.patent.tsv ~data.filter data.embedding.class_method=mdl.emb.gnn.Gnn_n2v +data.embedding.model.gnn.graph.pre=null'
@@ -79,7 +72,9 @@ jobs:
             label: warn.loc.m2v.validate
           - config: '+id=049 cmd=prep data.domain=cmn.patent.Patent data.source=../data/uspt/toy.patent.tsv data.output=../output/uspt/toy.patent.tsv data.filter.min_nteam=1 data.filter.min_team_size=2 data.embedding.class_method=mdl.emb.gnn.Gnn_m2v +data.embedding.model.gnn.graph.pre=null "+data.embedding.model.gnn.graph.structure=[[[skill, to, team], [member, to, team], [loc, to, team]], stml]" "+data.embedding.model.gnn.m2v.metapath_name=[[[member, to, team],[team, rev_to, loc], [loc, to, team], [team, rev_to, member]], mtl-ltm]"'
             label: warn.skill.m2v.validate
-
+          - config: '+id=050 cmd=prep data.domain=cmn.patent.Patent data.source=../data/uspt/toy.patent.tsv data.output=../output/uspt/toy.patent.tsv ~data.filter data.embedding.class_method=mdl.emb.gnn.Gnn_gcn +data.embedding.model.gnn.graph.pre=null'
+          - config: '+id=051 cmd=prep data.domain=cmn.patent.Patent data.source=../data/uspt/toy.patent.tsv data.output=../output/uspt/toy.patent.tsv data.filter.min_nteam=1 data.filter.min_team_size=2 data.embedding.class_method=mdl.emb.gnn.Gnn_gs +data.embedding.model.gnn.graph.pre=null'
+          - config: '+id=052 cmd=prep data.domain=cmn.patent.Patent data.source=../data/uspt/toy.patent.tsv data.output=../output/uspt/toy.patent.tsv data.filter.min_nteam=1 data.filter.min_team_size=2 data.embedding.class_method=mdl.emb.gnn.Gnn_gs +data.embedding.model.gnn.graph.pre=d9.e100.w10.d2v.dm1.skill'
       # Set to false if you want parallel runs:
       fail-fast: false
 

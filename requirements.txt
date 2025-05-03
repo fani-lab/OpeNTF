@@ -17,8 +17,10 @@ python-dateutil==2.9
 # mdl.emb.d2v.D2v.order() natsort==8.4.0
 # mdl.emb.d2v.D2v.train() gensim==4.3.3 #needs numpy 1.24.4
 # mdl.emb.gnn.Gnn.__init__() config.yml.pytorch: torch==2.2.2 --index-url https://download.pytorch.org/whl/cu124
-# mdl.emb.gnn.Gnn.__init__() torch_geometric==2.6.1 torch_cluster==1.6.3 -f https://data.pyg.org/whl/torch-{Gnn.torch.__version__}.html
+# mdl.emb.gnn.Gnn.__init__() torch_geometric==2.6.1 torch_cluster==1.6.3 torch_sparse==0.6.18 torch_scatter==2.1.2 -f https://data.pyg.org/whl/torch-{Gnn.torch.__version__}.html
+# mdl.emb.gnn.Gnn.__init__() tensorboard==2.14.0 tensorboardX==2.6.2.2
 # mdl.emb.gnn.Gnn.eval() scikit-learn==1.2.2
+
 
 
 # yet to be reached and checked

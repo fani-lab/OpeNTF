@@ -32,7 +32,14 @@ def str2cfg(s): #dot seperated kv, e.g., x1.y2.z3 --> x:1 y:2 z:3
         config[key] = int(value) if value.isdigit() else value
     return OmegaConf.create(config)
 
-
+textcolor = {
+    'blue':   '\033[94m',
+    'green':  '\033[92m',
+    'yellow': '\033[93m',
+    'red':    '\033[91m',
+    'magenta':'\033[95m',
+    'reset':  '\033[0m'
+}
 # #samples
 # install_import('hydra-core==1.3.2', 'hydra')
 # # Importing a submodule/class/function: from bs4 import BeautifulSoup

@@ -3,7 +3,7 @@ from tqdm import tqdm
 
 log = logging.getLogger(__name__)
 
-from pkgmgr import install_import, cfg2str, str2cfg
+import pkgmgr as opentf
 from .t2v import T2v
 
 class Gnn(T2v):
@@ -12,8 +12,10 @@ class Gnn(T2v):
         super().__init__(output, device, cgf)
         self.name = 'n2v' #default model
         self.decoder = None
-        Gnn.torch = install_import(cgf.pytorch, 'torch')
-        Gnn.pyg = install_import(f'torch_geometric==2.6.1 torch_cluster==1.6.3 -f https://data.pyg.org/whl/torch-{Gnn.torch.__version__}.html', 'torch_geometric')
+        Gnn.torch = opentf.install_import(cgf.pytorch, 'torch')
+        Gnn.pyg = opentf.install_import(f'torch_geometric==2.6.1 torch_cluster==1.6.3 torch_sparse==0.6.18 torch_scatter==2.1.2 -f https://data.pyg.org/whl/torch-{Gnn.torch.__version__}.html', 'torch_geometric')
+        opentf.install_import('tensorboard==2.14.0', 'tensorboard')
+        self.writer = opentf.install_import('tensorboardX==2.6.2.2', 'tensorboardX', 'SummaryWriter')(log_dir=self.output + '/logs4tfboard')
 
     def _prep(self, teamsvecs, indexes):
         #NOTE: for any change, unit test using https://github.com/fani-lab/OpeNTF/issues/280
@@ -77,8 +79,7 @@ class Gnn(T2v):
         # replace the 1 dimensional node features with pretrained d2v skill vectors of required dimension
         if self.cfg.graph.pre: self._init_d2v_node_features(indexes, teamsvecs)
 
-        log.info(f'Training {self.name} ... ')
-        loader = None; optimizer = None
+        log.info(f'{opentf.textcolor["blue"]}Training {self.name} {opentf.textcolor["reset"]}... ')
 
         # random-walk-based including n2v and m2v
         # such methods are unsupervised and learn node embeddings from scratch, using random initialization internally.
@@ -97,7 +98,7 @@ class Gnn(T2v):
                                  context_size=self.cfg.model.w,
                                  walks_per_node=self.cfg.model.wn,
                                  num_negative_samples=self.cfg.model.ns).to(self.device)
-            self._train_rw(prefix+output+postfix) #TODO: valid and test sets
+            self._train_rw(prefix + output + postfix) #TODO: valid and test sets
             self.get_node_emb(homo_data=homo_data) #logging purposes
 
         elif self.name == 'm2v':
@@ -110,24 +111,29 @@ class Gnn(T2v):
                                      context_size=self.cfg.model.w,
                                      walks_per_node=self.cfg.model.wn,
                                      num_negative_samples=self.cfg.model.ns).to(self.device)
-            self._train_rw(prefix+output+postfix) #TODO: valid and test sets
+            self._train_rw(prefix + output + postfix) #TODO: valid and test sets
             self.get_node_emb() #logging purposes
 
         # message-passing-based >> default on homo, but can be wrapped into HeteroConv
         elif self.name in {'gcn', 'gs', 'gat'}:#, 'gin', 'gatv2', 'han', 'gine', 'lant'}:
+            output = f'd{self.cfg.model.d}.e{self.cfg.model.e}.b{self.cfg.model.b}.lr{self.cfg.model.lr}.ns{self.cfg.model.ns}.h{"-".join([str(i) for i in self.cfg.model.h])}.nn{"-".join([str(i) for i in self.cfg.model.nn])}'
+
             # by default, gnn methods are for homo data.
             # we can wrap it by HeteroConv >> future
             # or manually simulate it >> I think Jamil did this >> future
             homo_data = self.data.to_homogeneous()
-            self.model = self._built_model_mp().to(self.device) # building multilayer gnn-based model. Shouldn't depend on data
+            # building multilayer gnn-based model. Shouldn't depend on data.
+            # but as our graph has no features for node (for now), we need to assign a randomly initialized embeddings as node features.
+            # so, we need the num_nodes of the graph
+            self.model = self._built_model_mp(homo_data.num_nodes).to(self.device)
             train_l, valid_l, test_l = self._build_loader_mp(homo_data=homo_data) # building train/valid/test splits and loaders. Should depend on data
-            self._train_mp(train_l, valid_l, test_l)
+            self._train_mp(prefix + output + postfix, train_l, valid_l, test_l)
 
         # if self.name == 'lant': self.model.learn(self, self.cfg.model.e)  # built-in validation inside lant_encoder class
         #
         # self.plot_points()
 
-    def _built_model_mp(self):
+    def _built_model_mp(self, num_nodes):
         class Model(Gnn.torch.nn.Module):
             def __init__(self, cfg, name, num_nodes):
                 super().__init__()
@@ -138,18 +144,18 @@ class Gnn(T2v):
                 elif name == 'gs' : conv_cls = Gnn.pyg.nn.SAGEConv
                 elif name == 'gat': conv_cls = lambda in_ch, out_ch: Gnn.pyg.nn.GATConv(in_ch, out_ch, heads=cfg.model.ah, concat=cfg.model.cat)
                 self.encoder = Gnn.torch.nn.ModuleList()
-                if 'hd' in cfg.model and cfg.model.hd is not None and len(cfg.model.hd) > 0:
+                if 'h' in cfg.model and cfg.model.h is not None and len(cfg.model.h) > 0:
                     for i, l in enumerate(cfg.model.h): self.encoder.append(conv_cls(cfg.model.d if i == 0 else cfg.model.h[i - 1], cfg.model.h[i]))
                 else: self.encoder = Gnn.torch.nn.ModuleList([conv_cls(cfg.model.d, cfg.model.d)])
             def forward(self, edge_index):
-                x = self.embedding.weight
+                x = self.node_emb.weight
                 for conv in self.encoder: x = Gnn.torch.nn.functional.relu(conv(x, edge_index))
                 return x
 
             # decoder part: as simple as dot-product or as complex as a MLP-based binary classifier (indeed another end2end approach with fnn and bnn!)
             # decoder = torch.nn.Linear(hidden_dims[-1], 2)
             def decode(self, x_i, x_j): return (x_i * x_j).sum(dim=-1) # we use binary_cross_entropy_with_logits for loss calc
-        return Model(self.cfg, self.name)
+        return Model(self.cfg, self.name, num_nodes)
     def _build_loader_mp(self, homo_data):
         # (1)
         # transductive (for opentf, only edges matter)
@@ -197,8 +203,8 @@ class Gnn(T2v):
                                                          num_neighbors=self.cfg.model.nn, # this should match the number of hops/layers
                                                          batch_size=self.cfg.model.b, shuffle=False)
         test_loader = Gnn.pyg.loader.LinkNeighborLoader(data=homo_data, # the transductive part: full graph for message passing
-                                                         edge_label_index=train_data.edge_label_index, # the transductive part: only the test edges for loss calc
-                                                         edge_label=train_data.edge_label,
+                                                         edge_label_index=test_data.edge_label_index, # the transductive part: only the test edges for loss calc
+                                                         edge_label=test_data.edge_label,
                                                          num_neighbors=self.cfg.model.nn, # this should match the number of hops/layers
                                                          batch_size=self.cfg.model.b, shuffle=False)
         return train_loader, valid_loader, test_loader
@@ -239,7 +245,7 @@ class Gnn(T2v):
         #     #     model = Encoder(hidden_channels=self.d, data=train_data)
         #     self.optimizer = Gnn.torch.optim.Adam(self.model.parameters(), lr=self.cfg.model.lr)
     def _train_mp(self, output, train_l, valid_l, test_l):
-        def _(loader, optimizer=None):
+        def _(e, loader, optimizer=None):
             if optimizer: self.model.train()
             else: self.model.eval()
             loss = 0
@@ -248,54 +254,64 @@ class Gnn(T2v):
                 if optimizer: optimizer.zero_grad()
                 x = self.model.forward(batch.edge_index)
                 pred = self.model.decode(x[batch.edge_label_index[0]], x[batch.edge_label_index[1]])
-                loss = Gnn.torch.binary_cross_entropy_with_logits(pred, batch.edge_label.float())
+                loss = Gnn.torch.nn.functional.binary_cross_entropy_with_logits(pred, batch.edge_label.float())
                 if optimizer: loss.backward(); optimizer.step();
                 loss += loss.item()
-            loss /= len(loader)
-            return loss
+
+                self.writer.add_scalar(tag='t_loss' if optimizer else 'v_loss', scalar_value=loss, global_step=e)
+                self.writer.add_embedding(tag='t_loss' if optimizer else 'v_loss', mat=x, global_step=e)
+
+            return (loss / len(loader)) if len(loader) > 0 else float('inf')
 
         optimizer = Gnn.torch.optim.Adam(self.model.parameters(), lr=self.cfg.model.lr)
         Gnn.torch.cuda.empty_cache()
-        for epoch in range(1, self.cfg.model.e + 1):
-            log.info(f'Epoch {epoch}, Train Loss: {(t_loss:=_(train_l, optimizer)):.4f}')
-            log.info(f'Epoch {epoch}, Valid Loss: {(v_loss:=_(valid_l)):.4f}')
+        for e in range(1, self.cfg.model.e + 1):
+            log.info(f'Epoch {e}, {opentf.textcolor["blue"]}Train Loss: {(t_loss:=_(e, train_l, optimizer)):.4f}{opentf.textcolor["reset"]}')
+            log.info(f'Epoch {e}, {opentf.textcolor["magenta"]}Valid Loss: {(v_loss:=_(e, valid_l)):.4f}{opentf.textcolor["reset"]}')
             if self.cfg.model.save_per_epoch:
                 #self.model.eval()
-                Gnn.torch.save({'model_state_dict': self.model.state_dict(), 'cfg': self.cfg, 'e': epoch, 't_loss': t_loss, 'v_loss': v_loss}, f'{output}.e{epoch}')
-                log.info(f'{self.name} model with {cfg2str(self.cfg.model)} saved at {output}.e{epoch}')
+                Gnn.torch.save({'model_state_dict': self.model.state_dict(), 'cfg': self.cfg, 'e': e, 't_loss': t_loss, 'v_loss': v_loss}, f'{output}.e{e}')
+                log.info(f'{self.name} model with {opentf.cfg2str(self.cfg.model)} saved at {output}.e{e}')
 
-        log.info(f'Test Loss: {(tst_loss:=_(test_l)):.4f}')
+        log.info(f'{opentf.textcolor["yellow"]}Test Loss: {(tst_loss:=_(self.cfg.model.e + 1, test_l)):.4f}')
         #self.model.eval()
-        Gnn.torch.save({'model_state_dict': self.model.state_dict(), 'cfg': self.cfg, 'e': epoch, 't_loss': t_loss, 'v_loss': v_loss, 'tst_loss': tst_loss}, output)
-        log.info(f'{self.name} model with {cfg2str(self.cfg.model)} saved at {output}.')
+        Gnn.torch.save({'model_state_dict': self.model.state_dict(), 'cfg': self.cfg, 'e': e, 't_loss': t_loss, 'v_loss': v_loss, 'tst_loss': tst_loss}, output)
+        log.info(f'{self.name} model with {opentf.cfg2str(self.cfg.model)} saved at {output}.')
+        self.writer.close()
 
     def _train_rw(self, output):
         optimizer = Gnn.torch.optim.Adam(self.model.parameters(), lr=self.cfg.model.lr)
         loader = self.model.loader(batch_size=self.cfg.model.b, shuffle=True)  # num_workers=os.cpu_count() not working in windows! also, cuda won't engage for the loader if num_workers param is passed
         Gnn.torch.cuda.empty_cache()
-        for epoch in range(1, self.cfg.model.e + 1):
+        for e in range(1, self.cfg.model.e + 1):
             e_loss = 0; self.model.train()
             for pos_rw, neg_rw in loader:
                 optimizer.zero_grad()
                 loss = self.model.loss(pos_rw.to(self.device), neg_rw.to(self.device))
                 loss.backward(); optimizer.step(); e_loss += loss.item()
             e_loss /= len(loader)
-            log.info(f'Epoch {epoch}, Loss: {e_loss:.4f}')
+            log.info(f'Epoch {e}, {opentf.textcolor["blue"]}Train Loss: {e_loss:.4f}{opentf.textcolor["reset"]}')
+
+            self.writer.add_scalar('Loss/train', e_loss, e)
+            # self.writer.add_embedding(node_embeddings, global_step=e)
+
             if self.cfg.model.save_per_epoch:
                 self.model.eval()
-                Gnn.torch.save({'model_state_dict': self.model.state_dict(), 'cfg': self.cfg, 'e': epoch, 't_loss': e_loss}, f'{output}.e{epoch}')
-                log.info(f'{self.name} model with {cfg2str(self.cfg.model)} saved at {output}.e{epoch}')
+                Gnn.torch.save({'model_state_dict': self.model.state_dict(), 'cfg': self.cfg, 'e': e, 't_loss': e_loss}, f'{output}.e{e}')
+                log.info(f'{self.name} model with {opentf.cfg2str(self.cfg.model)} saved at {output}.e{e}')
 
         self.model.eval()
-        Gnn.torch.save({'model_state_dict': self.model.state_dict(), 'cfg': self.cfg, 'e': epoch, 't_loss': e_loss}, output)
-        log.info(f'{self.name} model with {cfg2str(self.cfg.model)} saved at {output}.')
+        Gnn.torch.save({'model_state_dict': self.model.state_dict(), 'cfg': self.cfg, 'e': e, 't_loss': e_loss}, output)
+        log.info(f'{self.name} model with {opentf.cfg2str(self.cfg.model)} saved at {output}.')
+
     def _init_d2v_node_features(self, indexes, teamsvecs):
         flag = False
         log.info(f'Loading pretrained d2v embeddings {self.cfg.graph.pre} in {self.output} to initialize node features, or if not exist, train d2v embeddings from scratch ...')
         from .d2v import D2v
-        d2v_cfg = str2cfg(self.cfg.graph.pre)
+        d2v_cfg = opentf.str2cfg(self.cfg.graph.pre)
         d2v_cfg.embtype = self.cfg.graph.pre.split('.')[-1] # Check emb.d2v.D2v.train() for filename pattern
         d2v_cfg.lr = self.cfg.model.lr
+        d2v_cfg.save_per_epoch = self.cfg.model.save_per_epoch
         # simple lazy load, or train from scratch if the file not found!
         d2v_obj = D2v(self.output, self.device, d2v_cfg).train(teamsvecs, indexes)
         # the order is NOT correct in d2v, i.e., vecs[0] may be for vecs['s20']. Call D2v.natsortvecs(d2v_obj.model.wv)
