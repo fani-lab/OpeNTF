@@ -38,7 +38,7 @@ class Gnn(T2v):
             #edges
             for edge_type in self.cfg.graph.structure[0]:
                 log.info(f'Adding edges of type {edge_type} ...')
-                assert edge_type[0] in teamsvecs.keys() and teamsvecs[edge_type[0]] is not None
+                assert edge_type[0] in teamsvecs.keys() and teamsvecs[edge_type[0]] is not None, f'{opentf.textcolor["red"]}Teamsvecs do NOT have {edge_type[0]}{opentf.textcolor["reset"]}'
                 teams = teamsvecs[edge_type[0]] # take one part of an edge from here
                 edges = []
                 for i, row1 in enumerate(tqdm(teams, total=teams.shape[0])):
@@ -102,8 +102,8 @@ class Gnn(T2v):
             self.get_node_emb(homo_data=homo_data) #logging purposes
 
         elif self.name == 'm2v':
-            # assert isinstance(self.data, self.pyg.data.HeteroData), f'Hetero graph is needed for m2v. {self.cfg.graph.structure} is NOT hetero!'
-            assert len(self.data.node_types) > 1, f'Hetero graph is needed for m2v. {self.cfg.graph.structure} is NOT hetero!'
+            # assert isinstance(self.data, self.pyg.data.HeteroData), f'{opentf.textcolor["red"]}Hetero graph is needed for m2v. {self.cfg.graph.structure} is NOT hetero!{opentf.textcolor["reset"]}'
+            assert len(self.data.node_types) > 1, f'{opentf.textcolor["red"]}Hetero graph is needed for m2v. {self.cfg.graph.structure} is NOT hetero!{opentf.textcolor["reset"]}'
             output = f'.w{self.cfg.model.w}.wl{self.cfg.model.wl}.wn{self.cfg.model.wn}.{self.cfg.model.metapath_name[1]}' #should be fixed
             self.model = self.pyg.nn.MetaPath2Vec(self.data.edge_index_dict,
                                      metapath=[tuple(mp) for mp in self.cfg.model.metapath_name[0]],
@@ -116,12 +116,13 @@ class Gnn(T2v):
             self.get_node_emb() #logging purposes
 
         elif self.name == 'han':
-            # assert isinstance(self.data, self.pyg.data.HeteroData), f'Hetero graph is needed for m2v. {self.cfg.graph.structure} is NOT hetero!'
-            assert len(self.data.node_types) > 1, f'Hetero graph is needed for m2v. {self.cfg.graph.structure} is NOT hetero!'
-            pass
+            # assert isinstance(self.data, self.pyg.data.HeteroData), f'{opentf.textcolor["red"]}Hetero graph is needed for m2v. {self.cfg.graph.structure} is NOT hetero!{opentf.textcolor["reset"]}'
+            assert len(self.data.node_types) > 1, f'{opentf.textcolor["red"]}Hetero graph is needed for han. {self.cfg.graph.structure} is NOT hetero!{opentf.textcolor["reset"]}'
+            raise NotImplementedError(f'{self.name} not integrated!')
 
         elif self.name == 'lant':
-            pass
+            raise NotImplementedError(f'{self.name} not integrated!')
+
         # message-passing-based >> default on homo, but can be wrapped into HeteroConv
         elif self.name in {'gcn', 'gs', 'gat', 'gatv2', 'gin'}:
             output = f'd{self.cfg.model.d}.e{self.cfg.model.e}.b{self.cfg.model.b}.lr{self.cfg.model.lr}.ns{self.cfg.model.ns}.h{"-".join([str(i) for i in self.cfg.model.h])}.nn{"-".join([str(i) for i in self.cfg.model.nn])}'
@@ -156,6 +157,7 @@ class Gnn(T2v):
                 elif name == 'gat':   conv_cls = lambda in_ch, out_ch: self.pyg.nn.GATConv(in_ch, out_ch, heads=cfg.model.ah, concat=cfg.model.cat)
                 elif name == 'gatv2': conv_cls = lambda in_ch, out_ch: self.pyg.nn.GATv2Conv(in_ch, out_ch, heads=cfg.model.ah, concat=cfg.model.cat)
                 elif name == 'gin':   conv_cls = lambda in_ch, out_ch: self.pyg.nn.GINConv(self.torch.nn.Sequential(*[self.torch.nn.Linear(in_ch, out_ch), self.torch.nn.ReLU(), self.torch.nn.Linear(out_ch, out_ch)]))
+                else: raise NotImplementedError(f'{name} not supported')
 
                 self.encoder = self.torch.nn.ModuleList()
                 if 'h' in cfg.model and cfg.model.h is not None and len(cfg.model.h) > 0:
@@ -333,9 +335,9 @@ class Gnn(T2v):
         for node_type in self.data.node_types:
             if node_type == 'team':
                 # no issue as the docs are 0-based indexed 0 --> '0'
-                assert d2v_obj.model.docvecs.vectors.shape[0] == teamsvecs['skill'].shape[0]  # correct number of embeddings per team
+                assert d2v_obj.model.docvecs.vectors.shape[0] == teamsvecs['skill'].shape[0], f'{opentf.textcolor["red"]}Incorrect number of embeddings for teams!{opentf.textcolor["reset"]}'
                 indices = [d2v_obj.model.docvecs.key_to_index[str(i)] for i in range(len(d2v_obj.model.docvecs))]
-                assert np.allclose(d2v_obj.model.docvecs.vectors, d2v_obj.model.docvecs.vectors[indices])
+                assert np.allclose(d2v_obj.model.docvecs.vectors, d2v_obj.model.docvecs.vectors[indices]), f'{opentf.textcolor["red"]}Incorrect embedding for a team due to misorderings of embeddings!{opentf.textcolor["reset"]}'
                 # assert np.array_equal(d2v_obj.model.docvecs.vectors, d2v_obj.model.docvecs.vectors[indices])
                 # (d2v_obj.model.docvecs.vectors[2] == d2v_obj.model.docvecs['2']).all()
                 self.data[node_type].x = self.torch.tensor(d2v_obj.model.docvecs.vectors); flag = True  # team vectors (dv) for 'team' nodes, else individual node vectors (wv)
@@ -345,7 +347,7 @@ class Gnn(T2v):
             ordered_vecs = self.torch.tensor(D2v.natsortvecs(d2v_obj.model.wv))
             if 'member' in self.data.node_types: self.data['member'].x = ordered_vecs[:teamsvecs['member'].shape[1]] ;flag = True # the first part is all m*
             if 'skill' in self.data.node_types: self.data['skill'].x = ordered_vecs[teamsvecs['member'].shape[1]:]; flag = True  # the remaining is s*
-        assert flag, f'Nodes features initialization with d2v embeddings NOT applied! Check the consistency of d2v {self.cfg.graph.pre} and graph node types {self.cfg.graph.structure}'
+        assert flag, f'{opentf.textcolor["red"]}Nodes features initialization with d2v embeddings NOT applied! Check the consistency of d2v {self.cfg.graph.pre} and graph node types {self.cfg.graph.structure}{opentf.textcolor["reset"]}'
 
     def get_node_emb(self, homo_data=None):
         # in n2v, the weights are indeed the embeddings, like w2v or d2v

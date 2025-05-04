@@ -48,7 +48,7 @@ class D2v(T2v):
                 elif self.cfg.embtype == 'skillmember': td = self.gensim.models.doc2vec.TaggedDocument(skill_doc + member_doc, [str(i)])
                 elif self.cfg.embtype == 'skilltime': td = self.gensim.models.doc2vec.TaggedDocument(skill_doc + datetime_doc, [str(i)])
                 self.data.append(td)
-            assert teamsvecs['skill'].shape[0] == len(self.data)
+            assert teamsvecs['skill'].shape[0] == len(self.data), f'{opentf.textcolor["red"]}Incorrect number of docs for teams! {teamsvecs["skill"].shape[0]} != {len(self.data)}{opentf.textcolor["reset"]}"
             log.info(f'{len(self.data)} documents with word type of {self.cfg.embtype} have created. Saving ...')
             with open(datafile, 'wb') as f: pickle.dump(self.data, f)
             return self
@@ -60,7 +60,7 @@ class D2v(T2v):
             log.info(f"Loading the model {output} for {(teamsvecs['skill'].shape[0], self.cfg.d)}  embeddings ...")
             self.__class__.gensim = opentf.install_import('gensim==4.3.3', 'gensim')
             self.model = self.gensim.models.Doc2Vec.load(output)
-            assert self.model.docvecs.vectors.shape[0] == teamsvecs['skill'].shape[0] # correct number of embeddings per team
+            assert self.model.docvecs.vectors.shape[0] == teamsvecs['skill'].shape[0], f'{opentf.textcolor["red"]}Incorrect number of embeddings per team! {self.model.docvecs.vectors.shape[0]} != {teamsvecs["skill"].shape[0]}{opentf.textcolor["reset"]}'
             log.info(f'Model of {self.model.docvecs.vectors.shape} embeddings loaded.')
             return self
         except FileNotFoundError:
