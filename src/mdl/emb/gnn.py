@@ -142,17 +142,20 @@ class Gnn(T2v):
         # self.plot_points()
 
     def _built_model_mp(self, num_nodes):
-        class Model(self.torch.nn.Module):
+        class Model(Gnn.torch.nn.Module):
             def __init__(self, cfg, name, num_nodes):
                 super().__init__()
+                Model.torch = Gnn.torch
+                Model.pyg = Gnn.pyg
+
                 self.node_emb = self.torch.nn.Embedding(num_nodes, cfg.model.d)
                 self.torch.nn.init.xavier_uniform_(self.node_emb.weight)
                 conv_cls = None
-                if   name == 'gcn': conv_cls = self.pyg.nn.GCNConv
-                elif name == 'gs' : conv_cls = self.pyg.nn.SAGEConv
-                elif name == 'gat': conv_cls = lambda in_ch, out_ch: self.pyg.nn.GATConv(in_ch, out_ch, heads=cfg.model.ah, concat=cfg.model.cat)
+                if   name == 'gcn':   conv_cls = self.pyg.nn.GCNConv
+                elif name == 'gs' :   conv_cls = self.pyg.nn.SAGEConv
+                elif name == 'gat':   conv_cls = lambda in_ch, out_ch: self.pyg.nn.GATConv(in_ch, out_ch, heads=cfg.model.ah, concat=cfg.model.cat)
                 elif name == 'gatv2': conv_cls = lambda in_ch, out_ch: self.pyg.nn.GATv2Conv(in_ch, out_ch, heads=cfg.model.ah, concat=cfg.model.cat)
-                elif name == 'gin': conv_cls = lambda in_ch, out_ch: self.pyg.nn.GINConv(self.torch.nn.Sequential(*[self.torch.nn.Linear(in_ch, out_ch), self.torch.nn.ReLU(), self.torch.nn.Linear(out_ch, out_ch)]))
+                elif name == 'gin':   conv_cls = lambda in_ch, out_ch: self.pyg.nn.GINConv(self.torch.nn.Sequential(*[self.torch.nn.Linear(in_ch, out_ch), self.torch.nn.ReLU(), self.torch.nn.Linear(out_ch, out_ch)]))
 
                 self.encoder = self.torch.nn.ModuleList()
                 if 'h' in cfg.model and cfg.model.h is not None and len(cfg.model.h) > 0:

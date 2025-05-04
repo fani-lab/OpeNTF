@@ -111,6 +111,8 @@ model:
       #supervision_edge_types: # if not set, all edge_types as supervision edges.
       ##([('member', 'to', 'team')], 'stm')
 
+    gin: ${model.gnn.gcn}
+
     gat:
       d: ${dim}
       e: ${model.epochs}
@@ -126,31 +128,10 @@ model:
       ah: 2 # number of attention heads (if applicable)
       cat: True # multi-head attention aggregation, True: concat, False: mean
 
+    gatv2': ${model.gnn.gat}
 
-#  'gnn.gin': {
-#      'e': 100,
-#      'b': 128,
-#      'd': 8,
-#      'ns' : 5,
-#      'h': 2,
-#      'nn': [30, 20],
-#      'graph_types': 'stm',
-#      'agg': 'mean',
-#      'dir': False,
-#  },
 
-#  },
-#  'gnn.gatv2': {
-#      'e': 100,
-#      'b': 128,
-#      'd': 8,
-#      'ns' : 5,
-#      'h': 2,
-#      'nn': [20, 10],
-#      'graph_types': 'stm',
-#      'agg': 'mean',
-#      'dir': False,
-#  },
+
 #  'gnn.han': {
 #      'e': 100,
 #      'b': 128,
@@ -191,17 +172,7 @@ model:
 #          ]
 #      }
 #  },
-#  'gnn.gine': {
-#      'e': 100,
-#      'b': 128,
-#      'd': 8,
-#      'ns' : 5,
-#      'h': 2,
-#      'nn': [30, 20],
-#      'graph_types': 'stm',
-#      'agg': 'mean',
-#      'dir': False,
-#  },
+
 #  'gnn.lant': {
 #      'e': 100,
 #      'b': 128,
