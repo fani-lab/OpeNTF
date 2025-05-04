@@ -48,7 +48,7 @@ class D2v(T2v):
                 elif self.cfg.embtype == 'skillmember': td = self.gensim.models.doc2vec.TaggedDocument(skill_doc + member_doc, [str(i)])
                 elif self.cfg.embtype == 'skilltime': td = self.gensim.models.doc2vec.TaggedDocument(skill_doc + datetime_doc, [str(i)])
                 self.data.append(td)
-            assert teamsvecs['skill'].shape[0] == len(self.data), f'{opentf.textcolor["red"]}Incorrect number of docs for teams! {teamsvecs["skill"].shape[0]} != {len(self.data)}{opentf.textcolor["reset"]}"
+            assert teamsvecs['skill'].shape[0] == len(self.data), f'{opentf.textcolor["red"]}Incorrect number of docs for teams! {teamsvecs["skill"].shape[0]} != {len(self.data)}{opentf.textcolor["reset"]}'
             log.info(f'{len(self.data)} documents with word type of {self.cfg.embtype} have created. Saving ...')
             with open(datafile, 'wb') as f: pickle.dump(self.data, f)
             return self
