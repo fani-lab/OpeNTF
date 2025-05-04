@@ -11,8 +11,6 @@ update to readme for cmn layer and main readme
 
 d2v
 -- save per epoch
-add unit test for save per epoch using hydra cofig tag
-
 -- not worth strict splits of train/valid/test. I think even if it sees everything, does not produce good embeddings
 -- skill-member as docs during the train, then skills as docs during test to find the closest experts vectors as members :DD
 -- not worth it as the seq2seq is more powerful (document completion using pre-words of skills with members)
@@ -21,35 +19,28 @@ add unit test for save per epoch using hydra cofig tag
 Strict split way: create a training graph using training teams. The test teams should then added to infer the node embeddings.
 luckily the nodes are already seen (skills, experts) (team nodes are always unseen), but if not seen, either remove the node or infer based on surroundings.
 
-make a connection between train/vali/test splits of teams and train/valid/test edge lists
 
-node2vec >> done >>
-add unit test for save per epoch using hydra cofig tag
+node2vec, metapath2vec
 -- early stopping
 -- transductive vs. inductive >> train, valid, test
 -- yet to be run on entire datasets >> also check to engage cuda
 
-metapath2vec >> done >> yet to be run on entire datasets >> also check to engage cuda
-add unit test for save per epoch using hydra cofig tag
--- early stopping
--- transductive vs. inductive >> train, valid, test
--- yet to be run on entire datasets >> also check to engage cuda
-
-gcn, gs, gat
-add unit test for save per epoch using hydra cofig tag
+homo versions: gcn, gs, gat, gatv2, gin
 -- early stopping
 -- transductive vs. inductive >> train, valid, test
 -- yet to be run on entire datasets >> also check to engage cuda
 
 =========
-gatv2
-gin
-gine
-han
-lant
+hetero versions of gcn, gs, gat, gatv2, gin
+han >> pure hetero like m2v
+
+lant >> not pyg friendly
+gine >> edge-based. not relevant for now as we don't have edge attributes
 
 -- end2end
-node2vec >> we didnot have it! but we can, right?
+make a connection between train/vali/test splits of teams and train/valid/test edge lists
+
+node2vec >> we don't have it! but we can, right?
 metapath2vec >> we didnot have it! but we can, right?
 why not d2v when we have team, skill, and member vectors?
 

@@ -40,7 +40,7 @@ model:
       pre: # if set, use pretrained D2v vectors as initial node features of graph data
         #d8.e100.w10.d2v.dm1.skillmember  # skill, member, team
         #d8.e100.w10.d2v.dm1.skill  # skill, team
-        d9.e100.w10.d2v.dm1.skill  # if not exists, train from scratch!
+        #d9.e100.w10.d2v.dm1.skill  # if not exists, train from scratch!
 
     pytorch: #will be set dynamically in ./src/main.py from root ./config.yml
     model: #dummy tag. don't worry or touch it.
