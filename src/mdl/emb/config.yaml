@@ -128,7 +128,7 @@ model:
       ah: 2 # number of attention heads (if applicable)
       cat: True # multi-head attention aggregation, True: concat, False: mean
 
-    gatv2': ${model.gnn.gat}
+    gatv2: ${model.gnn.gat}
 
 
 

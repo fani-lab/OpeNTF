@@ -100,13 +100,14 @@ def run(cfg):
         vecs['skillcoverage'] = domain_cls.gen_skill_coverage(vecs, cfg.data.output) # after we have a sparse vector, we create es_vecs from that
 
         if 'embedding' in cfg.data and cfg.data.embedding:
-            OmegaConf.resolve(embcgf := OmegaConf.load('mdl/emb/config.yaml'))
             # Get command-line overrides for embedding.
             # Kinda tricky as we dynamically override a subconfig.
             # Use '+data.embedding.{...}=value' to override
             # Use '+data.embedding.{...}=null' to drop. The '~data.embedding.{...}' cannot be used here.
             emb_overrides = [o.replace('+data.embedding.', '') for o in HydraConfig.get().overrides.task if '+data.embedding.' in o]
-            cfg.data.embedding.config = OmegaConf.merge(embcgf, OmegaConf.from_dotlist(emb_overrides))
+            embcfg = OmegaConf.merge(OmegaConf.load('mdl/emb/config.yaml'), OmegaConf.from_dotlist(emb_overrides))
+            OmegaConf.resolve(embcfg)
+            cfg.data.embedding.config = embcfg
             cfg.data.embedding.config.model.gnn.pytorch = cfg.pytorch
             cls, method = cfg.data.embedding.class_method.split('_')
             cls = get_class(cls)
