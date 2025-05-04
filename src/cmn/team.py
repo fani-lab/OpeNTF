@@ -5,7 +5,7 @@ from dateutil import parser
 
 log = logging.getLogger(__name__)
 
-from pkgmgr import install_import
+import pkgmgr as opentf
 class Team(object):
     def __init__(self, id, members, skills, datetime, location=None):
         self.id = int(id)
@@ -206,8 +206,8 @@ class Team(object):
             #in dblp, the 'loc' is the replica of the paper venue, so it should be 1-hot for each team
             #in uspt, the 'loc' is the actual location of the inventor, so it can be multihot.
             e = [i for i in range(teamsvecs['loc'].shape[0]) if (len(teamsvecs['loc'].rows[i]) != 1) or (sum(teamsvecs['loc'].data[3]) != 1)]
-            if e: log.info(f'Following teams are not one-hot in the location of team members. '
-                           f'Based on the underlying dataset/domain, it may be valid like in uspt, or invalid like dblp.\n{e}')
+            if e: log.warning(f'{opentf.textcolor["yellow"]}Following teams are not one-hot in the location of team members.{opentf.textcolor["reset"]} '
+                              f'Based on the underlying dataset/domain, it may be valid like in uspt, or invalid like dblp.\n{e}')
 
         return (True, '')
     @classmethod
@@ -404,7 +404,7 @@ class Team(object):
 
     @staticmethod
     def plot_stats(stats, output, plot_title):
-        plt = install_import('matplotlib==3.7.5', 'matplotlib.pyplot')
+        plt = opentf.install_import('matplotlib==3.7.5', 'matplotlib.pyplot')
         plt.rcParams.update({'font.family': 'Consolas'})
         for k, v in stats.items():
             if '*' in k: print(f'{k} : {v}'); continue

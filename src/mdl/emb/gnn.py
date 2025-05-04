@@ -10,12 +10,12 @@ class Gnn(T2v):
 
     def __init__(self, output, device, cgf):
         super().__init__(output, device, cgf)
-        self.name = 'n2v' #default model
-        self.decoder = None
         Gnn.torch = opentf.install_import(cgf.pytorch, 'torch')
         Gnn.pyg = opentf.install_import(f'torch_geometric==2.6.1 torch_cluster==1.6.3 torch_sparse==0.6.18 torch_scatter==2.1.2 -f https://data.pyg.org/whl/torch-{Gnn.torch.__version__}.html', 'torch_geometric')
         opentf.install_import('tensorboard==2.14.0', 'tensorboard')
         self.writer = opentf.install_import('tensorboardX==2.6.2.2', 'tensorboardX', 'SummaryWriter')(log_dir=self.output + '/logs4tfboard')
+        self.name = None
+        self.decoder = None
 
     def _prep(self, teamsvecs, indexes):
         #NOTE: for any change, unit test using https://github.com/fani-lab/OpeNTF/issues/280
@@ -355,7 +355,7 @@ class Gnn(T2v):
         if self.name == 'm2v':
             for node_type in self.data.node_types: # self.model.start or self.model.end could be used for MetaPath2Vec model but ...
                 try: log.info(f'Node type: {node_type}, Shape: {self.model(node_type).shape}')
-                except KeyError: log.warning(f'No vectors for {node_type}. Check if it is part of metapath -> {self.cfg.model.metapath_name}' )
+                except KeyError: log.warning(f'{opentf.textcolor["yellow"]}No vectors for {node_type}.{opentf.textcolor["reset"]} Check if it is part of metapath -> {self.cfg.model.metapath_name}' )
         else:
             if homo_data is None: homo_data = self.data.to_homogeneous()
             embeddings = self.model.embedding.weight.data.cpu() if self.name == 'n2v' else self.model(homo_data)
