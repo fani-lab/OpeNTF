@@ -7,10 +7,9 @@ hydra:
     dir: . #unix or macos
     #dir: /dev/null # windows
 pytorch: torch==2.2.2 #--index-url https://download.pytorch.org/whl/cu124
-
 cmd:
   prep 
-  #train
+  train
   #test
   #eval
   #plot
@@ -40,19 +39,37 @@ data: #required for 'prep' step
   location: 'venue' #should be one of 'city', 'state', 'country', represents the *location of team members*, or 'venue' represents the location of team members as replica of the location of team like in dblp
   acceleration: 'cpu' #cpu for all cores, cpu:3 for 3 cores, 'cuda' for all gpus, 'cuda:1,3' for gpu1 and gpu3
   bucket_size: 1000
-  embedding: #if not set, will be skipped
+  embedding:
+    class_method: #directs to the correct part of the embedding config file. If not set, skipped.
+      #mdl.emb.d2v.D2v_d2v   #Doc2Vec https://radimrehurek.com/gensim/auto_examples/tutorials/run_doc2vec_lee.html
+      #mdl.emb.gnn.Gnn_n2v   #Node2Vec https://pytorch-geometric.readthedocs.io/en/latest/generated/torch_geometric.nn.models.Node2Vec.html
+      #mdl.emb.gnn.Gnn_m2v   #Metapath2Vec https://pytorch-geometric.readthedocs.io/en/latest/generated/torch_geometric.nn.models.MetaPath2Vec.html
+      #mdl.emb.gnn.Gnn_gcn   #GraphConvolutionNetwork https://pytorch-geometric.readthedocs.io/en/latest/generated/torch_geometric.nn.conv.GCNConv.html
+      #mdl.emb.gnn.Gnn_gs    #GraphSAGE https://pytorch-geometric.readthedocs.io/en/latest/generated/torch_geometric.nn.conv.SAGEConv.html
+      #mdl.emb.gnn.Gnn_gat   #GraphAttentionNetwork https://pytorch-geometric.readthedocs.io/en/latest/generated/torch_geometric.nn.conv.GATConv.html
+      #mdl.emb.gnn.Gnn_gatv2 #GraphAttentionNetwork https://pytorch-geometric.readthedocs.io/en/latest/generated/torch_geometric.nn.conv.GATv2Conv.html
+      #mdl.emb.gnn.Gnn_gin   #GraphIsomorphicNetwork
     config: ./mdl/emb/config.yml
-    class_method: # the name directs to the correct part of the embedding config file
-      #mdl.emb.d2v.D2v_d2v #Doc2Vec
-      #mdl.emb.gnn.Gnn_n2v #Node2Vec
-      mdl.emb.gnn.Gnn_m2v  #Metapath2Vec
 
-model:
-    baseline:
-        random:
-            b: 128
+models:
+  class_name:
+    mdl.rnd.Rnd
+    #mdl.fnn.Fnn #input skills could be multihot (default), embeddings by d2v, n2v, m2v, ... see above data.embedding.class_method
+    #mdl.bnn.Bnn
+    #mdl.nmt.Nmt
+    #mdl.tnmt.tNmt
+    #mdl.tntf.tNtf_fnn   #underlying base model could be fnn and bnn. future: tgnn?
+    #mdl.caser.Caser #external baseline
+    #mdl.rrn.Rrn     #external baseline
+  config: ./mdl/config.yml
 
 train:
-  nfolds: 3
-  train_test_split: 0.85
-  step_ahead: 2 #for now, it means that whatever are in the last [step_ahead] time interval will be the test set!
+  nfolds: 3 #ends with nfolds models each with nfolds-1 train splits and one fold valid split, nfolds results, averaged on a single test split
+  train_test_ratio: 0.85 #the nfolds will be on the trainig part.
+  step_ahead: 2 #streaming/temporal methods. for now, it means that whatever are in the last [step_ahead] time interval will be the test set!
+
+fair: #post-hoc reranks of the prediction list
+  np_ratio: #desired ratio of non-popular experts after reranking; if None, based on distribution in dataset; default: None; Eg. 0.5
+  fairness: det_greedy #reranking algorithm from {det_greedy, det_cons, det_relaxed}; required; Eg. det_cons
+  k_max: #cutoff for the reranking algorithms; default: None
+  attribute: #the set of our sensitive attributes')

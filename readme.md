@@ -25,7 +25,7 @@ Team formation involves selecting a team of skillful experts who will, more like
 
 
 </td>
-<td><img src='./misc/adila_flow_.png' width="600" align="right"" /></td>
+<td><img src='docs/adila_flow_.png' width="600" align="right"" /></td>
 <!-- <td><img src='./src/mdl/team_inheritance_hierarchy.png' width="90%%" /></td> -->
 </tr>
 </table>
@@ -80,7 +80,7 @@ This script loads and preprocesses the same dataset [``toy.dblp.v12.json``](data
 While state-of-the-art neural team formation methods are able to efficiently analyze massive collections of experts to form effective collaborative teams, they largely ignore the fairness in recommended teams of experts. In `Adila`, we study the application of `fairness-aware` team formation algorithms to mitigate the potential popularity bias in the neural team formation models. We support two fairness notions namely, `equality of opportunity` and `demographic parity`. To achieve fairness, we utilize three deterministic greedy reranking algorithms (`det_greedy`, `det_cons`, `det_relaxed`) in addition to `fa*ir`, a probabilistic greedy reranking algorithm . 
 
 
-<p align="center"><img src='./misc/adila_flow.png' width="1000" ></p>
+<p align="center"><img src='docs/adila_flow.png' width="1000" ></p>
 
 
 For further details and demo, please visit [Adila's submodule](https://github.com/fani-lab/Adila).
@@ -117,7 +117,7 @@ We randomly take ``85%`` of the dataset for the train-validation set and ``15%``
 
 Previous works in team formation presumed that teams follow the i.i.d property and hence when training their models they followed the bag of teams approach, where they train and validate their models on a shuffled dataset of teams. Moreover, they were interpolative and did not try to predict _future_ successful teams. In this work, we aim at extrapolating and predicting _future_ teams of experts. We sort the teams by time intervals and train a neural model incrementally  through the ordered collection of teams in [C<sub>0</sub>, ..C<sub>t</sub>, ..C<sub>T</sub>]. As can be seen in Figure below, after random initialization of skills’ and experts’ embeddings at t=0, we start training the model on the teams in the first time interval C<sub>0</sub> for a number of epochs, then we continue with training  on the second time interval C<sub>1</sub> using the learned embeddings from the previous time interval and so forth until we finish the training on the last training time interval C<sub>t=T</sub>. We believe that using this approach, will help the model understand how experts’ skills and collaborative ties evolve through time and the final embeddings are their optimum representation in the latent space to predict _future_ successful teams at time interval C<sub>t=T+1</sub>.
 
-<p align="center"><img src='./src/mdl/tntf.png' width="600"></p>
+<p align="center"><img src='src/mdl/docs/tntf.png' width="600"></p>
 
 
 
@@ -128,7 +128,7 @@ Each model has been defined in [``./src/mdl/``](./src/mdl/) under an inheritance
 For example, for our feedforward baseline [``fnn``](./src/mdl/fnn.py), the model has been implemented in [``./src/mdl/fnn.py``](src/mdl/fnn.py). Model's hyperparameters such as the learning rate (``lr``) or the number of epochs (``e``) can be set in [``./src/param.py``](src/param.py).
 
 
-<p align="center"><img src='./src/mdl/team_inheritance_hierarchy.png' width="550" ></p>
+<p align="center"><img src='src/mdl/docs/team_inheritance_hierarchy.png' width="550" ></p>
   
 Currently, we support neural models:
 1) Bayesian [``bnn``](./src/mdl/bnn.py) where model's parameter (weights) is assumed to be drawn from Gaussian (Normal) distribution and the task is to not to learn the weight but the mean (μ) and standard deviation (σ) of the distribution at each parameter.
@@ -196,13 +196,13 @@ We used [``pytrec_eval``](https://github.com/cvangysel/pytrec_eval) to evaluate 
 Average performance of 5-fold neural models on the test set of the `imdb`, `dblp` and `uspt` datasets. For the metrics: `ndkl`, lower values are better (↓); `skew`, values closer to 0 are better (→0); and `map` and `ndcg`, higher values are better (↑).
 <hr>
 imdb dataset
-<p align="center"><img src='./misc/fair_imdb.png'></p>
+<p align="center"><img src='docs/fair_imdb.png'></p>
 <hr>
 dblp table
-<p align="center"><img src='./misc/fair_dblp.png'></p>
+<p align="center"><img src='docs/fair_dblp.png'></p>
 <hr>
 uspt table
-<p align="center"><img src='./misc/fair_uspt.png'></p>
+<p align="center"><img src='docs/fair_uspt.png'></p>
 
 **2. Non-Temporal Neural Team Formation**
 
@@ -230,7 +230,7 @@ We kick-started our experiments based on the best results from the non-temporal 
 |Baselines|{bnn, tbnn}×{sparse, emb, dt2v_emb}×{unigram_b},{[rrn](https://dl.acm.org/doi/10.1145/3018661.3018689)}|
 |Results|[``./output/dblp.v12.json.filtered.mt75.ts3/``](./output/dblp.v12.json.filtered.mt75.ts3/), [``./output/title.basics.tsv.filtered.mt75.ts3/``](./output/title.basics.tsv.filtered.mt75.ts3/), [``./output/patent.tsv.filtered.mt75.ts3/``](./output/patent.tsv.filtered.mt75.ts3/)|
 
-<p align="center"><img src='./misc/temporal_results.png'></p>
+<p align="center"><img src='docs/temporal_results.png'></p>
 
 Full predictions of all models on test and training sets and the values of evaluation metrics are available in a rar file and will be delivered upon request! 
 
