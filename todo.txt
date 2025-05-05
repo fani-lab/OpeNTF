@@ -1,3 +1,9 @@
+Let's start the transfer part for now. I'll complete the tasks when I come to e2e
+
+- earlystoppings
+- strict splits, transductive, inductive
+- hetero version of gnns
+
 Notes:
 
 Our graph are mainly hetero, but gnn methods are mainly designed for homo graph. So, we create hetero, make it to_homo(), ...
@@ -10,10 +16,20 @@ update to readme for cmn layer and main readme
 
 
 d2v
--- save per epoch
 -- not worth strict splits of train/valid/test. I think even if it sees everything, does not produce good embeddings
 -- skill-member as docs during the train, then skills as docs during test to find the closest experts vectors as members :DD
 -- not worth it as the seq2seq is more powerful (document completion using pre-words of skills with members)
+
+for earlystopping of d2v or strict splits
+def evaluate_model(model, val_corpus):
+    sims = []
+    for doc in val_corpus:
+        inferred_vec = model.infer_vector(doc.words)
+        most_similar = model.dv.most_similar([inferred_vec], topn=1)
+        top_score = most_similar[0][1]
+        sims.append(top_score)
+    return sum(sims) / len(sims) >> a doc, when in test, should return the same doc if in train, or the most similar one (textoverlap?)
+
 
 -- gnn-transferred >> for now, entire graph is seen. But
 Strict split way: create a training graph using training teams. The test teams should then added to infer the node embeddings.
