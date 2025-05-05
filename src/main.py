@@ -89,7 +89,7 @@ def run(cfg):
         # skill coverage metric, all skills of each expert, all expert of each skills (supports of each skill, like in RarestFirst)
         vecs['skillcoverage'] = domain_cls.gen_skill_coverage(vecs, cfg.data.output) # after we have a sparse vector, we create es_vecs from that
 
-        if cfg.data.embedding.class_method:
+        if 'embedding' in cfg.data and cfg.data.embedding.class_method:
             # Get command-line overrides for embedding.
             # Kinda tricky as we dynamically override a subconfig.
             # Use '+data.embedding.{...}=value' to override
