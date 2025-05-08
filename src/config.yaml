@@ -6,15 +6,16 @@ hydra:
   run:
     dir: . #unix or macos
     #dir: /dev/null # windows
+seed:
 pytorch: torch==2.2.2 #--index-url https://download.pytorch.org/whl/cu124
 cmd:
-  prep 
-  train
-  #test
-  #eval
-  #plot
-  #agg
-  #fair
+  - prep
+  - train
+  #- test
+  #- eval
+  #- plot
+  #- agg
+  #- fair
 data: #required for 'prep' step
   domain:
     #cmn.publication.Publication
@@ -52,24 +53,30 @@ data: #required for 'prep' step
     config: ./mdl/emb/config.yml
 
 models:
-  class_name:
-    mdl.rnd.Rnd
-    #mdl.fnn.Fnn #input skills could be multihot (default), embeddings by d2v, n2v, m2v, ... see above data.embedding.class_method
-    #mdl.bnn.Bnn
-    #mdl.nmt.Nmt
-    #mdl.tnmt.tNmt
-    #mdl.tntf.tNtf_fnn   #underlying base model could be fnn and bnn. future: tgnn?
-    #mdl.caser.Caser #external baseline
-    #mdl.rrn.Rrn     #external baseline
+  instances:
+    #- mdl.rnd.Rnd()
+    #- mdl.fnn.Fnn() #input skills could be multihot (default), embeddings by d2v, n2v, m2v, ... see above data.embedding.class_method
+    #- mdl.bnn.Bnn()
+    #- mdl.nmt.Nmt()
+    #- mdl.tnmt.tNmt
+    - mdl.tntf.tNtf(mdl.rnd.Rnd(), ${train.nfolds}, ${train.step_ahead})   #underlying base model could be fnn and bnn. future: tgnn?
+    #- mdl.caser.Caser #external baseline
+    #- mdl.rrn.Rrn     #external baseline
+
   config: ./mdl/config.yml
 
 train:
   nfolds: 3 #ends with nfolds models each with nfolds-1 train splits and one fold valid split, nfolds results, averaged on a single test split
   train_test_ratio: 0.85 #the nfolds will be on the trainig part.
-  step_ahead: 2 #streaming/temporal methods. for now, it means that whatever are in the last [step_ahead] time interval will be the test set!
+  step_ahead: #if streaming/temporal training. for now, it means that whatever are in the last [step_ahead] time interval will be the test set!
+
+test:
+  merge_skills: False #shouldn't be in eval
 
 fair: #post-hoc reranks of the prediction list
   np_ratio: #desired ratio of non-popular experts after reranking; if None, based on distribution in dataset; default: None; Eg. 0.5
   fairness: det_greedy #reranking algorithm from {det_greedy, det_cons, det_relaxed}; required; Eg. det_cons
   k_max: #cutoff for the reranking algorithms; default: None
   attribute: #the set of our sensitive attributes')
+
+eval:

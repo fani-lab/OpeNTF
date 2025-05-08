@@ -1,4 +1,4 @@
-import subprocess, sys, importlib
+import subprocess, sys, importlib, random, numpy
 import logging
 log = logging.getLogger(__name__)
 from omegaconf import OmegaConf
@@ -20,6 +20,19 @@ def install_import(install_name, import_path=None, from_module=None):
 
     if from_module: return getattr(module, from_module)
     return module
+
+def set_seed(seed, torch=None):
+    if not seed: return
+    random.seed(seed)
+    numpy.random.seed(seed)
+    if torch:
+        torch.manual_seed(seed)
+        torch.use_deterministic_algorithms(True)
+        if torch.cuda.is_available():
+            torch.cuda.manual_seed(seed)
+            torch.cuda.manual_seed_all(seed)  # if multiple GPUs
+            torch.backends.cudnn.deterministic = True # in cuDNN
+            torch.backends.cudnn.benchmark = False
 
 def cfg2str(cfg): return '.'.join([f'{k}{v}' for k, v in OmegaConf.to_container(cfg, resolve=True).items()])
 

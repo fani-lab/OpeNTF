@@ -10,6 +10,7 @@ hydra-core==1.3.2
 python-dateutil==2.9
 
 # on-demand package installations
+# main.get_splits() scikit-learn==1.2.2
 # cmn.repository.Repository.read_data() pandas==2.0.0
 # cmn.movie.Movie.read_data() pandas==2.0.0
 # cmn.patent.Patent.read_data() pandas==2.0.0

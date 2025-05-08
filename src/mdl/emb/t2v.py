@@ -8,8 +8,8 @@ class T2v:
         self.device = device
 
     # to prep the required dataset for embeddings like documents for d2v or graphs for gnn-based
-    def _prep(self, teamsvecs, indexes): pass
+    def _prep(self, teamsvecs, indexes, splits): pass
 
-    def train(self, teamsvecs, indexes): pass
+    def train(self, teamsvecs, indexes, splits): pass
 
     def get_dense_vecs(self): pass # this should access the self.model to reach out the embeddings explicitly

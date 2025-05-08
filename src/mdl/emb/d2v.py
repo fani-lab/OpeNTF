@@ -21,7 +21,7 @@ class D2v(T2v):
         super().__init__(output, device, cgf)
         self.name = 'd2v'
 
-    def _prep(self, teamsvecs, indexes):
+    def _prep(self, teamsvecs, indexes, splits):
         datafile = self.output + f'/{self.cfg.embtype}.docs.pkl'
         try:
             log.info(f'Loading teams as docs {datafile}  ...')
@@ -53,7 +53,7 @@ class D2v(T2v):
             with open(datafile, 'wb') as f: pickle.dump(self.data, f)
             return self
 
-    def train(self, teamsvecs, indexes):
+    def train(self, teamsvecs, indexes, splits):
         # to select/create correct model file in the output directory
         output = self.output + f'/d{self.cfg.d}.e{self.cfg.e}.{self.name}.w{self.cfg.w}.dm{self.cfg.dm}.{self.cfg.embtype}'
         try:
@@ -65,10 +65,10 @@ class D2v(T2v):
             return self
         except FileNotFoundError:
             log.info(f'File not found! Training the embedding model from scratch ...')
-            self._prep(teamsvecs, indexes)
-            self.model = self.gensim.models.Doc2Vec(min_count=1, seed=0, dbow_words=1, # keep it always one as it may be needed for gnn-based method for 'pre' config, i.e., initial node features
+            self._prep(teamsvecs, indexes, splits)
+            self.model = self.gensim.models.Doc2Vec(min_count=1, dbow_words=1, # keep it always one as it may be needed for gnn-based method for 'pre' config, i.e., initial node features
                                                     dm=self.cfg.dm, vector_size=self.cfg.d, window=self.cfg.w, min_alpha=self.cfg.lr,
-                                                    workers=self.device.split(':')[1] if 'cpu:' in self.device else os.cpu_count())
+                                                    workers=self.device.split(':')[1] if 'cpu:' in self.device else os.cpu_count(), ** {'seed': self.cfg.seed} if self.cfg.seed else {})
 
             self.model.build_vocab(self.data)
             if self.cfg.save_per_epoch:

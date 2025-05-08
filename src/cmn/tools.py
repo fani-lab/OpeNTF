@@ -5,17 +5,8 @@ import pandas as pd
 import scipy.sparse
 import copy
 import torch
-from json import JSONEncoder
 from scipy.sparse import lil_matrix
 from cmn.sparse_sgd import SparseSGD
-
-
-class NumpyArrayEncoder(JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, np.ndarray):
-            return obj.tolist()
-        return JSONEncoder.default(self, obj)
-
 
 def merge_teams_by_skills(teamsvecs, inplace=False, distinct=False):
     vecs = teamsvecs if inplace else copy.deepcopy(teamsvecs)

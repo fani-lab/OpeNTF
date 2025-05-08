@@ -13,11 +13,12 @@ class Gnn(T2v):
         Gnn.torch = opentf.install_import(cgf.pytorch, 'torch')
         Gnn.pyg = opentf.install_import(f'torch_geometric==2.6.1 torch_cluster==1.6.3 torch_sparse==0.6.18 torch_scatter==2.1.2 -f https://data.pyg.org/whl/torch-{Gnn.torch.__version__}.html', 'torch_geometric')
         opentf.install_import('tensorboard==2.14.0', 'tensorboard')
+        opentf.set_seed(self.cfg.model.seed, Gnn.torch)
         self.writer = opentf.install_import('tensorboardX==2.6.2.2', 'tensorboardX', 'SummaryWriter')(log_dir=self.output + '/logs4tfboard')
         self.name = None
         self.decoder = None
 
-    def _prep(self, teamsvecs, indexes):
+    def _prep(self, teamsvecs, indexes, splits):
         #NOTE: for any change, unit test using https://github.com/fani-lab/OpeNTF/issues/280
         # import numpy as np
         # from scipy.sparse import lil_matrix
@@ -71,7 +72,7 @@ class Gnn(T2v):
             with open(file, 'wb') as f: pickle.dump(self.data, f)
             return self.data
 
-    def train(self, teamsvecs, indexes):
+    def train(self, teamsvecs, indexes, splits):
         self._prep(teamsvecs, None)
         self.cfg.model = self.cfg[self.name] #gnn.n2v or gnn.gs --> gnn.model
         prefix = self.output + f'/d{self.cfg.model.d}.e{self.cfg.model.e}.ns{self.cfg.model.ns}.{self.name}'

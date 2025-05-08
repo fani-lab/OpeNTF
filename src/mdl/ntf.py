@@ -1,23 +1,18 @@
-import multiprocessing
-import os, pickle, re
+import multiprocessing, os, pickle, re
 from functools import partial
 
-import matplotlib.pyplot as plt
-import pandas as pd
-import torch
-from torch import nn
-
-from eval.metric import *
-
-class Ntf(nn.Module):
-    def __init__(self):
-        super(Ntf, self).__init__()
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+class Ntf:
+    def __init__(self): super(Ntf, self).__init__()
 
     def learn(self, splits, indexes, vecs, params, prev_model, output): pass
     def test(self, model_path, splits, indexes, vecs, params, on_train_valid_set=False, per_epoch=False, merge_skills=False): pass
 
     def evaluate(self, model_path, splits, vecs, on_train_valid_set=False, per_instance=False, per_epoch=False):
+        import pandas as pd
+        import torch
+        from torch import nn
+        from eval.metric import calculate_skill_coverage, calculate_metrics
+
         print(f'\n.............. starting eval .................\n')
         if not os.path.isdir(model_path): raise Exception("The predictions do not exist!")
         y_test = vecs['member'][splits['test']] # the actual y
@@ -124,6 +119,7 @@ class Ntf(nn.Module):
                                                      eq_op=settings['eq_op'],
                                                      att=att), pairs)
     def plot_roc(self, model_path, splits, on_train_valid_set=False):
+        import matplotlib.pyplot as plt
         for pred_set in (['test', 'train', 'valid'] if on_train_valid_set else ['test']):
             plt.figure()
             for foldidx in splits['folds'].keys():

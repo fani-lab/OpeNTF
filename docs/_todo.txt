@@ -16,9 +16,9 @@ update to readme for cmn layer and main readme
 
 
 d2v
--- not worth strict splits of train/valid/test. I think even if it sees everything, does not produce good embeddings
+-- strict splits of train/valid/test. I think even if it sees everything, does not produce good embeddings
 -- skill-member as docs during the train, then skills as docs during test to find the closest experts vectors as members :DD
--- not worth it as the seq2seq is more powerful (document completion using pre-words of skills with members)
+-- may not worth it as the seq2seq is more powerful (document completion using pre-words of skills with members)
 
 for earlystopping of d2v or strict splits
 def evaluate_model(model, val_corpus):
