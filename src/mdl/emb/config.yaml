@@ -45,6 +45,7 @@ model:
         #d9.e100.w10.d2v.dm1.skill  # if not exists, train from scratch!
 
     pytorch: #will be overriden dynamically in ./src/main.py from root ./config.yml
+    seed: ${model.seed}
     model:   #dummy tag as placeholder. don't worry or touch it.
 
     #Grover, Aditya, and Jure Leskovec. "node2vec: Scalable feature learning for networks." Proceedings of the 22nd ACM SIGKDD international conference on Knowledge discovery and data mining. 2016.

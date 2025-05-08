@@ -22,7 +22,7 @@ def install_import(install_name, import_path=None, from_module=None):
     return module
 
 def set_seed(seed, torch=None):
-    if not seed: return
+    if seed is None: return
     random.seed(seed)
     numpy.random.seed(seed)
     if torch:
