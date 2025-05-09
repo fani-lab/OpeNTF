@@ -78,7 +78,7 @@ class Gnn(T2v):
         prefix = self.output + f'/d{self.cfg.model.d}.e{self.cfg.model.e}.ns{self.cfg.model.ns}.{self.name}'
         postfix = f'{".pre" if self.cfg.graph.pre else ""}.{self.cfg.graph.dup_edge}.{self.cfg.graph.structure[1]}'
         # replace the 1 dimensional node features with pretrained d2v skill vectors of required dimension
-        if self.cfg.graph.pre: self._init_d2v_node_features(indexes, teamsvecs)
+        if self.cfg.graph.pre: self._init_d2v_node_features(indexes, teamsvecs, splits)
 
         log.info(f'{opentf.textcolor["blue"]}Training {self.name} {opentf.textcolor["reset"]}... ')
 
@@ -321,7 +321,7 @@ class Gnn(T2v):
         self.torch.save({'model_state_dict': self.model.state_dict(), 'cfg': self.cfg, 'e': e, 't_loss': e_loss}, output)
         log.info(f'{self.name} model with {opentf.cfg2str(self.cfg.model)} saved at {output}.')
 
-    def _init_d2v_node_features(self, indexes, teamsvecs):
+    def _init_d2v_node_features(self, teamsvecs, indexes, splits):
         flag = False
         log.info(f'Loading pretrained d2v embeddings {self.cfg.graph.pre} in {self.output} to initialize node features, or if not exist, train d2v embeddings from scratch ...')
         from .d2v import D2v
@@ -330,7 +330,7 @@ class Gnn(T2v):
         d2v_cfg.lr = self.cfg.model.lr
         d2v_cfg.save_per_epoch = self.cfg.model.save_per_epoch
         # simple lazy load, or train from scratch if the file not found!
-        d2v_obj = D2v(self.output, self.device, d2v_cfg).train(teamsvecs, indexes)
+        d2v_obj = D2v(self.output, self.device, d2v_cfg).train(teamsvecs, indexes, splits)
         # the order is NOT correct in d2v, i.e., vecs[0] may be for vecs['s20']. Call D2v.natsortvecs(d2v_obj.model.wv)
         # d2v = Doc2Vec.load(self.cfg.graph.pre)
         for node_type in self.data.node_types:
