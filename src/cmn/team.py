@@ -5,7 +5,7 @@ from dateutil import parser
 
 log = logging.getLogger(__name__)
 
-from pkgmgr import install_import
+import pkgmgr as opentf
 class Team(object):
     def __init__(self, id, members, skills, datetime, location=None):
         self.id = int(id)
@@ -206,8 +206,8 @@ class Team(object):
             #in dblp, the 'loc' is the replica of the paper venue, so it should be 1-hot for each team
             #in uspt, the 'loc' is the actual location of the inventor, so it can be multihot.
             e = [i for i in range(teamsvecs['loc'].shape[0]) if (len(teamsvecs['loc'].rows[i]) != 1) or (sum(teamsvecs['loc'].data[3]) != 1)]
-            if e: log.info(f'Following teams are not one-hot in the location of team members. '
-                           f'Based on the underlying dataset/domain, it may be valid like in uspt, or invalid like dblp.\n{e}')
+            if e: log.warning(f'{opentf.textcolor["yellow"]}Following teams are not one-hot in the location of team members.{opentf.textcolor["reset"]} '
+                              f'Based on the underlying dataset/domain, it may be valid like in uspt, or invalid like dblp.\n{e}')
 
         return (True, '')
     @classmethod
@@ -278,7 +278,7 @@ class Team(object):
             # check no rows (teams) with empty skills, or empty members
             # check no columns (skills or members) with no value (no team)
             # assert Team.validate(vecs) --> not working! as a tuple is True :D
-            assert (r := Team.validate(vecs))[0], r[1]
+            assert (r := Team.validate(vecs))[0], f'{opentf.textcolor["red"]}{r[1]}{opentf.textcolor["reset"]}'
             with open(pkl, 'wb') as outfile: pickle.dump(vecs, outfile)
             log.info(f"Teamsvecs matrices for skills {vecs['skill'].shape}, members {vecs['member'].shape}, and locations {vecs['loc'].shape if vecs['loc'] is not None else None} saved at {pkl}")
             return vecs, indexes
@@ -304,9 +304,9 @@ class Team(object):
 
         filepath = f'{output}/skillcoverage.pkl'
         try :
-            log.info(f'Loading member-skill co-occurrence matrix ({teamsvecs["member"].shape[1]}, {teamsvecs["skill"].shape[1]}) loaded from {filepath} ...')
+            log.info(f'Loading member-skill co-occurrence matrix ({teamsvecs["member"].shape[1]}, {teamsvecs["skill"].shape[1]}) from {filepath} ...')
             with open(filepath, 'rb') as f: member_skill_co = pickle.load(f)
-            assert member_skill_co.shape == (teamsvecs["member"].shape[1], teamsvecs["skill"].shape[1])
+            assert member_skill_co.shape == (teamsvecs["member"].shape[1], teamsvecs["skill"].shape[1]), f'{opentf.textcolor["red"]}Incorrect matrix size!{opentf.textcolor["reset"]}'
             return member_skill_co
         except FileNotFoundError as e:
             log.info(f'Member-skill co-occurrence matrix not found! Generating ...')
@@ -419,7 +419,7 @@ class Team(object):
 
     @staticmethod
     def plot_stats(stats, output, plot_title):
-        plt = install_import('matplotlib==3.7.5', 'matplotlib.pyplot')
+        plt = opentf.install_import('matplotlib==3.7.5', 'matplotlib.pyplot')
         plt.rcParams.update({'font.family': 'Consolas'})
         for k, v in stats.items():
             if '*' in k: print(f'{k} : {v}'); continue

@@ -1,12 +1,5 @@
-import os, pickle, re, time, json
-import matplotlib.pyplot as plt
-import pandas as pd
-import numpy as np
-import os
+import os, json, numpy as np
 
-from sklearn.model_selection import KFold
-
-from cmn.tools import NumpyArrayEncoder
 from mdl.ntf import Ntf
 
 class tNtf(Ntf):
@@ -21,6 +14,7 @@ class tNtf(Ntf):
         items_in_directory = os.listdir(output)
         if 'param.py' in items_in_directory: items_in_directory.remove('param.py')
         items_in_directory = [int(item) for item in items_in_directory]
+        from sklearn.model_selection import KFold
         for i, v in enumerate(year_idx[:-self.step_ahead]):#the last years are for test.
             n_years_trained = len(items_in_directory)
             if n_years_trained > 1:
@@ -35,6 +29,7 @@ class tNtf(Ntf):
 
             output_ = f'{output}/{year_idx[i][1]}'
             if not os.path.isdir(output_): os.makedirs(output_)
+            from cmn.tools import NumpyArrayEncoder
             with open(f'{output_}/splits.json', 'w') as f: json.dump(splits, f, cls=NumpyArrayEncoder, indent=1)
 
             self.model.learn(splits, indexes, vecs, params, prev_model, output_) #not recursive, but fine-tune over years
@@ -54,9 +49,8 @@ class tNtf(Ntf):
             #     tsplits['test'] = np.arange(year_idx[i][0], year_idx[i + 1][0] if i < len(year_idx) else len(indexes['i2t']))
             self.model.test(output_, splits, indexes, vecs, settings, on_train_valid_set, per_epoch)
 
-        if 'eval' in cmd:# todo: the evaluation of each step ahead should be seperate
-            self.model.evaluate(output_, splits, vecs, on_train_valid_set, per_instance, per_epoch)
-
+        # todo: the evaluation of each step ahead should be seperate
+        if 'eval' in cmd: self.model.evaluate(output_, splits, vecs, on_train_valid_set, per_instance, per_epoch)
         if 'plot' in cmd: self.model.plot_roc(output_, splits, on_train_valid_set)
 
 

@@ -1,0 +1,65 @@
+name: inclusive-tests-preps-toys-main
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test-toy-configs:
+    runs-on: ubuntu-latest
+    if: ${{ !contains(github.event.head_commit.message, 'skip-ci') }}
+
+    strategy:
+      matrix:
+        include:
+          - config: '+id=000 cmd=prep data.domain=cmn.publication.Publication data.source=../data/dblp/toy.dblp.v12.json data.output=../output/dblp/toy.dblp.v12.json ~data.filter ~data.embedding'
+          - config: '+id=001 cmd=prep data.domain=cmn.publication.Publication data.source=../data/dblp/toy.dblp.v12.json data.output=../output/dblp/toy.dblp.v12.json data.filter.min_nteam=1 data.filter.min_team_size=2 ~data.embedding'
+          - config: '+id=002 cmd=prep data.domain=cmn.publication.Publication data.source=../data/dblp/toy.dblp.v12.json data.output=../output/dblp/toy.dblp.v12.json data.filter.min_nteam=9 data.filter.min_team_size=9 ~data.embedding'
+            label: fail.teamsvecs.validate
+
+          - config: '+id=014 cmd=prep data.domain=cmn.movie.Movie data.source=../data/imdb/toy.title.basics.tsv data.output=../output/imdb/toy.title.basics.tsv ~data.filter ~data.embedding'
+          - config: '+id=015 cmd=prep data.domain=cmn.movie.Movie data.source=../data/imdb/toy.title.basics.tsv data.output=../output/imdb/toy.title.basics.tsv data.filter.min_nteam=1 data.filter.min_team_size=2 ~data.embedding'
+          - config: '+id=016 cmd=prep data.domain=cmn.movie.Movie data.source=../data/imdb/toy.title.basics.tsv data.output=../output/dblp/toy.title.basics.tsv data.filter.min_nteam=9 data.filter.min_team_size=9 ~data.embedding'
+            label: fail.teamsvecs.validate
+
+          - config: '+id=025 cmd=prep data.domain=cmn.repository.Repository data.source=../data/gith/toy.repos.csv data.output=../output/gith/toy.repos.csv ~data.filter ~data.embedding'
+          - config: '+id=026 cmd=prep data.domain=cmn.repository.Repository data.source=../data/gith/toy.repos.csv data.output=../output/gith/toy.repos.csv data.filter.min_nteam=1 data.filter.min_team_size=2 ~data.embedding'
+          - config: '+id=027 cmd=prep data.domain=cmn.repository.Repository data.source=../data/gith/toy.repos.csv data.output=../output/gith/toy.repos.csv data.filter.min_nteam=9 data.filter.min_team_size=9 ~data.embedding'
+            label: fail.teamsvecs.validate
+
+          - config: '+id=036 cmd=prep data.domain=cmn.patent.Patent data.source=../data/uspt/toy.patent.tsv data.output=../output/uspt/toy.patent.tsv ~data.filter ~data.embedding'
+          - config: '+id=037 cmd=prep data.domain=cmn.patent.Patent data.source=../data/uspt/toy.patent.tsv data.output=../output/uspt/toy.patent.tsv data.filter.min_nteam=1 data.filter.min_team_size=2 ~data.embedding'
+          - config: '+id=038 cmd=prep data.domain=cmn.patent.Patent data.source=../data/uspt/toy.patent.tsv data.output=../output/uspt/toy.patent.tsv data.filter.min_nteam=9 data.filter.min_team_size=9 ~data.embedding'
+            label: fail.teamsvecs.validate
+
+      # Set to false if you want parallel runs:
+      fail-fast: false
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Clean up previous outputs
+        run: rm -rf output/
+
+      - name: Echo config index
+        run: |
+          echo 'Config index: ${{ matrix.index }}'
+
+      - name: Run config ${{ matrix.config }}
+        run: |
+          python main.py ${{ matrix.config }}
+        working-directory: ./src
+        continue-on-error: ${{ matrix.label == 'fail.teamsvecs.validate' || matrix.label == 'fail.pre.validate' }}
+

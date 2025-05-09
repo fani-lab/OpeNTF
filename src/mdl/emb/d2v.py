@@ -12,7 +12,7 @@ log = logging.getLogger(__name__)
 # embtype = 'skilltime' --> doc_list = ['s1 s2 dt1988','s3 dt1990']
 # label_list = ['t1','t2','t3']
 
-from pkgmgr import install_import
+import pkgmgr as opentf
 from .t2v import T2v
 
 class D2v(T2v):
@@ -21,7 +21,7 @@ class D2v(T2v):
         super().__init__(output, device, cgf)
         self.name = 'd2v'
 
-    def _prep(self, teamsvecs, indexes):
+    def _prep(self, teamsvecs, indexes, splits):
         datafile = self.output + f'/{self.cfg.embtype}.docs.pkl'
         try:
             log.info(f'Loading teams as docs {datafile}  ...')
@@ -48,30 +48,40 @@ class D2v(T2v):
                 elif self.cfg.embtype == 'skillmember': td = self.gensim.models.doc2vec.TaggedDocument(skill_doc + member_doc, [str(i)])
                 elif self.cfg.embtype == 'skilltime': td = self.gensim.models.doc2vec.TaggedDocument(skill_doc + datetime_doc, [str(i)])
                 self.data.append(td)
-            assert teamsvecs['skill'].shape[0] == len(self.data)
+            assert teamsvecs['skill'].shape[0] == len(self.data), f'{opentf.textcolor["red"]}Incorrect number of docs for teams! {teamsvecs["skill"].shape[0]} != {len(self.data)}{opentf.textcolor["reset"]}'
             log.info(f'{len(self.data)} documents with word type of {self.cfg.embtype} have created. Saving ...')
             with open(datafile, 'wb') as f: pickle.dump(self.data, f)
             return self
 
-    def train(self, teamsvecs, indexes):
+    def train(self, teamsvecs, indexes, splits):
         # to select/create correct model file in the output directory
         output = self.output + f'/d{self.cfg.d}.e{self.cfg.e}.{self.name}.w{self.cfg.w}.dm{self.cfg.dm}.{self.cfg.embtype}'
         try:
             log.info(f"Loading the model {output} for {(teamsvecs['skill'].shape[0], self.cfg.d)}  embeddings ...")
-            self.__class__.gensim = install_import('gensim==4.3.3', 'gensim')
+            self.__class__.gensim = opentf.install_import('gensim==4.3.3', 'gensim')
             self.model = self.gensim.models.Doc2Vec.load(output)
-            assert self.model.docvecs.vectors.shape[0] == teamsvecs['skill'].shape[0] # correct number of embeddings per team
+            assert self.model.docvecs.vectors.shape[0] == teamsvecs['skill'].shape[0], f'{opentf.textcolor["red"]}Incorrect number of embeddings per team! {self.model.docvecs.vectors.shape[0]} != {teamsvecs["skill"].shape[0]}{opentf.textcolor["reset"]}'
             log.info(f'Model of {self.model.docvecs.vectors.shape} embeddings loaded.')
             return self
         except FileNotFoundError:
             log.info(f'File not found! Training the embedding model from scratch ...')
-            self._prep(teamsvecs, indexes)
-            self.model = self.gensim.models.Doc2Vec(min_count=1, seed=0, dbow_words=1, # keep it always one as it may be needed for gnn-based method for 'pre' config, i.e., initial node features
-                                                    dm=self.cfg.dm, vector_size=self.cfg.d, window=self.cfg.w, alpha=self.cfg.lr,
-                                                    workers=self.device.split(':')[1] if 'cpu:' in self.device else os.cpu_count())
+            self._prep(teamsvecs, indexes, splits)
+            self.model = self.gensim.models.Doc2Vec(min_count=1, dbow_words=1, # keep it always one as it may be needed for gnn-based method for 'pre' config, i.e., initial node features
+                                                    dm=self.cfg.dm, vector_size=self.cfg.d, window=self.cfg.w, min_alpha=self.cfg.lr,
+                                                    workers=self.device.split(':')[1] if 'cpu:' in self.device else os.cpu_count(), ** {'seed': self.cfg.seed} if self.cfg.seed is not None else {})
 
             self.model.build_vocab(self.data)
-            self.model.train(self.data, total_examples=self.model.corpus_count, epochs=self.cfg.e)
+            if self.cfg.save_per_epoch:
+                import random
+                random.shuffle(self.data)
+                for epoch in range(1, self.cfg.e + 1):
+                    self.model.train(self.data, total_examples=self.model.corpus_count, epochs=1)
+                    delta = (self.model.alpha - self.model.min_alpha) / (self.cfg.e - 1)
+                    self.model.alpha = max(self.model.alpha - delta, self.model.min_alpha)
+                    log.info(f'Saving model at {output}.{opentf.textcolor["blue"]}e{epoch} at lr {self.model.alpha}{opentf.textcolor["reset"]}...')
+                    self.model.save(f'{output}.e{epoch}')
+            else: self.model.train(self.data, total_examples=self.model.corpus_count, epochs=self.cfg.e)
+
             log.info(f'Saving model at {output} ...')
             self.model.save(output)
             # self.model.save_word2vec_format(f'{output}.w2v')
@@ -91,7 +101,7 @@ class D2v(T2v):
     @staticmethod
     def natsortvecs(d2v_model_wv):
         import numpy as np
-        natsorted = install_import('natsort==8.4.0', 'natsort', 'natsorted')
+        natsorted = opentf.install_import('natsort==8.4.0', 'natsort', 'natsorted')
         sorted_words = natsorted(d2v_model_wv.index_to_key)  # ['m3', 's10', 's2', 's1'] --> ['m3', 's1', 's2', 's10']
         sorted_indices = np.array([d2v_model_wv.key_to_index[word] for word in sorted_words])
         return d2v_model_wv.vectors[sorted_indices]
