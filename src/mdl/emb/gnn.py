@@ -326,6 +326,7 @@ class Gnn(T2v):
         log.info(f'Loading pretrained d2v embeddings {self.cfg.graph.pre} in {self.output} to initialize node features, or if not exist, train d2v embeddings from scratch ...')
         from .d2v import D2v
         d2v_cfg = opentf.str2cfg(self.cfg.graph.pre)
+        d2v_cfg.seed = self.cfg.seed
         d2v_cfg.embtype = self.cfg.graph.pre.split('.')[-1] # Check emb.d2v.D2v.train() for filename pattern
         d2v_cfg.lr = self.cfg.model.lr
         d2v_cfg.save_per_epoch = self.cfg.model.save_per_epoch
