@@ -78,7 +78,7 @@ class Gnn(T2v):
         prefix = self.output + f'/d{self.cfg.model.d}.e{self.cfg.model.e}.ns{self.cfg.model.ns}.{self.name}'
         postfix = f'{".pre" if self.cfg.graph.pre else ""}.{self.cfg.graph.dup_edge}.{self.cfg.graph.structure[1]}'
         # replace the 1 dimensional node features with pretrained d2v skill vectors of required dimension
-        if self.cfg.graph.pre: self._init_d2v_node_features(indexes, teamsvecs, splits)
+        if self.cfg.graph.pre: self._init_d2v_node_features(teamsvecs, indexes, splits)
 
         log.info(f'{opentf.textcolor["blue"]}Training {self.name} {opentf.textcolor["reset"]}... ')
 
