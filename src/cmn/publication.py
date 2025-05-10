@@ -43,6 +43,8 @@ class Publication(Team):
                 for line in jf:
                     try:
                         if not line: break
+                        # Skip lines that are just brackets (for JSON array format files)
+                        if line.strip() in ['[', ']']: pbar.update(len(line)); continue
                         pbar.update(len(line))
                         jsonline = json.loads(line.lower().lstrip(","))
                         id = jsonline['id']

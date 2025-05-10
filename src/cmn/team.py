@@ -235,15 +235,30 @@ class Team(object):
 
                 data = scipy.sparse.vstack(data, 'lil')#{'bsr', 'coo', 'csc', 'csr', 'dia', 'dok', 'lil'}, By default an appropriate sparse matrix format is returned!!
 
-            #TODO: elif 'acceleration' in cfg and 'gpu' in cfg.acceleration:
-            #device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-            # model = CreateModel()
-            # model= nn.DataParallel(model)
-            # model.to(device)
-            # If you want to use specific GPUs: (For example, using 2 out of 4 GPUs)
-            # device = torch.device("cuda:1,3" if torch.cuda.is_available() else "cpu") ## specify the GPU id's, GPU id's start from 0.
-            # model= nn.DataParallel(model,device_ids = [1, 3])
-            # model.to(device)
+            elif 'acceleration' in cfg and 'cuda' in cfg.acceleration:
+                torch = opentf.install_import(cgf.pytorch, 'torch')
+                
+                device_id_str = cfg.acceleration.split(':', 1)[1].split(',')[0].strip() if ':' in cfg.acceleration else ','.join(str(i) for i in range(torch.cuda.device_count()))
+                device = torch.device(f'cuda:{device_id_str}')
+                log.info(f'Using GPU: {device} for team vector processing.')
+
+                s2i, c2i, l2i = indexes['s2i'], indexes['c2i'], indexes['l2i']
+                total_dim = len(s2i) + len(c2i) + len(l2i)
+                
+                gpu_tensor_batches = []
+                for i in range(0, len(teams), cfg.bucket_size):
+                    batch = teams[i:min(i + cfg.bucket_size, len(teams))]
+                    if not batch: continue
+                    
+                    # Process batch and send to GPU
+                    one_hot_arrays = [team.get_one_hot(s2i, c2i, l2i, cfg.location) for team in batch]
+                    batch_array = np.vstack(one_hot_arrays) if one_hot_arrays else np.zeros((0, total_dim), dtype='u1')
+                    gpu_tensor_batches.append(torch.from_numpy(batch_array).to(device))
+                
+                # Convert back to sparse matrix for validation
+                if gpu_tensor_batches: data = scipy.sparse.lil_matrix((torch.vstack(gpu_tensor_batches)).cpu().numpy())
+                else: data = scipy.sparse.lil_matrix((0, total_dim), dtype='u1')
+                
             # serial
             else: data = Team.bucketing(cfg.bucket_size, indexes['s2i'], indexes['c2i'], indexes['l2i'], cfg.location, teams)
 
