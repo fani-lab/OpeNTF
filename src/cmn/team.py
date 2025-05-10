@@ -236,9 +236,9 @@ class Team(object):
                 data = scipy.sparse.vstack(data, 'lil')#{'bsr', 'coo', 'csc', 'csr', 'dia', 'dok', 'lil'}, By default an appropriate sparse matrix format is returned!!
 
             elif 'acceleration' in cfg and 'cuda' in cfg.acceleration:
-                import torch
+                torch = opentf.install_import(cgf.pytorch, 'torch')
                 
-                device_id_str = cfg.acceleration.split(':', 1)[1].split(',')[0].strip() if ':' in cfg.acceleration else '0'
+                device_id_str = cfg.acceleration.split(':', 1)[1].split(',')[0].strip() if ':' in cfg.acceleration else ','.join(str(i) for i in range(torch.cuda.device_count()))
                 device = torch.device(f'cuda:{device_id_str}')
                 log.info(f'Using GPU: {device} for team vector processing.')
 
