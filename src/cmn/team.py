@@ -237,10 +237,8 @@ class Team(object):
 
             elif 'acceleration' in cfg and 'cuda' in cfg.acceleration:
                 torch = opentf.install_import(cfg.pytorch, 'torch')
-                
-                device_id_str = cfg.acceleration.split(':', 1)[1].split(',')[0].strip() if ':' in cfg.acceleration else ','.join(str(i) for i in range(torch.cuda.device_count()))
-                device = torch.device(f'cuda:{device_id_str}')
-                log.info(f'Using GPU: {device} for team vector processing.')
+                device = torch.device(cfg.acceleration if ':' in cfg.acceleration else 'cuda:0')
+                log.info(f'Using gpu {device} for teams vectors generation.')
 
                 s2i, c2i, l2i = indexes['s2i'], indexes['c2i'], indexes['l2i']
                 total_dim = len(s2i) + len(c2i) + len(l2i)
