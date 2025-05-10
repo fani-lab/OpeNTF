@@ -237,8 +237,11 @@ class Team(object):
 
             elif 'acceleration' in cfg and 'cuda' in cfg.acceleration:
                 torch = opentf.install_import(cfg.pytorch, 'torch')
-                device = torch.device(cfg.acceleration if ':' in cfg.acceleration else 'cuda:0')
-                log.info(f'Using gpu {device} for teams vectors generation.')
+                device = cfg.acceleration if ':' in cfg.acceleration else 'cuda:0'
+                try: torch.tensor([1.0], device=device)
+                except RuntimeError as e: raise RuntimeError(f'{opentf.textcolor["red"]}{cfg.acceleration}-->{device} is not available or invalid!{opentf.textcolor["reset"]}') from e
+                device = torch.device(device)
+                log.info(f'Using gpu {opentf.textcolor["blue"]}{cfg.acceleration}-->{device}{opentf.textcolor["reset"]} for teams vectors generation ...')
 
                 s2i, c2i, l2i = indexes['s2i'], indexes['c2i'], indexes['l2i']
                 total_dim = len(s2i) + len(c2i) + len(l2i)
