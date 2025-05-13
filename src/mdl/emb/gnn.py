@@ -17,6 +17,7 @@ class Gnn(T2v):
         self.writer = opentf.install_import('tensorboardX==2.6.2.2', 'tensorboardX', 'SummaryWriter')(log_dir=self.output + '/logs4tfboard')
         self.name = None
         self.decoder = None
+        self.modelfilepath = None
 
     def _prep(self, teamsvecs, indexes, splits):
         #NOTE: for any change, unit test using https://github.com/fani-lab/OpeNTF/issues/280
@@ -100,7 +101,7 @@ class Gnn(T2v):
                                  walks_per_node=self.cfg.model.wn,
                                  num_negative_samples=self.cfg.model.ns).to(self.device)
             self._train_rw(prefix + output + postfix) #TODO: valid and test sets
-            self.get_node_emb(homo_data=homo_data) #logging purposes
+            self._get_node_emb(homo_data=homo_data) #logging purposes
 
         elif self.name == 'm2v':
             # assert isinstance(self.data, self.pyg.data.HeteroData), f'{opentf.textcolor["red"]}Hetero graph is needed for m2v. {self.cfg.graph.structure} is NOT hetero!{opentf.textcolor["reset"]}'
@@ -114,7 +115,7 @@ class Gnn(T2v):
                                      walks_per_node=self.cfg.model.wn,
                                      num_negative_samples=self.cfg.model.ns).to(self.device)
             self._train_rw(prefix + output + postfix) #TODO: valid and test sets
-            self.get_node_emb() #logging purposes
+            self._get_node_emb() #logging purposes
 
         elif self.name == 'han':
             # assert isinstance(self.data, self.pyg.data.HeteroData), f'{opentf.textcolor["red"]}Hetero graph is needed for m2v. {self.cfg.graph.structure} is NOT hetero!{opentf.textcolor["reset"]}'
@@ -139,6 +140,7 @@ class Gnn(T2v):
             train_l, valid_l, test_l = self._build_loader_mp(homo_data=homo_data) # building train/valid/test splits and loaders. Should depend on data
             self._train_mp(prefix + output + postfix, train_l, valid_l, test_l)
 
+        self.modelfilepath = prefix + output + postfix
         # if self.name == 'lant': self.model.learn(self, self.cfg.model.e)  # built-in validation inside lant_encoder class
         #
         # self.plot_points()
@@ -351,12 +353,16 @@ class Gnn(T2v):
             if 'skill' in self.data.node_types: self.data['skill'].x = ordered_vecs[teamsvecs['member'].shape[1]:]; flag = True  # the remaining is s*
         assert flag, f'{opentf.textcolor["red"]}Nodes features initialization with d2v embeddings NOT applied! Check the consistency of d2v {self.cfg.graph.pre} and graph node types {self.cfg.graph.structure}{opentf.textcolor["reset"]}'
 
-    def get_node_emb(self, homo_data=None):
+    def get_dense_vecs(self, vectype='skill'): return self._get_node_emb(vectype=vectype)
+    def _get_node_emb(self, homo_data=None, node_type=None):
         # in n2v, the weights are indeed the embeddings, like w2v or d2v
         # in other models, self.model(self.data), that is the forward-pass produces the embedding
         # this part is not needed, as having a model, we always can have the embedding
         self.model.eval()
         if self.name == 'm2v':
+            if node_type is not None:
+                try: return self.model(node_type)
+                except KeyError as e: raise KeyError(f'{opentf.textcolor["yellow"]}No vectors for {node_type}.{opentf.textcolor["reset"]} Check if it is part of metapath -> {self.cfg.model.metapath_name}') from e
             for node_type in self.data.node_types: # self.model.start or self.model.end could be used for MetaPath2Vec model but ...
                 try: log.info(f'Node type: {node_type}, Shape: {self.model(node_type).shape}')
                 except KeyError: log.warning(f'{opentf.textcolor["yellow"]}No vectors for {node_type}.{opentf.textcolor["reset"]} Check if it is part of metapath -> {self.cfg.model.metapath_name}' )
@@ -364,9 +370,9 @@ class Gnn(T2v):
             if homo_data is None: homo_data = self.data.to_homogeneous()
             embeddings = self.model.embedding.weight.data.cpu() if self.name == 'n2v' else self.model(homo_data)
             node_type_tensor = homo_data.node_type # tensor of shape [num_nodes]
+            if node_type is not None: return embeddings[node_type_tensor == (self.data.node_types.index(node_type))]
             for i, node_type in enumerate(self.data.node_types):
-                mask = (node_type_tensor == i)
-                type_embeddings = embeddings[mask]  # shape: [num_nodes_of_type, self.cfg.model.d]
+                type_embeddings = embeddings[node_type_tensor == i]  # shape: [num_nodes_of_type, self.cfg.model.d]
                 log.info(f'Node type: {node_type}, Shape: {type_embeddings.shape}')
 
     # def save_emb(self):

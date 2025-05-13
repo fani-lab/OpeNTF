@@ -1,0 +1,9 @@
+seed: # will be overriden dynamically in ./src/main.py from root ./config.yml
+batch_size: 1000 # batch_size for loaders
+epochs: 100 # num max epochs
+ns: 5 # number of negative samples for each positive sample
+lr: 0.001 #learning rate
+pytorch: #will be overriden dynamically in ./src/main.py from root ./config.yml
+
+rnd:
+tntf:

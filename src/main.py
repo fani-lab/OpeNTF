@@ -22,8 +22,7 @@ def get_splits(n_sample, n_folds, train_ratio, output, seed, year_idx=None, step
         if year_idx:
             train = np.arange(year_idx[0][0], year_idx[-step_ahead][0])  # for temporal folding, we do on each time interval ==> look at tntf.py
             test = np.arange(year_idx[-step_ahead][0], n_sample)
-        else:
-            train, test = scikit.train_test_split(np.arange(n_sample), train_size=train_ratio, random_state=seed, shuffle=True)
+        else: train, test = scikit.train_test_split(np.arange(n_sample), train_size=train_ratio, random_state=seed, shuffle=True)
 
         splits = dict()
         splits['test'] = test
@@ -68,9 +67,10 @@ def aggregate(output):
             dff.set_axis(names, axis=1, inplace=True)
             dff.to_csv(f"{output}{rd}/{rf.replace('.csv', '.agg.csv')}", index=False)
 
-@hydra.main(version_base=None, config_path='.', config_name='config')
+@hydra.main(version_base=None, config_path='.', config_name='__config__')
 def run(cfg):
-    if any(c in cfg.cmd for c in ['prep', 'train']):
+    t2v = None
+    if any(c in cfg.cmd for c in ['prep', 'train', 'test']):
         cfg.data.output += f'.mt{cfg.data.filter.min_nteam}.ts{cfg.data.filter.min_team_size}' if 'filter' in cfg.data and cfg.data.filter else ''
         if not os.path.isdir(cfg.data.output): os.makedirs(cfg.data.output)
 
@@ -92,12 +92,11 @@ def run(cfg):
         splits = get_splits(vecs['skill'].shape[0], cfg.train.nfolds, cfg.train.train_test_ratio, cfg.data.output, cfg.seed, indexes['i2y'] if cfg.train.step_ahead else None, step_ahead=cfg.train.step_ahead)
 
         if 'embedding' in cfg.data and cfg.data.embedding.class_method:
-            # Get command-line overrides for embedding.
-            # Kinda tricky as we dynamically override a subconfig.
+            # Get command-line overrides for embedding. Kinda tricky as we dynamically override a subconfig.
             # Use '+data.embedding.{...}=value' to override
             # Use '+data.embedding.{...}=null' to drop. The '~data.embedding.{...}' cannot be used here.
             emb_overrides = [o.replace('+data.embedding.', '') for o in HydraConfig.get().overrides.task if '+data.embedding.' in o]
-            embcfg = OmegaConf.merge(OmegaConf.load('mdl/emb/config.yaml'), OmegaConf.from_dotlist(emb_overrides))
+            embcfg = OmegaConf.merge(OmegaConf.load('mdl/emb/__config__.yaml'), OmegaConf.from_dotlist(emb_overrides))
             embcfg.model.seed = cfg.seed
             embcfg.model.gnn.pytorch = cfg.pytorch
             OmegaConf.resolve(embcfg)
@@ -119,9 +118,38 @@ def run(cfg):
 
         # non-temporal (no streaming scenario, bag of teams)
 
+        assert len(cfg.models.instances) > 0, f'{opentf.textcolor["red"]}No model instance for training! Check ./src/config.yaml and models.instances ... {opentf.textcolor["reset"]}'
+
+        if cfg.train.merge_teams_w_same_skills: domain_cls.merge_teams_by_skills(vecs, inplace=True)
+
+        if 'embedding' in cfg.data and cfg.data.embedding.class_method:
+            # t2v object knows the embedding method and ...
+            skill_vecs = t2v.get_dense_vecs(vectype='skill')
+            assert skill_vecs.shape[0] == vecs['skill'].shape[0], f'{opentf.textcolor["red"]}Incorrect number of embeddings for teams subset of skills!{opentf.textcolor["reset"]}'
+            vecs['skill'] = skill_vecs
+
         for m in cfg.models.instances:
             import mdl # required for all models. Also, mdl/__init__.py should expose all submodules
             models[m] = eval(m, {'mdl': mdl})
+            # if m_name.endswith('a1'): vecs_['skill'] = lil_matrix(scipy.sparse.hstack((vecs_['skill'], lil_matrix(np.ones((vecs_['skill'].shape[0], 1))))))
+            log.info(f'Training team recommender instance {m} ... ')
+            # find a way to show model-emb pair setting
+            # make_popular_and_nonpopular_matrix(vecs_, data_list[0])
+
+            # Get command-line overrides for models. Kinda tricky as we dynamically override a subconfig.
+            # Use '+models.{...}=value' to override
+            # Use '+models.{...}=null' to drop
+            mdl_overrides = [o.replace('+models.', '') for o in HydraConfig.get().overrides.task if '+models.' in o]
+            mdlcfg = OmegaConf.merge(OmegaConf.load('mdl/__config__.yaml'), OmegaConf.from_dotlist(mdl_overrides))
+            mdlcfg.seed = cfg.seed
+            mdlcfg.pytorch = cfg.pytorch
+            OmegaConf.resolve(mdlcfg)
+            cfg.models.config = mdlcfg
+
+            output_ = (t2v.modelfilepath if t2v else cfg.data.output) + f'_{self.__class__.__name__.lower()}'
+            if not os.path.isdir(output): os.makedirs(output_)
+
+            if 'train' in cfg.cmd: models[m].learn(vecs, indexes, splits, cfg.models.config[models[m].__class__.__name__.lower()], None, output_)
 
         # # streaming scenario (no vector for time)
         # if 'tfnn' in model_list: models['tfnn'] = tNtf(Fnn(), cfg.train.nfolds, cfg.train.step_ahead)
@@ -141,30 +169,28 @@ def run(cfg):
         # if 'tbnn_dt2v_emb' in model_list: models['tbnn_dt2v_emb'] = tNtf(Bnn(), cfg.train.nfolds, cfg.train.step_ahead)
 
         # # todo: temporal: time as an input feature
-        #
+
         # # temporal recommender systems
         # if 'caser' in model_list: models['caser'] = Caser(settings['model']['step_ahead'])
         # if 'rrn' in model_list: models['rrn'] = Rrn(settings['model']['baseline']['rrn']['with_zero'], settings['model']['step_ahead'])
 
-        assert len(models) > 0, f'{opentf.textcolor["red"]}No model instance for training! Check ./src/config.yaml and models.instances ... {opentf.textcolor["reset"]}'
+    # if 'test' in cmd: self.test(output, splits, indexes, vecs, settings, on_train_valid_set, per_epoch, merge_skills)
+    # if 'eval' in cmd: self.evaluate(output, splits, vecs, on_train_valid_set, per_instance, per_epoch)
+    # if 'plot' in cmd: self.plot_roc(output, splits, on_train_valid_set)
+    # if 'fair' in cmd: self.fair(output, vecs, splits, fair_settings)
 
-        if 'embedding' in cfg.data and cfg.data.embedding.class_method:
-            # t2v object knows the embedding method and ...
-            vecs['skill'] = t2v.get_dense_vecs()['skill']
+    # for temporal
+    # year_idx = indexes['i2y']
+    # output_ = f'{output}/{year_idx[-self.step_ahead - 1][1]}'  # this folder will be created by the last model training
 
-        from shutil import copyfile
-        # from scipy.sparse import lil_matrix
-        for (m_name, m_obj) in models.items():
-            # if m_name.endswith('a1'): vecs_['skill'] = lil_matrix(scipy.sparse.hstack((vecs_['skill'], lil_matrix(np.ones((vecs_['skill'].shape[0], 1))))))
-            log.info(f'Training team recommender instance {m_name} ... ')
-            # find a way to show model-emb pair setting
-            copyfile('./config.yaml', f'{cfg.data.output}/config.yaml')
-            copyfile('./mdl/config.yaml', f'{cfg.data.output}/mdl/config.yaml')
-            copyfile('./mdl/emb/config.yaml', f'{cfg.data.output}/mdl/emb/config.yaml')
-
-            # make_popular_and_nonpopular_matrix(vecs_, data_list[0])
-
-            m_obj.run(vecs, indexes, splits, f'{cfg.data.output}', cfg.cmd, cfg.models.instances[m_name])
+    #if 'test' in cmd:# todo: the prediction of each step ahead should be seperate
+    #   # for i, v in enumerate(year_idx[-self.step_ahead:]):  # the last years are for test.
+    #   #     tsplits['test'] = np.arange(year_idx[i][0], year_idx[i + 1][0] if i < len(year_idx) else len(indexes['i2t']))
+    #   self.model.test(output_, splits, indexes, vecs, settings, on_train_valid_set, per_epoch)
+    #
+    #         # todo: the evaluation of each step ahead should be seperate
+    #   if 'eval' in cmd: self.model.evaluate(output_, splits, vecs, on_train_valid_set, per_instance, per_epoch)
+    #   if 'plot' in cmd: self.model.plot_roc(output_, splits, on_train_valid_set)
 
     if 'agg' in cfg.cmd: aggregate(cfg.data.output)
 

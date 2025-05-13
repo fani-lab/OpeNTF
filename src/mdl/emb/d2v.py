@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-
-import pickle, logging, os
-from tqdm import tqdm
+import pickle, logging, os, numpy as np
 
 log = logging.getLogger(__name__)
 
@@ -55,11 +52,11 @@ class D2v(T2v):
 
     def train(self, teamsvecs, indexes, splits):
         # to select/create correct model file in the output directory
-        output = self.output + f'/d{self.cfg.d}.e{self.cfg.e}.{self.name}.w{self.cfg.w}.dm{self.cfg.dm}.{self.cfg.embtype}'
+        self.modelfilepath = self.output + f'/d{self.cfg.d}.e{self.cfg.e}.{self.name}.w{self.cfg.w}.dm{self.cfg.dm}.{self.cfg.embtype}'
         try:
-            log.info(f"Loading the model {output} for {(teamsvecs['skill'].shape[0], self.cfg.d)}  embeddings ...")
+            log.info(f"Loading the model {self.modelfilepath} for {(teamsvecs['skill'].shape[0], self.cfg.d)}  embeddings ...")
             self.__class__.gensim = opentf.install_import('gensim==4.3.3', 'gensim')
-            self.model = self.gensim.models.Doc2Vec.load(output)
+            self.model = self.gensim.models.Doc2Vec.load(self.modelfilepath)
             assert self.model.docvecs.vectors.shape[0] == teamsvecs['skill'].shape[0], f'{opentf.textcolor["red"]}Incorrect number of embeddings per team! {self.model.docvecs.vectors.shape[0]} != {teamsvecs["skill"].shape[0]}{opentf.textcolor["reset"]}'
             log.info(f'Model of {self.model.docvecs.vectors.shape} embeddings loaded.')
             return self
@@ -78,12 +75,12 @@ class D2v(T2v):
                     self.model.train(self.data, total_examples=self.model.corpus_count, epochs=1)
                     delta = (self.model.alpha - self.model.min_alpha) / (self.cfg.e - 1)
                     self.model.alpha = max(self.model.alpha - delta, self.model.min_alpha)
-                    log.info(f'Saving model at {output}.{opentf.textcolor["blue"]}e{epoch} at lr {self.model.alpha}{opentf.textcolor["reset"]}...')
-                    self.model.save(f'{output}.e{epoch}')
+                    log.info(f'Saving model at {self.modelfilepath}.{opentf.textcolor["blue"]}e{epoch} at lr {self.model.alpha}{opentf.textcolor["reset"]}...')
+                    self.model.save(f'{self.modelfilepath}.e{epoch}')
             else: self.model.train(self.data, total_examples=self.model.corpus_count, epochs=self.cfg.e)
 
-            log.info(f'Saving model at {output} ...')
-            self.model.save(output)
+            log.info(f'Saving model at {self.modelfilepath} ...')
+            self.model.save(self.modelfilepath)
             # self.model.save_word2vec_format(f'{output}.w2v')
             # self.model.docvecs.save_word2vec_format(f'{output}.d2v')
             return self
@@ -106,7 +103,13 @@ class D2v(T2v):
         sorted_indices = np.array([d2v_model_wv.key_to_index[word] for word in sorted_words])
         return d2v_model_wv.vectors[sorted_indices]
 
-
+    def get_dense_vecs(self, vectype='skill'):
+        assert self.cfg.embtype == vectype, f'{opentf.textcolor["red"]}Incorrect d2v model ({self.cfg.embtype}) for the requested vector type {vectype}{opentf.textcolor["reset"]}'
+        indices = [self.model.docvecs.key_to_index[str(i)] for i in range(len(self.model.docvecs))]
+        assert np.allclose(self.model.docvecs.vectors, self.model.docvecs.vectors[indices]), f'{opentf.textcolor["red"]}Incorrect embedding for a team due to misorderings of embeddings!{opentf.textcolor["reset"]}'
+        # note that a doc includes a subset of skills or members. So, the doc vec represents the subset.
+        # we can have vec for each individual words (skill or member) but then we have to sum/mean then for a subset. that's w2v, not d2v-based skills or members
+        return self.model.docvecs.vectors
 
 # # unit tests :D
 # if cfg.model.d2v.embtype == 'skill': print(t2v.model['s5'])

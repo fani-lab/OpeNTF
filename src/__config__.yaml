@@ -8,7 +8,7 @@ hydra:
     #dir: /dev/null # windows
 seed: 0
 pytorch: torch==2.2.2 #--index-url https://download.pytorch.org/whl/cu124
-acceleration: 'cpu' #cpu for all cores, cpu:3 for 3 cores, 'cuda' or 'cuda:0' for the only available gpu, 'cuda:3' for gpu3 >> TODO: multiple gpus
+acceleration: 'cuda' #cpu for all cores, cpu:3 for 3 cores, 'cuda' or 'cuda:0' for the only available gpu, 'cuda:3' for gpu3 >> TODO: multiple gpus
 cmd:
   - prep
   - train
@@ -44,7 +44,7 @@ data: #required for 'prep' step
   acceleration: ${acceleration}
   embedding:
     class_method: #directs to the correct part of the embedding config file. If not set, skipped.
-      #mdl.emb.d2v.D2v_d2v   #Doc2Vec https://radimrehurek.com/gensim/auto_examples/tutorials/run_doc2vec_lee.html
+      mdl.emb.d2v.D2v_d2v   #Doc2Vec https://radimrehurek.com/gensim/auto_examples/tutorials/run_doc2vec_lee.html
       #mdl.emb.gnn.Gnn_n2v   #Node2Vec https://pytorch-geometric.readthedocs.io/en/latest/generated/torch_geometric.nn.models.Node2Vec.html
       #mdl.emb.gnn.Gnn_m2v   #Metapath2Vec https://pytorch-geometric.readthedocs.io/en/latest/generated/torch_geometric.nn.models.MetaPath2Vec.html
       #mdl.emb.gnn.Gnn_gcn   #GraphConvolutionNetwork https://pytorch-geometric.readthedocs.io/en/latest/generated/torch_geometric.nn.conv.GCNConv.html
@@ -56,7 +56,7 @@ data: #required for 'prep' step
 
 models:
   instances:
-    #- mdl.rnd.Rnd()
+    - mdl.rnd.Rnd()
     #- mdl.fnn.Fnn() #input skills could be multihot (default), embeddings by d2v, n2v, m2v, ... see above data.embedding.class_method
     #- mdl.bnn.Bnn()
     #- mdl.nmt.Nmt()
@@ -70,15 +70,20 @@ models:
 train:
   nfolds: 3 #ends with nfolds models each with nfolds-1 train splits and one fold valid split, nfolds results, averaged on a single test split
   train_test_ratio: 0.85 #the nfolds will be on the trainig part.
+  merge_teams_w_same_skills: True # for explanation >> https://github.com/fani-lab/OpeNTF/issues/156
   step_ahead: #if streaming/temporal training. for now, it means that whatever are in the last [step_ahead] time interval will be the test set!
+  save_per_epoch: False
 
 test:
-  merge_skills: False #shouldn't be in eval
+  on_train: False # for over vs. under-fitting check. # random baseline (mdl.rnd.Rnd()) cannot join this.
+  per_epoch: ${train.save_per_epoch} # the test results of each epoch on the test set >> for per-epoch performance. Similar to valid losses during training but here we can have eval metrics
+
+eval:
+  on_train: ${test.on_train}
+  save_per_instance: True # needed for paired significance tests
 
 fair: #post-hoc reranks of the prediction list
   np_ratio: #desired ratio of non-popular experts after reranking; if None, based on distribution in dataset; default: None; Eg. 0.5
   fairness: det_greedy #reranking algorithm from {det_greedy, det_cons, det_relaxed}; required; Eg. det_cons
   k_max: #cutoff for the reranking algorithms; default: None
   attribute: #the set of our sensitive attributes')
-
-eval:

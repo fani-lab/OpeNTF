@@ -1,23 +1,23 @@
-import multiprocessing, os, pickle, re
+import os, pickle, re, logging
 from functools import partial
+log = logging.getLogger(__name__)
 
+import pkgmgr as opentf
 class Ntf:
     def __init__(self): super(Ntf, self).__init__()
 
-    def learn(self, splits, indexes, vecs, params, prev_model, output): pass
-    def test(self, model_path, splits, indexes, vecs, params, on_train_valid_set=False, per_epoch=False, merge_skills=False): pass
-
-    def evaluate(self, model_path, splits, vecs, on_train_valid_set=False, per_instance=False, per_epoch=False):
+    def learn(self, teamsvecs, indexes, splits, cfg, prev_model, output): pass
+    def test(self, teamsvecs, indexes, splits, cfg, model_path, on_train=False, per_epoch=False): pass
+    def evaluate(self, teamsvecs, splits, model_path, on_train=False, per_instance=False, per_epoch=False):
         import pandas as pd
         import torch
-        from torch import nn
-        from eval.metric import calculate_skill_coverage, calculate_metrics
+        import evl.metric as metric
 
-        print(f'\n.............. starting eval .................\n')
+        log.info(f'\n{opentf.textcolor["blue"]}.............. starting eval .................{opentf.textcolor["reset"]}\n')
         if not os.path.isdir(model_path): raise Exception("The predictions do not exist!")
-        y_test = vecs['member'][splits['test']] # the actual y
+        y_test = teamsvecs['member'][splits['test']] # the actual y
 
-        for pred_set in (['test', 'train', 'valid'] if on_train_valid_set else ['test']):
+        for pred_set in (['test', 'train', 'valid'] if on_train else ['test']):
             fold_mean = pd.DataFrame()
             if per_instance: fold_mean_per_instance = pd.DataFrame()
             mean_std = pd.DataFrame()
@@ -28,24 +28,21 @@ class Ntf:
 
             epochs = len(predfiles)//len(splits['folds'].keys())
             for e in range(epochs):
-                epoch = f'e{e}.' if per_epoch and e < (epochs - 1) else ""
+                epoch = f'e{e}.' if per_epoch and e < (epochs - 1) else ''
                 for foldidx in splits['folds'].keys():
-                    if pred_set != 'test':
-                        Y = vecs['member'][splits['folds'][foldidx][pred_set]]
-                    else:
-                        Y = y_test
+                    if pred_set != 'test': Y = teamsvecs['member'][splits['folds'][foldidx][pred_set]]
+                    else: Y = y_test
                     Y_ = torch.load(f'{model_path}/f{foldidx}.{pred_set}.{epoch}pred')
 
-                    actual_skills = vecs['skill_main'][splits['test']].todense().astype(int) # taking the skills from the test teams
-                    skill_coverage = calculate_skill_coverage(vecs, actual_skills, Y_, [2, 5, 10]) # dict of skill_coverages for list of k's
+                    actual_skills = teamsvecs['skill_main'][splits['test']].todense().astype(int) # taking the skills from the test teams
+                    skill_coverage = metric.skill_coverage(teamsvecs, actual_skills, Y_, [2, 5, 10]) # dict of skill_coverages for list of k's
                     df_skc = pd.DataFrame.from_dict(skill_coverage, orient='index', columns=['mean']) # skill_coverage (top_k) per fold
 
-                    df, df_mean, (fpr, tpr) = calculate_metrics(Y, Y_, per_instance)
+                    df, df_mean, (fpr, tpr) = metric.calculate_metrics(Y, Y_, per_instance)
                     if per_instance: df.to_csv(f'{model_path}/f{foldidx}.{pred_set}.{epoch}pred.eval.per_instance.csv', float_format='%.15f')
-                    print(f'Saving file per fold as : f{foldidx}.{pred_set}.{epoch}pred.eval.mean.csv')
+                    log.info(f'Saving file per fold as : f{foldidx}.{pred_set}.{epoch}pred.eval.mean.csv')
                     df_mean.to_csv(f'{model_path}/f{foldidx}.{pred_set}.{epoch}pred.eval.mean.csv')
-                    with open(f'{model_path}/f{foldidx}.{pred_set}.{epoch}pred.eval.roc.pkl', 'wb') as outfile:
-                        pickle.dump((fpr, tpr), outfile)
+                    with open(f'{model_path}/f{foldidx}.{pred_set}.{epoch}pred.eval.roc.pkl', 'wb') as outfile: pickle.dump((fpr, tpr), outfile)
 
                     df_mean = pd.concat([df_mean, df_skc], axis = 0) # concat df_skc to the last row of df_mean
                     fold_mean = pd.concat([fold_mean, df_mean], axis=1)
@@ -53,12 +50,13 @@ class Ntf:
                 # the last row is a list of roc values
                 mean_std['mean'] = fold_mean.mean(axis=1)
                 mean_std['std'] = fold_mean.std(axis=1)
-                print(f'Saving mean evaluation file over nfolds as : {pred_set}.{epoch}pred.eval.mean.csv')
+                log.info(f'Saving mean evaluation file over nfolds as : {pred_set}.{epoch}pred.eval.mean.csv')
                 mean_std.to_csv(f'{model_path}/{pred_set}.{epoch}pred.eval.mean.csv')
                 if per_instance: fold_mean_per_instance.truediv(len(splits['folds'].keys())).to_csv(f'{model_path}/{pred_set}.{epoch}pred.eval.per_instance_mean.csv')
-        print(f'\n.............. ending eval .................\n')
+        log.info(f'\n{opentf.textcolor["blue"]}.............. starting eval .................{opentf.textcolor["reset"]}\n')
 
     def fair(self, model_path, teamsvecs, splits, settings):
+        import multiprocessing
         from Adila.src import main as adila
         if os.path.isfile(model_path):
             adila.Reranking.run(fpred=model_path,
@@ -134,16 +132,4 @@ class Ntf:
             plt.savefig(f'{model_path}/{pred_set}.roc.png', dpi=100, bbox_inches='tight')
             plt.show()
 
-    def run(self, splits, vecs, indexes, output, settings, cmd, fair_settings, merge_skills):
-        # output = f"{output}/t{vecs['skill'].shape[0]}.s{vecs['skill'].shape[1]}.m{vecs['member'].shape[1]}.{'.'.join([k + str(v).replace(' ', '') for k, v in settings.items() if v])}"
-        if not os.path.isdir(output): os.makedirs(output)
 
-        on_train_valid_set = False #random baseline cannot join this.
-        per_instance = False
-        per_epoch = False
-
-        if 'train' in cmd: self.learn(splits, indexes, vecs, settings, None, output)
-        if 'test' in cmd: self.test(output, splits, indexes, vecs, settings, on_train_valid_set, per_epoch, merge_skills)
-        if 'eval' in cmd: self.evaluate(output, splits, vecs, on_train_valid_set, per_instance, per_epoch)
-        if 'plot' in cmd: self.plot_roc(output, splits, on_train_valid_set)
-        if 'fair' in cmd: self.fair(output, vecs, splits, fair_settings)
