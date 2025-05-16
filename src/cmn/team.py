@@ -237,9 +237,10 @@ class Team(object):
 
             elif 'acceleration' in cfg and 'cuda' in cfg.acceleration:
                 torch = opentf.install_import(cfg.pytorch, 'torch')
-                try: torch.tensor([1.0], device=(device := torch.device(cfg.acceleration if ':' in cfg.acceleration else 'cuda:0')))
-                except RuntimeError as e: raise RuntimeError(f'{opentf.textcolor["red"]}{cfg.acceleration}-->{device} is not available or invalid!{opentf.textcolor["reset"]}') from e
-                log.info(f'Using gpu {opentf.textcolor["blue"]}{cfg.acceleration}-->{device}{opentf.textcolor["reset"]} for teams vectors generation ...')
+
+                device_id_str = cfg.acceleration.split(':', 1)[1].split(',')[0].strip() if ':' in cfg.acceleration else '0'
+                device = torch.device(f'cuda:{device_id_str}')
+                log.info(f'Using GPU: {device} for team vector processing.')
 
                 s2i, c2i, l2i = indexes['s2i'], indexes['c2i'], indexes['l2i']
                 total_dim = len(s2i) + len(c2i) + len(l2i)
@@ -255,7 +256,7 @@ class Team(object):
                     gpu_tensor_batches.append(torch.from_numpy(batch_array).to(device))
                 
                 # Convert back to sparse matrix for validation
-                if gpu_tensor_batches: data = scipy.sparse.lil_matrix((torch.vstack(gpu_tensor_batches)).cpu().numpy())
+                if gpu_tensor_batches: data = scipy.sparse.lil_matrix(torch.vstack(gpu_tensor_batches).cpu().numpy(), dtype='u1')
                 else: data = scipy.sparse.lil_matrix((0, total_dim), dtype='u1')
                 
             # serial
