@@ -34,7 +34,11 @@ data: #required for 'prep' step
     #../output/imdb/toy.title.basics.tsv
     #../output/gith/toy.repos.csv
     ../output/uspt/toy.patent.tsv
-
+  hf_output:
+    #output/dblp/toy.dblp.v12.json
+    #output/imdb/toy.title.basics.tsv
+    #output/gith/toy.repos.csv
+    output/uspt/toy.patent.tsv
   filter:
     min_nteam: 10 # as this may yield empty teams, min_team_size should be set to at least 1
     min_team_size: 2 #no filter -> no key 'filter' or ~data.filter in the command line

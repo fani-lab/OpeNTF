@@ -2,8 +2,10 @@ import os, scipy.sparse, pickle, numpy as np, logging
 from collections import Counter
 from functools import partial
 from dateutil import parser
+from huggingface_hub import HfApi
 
 log = logging.getLogger(__name__)
+hf_api = HfApi(token="")
 
 import pkgmgr as opentf
 class Team(object):
@@ -211,7 +213,7 @@ class Team(object):
 
         return (True, '')
     @classmethod
-    def gen_teamsvecs(cls, datapath, output, cfg):
+    def gen_teamsvecs(cls, datapath, output, cfg, hf_output):
         pkl = f'{output}/teamsvecs.pkl'
         try:
             log.info(f"Loading teamsvecs matrices from {pkl} ...")
@@ -220,6 +222,16 @@ class Team(object):
             log.info(f"Teamsvecs matrices for skills {vecs['skill'].shape}, members {vecs['member'].shape}, and locations {vecs['loc'].shape if vecs['loc'] is not None else None} are loaded.")
             return vecs, indexes
         except FileNotFoundError as e:
+            if(hf_api.file_exists(repo_id="fani-lab/OpeNTF-test", repo_type="dataset", filename=f"{hf_output}/teamsvecs.pkl")):
+                log.info(f"Downloading file from hf: {pkl} ...")
+                hf_api.hf_hub_download(repo_id="fani-lab/OpeNTF-test", repo_type="dataset", filename=f"{hf_output}/teamsvecs.pkl", local_dir='../')
+                
+                log.info(f"Loading teamsvecs matrices from {pkl} ...")
+                with open(pkl, 'rb') as infile: vecs = pickle.load(infile)
+                indexes, _ = cls.read_data(datapath, output, cfg, indexes_only=True)
+                log.info(f"Teamsvecs matrices for skills {vecs['skill'].shape}, members {vecs['member'].shape}, and locations {vecs['loc'].shape if vecs['loc'] is not None else None} are loaded.")
+                return vecs, indexes
+            
             log.info("Teamsvecs matrices not found! Generating ...")
             indexes, teams = cls.read_data(datapath, output, cfg, indexes_only=False)
 
