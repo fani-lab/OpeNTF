@@ -5,10 +5,7 @@ from huggingface_hub import HfApi, hf_hub_download, file_exists
 Obtain hf token:
 Go to https://huggingface.co/settings/tokens and create a new token
 '''
-hf_api = HfApi(
-    endpoint="https://huggingface.co/", # Can be a Private Hub endpoint.
-    token="", # Token is not persisted on the machine.
-)
+hf_api = HfApi(token="")
 
 
 # Upload as a folder
