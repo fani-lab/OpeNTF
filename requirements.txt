@@ -32,3 +32,6 @@ python-dateutil==2.9
 #fairsearchcore==1.0.4 # required by Adila submodule
 ##schedule
 #bayesian-torch
+
+huggingface_hub
+python-dotenv

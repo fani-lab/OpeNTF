@@ -2,6 +2,7 @@ import os, scipy.sparse, pickle, numpy as np, logging
 from collections import Counter
 from functools import partial
 from dateutil import parser
+from cmn.hf_client import HFClient
 
 log = logging.getLogger(__name__)
 
@@ -210,16 +211,25 @@ class Team(object):
                               f'Based on the underlying dataset/domain, it may be valid like in uspt, or invalid like dblp.\n{e}')
 
         return (True, '')
+    
+    def __load_teamsvecs_from_file(cls, datapath, output, cfg, pkl):
+        log.info(f"Loading teamsvecs matrices from {pkl} ...")
+        with open(pkl, 'rb') as infile: vecs = pickle.load(infile)
+        indexes, _ = cls.read_data(datapath, output, cfg, indexes_only=True)
+        log.info(f"Teamsvecs matrices for skills {vecs['skill'].shape}, members {vecs['member'].shape}, and locations {vecs['loc'].shape if vecs['loc'] is not None else None} are loaded.")
+        return vecs, indexes
+    
     @classmethod
     def gen_teamsvecs(cls, datapath, output, cfg):
         pkl = f'{output}/teamsvecs.pkl'
+        hf = HFClient(repo_id="fani-lab/OpeNTF-test", repo_type="dataset")
         try:
-            log.info(f"Loading teamsvecs matrices from {pkl} ...")
-            with open(pkl, 'rb') as infile: vecs = pickle.load(infile)
-            indexes, _ = cls.read_data(datapath, output, cfg, indexes_only=True)
-            log.info(f"Teamsvecs matrices for skills {vecs['skill'].shape}, members {vecs['member'].shape}, and locations {vecs['loc'].shape if vecs['loc'] is not None else None} are loaded.")
-            return vecs, indexes
+            return cls.__load_teamsvecs_from_file(cls, datapath, output, cfg, pkl)
         except FileNotFoundError as e:
+            # NOTE: in hugging face, the pkl file is in the same path as output, except the '../' is removed
+            if(pkl.startswith("../") and hf.download_file(filename=pkl[3:])):
+                return cls.__load_teamsvecs_from_file(cls, datapath, output, cfg, pkl)
+            
             log.info("Teamsvecs matrices not found! Generating ...")
             indexes, teams = cls.read_data(datapath, output, cfg, indexes_only=False)
 
