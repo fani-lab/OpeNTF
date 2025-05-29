@@ -223,6 +223,8 @@ class Team(object):
             log.info("Teamsvecs matrices not found! Generating ...")
             indexes, teams = cls.read_data(datapath, output, cfg, indexes_only=False)
 
+            # there should be no difference in content of teavsvecs when using different acceleration method
+            # do unit test manually as explained here: https://github.com/fani-lab/OpeNTF/issues/286#issuecomment-2920203907
             if 'acceleration' in cfg and 'cpu' in cfg.acceleration:
                 import multiprocessing
                 with multiprocessing.Pool() as p:
