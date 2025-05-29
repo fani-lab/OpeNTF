@@ -5,7 +5,7 @@ In this survey, we present a novel taxonomy from a computational perspective. Ex
 ![Team Formation Methods](figures/methods.jpg)
 
 This survey pertains to the graph-based Expert Team Formation algorithms, that is, those that employ graphs to model the experts’ collaboration ties followed by subgraph optimization algorithms, as they comprise the mainstream body of research. While some OR-based works model the dataset as a graph structure, they opt for linear/non-linear integer/real programming methods as opposed to subgraph optimization. In this survey, we include works that not only model the data as graphs but also apply subgraph optimization methods. We exclude works that are based on operations research and learning-based methods, as they differ fundamentally from subgraph optimization algorithms. We recognize the importance of these areas and the wealth of work they include, but a thorough analysis of them is beyond the scope of this work and merits separate surveys.
-![venn](figures/methods.jpg)
+![venn](figures/venn.jpg)
 
 We present a comprehensive overview of 18 seminal graph-based solutions to the Team Formation problem, 
 including 13 proposed optimization objectives, after screening 63 algorithms from 126 papers. 
