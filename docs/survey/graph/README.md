@@ -1,4 +1,4 @@
-## A Survey of Subgraph Optimization for Collaborative Team Formation: Objectives, Techniques, and Critics
+## A Survey of Subgraph Optimization for Expert Team Formation
 The search for gathering a team of experts who are expected to collaboratively work towards accomplishing a given
 project successfully is referred to as Team Formation, a problem that has historically been solved in a variety of
 ways including manually in a time-consuming and bias-filled manner, and, algorithmically within such disciplines as
