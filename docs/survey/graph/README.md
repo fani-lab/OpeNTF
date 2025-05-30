@@ -1,11 +1,6 @@
 ## A Survey of Subgraph Optimization for Expert Team Formation
 Expert Team Formation is the search for gathering a team of experts who are expected to collaboratively work towards accomplishing a given project, a problem that has historically been solved in a variety of ways, including manually in a time-consuming and bias-filled manner, and algorithmically within disciplines like social sciences and management. In the present effort, while providing a taxonomy to distinguish between search-based versus learning-based approaches, we survey graph-based studies from the search-based category, motivated as they comprise the mainstream. We present a unifying and vetted overview of the various definitions in this realm, scrutinize assumptions, and identify shortfalls. We start by reviewing initial approaches to the Expert Team Formation problem to lay the conceptual foundations and set forth the necessary notions for a more grounded view of this realm. Next, we provide a detailed view of graph-based Expert Team Formation approaches based on the objective functions they optimize. We lay out who builds on whom and how algorithms have evolved to solve the drawbacks of previous works. Further, we categorize evaluation schemas and elaborate on metrics and insights that can be drawn from each. Referring to the evaluation schemas and metrics, we compare works and propose future directions.
 
-Our survey brings forth a unifying and vetted methodology to the various definitions of the notions in this realm, criticizes assumptions and comparative benchmarks,
-and points out shortfalls to smooth the path for future research directions.
-In this survey, we present a novel taxonomy from a computational perspective:
-![Team Formation Methods](figures/methods.jpg)
-
 We present a comprehensive overview of 18 seminal graph-based solutions to the Team Formation problem, 
 including 13 proposed optimization objectives, after screening 63 algorithms from 126 papers. 
 The examined papers in this survey can be categorized as follows:
