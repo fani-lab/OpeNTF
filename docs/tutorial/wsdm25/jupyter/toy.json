@@ -1,0 +1,34 @@
+[
+  {
+    "id": 1,
+    "reviewers": [
+      { "name": "Ada", "id": 1, "expertise": "Multimedia mining" },
+      { "name": "Bob", "id": 11, "expertise": "Image Captioning" },
+      { "name": "Cameron", "id": 12, "expertise": "Image Classification" }
+    ],
+    "fos": ["Image Captioning"],
+    "title": "A Comprehensive Review of Domain-specific Image Captioning",
+    "year": 2000,
+    "r_status": [
+      { "r_id": 1, "status": "weak accept" },
+      { "r_id": 11, "status": "reject" },
+      { "r_id": 12, "status": "weak accept" }
+    ]
+  },
+  {
+    "id": 2,
+    "reviewers": [
+      { "name": "Ada", "id": 1, "expertise": "Multimedia mining" },
+      { "name": "David", "id": 9, "expertise": "Video Classification" },
+      { "name": "Cameron", "id": 12, "expertise": "Image Classification" }
+    ],
+    "fos": ["Machine Learning", "Image Segmentation"],
+    "title": "A methodology for the physically accurate visualisation of medical imaging",
+    "year": 1999,
+    "r_status": [
+      { "r_id": 1, "status": "accept" },
+      { "r_id": 11, "status": "accept" },
+      { "r_id": 12, "status": "weak accept" }
+    ]
+  }
+]

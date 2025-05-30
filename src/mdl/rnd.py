@@ -1,16 +1,15 @@
 import numpy as np
 
-import torch
-from torch.utils.data import DataLoader
-
 from mdl.ntf import Ntf
-from mdl.cds import TFDataset
 
 class Rnd(Ntf):
-    def __init__(self):
-        super(Rnd, self).__init__()
+    def __init__(self): super(Rnd, self).__init__()
 
-    def test(self, model_path, splits, indexes, vecs, params, on_train_valid_set=False, per_epoch=False):
+    def test(self, model_path, splits, indexes, vecs, params, on_train_valid_set=False, per_epoch=False, merge_skills=False):
+        import torch
+        from torch.utils.data import DataLoader
+        from mdl.cds import TFDataset
+
         X_test = vecs['skill'][splits['test'], :]
         y_test = vecs['member'][splits['test']]
         test_matrix = TFDataset(X_test, y_test)
@@ -29,5 +28,5 @@ class Rnd(Ntf):
             torch.save(y_pred, f'{model_path}/f{foldidx}.test.pred', pickle_protocol=4)
 
     def forward(self, x, y):
-        x = torch.clamp(torch.rand(y.shape), min=1.e-6, max=1. - 1.e-6)
-        return x
+        import torch
+        return torch.clamp(torch.rand(y.shape), min=1.e-6, max=1. - 1.e-6)

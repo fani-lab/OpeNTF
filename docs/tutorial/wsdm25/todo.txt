@@ -1,0 +1,12 @@
+links to gnn papers (
+  gcn: https://arxiv.org/pdf/1609.02907
+  graphsage: https://arxiv.org/pdf/1706.02216
+  gat: https://arxiv.org/pdf/1710.10903
+  gin: https://arxiv.org/pdf/1810.00826
+
+
+link to temporal papers
+- Effendy et al. Analysing trends in computer science research: A preliminary study using the microsoft academic graph.  WWW 2017.
+
+link to evaluation metric
+- https://ils.unc.edu/courses/2013_spring/inls509_001/lectures/10-EvaluationMetrics.pdf

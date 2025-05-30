@@ -4,4 +4,4 @@
 <p align="center"><img src="./bnn.png" width="400"></p>
 
 #Streaming Scenario using Temporal Neural Team Formation (tNtf)
-<p align="center"><img src="./tntf.png" width="700"></p>
+<p align="center"><img src="docs/tntf.png" width="700"></p>

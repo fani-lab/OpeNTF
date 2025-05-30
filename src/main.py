@@ -1,51 +1,43 @@
-import os, json
-import argparse
-import pickle
+import os, pickle, logging, numpy as np
+log = logging.getLogger(__name__)
 
-import numpy as np
-import pandas as pd
-from sklearn.model_selection import KFold, train_test_split
-from scipy.sparse import lil_matrix
-from shutil import copyfile
-import scipy.sparse
+import hydra
+from omegaconf import OmegaConf #,DictConfig
+from hydra.core.hydra_config import HydraConfig
+from hydra.utils import get_class
 
-import param
-from cmn.tools import NumpyArrayEncoder, popular_nonpopular_ratio
-from cmn.publication import Publication
-from cmn.movie import Movie
-from cmn.patent import Patent
-from cmn.github import Repo
-from mdl.fnn import Fnn
-from mdl.bnn import Bnn
-from mdl.rnd import Rnd
-from mdl.nmt import Nmt
-from mdl.tnmt import tNmt
-from mdl.tntf import tNtf
-from mdl.team2vec.team2vec import Team2Vec
-from mdl.caser import Caser
-from mdl.rrn import Rrn
-from cmn.tools import generate_popular_and_nonpopular
+import pkgmgr as opentf
 
-def create_evaluation_splits(n_sample, n_folds, train_ratio=0.85, year_idx=None, output='./', step_ahead=1):
-    if year_idx:
-        train = np.arange(year_idx[0][0], year_idx[-step_ahead][0])  # for teamporal folding, we do on each time interval ==> look at tntf.py
-        test = np.arange(year_idx[-step_ahead][0], n_sample)
-    else:
-        train, test = train_test_split(np.arange(n_sample), train_size=train_ratio, random_state=0, shuffle=True)
+# from cmn.tools import popular_nonpopular_ratio, generate_popular_and_nonpopular
 
-    splits = dict()
-    splits['test'] = test
-    splits['folds'] = dict()
-    skf = KFold(n_splits=n_folds, random_state=0, shuffle=True)
-    for k, (trainIdx, validIdx) in enumerate(skf.split(train)):
-        splits['folds'][k] = dict()
-        splits['folds'][k]['train'] = train[trainIdx]
-        splits['folds'][k]['valid'] = train[validIdx]
+def get_splits(n_sample, n_folds, train_ratio, output, seed, year_idx=None, step_ahead=1):
+    splitf = f'{output}/splits.pkl'
+    try:
+        log.info(f'Loading splits from {splitf} ...')
+        with open(splitf, 'rb') as f: splits = pickle.load(f)
+        return splits
+    except FileNotFoundError as e:
+        scikit = opentf.install_import('scikit-learn==1.2.2', 'sklearn.model_selection')
+        log.info(f'Splits file not found! Generating ...')
+        if year_idx:
+            train = np.arange(year_idx[0][0], year_idx[-step_ahead][0])  # for temporal folding, we do on each time interval ==> look at tntf.py
+            test = np.arange(year_idx[-step_ahead][0], n_sample)
+        else: train, test = scikit.train_test_split(np.arange(n_sample), train_size=train_ratio, random_state=seed, shuffle=True)
 
-    with open(f'{output}/splits.json', 'w') as f: json.dump(splits, f, cls=NumpyArrayEncoder, indent=1)
-    return splits
+        splits = dict()
+        splits['test'] = test
+        splits['folds'] = dict()
+        skf = scikit.KFold(n_splits=n_folds, random_state=seed, shuffle=True)
+        for k, (trainIdx, validIdx) in enumerate(skf.split(train)):
+            splits['folds'][k] = dict()
+            splits['folds'][k]['train'] = train[trainIdx]
+            splits['folds'][k]['valid'] = train[validIdx]
+
+        with open(splitf, 'wb') as f: pickle.dump(splits, f)
+        return splits
 
 def aggregate(output):
+    import pandas as pd
     files = list()
     for dirpath, dirnames, filenames in os.walk(output):
         if not dirnames: files += [os.path.join(os.path.normpath(dirpath), file).split(os.sep) for file in filenames if file.endswith("pred.eval.mean.csv")]
@@ -75,147 +67,137 @@ def aggregate(output):
             dff.set_axis(names, axis=1, inplace=True)
             dff.to_csv(f"{output}{rd}/{rf.replace('.csv', '.agg.csv')}", index=False)
 
-def run(data_list, domain_list, fair, filter, future, model_list, output, exp_id, settings):
-    filter_str = f".filtered.mt{settings['data']['filter']['min_nteam']}.ts{settings['data']['filter']['min_team_size']}" if filter else ""
+@hydra.main(version_base=None, config_path='.', config_name='__config__')
+def run(cfg):
+    t2v = None
+    if any(c in cfg.cmd for c in ['prep', 'train', 'test']):
+        cfg.data.output += f'.mt{cfg.data.filter.min_nteam}.ts{cfg.data.filter.min_team_size}' if 'filter' in cfg.data and cfg.data.filter else ''
+        if not os.path.isdir(cfg.data.output): os.makedirs(cfg.data.output)
 
-    if exp_id: output = f'{output}exp_{exp_id}/'
-    if not os.path.isdir(output): os.makedirs(output)
+        domain_cls = get_class(cfg.data.domain)
 
-    datasets = {}
-    models = {}
+        # this will call the Team.generate_sparse_vectors(), which itself may (lazy) call Team.read_data(), which itself may (lazy) call {Publication|Movie|Repo|Patent}.read_data()
+        vecs, indexes = domain_cls.gen_teamsvecs(cfg.data.source, cfg.data.output, cfg.data)
 
-    if 'dblp' in domain_list: datasets['dblp'] = Publication
-    if 'imdb' in domain_list: datasets['imdb'] = Movie
-    if 'uspt' in domain_list: datasets['uspt'] = Patent
-    if 'gith' in domain_list: datasets['gith'] = Repo
+        #TODO? move this call for evaluation part?
+        # skill coverage metric, all skills of each expert, all expert of each skills (supports of each skill, like in RarestFirst)
+        vecs['skillcoverage'] = domain_cls.gen_skill_coverage(vecs, cfg.data.output) # after we have a sparse vector, we create es_vecs from that
 
-    # model names starting with 't' means that they will follow the streaming scenario
-    # model names ending with _a1 means that they have one 1 added to their input for time as aspect learning
-    # model names having _dt2v means that they learn the input embedding with doc2vec where input is (skills + year)
-
-    # non-temporal (no streaming scenario, bag of teams)
-    if 'random' in model_list: models['random'] = Rnd()
-    if 'fnn' in model_list: models['fnn'] = Fnn()
-    if 'bnn' in model_list: models['bnn'] = Bnn()
-    if 'fnn_emb' in model_list: models['fnn_emb'] = Fnn()
-    if 'bnn_emb' in model_list: models['bnn_emb'] = Bnn()
-    if 'nmt' in model_list: models['nmt'] = Nmt()
-
-    # streaming scenario (no vector for time)
-    if 'tfnn' in model_list: models['tfnn'] = tNtf(Fnn(), settings['model']['nfolds'], step_ahead=settings['model']['step_ahead'])
-    if 'tbnn' in model_list: models['tbnn'] = tNtf(Bnn(), settings['model']['nfolds'], step_ahead=settings['model']['step_ahead'])
-    if 'tfnn_emb' in model_list: models['tfnn_emb'] = tNtf(Fnn(), settings['model']['nfolds'], step_ahead=settings['model']['step_ahead'])
-    if 'tbnn_emb' in model_list: models['tbnn_emb'] = tNtf(Bnn(), settings['model']['nfolds'], step_ahead=settings['model']['step_ahead'])
-    if 'tnmt' in model_list: models['tnmt'] = tNmt(settings['model']['nfolds'], settings['model']['step_ahead'])
-
-    # streaming scenario with adding one 1 to the input (time as aspect/vector for time)
-    if 'tfnn_a1' in model_list: models['tfnn_a1'] = tNtf(Fnn(), settings['model']['nfolds'], step_ahead=settings['model']['step_ahead'])
-    if 'tbnn_a1' in model_list: models['tbnn_a1'] = tNtf(Bnn(), settings['model']['nfolds'], step_ahead=settings['model']['step_ahead'])
-    if 'tfnn_emb_a1' in model_list: models['tfnn_emb_a1'] = tNtf(Fnn(), settings['model']['nfolds'], step_ahead=settings['model']['step_ahead'])
-    if 'tbnn_emb_a1' in model_list: models['tbnn_emb_a1'] = tNtf(Bnn(), settings['model']['nfolds'], step_ahead=settings['model']['step_ahead'])
-
-    # streaming scenario with adding the year to the doc2vec training (temporal dense skill vecs in input)
-    if 'tfnn_dt2v_emb' in model_list: models['tfnn_dt2v_emb'] = tNtf(Fnn(), settings['model']['nfolds'], step_ahead=settings['model']['step_ahead'])
-    if 'tbnn_dt2v_emb' in model_list: models['tbnn_dt2v_emb'] = tNtf(Bnn(), settings['model']['nfolds'], step_ahead=settings['model']['step_ahead'])
-
-    # todo: temporal: time as an input feature
-
-    # temporal recommender systems
-    if 'caser' in model_list: models['caser'] = Caser(settings['model']['step_ahead'])
-    if 'rrn' in model_list: models['rrn'] = Rrn(settings['model']['baseline']['rrn']['with_zero'], settings['model']['step_ahead'])
-
-
-    if 'np_ratio' in fair: settings['fair']['np_ratio'] = fair['np_ratio']
-    if 'fairness' in fair: settings['fair']['fairness'] = fair['fairness']
-    if 'k_max' in fair: settings['fair']['k_max'] = fair['k_max']
-    if 'attribute' in fair: settings['fair']['attribute'] = fair['attribute']
-
-    assert len(datasets) > 0
-    assert len(datasets) == len(domain_list)
-    assert len(models) > 0
-
-    for (d_name, d_cls) in datasets.items():
-        datapath = data_list[domain_list.index(d_name)]
-        prep_output = f'./../data/preprocessed/{d_name}/{os.path.split(datapath)[-1]}'
-        vecs, indexes = d_cls.generate_sparse_vectors(datapath, f'{prep_output}{filter_str}', filter, settings['data'])
         year_idx = []
-        for i in range(1, len(indexes['i2y'])):
-            if indexes['i2y'][i][0] - indexes['i2y'][i-1][0] > settings['model']['nfolds']:
-                year_idx.append(indexes['i2y'][i-1])
+        for i in range(1, len(indexes['i2y'])): #e.g, [(0, 1900), (6, 1903), (14, 1906)] => the i shows the starting index for teams of the year
+            if indexes['i2y'][i][0] - indexes['i2y'][i-1][0] > cfg.train.nfolds: year_idx.append(indexes['i2y'][i-1])
         year_idx.append(indexes['i2y'][-1])
         indexes['i2y'] = year_idx
-        splits = create_evaluation_splits(vecs['id'].shape[0], settings['model']['nfolds'], settings['model']['train_test_split'], indexes['i2y'] if future else None, output=f'{prep_output}{filter_str}', step_ahead=settings['model']['step_ahead'])
 
-        for (m_name, m_obj) in models.items():
-            vecs_ = vecs.copy()
-            if m_name.find('_emb') > 0:
-                t2v = Team2Vec(vecs, indexes, 'dt2v' if m_name.find('_dt2v') > 0 else 'skill', f'./../data/preprocessed/{d_name}/{os.path.split(datapath)[-1]}{filter_str}')
-                emb_setting = settings['model']['baseline']['emb']
-                t2v.train(emb_setting['d'], emb_setting['w'], emb_setting['dm'], emb_setting['e'])
-                vecs_['skill'] = t2v.dv()
+        splits = get_splits(vecs['skill'].shape[0], cfg.train.nfolds, cfg.train.train_test_ratio, cfg.data.output, cfg.seed, indexes['i2y'] if cfg.train.step_ahead else None, step_ahead=cfg.train.step_ahead)
 
-            if m_name.endswith('a1'): vecs_['skill'] = lil_matrix(scipy.sparse.hstack((vecs_['skill'], lil_matrix(np.ones((vecs_['skill'].shape[0], 1))))))
+        if 'embedding' in cfg.data and cfg.data.embedding.class_method:
+            # Get command-line overrides for embedding. Kinda tricky as we dynamically override a subconfig.
+            # Use '+data.embedding.{...}=value' to override
+            # Use '+data.embedding.{...}=null' to drop. The '~data.embedding.{...}' cannot be used here.
+            emb_overrides = [o.replace('+data.embedding.', '') for o in HydraConfig.get().overrides.task if '+data.embedding.' in o]
+            embcfg = OmegaConf.merge(OmegaConf.load('mdl/emb/__config__.yaml'), OmegaConf.from_dotlist(emb_overrides))
+            embcfg.model.seed = cfg.seed
+            embcfg.model.gnn.pytorch = cfg.pytorch
+            OmegaConf.resolve(embcfg)
+            cfg.data.embedding.config = embcfg
+            cls, method = cfg.data.embedding.class_method.split('_')
+            cls = get_class(cls)
+            t2v = cls(cfg.data.output, cfg.data.acceleration, cfg.data.embedding.config.model[cls.__name__.lower()])
+            t2v.name = method
+            t2v.train(vecs, indexes, splits)
 
-            baseline_name = m_name.lstrip('t').replace('_emb', '').replace('_dt2v', '').replace('_a1', '')
-            print(f'Running for (dataset, model): ({d_name}, {m_name}) ... ')
+    if any(c in cfg.cmd for c in ['train', 'test']):
 
-            output_path = f"{output}{os.path.split(datapath)[-1]}{filter_str}/{m_name}/t{vecs_['skill'].shape[0]}.s{vecs_['skill'].shape[1]}.m{vecs_['member'].shape[1]}.{'.'.join([k + str(v).replace(' ', '') for k, v in settings['model']['baseline'][baseline_name].items() if v])}"
-            if not os.path.isdir(output_path): os.makedirs(output_path)
-            copyfile('./param.py', f'{output_path}/param.py')
+        # if a list, all see the exact splits of teams.
+        # if individual, they see different teams in splits. But as we show the average results, no big deal, esp., as we do n-fold
+        models = {}
+        # model names t* will follow the streaming scenario
+        # model names *_ts have timestamp (year) as a single added feature
+        # model names *_ts2v learn temporal skill vectors via d2v when each doc is a stream of (skills: year of the team)
+
+        # non-temporal (no streaming scenario, bag of teams)
+
+        assert len(cfg.models.instances) > 0, f'{opentf.textcolor["red"]}No model instance for training! Check ./src/config.yaml and models.instances ... {opentf.textcolor["reset"]}'
+
+        if cfg.train.merge_teams_w_same_skills: domain_cls.merge_teams_by_skills(vecs, inplace=True)
+
+        if 'embedding' in cfg.data and cfg.data.embedding.class_method:
+            # t2v object knows the embedding method and ...
+            skill_vecs = t2v.get_dense_vecs(vectype='skill')
+            assert skill_vecs.shape[0] == vecs['skill'].shape[0], f'{opentf.textcolor["red"]}Incorrect number of embeddings for teams subset of skills!{opentf.textcolor["reset"]}'
+            vecs['skill'] = skill_vecs
+
+        for m in cfg.models.instances:
+            import mdl # required for all models. Also, mdl/__init__.py should expose all submodules
+            models[m] = eval(m, {'mdl': mdl})
+            # if m_name.endswith('a1'): vecs_['skill'] = lil_matrix(scipy.sparse.hstack((vecs_['skill'], lil_matrix(np.ones((vecs_['skill'].shape[0], 1))))))
+            log.info(f'Training team recommender instance {m} ... ')
+            # find a way to show model-emb pair setting
             # make_popular_and_nonpopular_matrix(vecs_, data_list[0])
 
-            m_obj.run(splits, vecs_, indexes, f'{output_path}', settings['model']['baseline'][baseline_name], settings['model']['cmd'], settings['fair'], merge_skills=False)
-    if 'agg' in settings['model']['cmd']: aggregate(output)
+            # Get command-line overrides for models. Kinda tricky as we dynamically override a subconfig.
+            # Use '+models.{...}=value' to override
+            # Use '+models.{...}=null' to drop
+            mdl_overrides = [o.replace('+models.', '') for o in HydraConfig.get().overrides.task if '+models.' in o]
+            mdlcfg = OmegaConf.merge(OmegaConf.load('mdl/__config__.yaml'), OmegaConf.from_dotlist(mdl_overrides))
+            mdlcfg.seed = cfg.seed
+            mdlcfg.pytorch = cfg.pytorch
+            OmegaConf.resolve(mdlcfg)
+            cfg.models.config = mdlcfg
 
+            output_ = (t2v.modelfilepath if t2v else cfg.data.output) + f'_{self.__class__.__name__.lower()}'
+            if not os.path.isdir(output): os.makedirs(output_)
 
-def addargs(parser):
-    dataset = parser.add_argument_group('dataset')
-    dataset.add_argument('-data', '--data-list', nargs='+', type=str, default=[], required=True, help='a list of dataset paths; required; (eg. -data ./../data/raw/toy.json)')
-    dataset.add_argument('-domain', '--domain-list', nargs='+', type=str.lower, default=[], required=True, help='a list of domains; required; (eg. -domain dblp imdb uspt gith)')
-    dataset.add_argument('-filter', type=int, default=0, choices=[0, 1], help='remove outliers? (e.g., -filter 0 (default) or 1)')
-    dataset.add_argument('-future', type=int, default=0, choices=[0, 1], help='predict future? (e.g., -future 0 (default) or 1)')
+            if 'train' in cfg.cmd: models[m].learn(vecs, indexes, splits, cfg.models.config[models[m].__class__.__name__.lower()], None, output_)
 
-    baseline = parser.add_argument_group('baseline')
-    baseline.add_argument('-model', '--model-list', nargs='+', type=str.lower, default=[], required=True, help='a list of neural models (eg. -model random fnn bnn fnn_emb bnn_emb nmt)')
+        # # streaming scenario (no vector for time)
+        # if 'tfnn' in model_list: models['tfnn'] = tNtf(Fnn(), cfg.train.nfolds, cfg.train.step_ahead)
+        # if 'tbnn' in model_list: models['tbnn'] = tNtf(Bnn(), cfg.train.nfolds, cfg.train.step_ahead)
+        # if 'tfnn_emb' in model_list: models['tfnn_emb'] = tNtf(Fnn(), cfg.train.nfolds, cfg.train.step_ahead)
+        # if 'tbnn_emb' in model_list: models['tbnn_emb'] = tNtf(Bnn(), cfg.train.nfolds, cfg.train.step_ahead)
+        # if 'tnmt' in model_list: models['tnmt'] = tNmt(cfg.train.nfolds, cfg.train.step_ahead)
+        #
+        # # streaming scenario with adding one 1 to the input (time as aspect/vector for time)
+        # if 'tfnn_a1' in model_list: models['tfnn_a1'] = tNtf(Fnn(), cfg.train.nfolds, cfg.train.step_ahead)
+        # if 'tbnn_a1' in model_list: models['tbnn_a1'] = tNtf(Bnn(), cfg.train.nfolds, cfg.train.step_ahead)
+        # if 'tfnn_emb_a1' in model_list: models['tfnn_emb_a1'] = tNtf(Fnn(), cfg.train.nfolds, cfg.train.step_ahead)
+        # if 'tbnn_emb_a1' in model_list: models['tbnn_emb_a1'] = tNtf(Bnn(), cfg.train.nfolds, cfg.train.step_ahead)
+        #
+        # # streaming scenario with adding the year to the doc2vec training (temporal dense skill vecs in input)
+        # if 'tfnn_dt2v_emb' in model_list: models['tfnn_dt2v_emb'] = tNtf(Fnn(), cfg.train.nfolds, cfg.train.step_ahead)
+        # if 'tbnn_dt2v_emb' in model_list: models['tbnn_dt2v_emb'] = tNtf(Bnn(), cfg.train.nfolds, cfg.train.step_ahead)
 
-    output = parser.add_argument_group('output')
-    output.add_argument('-output', type=str, default='./../output/', help='The output path (default: -output ./../output/)')
-    output.add_argument('-exp_id', type=str, default=None, help='ID of the experiment')
+        # # todo: temporal: time as an input feature
 
-    fair = parser.add_argument_group('fair')
-    fair.add_argument('-np_ratio', '--np_ratio', type=float, default=None, required=False, help='desired ratio of non-popular experts after reranking; if None, based on distribution in dataset; default: None; Eg. 0.5')
-    fair.add_argument('-fairness', '--fairness', nargs='+', type=str, default='det_greedy', required=False, help='reranking algorithm from {det_greedy, det_cons, det_relaxed}; required; Eg. det_cons')
-    fair.add_argument('-k_max', '--k_max', type=int, default=None, required=False, help='cutoff for the reranking algorithms; default: None')
-    fair.add_argument('-attribute', '--attribute', nargs='+' ,type=str, default='popularity', required=False, help='the set of our sensitive attributes')
+        # # temporal recommender systems
+        # if 'caser' in model_list: models['caser'] = Caser(settings['model']['step_ahead'])
+        # if 'rrn' in model_list: models['rrn'] = Rrn(settings['model']['baseline']['rrn']['with_zero'], settings['model']['step_ahead'])
 
-# python -u main.py -data ../data/raw/dblp/toy.dblp.v12.json
-# 						  ../data/raw/imdb/toy.title.basics.tsv
-# 						  ../data/raw/uspt/toy.patent.tsv
-#                         ../data/raw/gith/toy.data.csv
-# 					-domain dblp imdb uspt gith
-# 					-model random
-# 					       fnn fnn_emb bnn bnn_emb nmt
-# 					       tfnn tbnn tnmt tfnn_emb tbnn_emb tfnn_a1 tbnn_a1 tfnn_emb_a1 tbnn_emb_a1 tfnn_dt2v_emb tbnn_dt2v_emb
-#                   -filter 1
+    # if 'test' in cmd: self.test(output, splits, indexes, vecs, settings, on_train_valid_set, per_epoch, merge_skills)
+    # if 'eval' in cmd: self.evaluate(output, splits, vecs, on_train_valid_set, per_instance, per_epoch)
+    # if 'plot' in cmd: self.plot_roc(output, splits, on_train_valid_set)
+    # if 'fair' in cmd: self.fair(output, vecs, splits, fair_settings)
+
+    # for temporal
+    # year_idx = indexes['i2y']
+    # output_ = f'{output}/{year_idx[-self.step_ahead - 1][1]}'  # this folder will be created by the last model training
+
+    #if 'test' in cmd:# todo: the prediction of each step ahead should be seperate
+    #   # for i, v in enumerate(year_idx[-self.step_ahead:]):  # the last years are for test.
+    #   #     tsplits['test'] = np.arange(year_idx[i][0], year_idx[i + 1][0] if i < len(year_idx) else len(indexes['i2t']))
+    #   self.model.test(output_, splits, indexes, vecs, settings, on_train_valid_set, per_epoch)
+    #
+    #         # todo: the evaluation of each step ahead should be seperate
+    #   if 'eval' in cmd: self.model.evaluate(output_, splits, vecs, on_train_valid_set, per_instance, per_epoch)
+    #   if 'plot' in cmd: self.model.plot_roc(output_, splits, on_train_valid_set)
+
+    if 'agg' in cfg.cmd: aggregate(cfg.data.output)
+
+# sample runs for different configs, including different prep, embeddings, model training, ..., are available as unit-test in
+# ./github/workflows/*.yml
 
 # To run on compute canada servers you can use the following command: (time is in minutes)
-#sbatch --account=def-hfani --mem=96000MB --time=2880 cc.sh
+#sbatch --account=def-hfani --mem=96000MB --time=2880 computecanada.sh
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Neural Team Formation')
-    addargs(parser)
-    args = parser.parse_args()
-
-    fair = { 'fairness': args.fairness, 'k_max': args.k_max, 'np_ratio': args.np_ratio, 'attribute': args.attribute }
-    run(data_list=args.data_list,
-        domain_list=args.domain_list,
-        fair = fair,
-        filter=args.filter,
-        future=args.future,
-        model_list=args.model_list,
-        output=args.output,
-        exp_id=args.exp_id,
-        settings=param.settings)
-
-    # aggregate(args.output)
-
+if __name__ == '__main__': run()

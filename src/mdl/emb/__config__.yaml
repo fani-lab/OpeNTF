@@ -1,0 +1,191 @@
+dim: 128 # embedding dim. it matters for skill vectors if the skill set is small (e.g., in imdb or gith) or large (e.g., in dblp or uspt)
+
+model:
+  seed: # will be overriden dynamically in ./src/main.py from root ./config.yml
+  batch_size: 1000 # batch_size for loaders
+  epochs: 100 # num max epochs
+  ns: 5 # number of negative samples for each positive sample
+  lr: 0.001 #learning rate
+  save_per_epoch: False
+
+  # Quoc V. Le, Tomás Mikolov: Distributed Representations of Sentences and Documents. ICML 2014: 1188-1196
+  d2v: # we use gensim
+    seed: ${model.seed}
+    embtype: skill # skill, member, skillmember, skilltime
+    dm: 1 # training algorithm. 1: distributed memory (PV-DM), 0: distributed bag of words (PV-DBOW)
+    # NOTE: As the input is a skill subset, so either the sum/avg of skill vectors individually >> embtype = 'skill' or 'joint' and  dbow_words = True
+    # OR the team vecs when the words are only skills. So, embtype = 'skill' and  dbow_words = False
+    # let's remove this and do for always
+    # dbow_words: True # train word-vectors in skip-gram fashion; 0: no (default, faster), 1: yes.
+    w: 5 # cooccurrence window. In OpeNTF (for teams), depends on the average team size (n_members) plus n_skills per teams
+    d: ${dim}
+    e: ${model.epochs}
+    lr: ${model.lr}
+    save_per_epoch: ${model.save_per_epoch}
+
+  gnn:
+    graph:
+      structure: #hydra doesn't understand tuple. So, inside code, explicit cast to tuple(...)
+        #[[[member, to, member]], m] # looks like hetero but homo to have consistent pipleline for both types
+        #[[[skill, to, member]], sm) #hetero
+        [[[skill, to, team], [member, to, team]], stm]
+        #[[[skill, to, team], [member, to, team], [loc, to, team]], stml]
+        #[[[skill, to, skill], [skill, to, team], [member, to, team], [loc, to, team]], sstml]
+
+      dup_edge: #https://pytorch-geometric.readthedocs.io/en/2.6.1/generated/torch_geometric.transforms.ToUndirected.html
+        # if not set, keep the duplicates, else: merged by 'add', 'mean', 'min', 'max', or 'mul' >> for now, a single edge feature of value 1, so, mean, max, min should have all same effect
+        add
+        #mean
+        #min
+        #max
+        #mul
+      pre: # if set, use pretrained D2v vectors as initial node features of graph data
+        #d8.e100.w10.d2v.dm1.skillmember  # skill, member, team
+        #d8.e100.w10.d2v.dm1.skill  # skill, team
+        #d9.e100.w10.d2v.dm1.skill  # if not exists, train from scratch!
+
+    pytorch: #will be overriden dynamically in ./src/main.py from root ./config.yml
+    seed: ${model.seed}
+    model:   #dummy tag as placeholder. don't worry or touch it.
+
+    #Grover, Aditya, and Jure Leskovec. "node2vec: Scalable feature learning for networks." Proceedings of the 22nd ACM SIGKDD international conference on Knowledge discovery and data mining. 2016.
+    #p: Return parameter, controls likelihood of revisiting the previous node. high p → discourages going back, low p → encourages backtracking
+    #q: In-out (exploration) parameter, controls likelihood of visiting distant vs nearby nodes. high q → BFS-like (stick to local neighborhood), low q → DFS-like (explore outward)
+    #p q	Behavior
+    #1 1	Unbiased random walk (vanilla DeepWalk)
+    #1 0.5	DFS-like (explore outward, communities)
+    #1 2	BFS-like (stay local, structural roles)
+    #0.2 4	Very local walks
+    #4 0.25	Very exploratory
+    n2v:
+      d:  ${dim}
+      w:  ${model.d2v.w}
+      e:  ${model.epochs}
+      b:  ${model.batch_size}
+      lr: ${model.lr}
+      ns: ${model.ns}
+      save_per_epoch: ${model.save_per_epoch}
+      wl: 5  #walk_length
+      wn: 10 #walks_per_node
+      p:  1.0
+      q:  1.0
+
+    #Dong, Chawla, Swami. "metapath2vec: Scalable representation learning for heterogeneous networks." SIGKDD 2017.
+    m2v:
+      metapath_name: # to have an embedding for a node type, it should be part of the metapath, e.g., for locations
+          #[[[member, rev_to, skill], [skill, to, member]], ms-sm] # for sm graph structure
+          [[[member, to, team], [team, rev_to, skill], [skill, to, team], [team, rev_to, member]], 'mts-stm'] #m->t->s, s->t->m for stm. Note: when we build the graph, m->t, s->t, l->t. So, make it undirected, t->m, t->s get 'rev_to' label
+          #[[[member, to, team],[team, rev_to, loc], [loc, to, team], [team, rev_to, member]], mtl-ltm] #stml
+      d:  ${dim}
+      w:  ${model.d2v.w}
+      e:  ${model.epochs}
+      b:  ${model.batch_size}
+      lr: ${model.lr}
+      ns: ${model.gnn.n2v.ns}
+      save_per_epoch: ${model.save_per_epoch}
+      wl: ${model.gnn.n2v.wl} #walk_length
+      wn: ${model.gnn.n2v.wn} #walks_per_node
+
+    #Thomas N. Kipf, Max Welling: Semi-Supervised Classification with Graph Convolutional Networks. ICLR (Poster) 2017
+    gcn:
+      d: ${dim}
+      e: ${model.epochs}
+      b: ${model.batch_size}
+      lr: ${model.lr}
+      ns: ${model.ns}
+      save_per_epoch: ${model.save_per_epoch}
+      h: # hidden dimension, if empty, means 1-hop: [${dim}, ${dim}], otherwise means len(hd)+1 hop: [${dim}, hd[0], hd[1], ..., ${dim}]
+        - ${dim} # hydra cannot interpolate in a list like [${dim}]. So, each item per line
+      nn: [30, 20] # number of neighbors in each hop ([20, 10] -> 20 neighbors in 1-hop, 10 neighbors in 2-hop). Should match hd
+      supervision_edge_types: # if not set, all edge_types as supervision edges.
+        #([('member', 'to', 'team')], 'stm')
+
+    #Hamilton, Will, Zhitao Ying, and Jure Leskovec. "Inductive representation learning on large graphs." NIPS (2017).
+    gs: ${model.gnn.gcn}
+      #d: ${dim}
+      #e: ${model.epochs}
+      #b: ${model.batch_size}
+      #lr: ${model.lr}
+      #ns: ${model.ns}
+      #save_per_epoch: ${model.save_per_epoch}
+      #h: # hidden dimension, if empty, means 1-hop: [${dim}, ${dim}], otherwise means len(hd)+1 hop: [${dim}, hd[0], hd[1], ..., ${dim}]
+      #  - ${dim} # hydra cannot interpolate in a list like [${dim}]. So, each item per line
+      #nn: [ 30, 20 ] # number of neighbors in each hop ([20, 10] -> 20 neighbors in 1-hop, 10 neighbors in 2-hop). Should match hd
+      #supervision_edge_types: # if not set, all edge_types as supervision edges.
+      ##([('member', 'to', 'team')], 'stm')
+
+    gin: ${model.gnn.gcn}
+
+    gat:
+      d: ${dim}
+      e: ${model.epochs}
+      b: ${model.batch_size}
+      lr: ${model.lr}
+      ns: ${model.ns}
+      save_per_epoch: ${model.save_per_epoch}
+      h: # hidden dimension, if empty, means 1-hop: [${dim}, ${dim}], otherwise means len(hd)+1 hop: [${dim}, hd[0], hd[1], ..., ${dim}]
+        - ${dim} # hydra cannot interpolate in a list like [${dim}]. So, each item per line
+      nn: [30, 20] # number of neighbors in each hop ([20, 10] -> 20 neighbors in 1-hop, 10 neighbors in 2-hop). Should match hd
+      supervision_edge_types: # if not set, all edge_types as supervision edges.
+        #([('member', 'to', 'team')], 'stm')
+      ah: 2 # number of attention heads (if applicable)
+      cat: True # multi-head attention aggregation, True: concat, False: mean
+
+    gatv2: ${model.gnn.gat}
+
+
+
+#  'gnn.han': {
+#      'e': 100,
+#      'b': 128,
+#      'd': 8,
+#      'ns' : 5,
+#      'h': 2,
+#      'nn': [30, 20],
+#      'graph_types': 'stm',
+#      'agg': 'mean',
+#      'dir': False,
+#      'metapaths':{
+#          'sm': [[('skill', 'to', 'member'), ('member', 'rev_to', 'skill')]],
+#          'stm': [
+#              [('member', 'to', 'team'), ('team', 'rev_to', 'skill'), ('skill', 'to', 'team'), ('team', 'rev_to', 'member')],
+#              [('skill', 'to', 'team'), ('team', 'rev_to', 'member'), ('member', 'to', 'team'), ('team', 'rev_to', 'skill')],
+#              [('member', 'to', 'team'), ('team', 'rev_to', 'member')],
+#              [('skill', 'to', 'team'), ('team', 'rev_to', 'skill')],
+#          ],
+#          'stml': [
+#              [('member', 'to', 'team'), ('team', 'rev_to', 'loc'), ('loc', 'to', 'team'), ('team', 'rev_to', 'member')],
+#              [('skill', 'to', 'team'), ('team', 'rev_to', 'member'), ('member', 'to', 'team'), ('team', 'rev_to', 'skill')],
+#              [('member', 'to', 'team'), ('team', 'rev_to', 'member')],
+#              [('skill', 'to', 'team'), ('team', 'rev_to', 'skill')],
+#          ],
+#          # added one extra e-e connection in the middle
+#          # 'sm.en': [[('skill', 'to', 'skill'), ('skill', 'to', 'member'), ('member', 'to', 'member'), ('member', 'rev_to', 'skill'), ('skill', 'to', 'skill')]],
+#          'sm.en': [[('skill', 'to', 'skill'), ('skill', 'to', 'member'), ('member', 'rev_to', 'skill'), ('skill', 'to', 'skill')]],
+#          'stm.en': [
+#              [('member', 'to', 'team'), ('team', 'rev_to', 'skill'), ('skill', 'to', 'team'), ('team', 'rev_to', 'member')],
+#              [('skill', 'to', 'team'), ('team', 'rev_to', 'member'), ('member', 'to', 'team'), ('team', 'rev_to', 'skill')],
+#              [('member', 'to', 'team'), ('team', 'rev_to', 'member')],
+#              [('skill', 'to', 'team'), ('team', 'rev_to', 'skill')],
+#              # repeating the same set of metapaths with additional s-s or e-e connections
+#              # [('member', 'to', 'member'), ('member', 'to', 'team'), ('team', 'rev_to', 'skill'), ('skill', 'to', 'team'), ('team', 'rev_to', 'member'), ('member', 'to', 'member')],
+#              # [('skill', 'to', 'skill'), ('skill', 'to', 'team'), ('team', 'rev_to', 'member'), ('member', 'to', 'team'), ('team', 'rev_to', 'skill'), ('skill', 'to', 'skill')],
+#              # [('member', 'to', 'member'), ('member', 'to', 'team'), ('team', 'rev_to', 'member'), ('member', 'to', 'member')],
+#              # [('skill', 'to', 'skill'), ('skill', 'to', 'team'), ('team', 'rev_to', 'skill'), ('skill', 'to', 'skill')],
+#          ]
+#      }
+#  },
+
+#  'gnn.lant': {
+#      'e': 100,
+#      'b': 128,
+#      'd': 8,
+#      'ns' : 5,
+#      'h': 2,
+#      'nn': [30, 20],
+#      'graph_types': 'stm',
+#      'agg': 'mean',
+#      'dir': False,
+#  },
+
+#},

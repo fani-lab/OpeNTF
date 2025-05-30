@@ -1,0 +1,655 @@
+[2025-04-29 19:38:28,980][cmn.team][INFO] - Loading teamsvecs matrices from ../output/imdb/title.basics.tsv.mt10.ts2/teamsvecs.pkl ...
+[2025-04-29 19:38:29,390][cmn.team][INFO] - Loading indexes pickle from ../output/imdb/title.basics.tsv.mt10.ts2/indexes.pkl ...
+[2025-04-29 19:38:29,458][cmn.team][INFO] - Indexes pickle is loaded.
+[2025-04-29 19:38:29,458][cmn.team][INFO] - Teamsvecs matrices for skills (186385, 27), members (186385, 44774), and locations None are loaded.
+[2025-04-29 19:38:29,458][cmn.team][INFO] - Loading member-skill co-occurrence matrix (44774, 27) loaded from ../output/imdb/title.basics.tsv.mt10.ts2/skillcoverage.pkl ...
+[2025-04-29 19:38:29,458][cmn.team][INFO] - Member-skill co-occurrence matrix not found! Generating ...
+[2025-04-29 19:38:29,773][cmn.team][INFO] - Member-skill co-occurrence matrix (44774, 27) saved at ../output/imdb/title.basics.tsv.mt10.ts2/skillcoverage.pkl.
+[2025-04-29 19:38:29,813][mdl.emb.d2v][INFO] - Loading the model ../output/imdb/title.basics.tsv.mt10.ts2/d128.e100.d2v.w5.dm1.skill for (186385, 128)  embeddings ...
+[2025-04-29 19:38:29,814][pkgmgr][INFO] - gensim not found. Installing gensim==4.3.3...
+[2025-04-29 19:38:41,460][pkgmgr][INFO] - Collecting gensim==4.3.3
+  Downloading gensim-4.3.3-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (8.3 kB)
+Requirement already satisfied: numpy<2.0,>=1.18.5 in /usr/local/lib/python3.8/site-packages (from gensim==4.3.3) (1.24.4)
+Requirement already satisfied: scipy<1.14.0,>=1.7.0 in /usr/local/lib/python3.8/site-packages (from gensim==4.3.3) (1.10.1)
+Collecting smart-open>=1.8.1 (from gensim==4.3.3)
+  Downloading smart_open-7.1.0-py3-none-any.whl.metadata (24 kB)
+Collecting wrapt (from smart-open>=1.8.1->gensim==4.3.3)
+  Downloading wrapt-1.17.2-cp38-cp38-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.4 kB)
+Downloading gensim-4.3.3-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (26.6 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 26.6/26.6 MB 106.7 MB/s eta 0:00:00
+Downloading smart_open-7.1.0-py3-none-any.whl (61 kB)
+Downloading wrapt-1.17.2-cp38-cp38-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl (85 kB)
+Installing collected packages: wrapt, smart-open, gensim
+Successfully installed gensim-4.3.3 smart-open-7.1.0 wrapt-1.17.2
+
+[2025-04-29 19:38:41,879][gensim.utils][INFO] - loading Doc2Vec object from ../output/imdb/title.basics.tsv.mt10.ts2/d128.e100.d2v.w5.dm1.skill
+[2025-04-29 19:38:41,880][mdl.emb.d2v][INFO] - File not found! Training the embedding model from scratch ...
+[2025-04-29 19:38:41,880][mdl.emb.d2v][INFO] - Loading teams as docs ../output/imdb/title.basics.tsv.mt10.ts2/skill.docs.pkl  ...
+[2025-04-29 19:38:41,880][mdl.emb.d2v][INFO] - File not found! Creating the documents out of teams ...
+[2025-04-29 19:39:28,046][mdl.emb.d2v][INFO] - 186385 documents with word type of skill have created. Saving ...
+[2025-04-29 19:39:28,446][gensim.utils][INFO] - Doc2Vec lifecycle event {'params': 'Doc2Vec<dm/m,d128,n5,w5,s0.001,t224>', 'datetime': '2025-04-29T19:39:28.445368', 'gensim': '4.3.3', 'python': '3.8.20 (default, Sep 27 2024, 06:05:23) \n[GCC 12.2.0]', 'platform': 'Linux-6.8.0-54-generic-x86_64-with-glibc2.34', 'event': 'created'}
+[2025-04-29 19:39:28,446][gensim.models.doc2vec][INFO] - collecting all words and their counts
+[2025-04-29 19:39:28,446][gensim.models.doc2vec][INFO] - PROGRESS: at example #0, processed 0 words (0 words/s), 0 word types, 0 tags
+[2025-04-29 19:39:28,458][gensim.models.doc2vec][INFO] - PROGRESS: at example #10000, processed 13464 words (1103048 words/s), 21 word types, 10000 tags
+[2025-04-29 19:39:28,471][gensim.models.doc2vec][INFO] - PROGRESS: at example #20000, processed 29588 words (1253618 words/s), 23 word types, 20000 tags
+[2025-04-29 19:39:28,485][gensim.models.doc2vec][INFO] - PROGRESS: at example #30000, processed 47714 words (1363642 words/s), 23 word types, 30000 tags
+[2025-04-29 19:39:28,499][gensim.models.doc2vec][INFO] - PROGRESS: at example #40000, processed 66061 words (1318661 words/s), 24 word types, 40000 tags
+[2025-04-29 19:39:28,513][gensim.models.doc2vec][INFO] - PROGRESS: at example #50000, processed 83198 words (1184582 words/s), 24 word types, 50000 tags
+[2025-04-29 19:39:28,527][gensim.models.doc2vec][INFO] - PROGRESS: at example #60000, processed 99919 words (1191862 words/s), 24 word types, 60000 tags
+[2025-04-29 19:39:28,541][gensim.models.doc2vec][INFO] - PROGRESS: at example #70000, processed 116685 words (1218393 words/s), 25 word types, 70000 tags
+[2025-04-29 19:39:28,555][gensim.models.doc2vec][INFO] - PROGRESS: at example #80000, processed 133151 words (1171362 words/s), 25 word types, 80000 tags
+[2025-04-29 19:39:28,736][gensim.models.doc2vec][INFO] - PROGRESS: at example #90000, processed 149746 words (91602 words/s), 27 word types, 90000 tags
+[2025-04-29 19:39:28,751][gensim.models.doc2vec][INFO] - PROGRESS: at example #100000, processed 166339 words (1157209 words/s), 27 word types, 100000 tags
+[2025-04-29 19:39:28,765][gensim.models.doc2vec][INFO] - PROGRESS: at example #110000, processed 182657 words (1182894 words/s), 27 word types, 110000 tags
+[2025-04-29 19:39:28,779][gensim.models.doc2vec][INFO] - PROGRESS: at example #120000, processed 199307 words (1198702 words/s), 27 word types, 120000 tags
+[2025-04-29 19:39:28,793][gensim.models.doc2vec][INFO] - PROGRESS: at example #130000, processed 216151 words (1198755 words/s), 27 word types, 130000 tags
+[2025-04-29 19:39:28,808][gensim.models.doc2vec][INFO] - PROGRESS: at example #140000, processed 234057 words (1208758 words/s), 27 word types, 140000 tags
+[2025-04-29 19:39:28,823][gensim.models.doc2vec][INFO] - PROGRESS: at example #150000, processed 252245 words (1199751 words/s), 27 word types, 150000 tags
+[2025-04-29 19:39:28,838][gensim.models.doc2vec][INFO] - PROGRESS: at example #160000, processed 270320 words (1230079 words/s), 27 word types, 160000 tags
+[2025-04-29 19:39:28,853][gensim.models.doc2vec][INFO] - PROGRESS: at example #170000, processed 287865 words (1199090 words/s), 27 word types, 170000 tags
+[2025-04-29 19:39:28,871][gensim.models.doc2vec][INFO] - PROGRESS: at example #180000, processed 305801 words (967344 words/s), 27 word types, 180000 tags
+[2025-04-29 19:39:29,662][gensim.models.doc2vec][INFO] - collected 27 word types and 186385 unique tags from a corpus of 186385 examples and 318950 words
+[2025-04-29 19:39:29,662][gensim.models.word2vec][INFO] - Creating a fresh vocabulary
+[2025-04-29 19:39:29,662][gensim.utils][INFO] - Doc2Vec lifecycle event {'msg': 'effective_min_count=1 retains 27 unique words (100.00% of original 27, drops 0)', 'datetime': '2025-04-29T19:39:29.662697', 'gensim': '4.3.3', 'python': '3.8.20 (default, Sep 27 2024, 06:05:23) \n[GCC 12.2.0]', 'platform': 'Linux-6.8.0-54-generic-x86_64-with-glibc2.34', 'event': 'prepare_vocab'}
+[2025-04-29 19:39:29,662][gensim.utils][INFO] - Doc2Vec lifecycle event {'msg': 'effective_min_count=1 leaves 318950 word corpus (100.00% of original 318950, drops 0)', 'datetime': '2025-04-29T19:39:29.662773', 'gensim': '4.3.3', 'python': '3.8.20 (default, Sep 27 2024, 06:05:23) \n[GCC 12.2.0]', 'platform': 'Linux-6.8.0-54-generic-x86_64-with-glibc2.34', 'event': 'prepare_vocab'}
+[2025-04-29 19:39:29,662][gensim.models.word2vec][INFO] - deleting the raw counts dictionary of 27 items
+[2025-04-29 19:39:29,663][gensim.models.word2vec][INFO] - sample=0.001 downsamples 22 most-common words
+[2025-04-29 19:39:29,663][gensim.utils][INFO] - Doc2Vec lifecycle event {'msg': 'downsampling leaves estimated 48195.09206530995 word corpus (15.1%% of prior 318950)', 'datetime': '2025-04-29T19:39:29.663169', 'gensim': '4.3.3', 'python': '3.8.20 (default, Sep 27 2024, 06:05:23) \n[GCC 12.2.0]', 'platform': 'Linux-6.8.0-54-generic-x86_64-with-glibc2.34', 'event': 'prepare_vocab'}
+[2025-04-29 19:39:29,663][gensim.models.word2vec][INFO] - estimated required memory for 27 words and 128 dimensions: 132747268 bytes
+[2025-04-29 19:39:29,663][gensim.models.word2vec][INFO] - resetting layer weights
+[2025-04-29 19:39:29,742][gensim.utils][INFO] - Doc2Vec lifecycle event {'msg': 'training model with 224 workers on 27 vocabulary and 128 features, using sg=0 hs=0 sample=0.001 negative=5 window=5 shrink_windows=True', 'datetime': '2025-04-29T19:39:29.742114', 'gensim': '4.3.3', 'python': '3.8.20 (default, Sep 27 2024, 06:05:23) \n[GCC 12.2.0]', 'platform': 'Linux-6.8.0-54-generic-x86_64-with-glibc2.34', 'event': 'train'}
+[2025-04-29 19:39:33,773][gensim.models.word2vec][INFO] - EPOCH 0 - PROGRESS: at 13.41% examples, 7715 words/s, in_qsize 28, out_qsize 1
+[2025-04-29 19:39:42,738][gensim.models.word2vec][INFO] - EPOCH 0 - PROGRESS: at 16.32% examples, 2904 words/s, in_qsize 27, out_qsize 1
+[2025-04-29 19:39:44,461][gensim.models.word2vec][INFO] - EPOCH 0 - PROGRESS: at 27.43% examples, 4387 words/s, in_qsize 23, out_qsize 1
+[2025-04-29 19:39:45,558][gensim.models.word2vec][INFO] - EPOCH 0 - PROGRESS: at 36.18% examples, 5438 words/s, in_qsize 20, out_qsize 1
+[2025-04-29 19:39:46,270][gensim.models.word2vec][INFO] - EPOCH 0: training on 318950 raw words (234809 effective words) took 16.5s, 14255 effective words/s
+[2025-04-29 19:39:53,015][gensim.models.word2vec][INFO] - EPOCH 1 - PROGRESS: at 9.34% examples, 3269 words/s, in_qsize 29, out_qsize 1
+[2025-04-29 19:39:58,043][gensim.models.word2vec][INFO] - EPOCH 1 - PROGRESS: at 12.22% examples, 2473 words/s, in_qsize 28, out_qsize 1
+[2025-04-29 19:40:00,644][gensim.models.word2vec][INFO] - EPOCH 1 - PROGRESS: at 14.51% examples, 2431 words/s, in_qsize 27, out_qsize 1
+[2025-04-29 19:40:02,040][gensim.models.word2vec][INFO] - EPOCH 1 - PROGRESS: at 17.65% examples, 2683 words/s, in_qsize 26, out_qsize 1
+[2025-04-29 19:40:03,110][gensim.models.word2vec][INFO] - EPOCH 1 - PROGRESS: at 36.06% examples, 5096 words/s, in_qsize 20, out_qsize 1
+[2025-04-29 19:40:03,962][gensim.models.word2vec][INFO] - EPOCH 1: training on 318950 raw words (234506 effective words) took 17.6s, 13300 effective words/s
+[2025-04-29 19:40:05,316][gensim.models.word2vec][INFO] - EPOCH 2 - PROGRESS: at 22.62% examples, 40966 words/s, in_qsize 0, out_qsize 0
+[2025-04-29 19:40:10,091][gensim.models.word2vec][INFO] - EPOCH 2 - PROGRESS: at 25.61% examples, 9863 words/s, in_qsize 24, out_qsize 1
+[2025-04-29 19:40:11,147][gensim.models.word2vec][INFO] - EPOCH 2 - PROGRESS: at 28.84% examples, 9463 words/s, in_qsize 23, out_qsize 1
+[2025-04-29 19:40:13,495][gensim.models.word2vec][INFO] - EPOCH 2 - PROGRESS: at 32.02% examples, 7913 words/s, in_qsize 22, out_qsize 1
+[2025-04-29 19:40:15,193][gensim.models.word2vec][INFO] - EPOCH 2 - PROGRESS: at 38.14% examples, 8001 words/s, in_qsize 20, out_qsize 1
+[2025-04-29 19:40:16,610][gensim.models.word2vec][INFO] - EPOCH 2 - PROGRESS: at 49.67% examples, 9278 words/s, in_qsize 16, out_qsize 1
+[2025-04-29 19:40:17,622][gensim.models.word2vec][INFO] - EPOCH 2 - PROGRESS: at 100.00% examples, 17249 words/s, in_qsize 0, out_qsize 1
+[2025-04-29 19:40:17,622][gensim.models.word2vec][INFO] - EPOCH 2: training on 318950 raw words (234507 effective words) took 13.6s, 17249 effective words/s
+[2025-04-29 19:40:30,483][gensim.models.word2vec][INFO] - EPOCH 3 - PROGRESS: at 16.58% examples, 2962 words/s, in_qsize 27, out_qsize 1
+[2025-04-29 19:40:31,700][gensim.models.word2vec][INFO] - EPOCH 3 - PROGRESS: at 27.98% examples, 4662 words/s, in_qsize 23, out_qsize 1
+[2025-04-29 19:40:32,786][gensim.models.word2vec][INFO] - EPOCH 3 - PROGRESS: at 42.80% examples, 6666 words/s, in_qsize 18, out_qsize 1
+[2025-04-29 19:40:33,491][gensim.models.word2vec][INFO] - EPOCH 3: training on 318950 raw words (234483 effective words) took 15.8s, 14844 effective words/s
+[2025-04-29 19:40:38,068][gensim.models.word2vec][INFO] - EPOCH 4 - PROGRESS: at 25.35% examples, 13128 words/s, in_qsize 24, out_qsize 1
+[2025-04-29 19:40:42,432][gensim.models.word2vec][INFO] - EPOCH 4 - PROGRESS: at 28.42% examples, 7492 words/s, in_qsize 23, out_qsize 1
+[2025-04-29 19:40:44,447][gensim.models.word2vec][INFO] - EPOCH 4 - PROGRESS: at 31.38% examples, 6743 words/s, in_qsize 22, out_qsize 1
+[2025-04-29 19:40:47,235][gensim.models.word2vec][INFO] - EPOCH 4 - PROGRESS: at 36.57% examples, 6303 words/s, in_qsize 20, out_qsize 1
+[2025-04-29 19:40:47,891][gensim.models.word2vec][INFO] - EPOCH 4: training on 318950 raw words (234778 effective words) took 14.3s, 16380 effective words/s
+[2025-04-29 19:40:49,193][gensim.models.word2vec][INFO] - EPOCH 5 - PROGRESS: at 13.75% examples, 25363 words/s, in_qsize 0, out_qsize 2
+[2025-04-29 19:40:50,933][gensim.models.word2vec][INFO] - EPOCH 5 - PROGRESS: at 32.87% examples, 25686 words/s, in_qsize 22, out_qsize 1
+[2025-04-29 19:40:52,902][gensim.models.word2vec][INFO] - EPOCH 5 - PROGRESS: at 39.03% examples, 18396 words/s, in_qsize 20, out_qsize 1
+[2025-04-29 19:40:55,078][gensim.models.word2vec][INFO] - EPOCH 5 - PROGRESS: at 45.14% examples, 14828 words/s, in_qsize 18, out_qsize 1
+[2025-04-29 19:40:57,787][gensim.models.word2vec][INFO] - EPOCH 5 - PROGRESS: at 48.02% examples, 11458 words/s, in_qsize 17, out_qsize 1
+[2025-04-29 19:40:59,059][gensim.models.word2vec][INFO] - EPOCH 5 - PROGRESS: at 62.88% examples, 13296 words/s, in_qsize 12, out_qsize 1
+[2025-04-29 19:40:59,842][gensim.models.word2vec][INFO] - EPOCH 5: training on 318950 raw words (234709 effective words) took 11.9s, 19753 effective words/s
+[2025-04-29 19:41:03,065][gensim.models.word2vec][INFO] - EPOCH 6 - PROGRESS: at 2.93% examples, 2215 words/s, in_qsize 31, out_qsize 1
+[2025-04-29 19:41:09,906][gensim.models.word2vec][INFO] - EPOCH 6 - PROGRESS: at 6.00% examples, 1431 words/s, in_qsize 30, out_qsize 1
+[2025-04-29 19:41:12,286][gensim.models.word2vec][INFO] - EPOCH 6 - PROGRESS: at 9.15% examples, 1741 words/s, in_qsize 29, out_qsize 1
+[2025-04-29 19:41:13,540][gensim.models.word2vec][INFO] - EPOCH 6 - PROGRESS: at 11.43% examples, 2004 words/s, in_qsize 28, out_qsize 1
+[2025-04-29 19:41:15,476][gensim.models.word2vec][INFO] - EPOCH 6 - PROGRESS: at 17.94% examples, 2726 words/s, in_qsize 26, out_qsize 1
+[2025-04-29 19:41:16,483][gensim.models.word2vec][INFO] - EPOCH 6 - PROGRESS: at 63.16% examples, 9032 words/s, in_qsize 11, out_qsize 1
+[2025-04-29 19:41:17,015][gensim.models.word2vec][INFO] - EPOCH 6: training on 318950 raw words (234649 effective words) took 17.1s, 13718 effective words/s
+[2025-04-29 19:41:27,647][gensim.models.word2vec][INFO] - EPOCH 7 - PROGRESS: at 18.60% examples, 4126 words/s, in_qsize 26, out_qsize 1
+[2025-04-29 19:41:29,630][gensim.models.word2vec][INFO] - EPOCH 7 - PROGRESS: at 21.75% examples, 4059 words/s, in_qsize 25, out_qsize 1
+[2025-04-29 19:41:30,826][gensim.models.word2vec][INFO] - EPOCH 7 - PROGRESS: at 26.94% examples, 4631 words/s, in_qsize 23, out_qsize 1
+[2025-04-29 19:41:32,041][gensim.models.word2vec][INFO] - EPOCH 7 - PROGRESS: at 32.87% examples, 5210 words/s, in_qsize 21, out_qsize 1
+[2025-04-29 19:41:32,970][gensim.models.word2vec][INFO] - EPOCH 7: training on 318950 raw words (234254 effective words) took 15.9s, 14742 effective words/s
+[2025-04-29 19:41:38,136][gensim.models.word2vec][INFO] - EPOCH 8 - PROGRESS: at 3.08% examples, 1449 words/s, in_qsize 31, out_qsize 1
+[2025-04-29 19:41:40,949][gensim.models.word2vec][INFO] - EPOCH 8 - PROGRESS: at 6.01% examples, 1814 words/s, in_qsize 30, out_qsize 1
+[2025-04-29 19:41:44,498][gensim.models.word2vec][INFO] - EPOCH 8 - PROGRESS: at 9.00% examples, 1877 words/s, in_qsize 29, out_qsize 1
+[2025-04-29 19:41:46,563][gensim.models.word2vec][INFO] - EPOCH 8 - PROGRESS: at 20.60% examples, 3655 words/s, in_qsize 25, out_qsize 1
+[2025-04-29 19:41:48,416][gensim.models.word2vec][INFO] - EPOCH 8 - PROGRESS: at 27.09% examples, 4183 words/s, in_qsize 23, out_qsize 1
+[2025-04-29 19:41:49,469][gensim.models.word2vec][INFO] - EPOCH 8 - PROGRESS: at 66.86% examples, 9602 words/s, in_qsize 10, out_qsize 1
+[2025-04-29 19:41:49,755][gensim.models.word2vec][INFO] - EPOCH 8: training on 318950 raw words (234199 effective words) took 16.7s, 14001 effective words/s
+[2025-04-29 19:41:50,907][gensim.models.word2vec][INFO] - EPOCH 9 - PROGRESS: at 12.97% examples, 27332 words/s, in_qsize 28, out_qsize 3
+[2025-04-29 19:41:59,838][gensim.models.word2vec][INFO] - EPOCH 9 - PROGRESS: at 15.25% examples, 3552 words/s, in_qsize 27, out_qsize 1
+[2025-04-29 19:42:02,269][gensim.models.word2vec][INFO] - EPOCH 9 - PROGRESS: at 18.29% examples, 3446 words/s, in_qsize 26, out_qsize 1
+[2025-04-29 19:42:03,541][gensim.models.word2vec][INFO] - EPOCH 9 - PROGRESS: at 39.72% examples, 6815 words/s, in_qsize 19, out_qsize 1
+[2025-04-29 19:42:04,562][gensim.models.word2vec][INFO] - EPOCH 9 - PROGRESS: at 93.59% examples, 14883 words/s, in_qsize 2, out_qsize 1
+[2025-04-29 19:42:04,570][gensim.models.word2vec][INFO] - EPOCH 9: training on 318950 raw words (234475 effective words) took 14.8s, 15892 effective words/s
+[2025-04-29 19:42:18,538][gensim.models.word2vec][INFO] - EPOCH 10 - PROGRESS: at 6.07% examples, 1036 words/s, in_qsize 30, out_qsize 1
+[2025-04-29 19:42:19,561][gensim.models.word2vec][INFO] - EPOCH 10 - PROGRESS: at 8.35% examples, 1354 words/s, in_qsize 29, out_qsize 1
+[2025-04-29 19:42:20,650][gensim.models.word2vec][INFO] - EPOCH 10 - PROGRESS: at 11.58% examples, 1727 words/s, in_qsize 28, out_qsize 1
+[2025-04-29 19:42:22,223][gensim.models.word2vec][INFO] - EPOCH 10 - PROGRESS: at 26.45% examples, 3594 words/s, in_qsize 23, out_qsize 1
+[2025-04-29 19:42:23,241][gensim.models.word2vec][INFO] - EPOCH 10 - PROGRESS: at 100.00% examples, 12614 words/s, in_qsize 0, out_qsize 1
+[2025-04-29 19:42:23,242][gensim.models.word2vec][INFO] - EPOCH 10: training on 318950 raw words (234779 effective words) took 18.6s, 12614 effective words/s
+[2025-04-29 19:42:24,397][gensim.models.word2vec][INFO] - EPOCH 11 - PROGRESS: at 23.34% examples, 49075 words/s, in_qsize 0, out_qsize 0
+[2025-04-29 19:42:32,458][gensim.models.word2vec][INFO] - EPOCH 11 - PROGRESS: at 26.37% examples, 6644 words/s, in_qsize 24, out_qsize 1
+[2025-04-29 19:42:35,520][gensim.models.word2vec][INFO] - EPOCH 11 - PROGRESS: at 28.65% examples, 5453 words/s, in_qsize 23, out_qsize 1
+[2025-04-29 19:42:37,336][gensim.models.word2vec][INFO] - EPOCH 11 - PROGRESS: at 34.45% examples, 5745 words/s, in_qsize 21, out_qsize 1
+[2025-04-29 19:42:38,361][gensim.models.word2vec][INFO] - EPOCH 11 - PROGRESS: at 83.26% examples, 13019 words/s, in_qsize 5, out_qsize 1
+[2025-04-29 19:42:38,474][gensim.models.word2vec][INFO] - EPOCH 11: training on 318950 raw words (234594 effective words) took 15.2s, 15464 effective words/s
+[2025-04-29 19:42:50,968][gensim.models.word2vec][INFO] - EPOCH 12 - PROGRESS: at 2.28% examples, 470 words/s, in_qsize 31, out_qsize 1
+[2025-04-29 19:42:53,120][gensim.models.word2vec][INFO] - EPOCH 12 - PROGRESS: at 11.36% examples, 1890 words/s, in_qsize 28, out_qsize 1
+[2025-04-29 19:42:54,172][gensim.models.word2vec][INFO] - EPOCH 12 - PROGRESS: at 33.19% examples, 5011 words/s, in_qsize 21, out_qsize 1
+[2025-04-29 19:42:55,192][gensim.models.word2vec][INFO] - EPOCH 12 - PROGRESS: at 45.06% examples, 6402 words/s, in_qsize 17, out_qsize 1
+[2025-04-29 19:42:55,809][gensim.models.word2vec][INFO] - EPOCH 12: training on 318950 raw words (234573 effective words) took 17.3s, 13578 effective words/s
+[2025-04-29 19:42:56,916][gensim.models.word2vec][INFO] - EPOCH 13 - PROGRESS: at 24.84% examples, 55488 words/s, in_qsize 0, out_qsize 0
+[2025-04-29 19:43:04,520][gensim.models.word2vec][INFO] - EPOCH 13 - PROGRESS: at 48.57% examples, 13219 words/s, in_qsize 16, out_qsize 1
+[2025-04-29 19:43:05,657][gensim.models.word2vec][INFO] - EPOCH 13 - PROGRESS: at 57.80% examples, 13955 words/s, in_qsize 13, out_qsize 1
+[2025-04-29 19:43:06,414][gensim.models.word2vec][INFO] - EPOCH 13: training on 318950 raw words (234279 effective words) took 10.5s, 22214 effective words/s
+[2025-04-29 19:43:07,614][gensim.models.word2vec][INFO] - EPOCH 14 - PROGRESS: at 13.82% examples, 27938 words/s, in_qsize 28, out_qsize 1
+[2025-04-29 19:43:13,305][gensim.models.word2vec][INFO] - EPOCH 14 - PROGRESS: at 16.90% examples, 5702 words/s, in_qsize 27, out_qsize 1
+[2025-04-29 19:43:17,146][gensim.models.word2vec][INFO] - EPOCH 14 - PROGRESS: at 20.05% examples, 4335 words/s, in_qsize 26, out_qsize 1
+[2025-04-29 19:43:18,623][gensim.models.word2vec][INFO] - EPOCH 14 - PROGRESS: at 23.36% examples, 4440 words/s, in_qsize 25, out_qsize 1
+[2025-04-29 19:43:19,891][gensim.models.word2vec][INFO] - EPOCH 14 - PROGRESS: at 25.64% examples, 4450 words/s, in_qsize 24, out_qsize 1
+[2025-04-29 19:43:21,097][gensim.models.word2vec][INFO] - EPOCH 14 - PROGRESS: at 37.95% examples, 6068 words/s, in_qsize 20, out_qsize 1
+[2025-04-29 19:43:22,142][gensim.models.word2vec][INFO] - EPOCH 14 - PROGRESS: at 56.05% examples, 8386 words/s, in_qsize 14, out_qsize 1
+[2025-04-29 19:43:22,745][gensim.models.word2vec][INFO] - EPOCH 14: training on 318950 raw words (234876 effective words) took 16.3s, 14451 effective words/s
+[2025-04-29 19:43:32,164][gensim.models.word2vec][INFO] - EPOCH 15 - PROGRESS: at 6.42% examples, 1620 words/s, in_qsize 30, out_qsize 1
+[2025-04-29 19:43:34,206][gensim.models.word2vec][INFO] - EPOCH 15 - PROGRESS: at 9.31% examples, 1954 words/s, in_qsize 29, out_qsize 1
+[2025-04-29 19:43:36,486][gensim.models.word2vec][INFO] - EPOCH 15 - PROGRESS: at 13.32% examples, 2256 words/s, in_qsize 28, out_qsize 1
+[2025-04-29 19:43:37,777][gensim.models.word2vec][INFO] - EPOCH 15 - PROGRESS: at 24.82% examples, 3883 words/s, in_qsize 24, out_qsize 1
+[2025-04-29 19:43:38,940][gensim.models.word2vec][INFO] - EPOCH 15 - PROGRESS: at 30.97% examples, 4491 words/s, in_qsize 22, out_qsize 1
+[2025-04-29 19:43:39,784][gensim.models.word2vec][INFO] - EPOCH 15: training on 318950 raw words (234506 effective words) took 17.0s, 13817 effective words/s
+[2025-04-29 19:43:50,110][gensim.models.word2vec][INFO] - EPOCH 16 - PROGRESS: at 5.80% examples, 1368 words/s, in_qsize 30, out_qsize 1
+[2025-04-29 19:43:52,041][gensim.models.word2vec][INFO] - EPOCH 16 - PROGRESS: at 8.94% examples, 1750 words/s, in_qsize 29, out_qsize 1
+[2025-04-29 19:43:53,991][gensim.models.word2vec][INFO] - EPOCH 16 - PROGRESS: at 11.23% examples, 1925 words/s, in_qsize 28, out_qsize 1
+[2025-04-29 19:43:55,402][gensim.models.word2vec][INFO] - EPOCH 16 - PROGRESS: at 14.10% examples, 2203 words/s, in_qsize 27, out_qsize 1
+[2025-04-29 19:43:56,587][gensim.models.word2vec][INFO] - EPOCH 16 - PROGRESS: at 32.56% examples, 4642 words/s, in_qsize 21, out_qsize 1
+[2025-04-29 19:43:57,271][gensim.models.word2vec][INFO] - EPOCH 16: training on 318950 raw words (234791 effective words) took 17.4s, 13481 effective words/s
+[2025-04-29 19:43:58,543][gensim.models.word2vec][INFO] - EPOCH 17 - PROGRESS: at 3.26% examples, 6348 words/s, in_qsize 31, out_qsize 1
+[2025-04-29 19:44:11,057][gensim.models.word2vec][INFO] - EPOCH 17 - PROGRESS: at 5.54% examples, 984 words/s, in_qsize 30, out_qsize 1
+[2025-04-29 19:44:12,981][gensim.models.word2vec][INFO] - EPOCH 17 - PROGRESS: at 11.70% examples, 1791 words/s, in_qsize 28, out_qsize 1
+[2025-04-29 19:44:14,040][gensim.models.word2vec][INFO] - EPOCH 17 - PROGRESS: at 29.80% examples, 4252 words/s, in_qsize 22, out_qsize 1
+[2025-04-29 19:44:14,982][gensim.models.word2vec][INFO] - EPOCH 17: training on 318950 raw words (234648 effective words) took 17.6s, 13302 effective words/s
+[2025-04-29 19:44:16,975][gensim.models.word2vec][INFO] - EPOCH 18 - PROGRESS: at 8.36% examples, 10432 words/s, in_qsize 29, out_qsize 1
+[2025-04-29 19:44:21,746][gensim.models.word2vec][INFO] - EPOCH 18 - PROGRESS: at 17.69% examples, 6293 words/s, in_qsize 26, out_qsize 1
+[2025-04-29 19:44:28,588][gensim.models.word2vec][INFO] - EPOCH 18 - PROGRESS: at 20.72% examples, 3636 words/s, in_qsize 25, out_qsize 1
+[2025-04-29 19:44:29,608][gensim.models.word2vec][INFO] - EPOCH 18 - PROGRESS: at 48.16% examples, 7822 words/s, in_qsize 16, out_qsize 1
+[2025-04-29 19:44:29,887][gensim.models.word2vec][INFO] - EPOCH 18: training on 318950 raw words (234589 effective words) took 14.8s, 15813 effective words/s
+[2025-04-29 19:44:38,899][gensim.models.word2vec][INFO] - EPOCH 19 - PROGRESS: at 6.04% examples, 1597 words/s, in_qsize 30, out_qsize 1
+[2025-04-29 19:44:44,070][gensim.models.word2vec][INFO] - EPOCH 19 - PROGRESS: at 8.32% examples, 1426 words/s, in_qsize 29, out_qsize 1
+[2025-04-29 19:44:45,544][gensim.models.word2vec][INFO] - EPOCH 19 - PROGRESS: at 17.38% examples, 2679 words/s, in_qsize 26, out_qsize 1
+[2025-04-29 19:44:46,638][gensim.models.word2vec][INFO] - EPOCH 19 - PROGRESS: at 41.53% examples, 5912 words/s, in_qsize 18, out_qsize 1
+[2025-04-29 19:44:47,396][gensim.models.word2vec][INFO] - EPOCH 19: training on 318950 raw words (234361 effective words) took 17.5s, 13426 effective words/s
+[2025-04-29 19:44:58,885][gensim.models.word2vec][INFO] - EPOCH 20 - PROGRESS: at 18.14% examples, 3747 words/s, in_qsize 26, out_qsize 1
+[2025-04-29 19:45:00,284][gensim.models.word2vec][INFO] - EPOCH 20 - PROGRESS: at 21.01% examples, 3881 words/s, in_qsize 25, out_qsize 1
+[2025-04-29 19:45:01,633][gensim.models.word2vec][INFO] - EPOCH 20 - PROGRESS: at 32.95% examples, 5524 words/s, in_qsize 21, out_qsize 1
+[2025-04-29 19:45:02,647][gensim.models.word2vec][INFO] - EPOCH 20 - PROGRESS: at 47.89% examples, 7497 words/s, in_qsize 16, out_qsize 1
+[2025-04-29 19:45:03,081][gensim.models.word2vec][INFO] - EPOCH 20: training on 318950 raw words (234424 effective words) took 15.6s, 15016 effective words/s
+[2025-04-29 19:45:05,657][gensim.models.word2vec][INFO] - EPOCH 21 - PROGRESS: at 22.78% examples, 26089 words/s, in_qsize 10, out_qsize 51
+[2025-04-29 19:45:06,325][gensim.models.word2vec][INFO] - EPOCH 21 - PROGRESS: at 26.13% examples, 18987 words/s, in_qsize 24, out_qsize 1
+[2025-04-29 19:45:13,635][gensim.models.word2vec][INFO] - EPOCH 21 - PROGRESS: at 32.63% examples, 7203 words/s, in_qsize 22, out_qsize 1
+[2025-04-29 19:45:14,704][gensim.models.word2vec][INFO] - EPOCH 21 - PROGRESS: at 58.91% examples, 11959 words/s, in_qsize 13, out_qsize 1
+[2025-04-29 19:45:15,008][gensim.models.word2vec][INFO] - EPOCH 21: training on 318950 raw words (234458 effective words) took 11.9s, 19782 effective words/s
+[2025-04-29 19:45:28,949][gensim.models.word2vec][INFO] - EPOCH 22 - PROGRESS: at 2.93% examples, 504 words/s, in_qsize 31, out_qsize 1
+[2025-04-29 19:45:30,636][gensim.models.word2vec][INFO] - EPOCH 22 - PROGRESS: at 11.38% examples, 1757 words/s, in_qsize 28, out_qsize 1
+[2025-04-29 19:45:31,922][gensim.models.word2vec][INFO] - EPOCH 22 - PROGRESS: at 14.65% examples, 2070 words/s, in_qsize 27, out_qsize 1
+[2025-04-29 19:45:32,977][gensim.models.word2vec][INFO] - EPOCH 22 - PROGRESS: at 44.78% examples, 5915 words/s, in_qsize 17, out_qsize 1
+[2025-04-29 19:45:33,515][gensim.models.word2vec][INFO] - EPOCH 22: training on 318950 raw words (234159 effective words) took 18.4s, 12701 effective words/s
+[2025-04-29 19:45:45,479][gensim.models.word2vec][INFO] - EPOCH 23 - PROGRESS: at 9.64% examples, 1879 words/s, in_qsize 29, out_qsize 1
+[2025-04-29 19:45:46,921][gensim.models.word2vec][INFO] - EPOCH 23 - PROGRESS: at 11.92% examples, 2112 words/s, in_qsize 28, out_qsize 1
+[2025-04-29 19:45:48,565][gensim.models.word2vec][INFO] - EPOCH 23 - PROGRESS: at 17.70% examples, 2806 words/s, in_qsize 26, out_qsize 1
+[2025-04-29 19:45:49,759][gensim.models.word2vec][INFO] - EPOCH 23 - PROGRESS: at 26.49% examples, 3890 words/s, in_qsize 23, out_qsize 1
+[2025-04-29 19:45:50,784][gensim.models.word2vec][INFO] - EPOCH 23 - PROGRESS: at 100.00% examples, 13632 words/s, in_qsize 0, out_qsize 1
+[2025-04-29 19:45:50,784][gensim.models.word2vec][INFO] - EPOCH 23: training on 318950 raw words (234463 effective words) took 17.2s, 13632 effective words/s
+[2025-04-29 19:45:52,206][gensim.models.word2vec][INFO] - EPOCH 24 - PROGRESS: at 16.83% examples, 28289 words/s, in_qsize 0, out_qsize 0
+[2025-04-29 19:45:55,207][gensim.models.word2vec][INFO] - EPOCH 24 - PROGRESS: at 35.58% examples, 18904 words/s, in_qsize 21, out_qsize 1
+[2025-04-29 19:45:58,548][gensim.models.word2vec][INFO] - EPOCH 24 - PROGRESS: at 38.84% examples, 11685 words/s, in_qsize 20, out_qsize 1
+[2025-04-29 19:46:00,025][gensim.models.word2vec][INFO] - EPOCH 24 - PROGRESS: at 47.48% examples, 12038 words/s, in_qsize 17, out_qsize 1
+[2025-04-29 19:46:01,030][gensim.models.word2vec][INFO] - EPOCH 24 - PROGRESS: at 83.67% examples, 19339 words/s, in_qsize 5, out_qsize 1
+[2025-04-29 19:46:01,133][gensim.models.word2vec][INFO] - EPOCH 24: training on 318950 raw words (234528 effective words) took 10.3s, 22823 effective words/s
+[2025-04-29 19:46:07,341][gensim.models.word2vec][INFO] - EPOCH 25 - PROGRESS: at 9.78% examples, 3675 words/s, in_qsize 29, out_qsize 1
+[2025-04-29 19:46:12,333][gensim.models.word2vec][INFO] - EPOCH 25 - PROGRESS: at 12.85% examples, 2680 words/s, in_qsize 28, out_qsize 1
+[2025-04-29 19:46:14,639][gensim.models.word2vec][INFO] - EPOCH 25 - PROGRESS: at 15.14% examples, 2655 words/s, in_qsize 27, out_qsize 1
+[2025-04-29 19:46:15,991][gensim.models.word2vec][INFO] - EPOCH 25 - PROGRESS: at 27.16% examples, 4371 words/s, in_qsize 23, out_qsize 1
+[2025-04-29 19:46:17,087][gensim.models.word2vec][INFO] - EPOCH 25 - PROGRESS: at 60.83% examples, 9047 words/s, in_qsize 12, out_qsize 1
+[2025-04-29 19:46:17,549][gensim.models.word2vec][INFO] - EPOCH 25: training on 318950 raw words (234552 effective words) took 16.4s, 14344 effective words/s
+[2025-04-29 19:46:20,037][gensim.models.word2vec][INFO] - EPOCH 26 - PROGRESS: at 12.65% examples, 12381 words/s, in_qsize 28, out_qsize 1
+[2025-04-29 19:46:30,210][gensim.models.word2vec][INFO] - EPOCH 26 - PROGRESS: at 14.94% examples, 2842 words/s, in_qsize 27, out_qsize 1
+[2025-04-29 19:46:31,386][gensim.models.word2vec][INFO] - EPOCH 26 - PROGRESS: at 29.89% examples, 5176 words/s, in_qsize 22, out_qsize 1
+[2025-04-29 19:46:32,505][gensim.models.word2vec][INFO] - EPOCH 26 - PROGRESS: at 54.28% examples, 8661 words/s, in_qsize 14, out_qsize 1
+[2025-04-29 19:46:32,996][gensim.models.word2vec][INFO] - EPOCH 26: training on 318950 raw words (234553 effective words) took 15.4s, 15253 effective words/s
+[2025-04-29 19:46:39,479][gensim.models.word2vec][INFO] - EPOCH 27 - PROGRESS: at 3.31% examples, 1193 words/s, in_qsize 31, out_qsize 1
+[2025-04-29 19:46:46,505][gensim.models.word2vec][INFO] - EPOCH 27 - PROGRESS: at 6.24% examples, 1087 words/s, in_qsize 30, out_qsize 1
+[2025-04-29 19:46:47,743][gensim.models.word2vec][INFO] - EPOCH 27 - PROGRESS: at 20.38% examples, 3307 words/s, in_qsize 25, out_qsize 1
+[2025-04-29 19:46:48,787][gensim.models.word2vec][INFO] - EPOCH 27 - PROGRESS: at 23.45% examples, 3550 words/s, in_qsize 24, out_qsize 1
+[2025-04-29 19:46:49,857][gensim.models.word2vec][INFO] - EPOCH 27 - PROGRESS: at 63.22% examples, 8918 words/s, in_qsize 11, out_qsize 1
+[2025-04-29 19:46:50,196][gensim.models.word2vec][INFO] - EPOCH 27: training on 318950 raw words (234697 effective words) took 17.1s, 13699 effective words/s
+[2025-04-29 19:46:51,396][gensim.models.word2vec][INFO] - EPOCH 28 - PROGRESS: at 25.23% examples, 51529 words/s, in_qsize 1, out_qsize 1
+[2025-04-29 19:46:59,148][gensim.models.word2vec][INFO] - EPOCH 28 - PROGRESS: at 31.56% examples, 8296 words/s, in_qsize 22, out_qsize 1
+[2025-04-29 19:47:00,202][gensim.models.word2vec][INFO] - EPOCH 28 - PROGRESS: at 40.67% examples, 9586 words/s, in_qsize 19, out_qsize 1
+[2025-04-29 19:47:02,407][gensim.models.word2vec][INFO] - EPOCH 28 - PROGRESS: at 49.08% examples, 9537 words/s, in_qsize 16, out_qsize 1
+[2025-04-29 19:47:03,256][gensim.models.word2vec][INFO] - EPOCH 28: training on 318950 raw words (234474 effective words) took 13.0s, 18027 effective words/s
+[2025-04-29 19:47:12,749][gensim.models.word2vec][INFO] - EPOCH 29 - PROGRESS: at 12.43% examples, 3068 words/s, in_qsize 28, out_qsize 1
+[2025-04-29 19:47:15,764][gensim.models.word2vec][INFO] - EPOCH 29 - PROGRESS: at 15.51% examples, 2920 words/s, in_qsize 27, out_qsize 1
+[2025-04-29 19:47:16,910][gensim.models.word2vec][INFO] - EPOCH 29 - PROGRESS: at 22.41% examples, 3825 words/s, in_qsize 25, out_qsize 1
+[2025-04-29 19:47:18,154][gensim.models.word2vec][INFO] - EPOCH 29 - PROGRESS: at 31.56% examples, 4957 words/s, in_qsize 22, out_qsize 1
+[2025-04-29 19:47:19,162][gensim.models.word2vec][INFO] - EPOCH 29 - PROGRESS: at 93.44% examples, 13839 words/s, in_qsize 1, out_qsize 3
+[2025-04-29 19:47:19,166][gensim.models.word2vec][INFO] - EPOCH 29: training on 318950 raw words (234565 effective words) took 15.9s, 14797 effective words/s
+[2025-04-29 19:47:31,369][gensim.models.word2vec][INFO] - EPOCH 30 - PROGRESS: at 21.35% examples, 4174 words/s, in_qsize 25, out_qsize 1
+[2025-04-29 19:47:32,569][gensim.models.word2vec][INFO] - EPOCH 30 - PROGRESS: at 24.24% examples, 4331 words/s, in_qsize 24, out_qsize 1
+[2025-04-29 19:47:33,573][gensim.models.word2vec][INFO] - EPOCH 30 - PROGRESS: at 33.31% examples, 5526 words/s, in_qsize 21, out_qsize 1
+[2025-04-29 19:47:34,582][gensim.models.word2vec][INFO] - EPOCH 30 - PROGRESS: at 79.35% examples, 12234 words/s, in_qsize 6, out_qsize 1
+[2025-04-29 19:47:34,661][gensim.models.word2vec][INFO] - EPOCH 30: training on 318950 raw words (234818 effective words) took 15.4s, 15224 effective words/s
+[2025-04-29 19:47:37,490][gensim.models.word2vec][INFO] - EPOCH 31 - PROGRESS: at 12.76% examples, 10760 words/s, in_qsize 28, out_qsize 1
+[2025-04-29 19:47:39,185][gensim.models.word2vec][INFO] - EPOCH 31 - PROGRESS: at 15.85% examples, 8328 words/s, in_qsize 27, out_qsize 1
+[2025-04-29 19:47:41,913][gensim.models.word2vec][INFO] - EPOCH 31 - PROGRESS: at 18.73% examples, 6158 words/s, in_qsize 26, out_qsize 1
+[2025-04-29 19:47:43,400][gensim.models.word2vec][INFO] - EPOCH 31 - PROGRESS: at 21.68% examples, 5906 words/s, in_qsize 25, out_qsize 1
+[2025-04-29 19:47:46,430][gensim.models.word2vec][INFO] - EPOCH 31 - PROGRESS: at 24.73% examples, 4984 words/s, in_qsize 24, out_qsize 1
+[2025-04-29 19:47:47,457][gensim.models.word2vec][INFO] - EPOCH 31 - PROGRESS: at 30.16% examples, 5625 words/s, in_qsize 22, out_qsize 1
+[2025-04-29 19:47:48,570][gensim.models.word2vec][INFO] - EPOCH 31 - PROGRESS: at 45.01% examples, 7719 words/s, in_qsize 17, out_qsize 1
+[2025-04-29 19:47:49,535][gensim.models.word2vec][INFO] - EPOCH 31: training on 318950 raw words (234535 effective words) took 14.8s, 15843 effective words/s
+[2025-04-29 19:48:03,456][gensim.models.word2vec][INFO] - EPOCH 32 - PROGRESS: at 9.04% examples, 1548 words/s, in_qsize 29, out_qsize 1
+[2025-04-29 19:48:04,671][gensim.models.word2vec][INFO] - EPOCH 32 - PROGRESS: at 18.69% examples, 2919 words/s, in_qsize 26, out_qsize 1
+[2025-04-29 19:48:05,784][gensim.models.word2vec][INFO] - EPOCH 32 - PROGRESS: at 24.64% examples, 3587 words/s, in_qsize 24, out_qsize 1
+[2025-04-29 19:48:06,801][gensim.models.word2vec][INFO] - EPOCH 32 - PROGRESS: at 86.14% examples, 11801 words/s, in_qsize 4, out_qsize 1
+[2025-04-29 19:48:06,909][gensim.models.word2vec][INFO] - EPOCH 32: training on 318950 raw words (234535 effective words) took 17.3s, 13550 effective words/s
+[2025-04-29 19:48:18,143][gensim.models.word2vec][INFO] - EPOCH 33 - PROGRESS: at 3.27% examples, 677 words/s, in_qsize 31, out_qsize 1
+[2025-04-29 19:48:19,432][gensim.models.word2vec][INFO] - EPOCH 33 - PROGRESS: at 6.25% examples, 1173 words/s, in_qsize 30, out_qsize 1
+[2025-04-29 19:48:21,291][gensim.models.word2vec][INFO] - EPOCH 33 - PROGRESS: at 12.34% examples, 2024 words/s, in_qsize 28, out_qsize 1
+[2025-04-29 19:48:22,463][gensim.models.word2vec][INFO] - EPOCH 33 - PROGRESS: at 20.77% examples, 3180 words/s, in_qsize 25, out_qsize 1
+[2025-04-29 19:48:23,673][gensim.models.word2vec][INFO] - EPOCH 33 - PROGRESS: at 41.90% examples, 5966 words/s, in_qsize 18, out_qsize 1
+[2025-04-29 19:48:24,355][gensim.models.word2vec][INFO] - EPOCH 33: training on 318950 raw words (234711 effective words) took 17.4s, 13505 effective words/s
+[2025-04-29 19:48:25,715][gensim.models.word2vec][INFO] - EPOCH 34 - PROGRESS: at 12.79% examples, 23155 words/s, in_qsize 0, out_qsize 0
+[2025-04-29 19:48:26,964][gensim.models.word2vec][INFO] - EPOCH 34 - PROGRESS: at 19.12% examples, 17649 words/s, in_qsize 26, out_qsize 1
+[2025-04-29 19:48:29,587][gensim.models.word2vec][INFO] - EPOCH 34 - PROGRESS: at 22.80% examples, 10267 words/s, in_qsize 25, out_qsize 1
+[2025-04-29 19:48:30,594][gensim.models.word2vec][INFO] - EPOCH 34 - PROGRESS: at 25.94% examples, 9783 words/s, in_qsize 24, out_qsize 1
+[2025-04-29 19:48:31,655][gensim.models.word2vec][INFO] - EPOCH 34 - PROGRESS: at 29.09% examples, 9370 words/s, in_qsize 23, out_qsize 1
+[2025-04-29 19:48:33,917][gensim.models.word2vec][INFO] - EPOCH 34 - PROGRESS: at 35.52% examples, 8716 words/s, in_qsize 21, out_qsize 1
+[2025-04-29 19:48:34,965][gensim.models.word2vec][INFO] - EPOCH 34 - PROGRESS: at 44.04% examples, 9794 words/s, in_qsize 18, out_qsize 1
+[2025-04-29 19:48:36,154][gensim.models.word2vec][INFO] - EPOCH 34 - PROGRESS: at 52.88% examples, 10619 words/s, in_qsize 15, out_qsize 1
+[2025-04-29 19:48:36,830][gensim.models.word2vec][INFO] - EPOCH 34: training on 318950 raw words (234491 effective words) took 12.4s, 18906 effective words/s
+[2025-04-29 19:48:39,790][gensim.models.word2vec][INFO] - EPOCH 35 - PROGRESS: at 12.23% examples, 10018 words/s, in_qsize 28, out_qsize 1
+[2025-04-29 19:48:50,471][gensim.models.word2vec][INFO] - EPOCH 35 - PROGRESS: at 14.51% examples, 2571 words/s, in_qsize 27, out_qsize 1
+[2025-04-29 19:48:51,637][gensim.models.word2vec][INFO] - EPOCH 35 - PROGRESS: at 17.46% examples, 2834 words/s, in_qsize 26, out_qsize 1
+[2025-04-29 19:48:53,201][gensim.models.word2vec][INFO] - EPOCH 35 - PROGRESS: at 21.14% examples, 3065 words/s, in_qsize 25, out_qsize 1
+[2025-04-29 19:48:54,091][gensim.models.word2vec][INFO] - EPOCH 35: training on 318950 raw words (234700 effective words) took 17.2s, 13648 effective words/s
+[2025-04-29 19:49:00,839][gensim.models.word2vec][INFO] - EPOCH 36 - PROGRESS: at 3.15% examples, 1098 words/s, in_qsize 31, out_qsize 1
+[2025-04-29 19:49:08,566][gensim.models.word2vec][INFO] - EPOCH 36 - PROGRESS: at 5.44% examples, 912 words/s, in_qsize 30, out_qsize 1
+[2025-04-29 19:49:10,432][gensim.models.word2vec][INFO] - EPOCH 36 - PROGRESS: at 8.31% examples, 1239 words/s, in_qsize 29, out_qsize 1
+[2025-04-29 19:49:11,502][gensim.models.word2vec][INFO] - EPOCH 36 - PROGRESS: at 20.02% examples, 2786 words/s, in_qsize 25, out_qsize 1
+[2025-04-29 19:49:12,508][gensim.models.word2vec][INFO] - EPOCH 36 - PROGRESS: at 76.01% examples, 9813 words/s, in_qsize 7, out_qsize 1
+[2025-04-29 19:49:12,613][gensim.models.word2vec][INFO] - EPOCH 36: training on 318950 raw words (234704 effective words) took 18.4s, 12721 effective words/s
+[2025-04-29 19:49:27,152][gensim.models.word2vec][INFO] - EPOCH 37 - PROGRESS: at 2.28% examples, 402 words/s, in_qsize 31, out_qsize 1
+[2025-04-29 19:49:28,194][gensim.models.word2vec][INFO] - EPOCH 37 - PROGRESS: at 8.54% examples, 1322 words/s, in_qsize 29, out_qsize 1
+[2025-04-29 19:49:29,231][gensim.models.word2vec][INFO] - EPOCH 37 - PROGRESS: at 24.25% examples, 3471 words/s, in_qsize 24, out_qsize 1
+[2025-04-29 19:49:30,256][gensim.models.word2vec][INFO] - EPOCH 37 - PROGRESS: at 89.07% examples, 11965 words/s, in_qsize 3, out_qsize 1
+[2025-04-29 19:49:30,284][gensim.models.word2vec][INFO] - EPOCH 37: training on 318950 raw words (234624 effective words) took 17.6s, 13332 effective words/s
+[2025-04-29 19:49:32,354][gensim.models.word2vec][INFO] - EPOCH 38 - PROGRESS: at 16.35% examples, 18696 words/s, in_qsize 27, out_qsize 1
+[2025-04-29 19:49:43,289][gensim.models.word2vec][INFO] - EPOCH 38 - PROGRESS: at 18.64% examples, 3346 words/s, in_qsize 26, out_qsize 1
+[2025-04-29 19:49:44,368][gensim.models.word2vec][INFO] - EPOCH 38 - PROGRESS: at 34.09% examples, 5665 words/s, in_qsize 21, out_qsize 1
+[2025-04-29 19:49:45,400][gensim.models.word2vec][INFO] - EPOCH 38 - PROGRESS: at 86.46% examples, 13510 words/s, in_qsize 4, out_qsize 1
+[2025-04-29 19:49:45,431][gensim.models.word2vec][INFO] - EPOCH 38: training on 318950 raw words (234449 effective words) took 15.1s, 15550 effective words/s
+[2025-04-29 19:49:46,532][gensim.models.word2vec][INFO] - EPOCH 39 - PROGRESS: at 4.02% examples, 8285 words/s, in_qsize 0, out_qsize 6
+[2025-04-29 19:49:48,404][gensim.models.word2vec][INFO] - EPOCH 39 - PROGRESS: at 41.20% examples, 33462 words/s, in_qsize 4, out_qsize 3
+[2025-04-29 19:49:49,576][gensim.models.word2vec][INFO] - EPOCH 39 - PROGRESS: at 50.83% examples, 29167 words/s, in_qsize 16, out_qsize 1
+[2025-04-29 19:49:51,561][gensim.models.word2vec][INFO] - EPOCH 39 - PROGRESS: at 59.69% examples, 23101 words/s, in_qsize 13, out_qsize 1
+[2025-04-29 19:49:52,130][gensim.models.word2vec][INFO] - EPOCH 39: training on 318950 raw words (234476 effective words) took 6.6s, 35349 effective words/s
+[2025-04-29 19:50:05,645][gensim.models.word2vec][INFO] - EPOCH 40 - PROGRESS: at 12.84% examples, 2192 words/s, in_qsize 28, out_qsize 1
+[2025-04-29 19:50:06,914][gensim.models.word2vec][INFO] - EPOCH 40 - PROGRESS: at 15.72% examples, 2488 words/s, in_qsize 27, out_qsize 1
+[2025-04-29 19:50:07,981][gensim.models.word2vec][INFO] - EPOCH 40 - PROGRESS: at 30.65% examples, 4571 words/s, in_qsize 22, out_qsize 1
+[2025-04-29 19:50:09,026][gensim.models.word2vec][INFO] - EPOCH 40 - PROGRESS: at 73.77% examples, 10324 words/s, in_qsize 8, out_qsize 1
+[2025-04-29 19:50:09,154][gensim.models.word2vec][INFO] - EPOCH 40: training on 318950 raw words (234624 effective words) took 17.0s, 13835 effective words/s
+[2025-04-29 19:50:21,829][gensim.models.word2vec][INFO] - EPOCH 41 - PROGRESS: at 21.41% examples, 4009 words/s, in_qsize 25, out_qsize 1
+[2025-04-29 19:50:23,618][gensim.models.word2vec][INFO] - EPOCH 41 - PROGRESS: at 27.44% examples, 4499 words/s, in_qsize 23, out_qsize 1
+[2025-04-29 19:50:24,633][gensim.models.word2vec][INFO] - EPOCH 41 - PROGRESS: at 76.41% examples, 11682 words/s, in_qsize 7, out_qsize 1
+[2025-04-29 19:50:24,788][gensim.models.word2vec][INFO] - EPOCH 41: training on 318950 raw words (234386 effective words) took 15.6s, 15056 effective words/s
+[2025-04-29 19:50:25,933][gensim.models.word2vec][INFO] - EPOCH 42 - PROGRESS: at 25.68% examples, 55182 words/s, in_qsize 0, out_qsize 0
+[2025-04-29 19:50:37,006][gensim.models.word2vec][INFO] - EPOCH 42 - PROGRESS: at 31.57% examples, 6053 words/s, in_qsize 22, out_qsize 1
+[2025-04-29 19:50:38,195][gensim.models.word2vec][INFO] - EPOCH 42 - PROGRESS: at 36.90% examples, 6500 words/s, in_qsize 20, out_qsize 1
+[2025-04-29 19:50:39,553][gensim.models.word2vec][INFO] - EPOCH 42 - PROGRESS: at 39.77% examples, 6373 words/s, in_qsize 19, out_qsize 1
+[2025-04-29 19:50:40,397][gensim.models.word2vec][INFO] - EPOCH 42: training on 318950 raw words (234514 effective words) took 15.5s, 15085 effective words/s
+[2025-04-29 19:50:48,825][gensim.models.word2vec][INFO] - EPOCH 43 - PROGRESS: at 10.61% examples, 2849 words/s, in_qsize 29, out_qsize 1
+[2025-04-29 19:50:54,411][gensim.models.word2vec][INFO] - EPOCH 43 - PROGRESS: at 12.90% examples, 2125 words/s, in_qsize 28, out_qsize 1
+[2025-04-29 19:50:56,024][gensim.models.word2vec][INFO] - EPOCH 43 - PROGRESS: at 16.04% examples, 2383 words/s, in_qsize 27, out_qsize 1
+[2025-04-29 19:50:57,041][gensim.models.word2vec][INFO] - EPOCH 43 - PROGRESS: at 34.25% examples, 4817 words/s, in_qsize 21, out_qsize 1
+[2025-04-29 19:50:57,919][gensim.models.word2vec][INFO] - EPOCH 43: training on 318950 raw words (234581 effective words) took 17.5s, 13441 effective words/s
+[2025-04-29 19:50:59,166][gensim.models.word2vec][INFO] - EPOCH 44 - PROGRESS: at 25.76% examples, 50642 words/s, in_qsize 0, out_qsize 0
+[2025-04-29 19:51:00,281][gensim.models.word2vec][INFO] - EPOCH 44 - PROGRESS: at 34.84% examples, 35428 words/s, in_qsize 20, out_qsize 3
+[2025-04-29 19:51:05,770][gensim.models.word2vec][INFO] - EPOCH 44 - PROGRESS: at 45.17% examples, 13457 words/s, in_qsize 18, out_qsize 1
+[2025-04-29 19:51:07,453][gensim.models.word2vec][INFO] - EPOCH 44 - PROGRESS: at 47.46% examples, 11679 words/s, in_qsize 17, out_qsize 1
+[2025-04-29 19:51:08,548][gensim.models.word2vec][INFO] - EPOCH 44 - PROGRESS: at 53.49% examples, 11832 words/s, in_qsize 15, out_qsize 1
+[2025-04-29 19:51:09,522][gensim.models.word2vec][INFO] - EPOCH 44: training on 318950 raw words (234643 effective words) took 11.5s, 20348 effective words/s
+[2025-04-29 19:51:13,109][gensim.models.word2vec][INFO] - EPOCH 45 - PROGRESS: at 10.44% examples, 6666 words/s, in_qsize 29, out_qsize 1
+[2025-04-29 19:51:17,789][gensim.models.word2vec][INFO] - EPOCH 45 - PROGRESS: at 13.58% examples, 3771 words/s, in_qsize 28, out_qsize 1
+[2025-04-29 19:51:22,964][gensim.models.word2vec][INFO] - EPOCH 45 - PROGRESS: at 16.45% examples, 2832 words/s, in_qsize 27, out_qsize 1
+[2025-04-29 19:51:24,780][gensim.models.word2vec][INFO] - EPOCH 45 - PROGRESS: at 21.97% examples, 3370 words/s, in_qsize 25, out_qsize 1
+[2025-04-29 19:51:25,841][gensim.models.word2vec][INFO] - EPOCH 45 - PROGRESS: at 55.67% examples, 8027 words/s, in_qsize 14, out_qsize 1
+[2025-04-29 19:51:26,470][gensim.models.word2vec][INFO] - EPOCH 45: training on 318950 raw words (234412 effective words) took 16.9s, 13881 effective words/s
+[2025-04-29 19:51:28,289][gensim.models.word2vec][INFO] - EPOCH 46 - PROGRESS: at 9.22% examples, 20421 words/s, in_qsize 0, out_qsize 56
+[2025-04-29 19:51:31,697][gensim.models.word2vec][INFO] - EPOCH 46 - PROGRESS: at 21.90% examples, 9958 words/s, in_qsize 25, out_qsize 1
+[2025-04-29 19:51:37,418][gensim.models.word2vec][INFO] - EPOCH 46 - PROGRESS: at 24.82% examples, 5354 words/s, in_qsize 24, out_qsize 1
+[2025-04-29 19:51:38,499][gensim.models.word2vec][INFO] - EPOCH 46 - PROGRESS: at 27.97% examples, 5480 words/s, in_qsize 23, out_qsize 1
+[2025-04-29 19:51:39,993][gensim.models.word2vec][INFO] - EPOCH 46 - PROGRESS: at 39.31% examples, 6918 words/s, in_qsize 19, out_qsize 1
+[2025-04-29 19:51:41,071][gensim.models.word2vec][INFO] - EPOCH 46 - PROGRESS: at 54.77% examples, 8901 words/s, in_qsize 14, out_qsize 1
+[2025-04-29 19:51:41,521][gensim.models.word2vec][INFO] - EPOCH 46: training on 318950 raw words (234702 effective words) took 15.0s, 15668 effective words/s
+[2025-04-29 19:51:54,373][gensim.models.word2vec][INFO] - EPOCH 47 - PROGRESS: at 6.50% examples, 1189 words/s, in_qsize 30, out_qsize 1
+[2025-04-29 19:51:55,524][gensim.models.word2vec][INFO] - EPOCH 47 - PROGRESS: at 8.78% examples, 1508 words/s, in_qsize 29, out_qsize 1
+[2025-04-29 19:51:56,772][gensim.models.word2vec][INFO] - EPOCH 47 - PROGRESS: at 14.93% examples, 2332 words/s, in_qsize 27, out_qsize 1
+[2025-04-29 19:51:57,781][gensim.models.word2vec][INFO] - EPOCH 47 - PROGRESS: at 24.13% examples, 3528 words/s, in_qsize 24, out_qsize 1
+[2025-04-29 19:51:58,815][gensim.models.word2vec][INFO] - EPOCH 47 - PROGRESS: at 72.89% examples, 10017 words/s, in_qsize 8, out_qsize 1
+[2025-04-29 19:51:59,053][gensim.models.word2vec][INFO] - EPOCH 47: training on 318950 raw words (234591 effective words) took 17.5s, 13434 effective words/s
+[2025-04-29 19:52:10,465][gensim.models.word2vec][INFO] - EPOCH 48 - PROGRESS: at 12.38% examples, 2517 words/s, in_qsize 28, out_qsize 1
+[2025-04-29 19:52:13,610][gensim.models.word2vec][INFO] - EPOCH 48 - PROGRESS: at 15.42% examples, 2462 words/s, in_qsize 27, out_qsize 1
+[2025-04-29 19:52:14,646][gensim.models.word2vec][INFO] - EPOCH 48 - PROGRESS: at 24.73% examples, 3714 words/s, in_qsize 24, out_qsize 1
+[2025-04-29 19:52:15,647][gensim.models.word2vec][INFO] - EPOCH 48 - PROGRESS: at 76.74% examples, 10928 words/s, in_qsize 7, out_qsize 1
+[2025-04-29 19:52:15,816][gensim.models.word2vec][INFO] - EPOCH 48: training on 318950 raw words (234200 effective words) took 16.7s, 14031 effective words/s
+[2025-04-29 19:52:18,819][gensim.models.word2vec][INFO] - EPOCH 49 - PROGRESS: at 5.81% examples, 4830 words/s, in_qsize 30, out_qsize 1
+[2025-04-29 19:52:20,819][gensim.models.word2vec][INFO] - EPOCH 49 - PROGRESS: at 8.96% examples, 4349 words/s, in_qsize 29, out_qsize 1
+[2025-04-29 19:52:25,641][gensim.models.word2vec][INFO] - EPOCH 49 - PROGRESS: at 12.98% examples, 3087 words/s, in_qsize 28, out_qsize 1
+[2025-04-29 19:52:29,385][gensim.models.word2vec][INFO] - EPOCH 49 - PROGRESS: at 15.26% examples, 2661 words/s, in_qsize 27, out_qsize 1
+[2025-04-29 19:52:31,075][gensim.models.word2vec][INFO] - EPOCH 49 - PROGRESS: at 18.17% examples, 2818 words/s, in_qsize 26, out_qsize 1
+[2025-04-29 19:52:32,217][gensim.models.word2vec][INFO] - EPOCH 49 - PROGRESS: at 30.09% examples, 4343 words/s, in_qsize 22, out_qsize 1
+[2025-04-29 19:52:33,124][gensim.models.word2vec][INFO] - EPOCH 49: training on 318950 raw words (234623 effective words) took 17.2s, 13606 effective words/s
+[2025-04-29 19:52:36,527][gensim.models.word2vec][INFO] - EPOCH 50 - PROGRESS: at 3.67% examples, 2445 words/s, in_qsize 31, out_qsize 1
+[2025-04-29 19:52:39,228][gensim.models.word2vec][INFO] - EPOCH 50 - PROGRESS: at 6.82% examples, 2582 words/s, in_qsize 30, out_qsize 1
+[2025-04-29 19:52:45,273][gensim.models.word2vec][INFO] - EPOCH 50 - PROGRESS: at 9.73% examples, 1859 words/s, in_qsize 29, out_qsize 1
+[2025-04-29 19:52:46,466][gensim.models.word2vec][INFO] - EPOCH 50 - PROGRESS: at 14.94% examples, 2658 words/s, in_qsize 27, out_qsize 1
+[2025-04-29 19:52:47,525][gensim.models.word2vec][INFO] - EPOCH 50 - PROGRESS: at 21.08% examples, 3500 words/s, in_qsize 25, out_qsize 1
+[2025-04-29 19:52:48,921][gensim.models.word2vec][INFO] - EPOCH 50 - PROGRESS: at 27.26% examples, 4107 words/s, in_qsize 23, out_qsize 1
+[2025-04-29 19:52:49,957][gensim.models.word2vec][INFO] - EPOCH 50 - PROGRESS: at 67.12% examples, 9459 words/s, in_qsize 10, out_qsize 1
+[2025-04-29 19:52:50,123][gensim.models.word2vec][INFO] - EPOCH 50: training on 318950 raw words (234468 effective words) took 16.9s, 13846 effective words/s
+[2025-04-29 19:53:03,186][gensim.models.word2vec][INFO] - EPOCH 51 - PROGRESS: at 3.31% examples, 583 words/s, in_qsize 31, out_qsize 1
+[2025-04-29 19:53:04,485][gensim.models.word2vec][INFO] - EPOCH 51 - PROGRESS: at 5.60% examples, 935 words/s, in_qsize 30, out_qsize 1
+[2025-04-29 19:53:05,869][gensim.models.word2vec][INFO] - EPOCH 51 - PROGRESS: at 11.50% examples, 1742 words/s, in_qsize 28, out_qsize 1
+[2025-04-29 19:53:06,980][gensim.models.word2vec][INFO] - EPOCH 51 - PROGRESS: at 23.44% examples, 3316 words/s, in_qsize 24, out_qsize 1
+[2025-04-29 19:53:07,980][gensim.models.word2vec][INFO] - EPOCH 51 - PROGRESS: at 66.64% examples, 8849 words/s, in_qsize 10, out_qsize 1
+[2025-04-29 19:53:08,209][gensim.models.word2vec][INFO] - EPOCH 51: training on 318950 raw words (234362 effective words) took 18.0s, 13010 effective words/s
+[2025-04-29 19:53:09,419][gensim.models.word2vec][INFO] - EPOCH 52 - PROGRESS: at 12.01% examples, 24933 words/s, in_qsize 28, out_qsize 1
+[2025-04-29 19:53:18,313][gensim.models.word2vec][INFO] - EPOCH 52 - PROGRESS: at 14.29% examples, 3417 words/s, in_qsize 27, out_qsize 1
+[2025-04-29 19:53:21,763][gensim.models.word2vec][INFO] - EPOCH 52 - PROGRESS: at 17.48% examples, 3090 words/s, in_qsize 26, out_qsize 1
+[2025-04-29 19:53:22,920][gensim.models.word2vec][INFO] - EPOCH 52 - PROGRESS: at 51.51% examples, 8335 words/s, in_qsize 15, out_qsize 1
+[2025-04-29 19:53:23,602][gensim.models.word2vec][INFO] - EPOCH 52: training on 318950 raw words (234530 effective words) took 15.3s, 15304 effective words/s
+[2025-04-29 19:53:33,756][gensim.models.word2vec][INFO] - EPOCH 53 - PROGRESS: at 17.00% examples, 3845 words/s, in_qsize 27, out_qsize 1
+[2025-04-29 19:53:35,315][gensim.models.word2vec][INFO] - EPOCH 53 - PROGRESS: at 20.03% examples, 3936 words/s, in_qsize 26, out_qsize 1
+[2025-04-29 19:53:37,720][gensim.models.word2vec][INFO] - EPOCH 53 - PROGRESS: at 34.58% examples, 5727 words/s, in_qsize 21, out_qsize 1
+[2025-04-29 19:53:38,751][gensim.models.word2vec][INFO] - EPOCH 53 - PROGRESS: at 52.35% examples, 8159 words/s, in_qsize 15, out_qsize 1
+[2025-04-29 19:53:39,289][gensim.models.word2vec][INFO] - EPOCH 53: training on 318950 raw words (234461 effective words) took 15.6s, 15008 effective words/s
+[2025-04-29 19:53:40,867][gensim.models.word2vec][INFO] - EPOCH 54 - PROGRESS: at 16.13% examples, 24702 words/s, in_qsize 27, out_qsize 1
+[2025-04-29 19:53:48,796][gensim.models.word2vec][INFO] - EPOCH 54 - PROGRESS: at 19.48% examples, 4786 words/s, in_qsize 26, out_qsize 1
+[2025-04-29 19:53:52,083][gensim.models.word2vec][INFO] - EPOCH 54 - PROGRESS: at 22.35% examples, 4098 words/s, in_qsize 25, out_qsize 1
+[2025-04-29 19:53:53,161][gensim.models.word2vec][INFO] - EPOCH 54 - PROGRESS: at 33.83% examples, 5748 words/s, in_qsize 21, out_qsize 1
+[2025-04-29 19:53:54,216][gensim.models.word2vec][INFO] - EPOCH 54 - PROGRESS: at 71.08% examples, 11221 words/s, in_qsize 9, out_qsize 1
+[2025-04-29 19:53:54,473][gensim.models.word2vec][INFO] - EPOCH 54: training on 318950 raw words (234227 effective words) took 15.1s, 15491 effective words/s
+[2025-04-29 19:54:00,181][gensim.models.word2vec][INFO] - EPOCH 55 - PROGRESS: at 9.37% examples, 3886 words/s, in_qsize 29, out_qsize 1
+[2025-04-29 19:54:08,198][gensim.models.word2vec][INFO] - EPOCH 55 - PROGRESS: at 11.66% examples, 2033 words/s, in_qsize 28, out_qsize 1
+[2025-04-29 19:54:09,292][gensim.models.word2vec][INFO] - EPOCH 55 - PROGRESS: at 14.80% examples, 2384 words/s, in_qsize 27, out_qsize 1
+[2025-04-29 19:54:10,681][gensim.models.word2vec][INFO] - EPOCH 55 - PROGRESS: at 27.29% examples, 4000 words/s, in_qsize 23, out_qsize 1
+[2025-04-29 19:54:11,630][gensim.models.word2vec][INFO] - EPOCH 55: training on 318950 raw words (234888 effective words) took 17.1s, 13744 effective words/s
+[2025-04-29 19:54:13,280][gensim.models.word2vec][INFO] - EPOCH 56 - PROGRESS: at 18.32% examples, 39662 words/s, in_qsize 3, out_qsize 120
+[2025-04-29 19:54:20,809][gensim.models.word2vec][INFO] - EPOCH 56 - PROGRESS: at 27.81% examples, 7201 words/s, in_qsize 23, out_qsize 1
+[2025-04-29 19:54:23,037][gensim.models.word2vec][INFO] - EPOCH 56 - PROGRESS: at 30.09% examples, 6301 words/s, in_qsize 22, out_qsize 1
+[2025-04-29 19:54:24,525][gensim.models.word2vec][INFO] - EPOCH 56 - PROGRESS: at 35.96% examples, 6649 words/s, in_qsize 20, out_qsize 1
+[2025-04-29 19:54:25,556][gensim.models.word2vec][INFO] - EPOCH 56 - PROGRESS: at 76.04% examples, 12977 words/s, in_qsize 7, out_qsize 1
+[2025-04-29 19:54:25,727][gensim.models.word2vec][INFO] - EPOCH 56: training on 318950 raw words (234655 effective words) took 14.0s, 16731 effective words/s
+[2025-04-29 19:54:32,254][gensim.models.word2vec][INFO] - EPOCH 57 - PROGRESS: at 7.26% examples, 2489 words/s, in_qsize 30, out_qsize 1
+[2025-04-29 19:54:34,073][gensim.models.word2vec][INFO] - EPOCH 57 - PROGRESS: at 16.97% examples, 4657 words/s, in_qsize 27, out_qsize 1
+[2025-04-29 19:54:38,141][gensim.models.word2vec][INFO] - EPOCH 57 - PROGRESS: at 19.25% examples, 3594 words/s, in_qsize 26, out_qsize 1
+[2025-04-29 19:54:39,388][gensim.models.word2vec][INFO] - EPOCH 57 - PROGRESS: at 22.40% examples, 3808 words/s, in_qsize 25, out_qsize 1
+[2025-04-29 19:54:40,990][gensim.models.word2vec][INFO] - EPOCH 57 - PROGRESS: at 28.29% examples, 4322 words/s, in_qsize 23, out_qsize 1
+[2025-04-29 19:54:42,002][gensim.models.word2vec][INFO] - EPOCH 57 - PROGRESS: at 68.01% examples, 9841 words/s, in_qsize 10, out_qsize 1
+[2025-04-29 19:54:42,239][gensim.models.word2vec][INFO] - EPOCH 57: training on 318950 raw words (234623 effective words) took 16.5s, 14262 effective words/s
+[2025-04-29 19:54:47,380][gensim.models.word2vec][INFO] - EPOCH 58 - PROGRESS: at 6.10% examples, 2828 words/s, in_qsize 30, out_qsize 1
+[2025-04-29 19:54:56,292][gensim.models.word2vec][INFO] - EPOCH 58 - PROGRESS: at 8.38% examples, 1444 words/s, in_qsize 29, out_qsize 1
+[2025-04-29 19:54:57,558][gensim.models.word2vec][INFO] - EPOCH 58 - PROGRESS: at 14.29% examples, 2241 words/s, in_qsize 27, out_qsize 1
+[2025-04-29 19:54:58,803][gensim.models.word2vec][INFO] - EPOCH 58 - PROGRESS: at 29.17% examples, 4228 words/s, in_qsize 22, out_qsize 1
+[2025-04-29 19:54:59,732][gensim.models.word2vec][INFO] - EPOCH 58: training on 318950 raw words (234408 effective words) took 17.4s, 13455 effective words/s
+[2025-04-29 19:55:05,709][gensim.models.word2vec][INFO] - EPOCH 59 - PROGRESS: at 4.02% examples, 1452 words/s, in_qsize 31, out_qsize 1
+[2025-04-29 19:55:13,160][gensim.models.word2vec][INFO] - EPOCH 59 - PROGRESS: at 7.00% examples, 1169 words/s, in_qsize 30, out_qsize 1
+[2025-04-29 19:55:14,465][gensim.models.word2vec][INFO] - EPOCH 59 - PROGRESS: at 15.71% examples, 2484 words/s, in_qsize 27, out_qsize 1
+[2025-04-29 19:55:15,546][gensim.models.word2vec][INFO] - EPOCH 59 - PROGRESS: at 37.52% examples, 5587 words/s, in_qsize 20, out_qsize 1
+[2025-04-29 19:55:16,577][gensim.models.word2vec][INFO] - EPOCH 59 - PROGRESS: at 76.98% examples, 10810 words/s, in_qsize 7, out_qsize 1
+[2025-04-29 19:55:16,721][gensim.models.word2vec][INFO] - EPOCH 59: training on 318950 raw words (234793 effective words) took 16.9s, 13877 effective words/s
+[2025-04-29 19:55:18,038][gensim.models.word2vec][INFO] - EPOCH 60 - PROGRESS: at 7.16% examples, 12907 words/s, in_qsize 30, out_qsize 1
+[2025-04-29 19:55:30,752][gensim.models.word2vec][INFO] - EPOCH 60 - PROGRESS: at 9.44% examples, 1569 words/s, in_qsize 29, out_qsize 1
+[2025-04-29 19:55:33,192][gensim.models.word2vec][INFO] - EPOCH 60 - PROGRESS: at 12.36% examples, 1757 words/s, in_qsize 28, out_qsize 1
+[2025-04-29 19:55:34,256][gensim.models.word2vec][INFO] - EPOCH 60 - PROGRESS: at 45.25% examples, 6114 words/s, in_qsize 17, out_qsize 1
+[2025-04-29 19:55:34,753][gensim.models.word2vec][INFO] - EPOCH 60: training on 318950 raw words (234850 effective words) took 18.0s, 13076 effective words/s
+[2025-04-29 19:55:38,005][gensim.models.word2vec][INFO] - EPOCH 61 - PROGRESS: at 3.67% examples, 2560 words/s, in_qsize 31, out_qsize 1
+[2025-04-29 19:55:46,249][gensim.models.word2vec][INFO] - EPOCH 61 - PROGRESS: at 6.90% examples, 1372 words/s, in_qsize 30, out_qsize 1
+[2025-04-29 19:55:49,099][gensim.models.word2vec][INFO] - EPOCH 61 - PROGRESS: at 9.18% examples, 1504 words/s, in_qsize 29, out_qsize 1
+[2025-04-29 19:55:50,129][gensim.models.word2vec][INFO] - EPOCH 61 - PROGRESS: at 15.42% examples, 2360 words/s, in_qsize 27, out_qsize 1
+[2025-04-29 19:55:51,216][gensim.models.word2vec][INFO] - EPOCH 61 - PROGRESS: at 52.02% examples, 7476 words/s, in_qsize 15, out_qsize 1
+[2025-04-29 19:55:52,008][gensim.models.word2vec][INFO] - EPOCH 61: training on 318950 raw words (234769 effective words) took 17.2s, 13656 effective words/s
+[2025-04-29 19:55:56,375][gensim.models.word2vec][INFO] - EPOCH 62 - PROGRESS: at 15.77% examples, 8559 words/s, in_qsize 27, out_qsize 1
+[2025-04-29 19:55:58,187][gensim.models.word2vec][INFO] - EPOCH 62 - PROGRESS: at 19.01% examples, 7258 words/s, in_qsize 26, out_qsize 1
+[2025-04-29 19:56:03,803][gensim.models.word2vec][INFO] - EPOCH 62 - PROGRESS: at 22.26% examples, 4422 words/s, in_qsize 25, out_qsize 1
+[2025-04-29 19:56:05,188][gensim.models.word2vec][INFO] - EPOCH 62 - PROGRESS: at 24.54% examples, 4397 words/s, in_qsize 24, out_qsize 1
+[2025-04-29 19:56:07,230][gensim.models.word2vec][INFO] - EPOCH 62 - PROGRESS: at 33.82% examples, 5244 words/s, in_qsize 21, out_qsize 1
+[2025-04-29 19:56:08,242][gensim.models.word2vec][INFO] - EPOCH 62 - PROGRESS: at 100.00% examples, 14489 words/s, in_qsize 0, out_qsize 1
+[2025-04-29 19:56:08,243][gensim.models.word2vec][INFO] - EPOCH 62: training on 318950 raw words (234386 effective words) took 16.2s, 14489 effective words/s
+[2025-04-29 19:56:23,416][gensim.models.word2vec][INFO] - EPOCH 63 - PROGRESS: at 8.31% examples, 1344 words/s, in_qsize 29, out_qsize 1
+[2025-04-29 19:56:24,853][gensim.models.word2vec][INFO] - EPOCH 63 - PROGRESS: at 11.24% examples, 1652 words/s, in_qsize 28, out_qsize 1
+[2025-04-29 19:56:26,072][gensim.models.word2vec][INFO] - EPOCH 63 - PROGRESS: at 17.14% examples, 2329 words/s, in_qsize 26, out_qsize 1
+[2025-04-29 19:56:27,089][gensim.models.word2vec][INFO] - EPOCH 63 - PROGRESS: at 56.71% examples, 7199 words/s, in_qsize 13, out_qsize 1
+[2025-04-29 19:56:27,403][gensim.models.word2vec][INFO] - EPOCH 63: training on 318950 raw words (234609 effective words) took 19.1s, 12297 effective words/s
+[2025-04-29 19:56:32,890][gensim.models.word2vec][INFO] - EPOCH 64 - PROGRESS: at 9.03% examples, 3910 words/s, in_qsize 29, out_qsize 1
+[2025-04-29 19:56:40,997][gensim.models.word2vec][INFO] - EPOCH 64 - PROGRESS: at 11.31% examples, 1997 words/s, in_qsize 28, out_qsize 1
+[2025-04-29 19:56:42,158][gensim.models.word2vec][INFO] - EPOCH 64 - PROGRESS: at 14.22% examples, 2311 words/s, in_qsize 27, out_qsize 1
+[2025-04-29 19:56:43,294][gensim.models.word2vec][INFO] - EPOCH 64 - PROGRESS: at 35.84% examples, 5370 words/s, in_qsize 20, out_qsize 1
+[2025-04-29 19:56:44,282][gensim.models.word2vec][INFO] - EPOCH 64: training on 318950 raw words (234403 effective words) took 16.8s, 13945 effective words/s
+[2025-04-29 19:56:53,740][gensim.models.word2vec][INFO] - EPOCH 65 - PROGRESS: at 6.33% examples, 1582 words/s, in_qsize 30, out_qsize 1
+[2025-04-29 19:56:57,982][gensim.models.word2vec][INFO] - EPOCH 65 - PROGRESS: at 9.20% examples, 1606 words/s, in_qsize 29, out_qsize 1
+[2025-04-29 19:57:00,292][gensim.models.word2vec][INFO] - EPOCH 65 - PROGRESS: at 17.57% examples, 2644 words/s, in_qsize 26, out_qsize 1
+[2025-04-29 19:57:01,313][gensim.models.word2vec][INFO] - EPOCH 65 - PROGRESS: at 30.53% examples, 4249 words/s, in_qsize 22, out_qsize 1
+[2025-04-29 19:57:01,794][gensim.models.word2vec][INFO] - EPOCH 65: training on 318950 raw words (234507 effective words) took 17.4s, 13448 effective words/s
+[2025-04-29 19:57:02,945][gensim.models.word2vec][INFO] - EPOCH 66 - PROGRESS: at 17.12% examples, 35586 words/s, in_qsize 0, out_qsize 2
+[2025-04-29 19:57:04,237][gensim.models.word2vec][INFO] - EPOCH 66 - PROGRESS: at 26.68% examples, 25694 words/s, in_qsize 24, out_qsize 1
+[2025-04-29 19:57:05,645][gensim.models.word2vec][INFO] - EPOCH 66 - PROGRESS: at 29.57% examples, 18039 words/s, in_qsize 23, out_qsize 1
+[2025-04-29 19:57:07,778][gensim.models.word2vec][INFO] - EPOCH 66 - PROGRESS: at 32.49% examples, 12723 words/s, in_qsize 22, out_qsize 1
+[2025-04-29 19:57:13,195][gensim.models.word2vec][INFO] - EPOCH 66 - PROGRESS: at 36.16% examples, 7362 words/s, in_qsize 21, out_qsize 1
+[2025-04-29 19:57:14,755][gensim.models.word2vec][INFO] - EPOCH 66 - PROGRESS: at 47.59% examples, 8603 words/s, in_qsize 17, out_qsize 1
+[2025-04-29 19:57:15,517][gensim.models.word2vec][INFO] - EPOCH 66: training on 318950 raw words (234347 effective words) took 13.7s, 17151 effective words/s
+[2025-04-29 19:57:26,406][gensim.models.word2vec][INFO] - EPOCH 67 - PROGRESS: at 23.70% examples, 5226 words/s, in_qsize 24, out_qsize 1
+[2025-04-29 19:57:27,649][gensim.models.word2vec][INFO] - EPOCH 67 - PROGRESS: at 29.79% examples, 5880 words/s, in_qsize 22, out_qsize 1
+[2025-04-29 19:57:28,756][gensim.models.word2vec][INFO] - EPOCH 67 - PROGRESS: at 42.26% examples, 7619 words/s, in_qsize 18, out_qsize 1
+[2025-04-29 19:57:29,762][gensim.models.word2vec][INFO] - EPOCH 67 - PROGRESS: at 85.70% examples, 14282 words/s, in_qsize 4, out_qsize 1
+[2025-04-29 19:57:29,810][gensim.models.word2vec][INFO] - EPOCH 67: training on 318950 raw words (234518 effective words) took 14.2s, 16490 effective words/s
+[2025-04-29 19:57:31,469][gensim.models.word2vec][INFO] - EPOCH 68 - PROGRESS: at 9.56% examples, 13871 words/s, in_qsize 29, out_qsize 1
+[2025-04-29 19:57:41,093][gensim.models.word2vec][INFO] - EPOCH 68 - PROGRESS: at 12.76% examples, 2635 words/s, in_qsize 28, out_qsize 1
+[2025-04-29 19:57:43,366][gensim.models.word2vec][INFO] - EPOCH 68 - PROGRESS: at 15.04% examples, 2625 words/s, in_qsize 27, out_qsize 1
+[2025-04-29 19:57:44,628][gensim.models.word2vec][INFO] - EPOCH 68 - PROGRESS: at 18.03% examples, 2884 words/s, in_qsize 26, out_qsize 1
+[2025-04-29 19:57:45,705][gensim.models.word2vec][INFO] - EPOCH 68 - PROGRESS: at 42.84% examples, 6390 words/s, in_qsize 18, out_qsize 1
+[2025-04-29 19:57:46,469][gensim.models.word2vec][INFO] - EPOCH 68: training on 318950 raw words (234748 effective words) took 16.6s, 14144 effective words/s
+[2025-04-29 19:57:49,446][gensim.models.word2vec][INFO] - EPOCH 69 - PROGRESS: at 9.71% examples, 7662 words/s, in_qsize 29, out_qsize 1
+[2025-04-29 19:57:51,437][gensim.models.word2vec][INFO] - EPOCH 69 - PROGRESS: at 13.73% examples, 6303 words/s, in_qsize 28, out_qsize 1
+[2025-04-29 19:57:59,575][gensim.models.word2vec][INFO] - EPOCH 69 - PROGRESS: at 17.07% examples, 2969 words/s, in_qsize 27, out_qsize 1
+[2025-04-29 19:58:01,293][gensim.models.word2vec][INFO] - EPOCH 69 - PROGRESS: at 28.44% examples, 4474 words/s, in_qsize 23, out_qsize 1
+[2025-04-29 19:58:02,338][gensim.models.word2vec][INFO] - EPOCH 69 - PROGRESS: at 55.42% examples, 8244 words/s, in_qsize 14, out_qsize 1
+[2025-04-29 19:58:02,767][gensim.models.word2vec][INFO] - EPOCH 69: training on 318950 raw words (234877 effective words) took 16.2s, 14461 effective words/s
+[2025-04-29 19:58:04,949][gensim.models.word2vec][INFO] - EPOCH 70 - PROGRESS: at 10.44% examples, 11053 words/s, in_qsize 29, out_qsize 1
+[2025-04-29 19:58:06,900][gensim.models.word2vec][INFO] - EPOCH 70 - PROGRESS: at 13.36% examples, 7474 words/s, in_qsize 28, out_qsize 1
+[2025-04-29 19:58:11,835][gensim.models.word2vec][INFO] - EPOCH 70 - PROGRESS: at 23.06% examples, 5900 words/s, in_qsize 25, out_qsize 1
+[2025-04-29 19:58:13,402][gensim.models.word2vec][INFO] - EPOCH 70 - PROGRESS: at 28.93% examples, 6329 words/s, in_qsize 23, out_qsize 1
+[2025-04-29 19:58:14,597][gensim.models.word2vec][INFO] - EPOCH 70 - PROGRESS: at 43.21% examples, 8595 words/s, in_qsize 18, out_qsize 1
+[2025-04-29 19:58:15,624][gensim.models.word2vec][INFO] - EPOCH 70 - PROGRESS: at 49.51% examples, 9079 words/s, in_qsize 16, out_qsize 1
+[2025-04-29 19:58:16,474][gensim.models.word2vec][INFO] - EPOCH 70: training on 318950 raw words (234630 effective words) took 13.6s, 17191 effective words/s
+[2025-04-29 19:58:21,861][gensim.models.word2vec][INFO] - EPOCH 71 - PROGRESS: at 12.84% examples, 5578 words/s, in_qsize 28, out_qsize 1
+[2025-04-29 19:58:23,809][gensim.models.word2vec][INFO] - EPOCH 71 - PROGRESS: at 16.09% examples, 5134 words/s, in_qsize 27, out_qsize 1
+[2025-04-29 19:58:25,183][gensim.models.word2vec][INFO] - EPOCH 71 - PROGRESS: at 19.29% examples, 5176 words/s, in_qsize 26, out_qsize 1
+[2025-04-29 19:58:26,988][gensim.models.word2vec][INFO] - EPOCH 71 - PROGRESS: at 25.90% examples, 5746 words/s, in_qsize 24, out_qsize 1
+[2025-04-29 19:58:28,917][gensim.models.word2vec][INFO] - EPOCH 71 - PROGRESS: at 28.18% examples, 5320 words/s, in_qsize 23, out_qsize 1
+[2025-04-29 19:58:30,008][gensim.models.word2vec][INFO] - EPOCH 71 - PROGRESS: at 42.96% examples, 7503 words/s, in_qsize 18, out_qsize 1
+[2025-04-29 19:58:31,009][gensim.models.word2vec][INFO] - EPOCH 71 - PROGRESS: at 92.74% examples, 15100 words/s, in_qsize 1, out_qsize 3
+[2025-04-29 19:58:31,048][gensim.models.word2vec][INFO] - EPOCH 71: training on 318950 raw words (234588 effective words) took 14.5s, 16174 effective words/s
+[2025-04-29 19:58:35,319][gensim.models.word2vec][INFO] - EPOCH 72 - PROGRESS: at 3.18% examples, 1787 words/s, in_qsize 31, out_qsize 1
+[2025-04-29 19:58:42,570][gensim.models.word2vec][INFO] - EPOCH 72 - PROGRESS: at 6.25% examples, 1287 words/s, in_qsize 30, out_qsize 1
+[2025-04-29 19:58:44,664][gensim.models.word2vec][INFO] - EPOCH 72 - PROGRESS: at 9.28% examples, 1615 words/s, in_qsize 29, out_qsize 1
+[2025-04-29 19:58:45,696][gensim.models.word2vec][INFO] - EPOCH 72 - PROGRESS: at 17.84% examples, 2921 words/s, in_qsize 26, out_qsize 1
+[2025-04-29 19:58:46,977][gensim.models.word2vec][INFO] - EPOCH 72 - PROGRESS: at 23.63% examples, 3572 words/s, in_qsize 24, out_qsize 1
+[2025-04-29 19:58:48,139][gensim.models.word2vec][INFO] - EPOCH 72 - PROGRESS: at 66.27% examples, 9236 words/s, in_qsize 10, out_qsize 1
+[2025-04-29 19:58:48,474][gensim.models.word2vec][INFO] - EPOCH 72: training on 318950 raw words (234683 effective words) took 17.4s, 13523 effective words/s
+[2025-04-29 19:58:55,505][gensim.models.word2vec][INFO] - EPOCH 73 - PROGRESS: at 3.08% examples, 1065 words/s, in_qsize 31, out_qsize 1
+[2025-04-29 19:59:01,674][gensim.models.word2vec][INFO] - EPOCH 73 - PROGRESS: at 6.76% examples, 1187 words/s, in_qsize 30, out_qsize 1
+[2025-04-29 19:59:04,324][gensim.models.word2vec][INFO] - EPOCH 73 - PROGRESS: at 12.09% examples, 1803 words/s, in_qsize 28, out_qsize 1
+[2025-04-29 19:59:05,420][gensim.models.word2vec][INFO] - EPOCH 73 - PROGRESS: at 18.39% examples, 2558 words/s, in_qsize 26, out_qsize 1
+[2025-04-29 19:59:06,318][gensim.models.word2vec][INFO] - EPOCH 73: training on 318950 raw words (234743 effective words) took 17.8s, 13201 effective words/s
+[2025-04-29 19:59:08,935][gensim.models.word2vec][INFO] - EPOCH 74 - PROGRESS: at 6.14% examples, 5573 words/s, in_qsize 30, out_qsize 1
+[2025-04-29 19:59:10,874][gensim.models.word2vec][INFO] - EPOCH 74 - PROGRESS: at 9.46% examples, 4876 words/s, in_qsize 29, out_qsize 1
+[2025-04-29 19:59:17,719][gensim.models.word2vec][INFO] - EPOCH 74 - PROGRESS: at 12.34% examples, 2568 words/s, in_qsize 28, out_qsize 1
+[2025-04-29 19:59:18,740][gensim.models.word2vec][INFO] - EPOCH 74 - PROGRESS: at 18.25% examples, 3490 words/s, in_qsize 26, out_qsize 1
+[2025-04-29 19:59:19,949][gensim.models.word2vec][INFO] - EPOCH 74 - PROGRESS: at 27.12% examples, 4741 words/s, in_qsize 23, out_qsize 1
+[2025-04-29 19:59:20,974][gensim.models.word2vec][INFO] - EPOCH 74 - PROGRESS: at 33.32% examples, 5397 words/s, in_qsize 21, out_qsize 1
+[2025-04-29 19:59:21,985][gensim.models.word2vec][INFO] - EPOCH 74 - PROGRESS: at 48.87% examples, 7373 words/s, in_qsize 16, out_qsize 1
+[2025-04-29 19:59:22,762][gensim.models.word2vec][INFO] - EPOCH 74: training on 318950 raw words (234844 effective words) took 16.4s, 14326 effective words/s
+[2025-04-29 19:59:32,276][gensim.models.word2vec][INFO] - EPOCH 75 - PROGRESS: at 6.11% examples, 1553 words/s, in_qsize 30, out_qsize 1
+[2025-04-29 19:59:33,879][gensim.models.word2vec][INFO] - EPOCH 75 - PROGRESS: at 9.16% examples, 1976 words/s, in_qsize 29, out_qsize 1
+[2025-04-29 19:59:35,203][gensim.models.word2vec][INFO] - EPOCH 75 - PROGRESS: at 14.53% examples, 2836 words/s, in_qsize 27, out_qsize 1
+[2025-04-29 19:59:36,893][gensim.models.word2vec][INFO] - EPOCH 75 - PROGRESS: at 24.24% examples, 4104 words/s, in_qsize 24, out_qsize 1
+[2025-04-29 19:59:37,988][gensim.models.word2vec][INFO] - EPOCH 75 - PROGRESS: at 54.75% examples, 8578 words/s, in_qsize 14, out_qsize 1
+[2025-04-29 19:59:38,424][gensim.models.word2vec][INFO] - EPOCH 75: training on 318950 raw words (234760 effective words) took 15.6s, 15060 effective words/s
+[2025-04-29 19:59:42,476][gensim.models.word2vec][INFO] - EPOCH 76 - PROGRESS: at 22.34% examples, 13170 words/s, in_qsize 25, out_qsize 1
+[2025-04-29 19:59:44,869][gensim.models.word2vec][INFO] - EPOCH 76 - PROGRESS: at 25.58% examples, 9414 words/s, in_qsize 24, out_qsize 1
+[2025-04-29 19:59:46,089][gensim.models.word2vec][INFO] - EPOCH 76 - PROGRESS: at 28.46% examples, 8846 words/s, in_qsize 23, out_qsize 1
+[2025-04-29 19:59:49,884][gensim.models.word2vec][INFO] - EPOCH 76 - PROGRESS: at 33.62% examples, 7027 words/s, in_qsize 21, out_qsize 1
+[2025-04-29 19:59:50,943][gensim.models.word2vec][INFO] - EPOCH 76 - PROGRESS: at 43.05% examples, 8195 words/s, in_qsize 18, out_qsize 1
+[2025-04-29 19:59:51,951][gensim.models.word2vec][INFO] - EPOCH 76 - PROGRESS: at 57.88% examples, 10194 words/s, in_qsize 13, out_qsize 1
+[2025-04-29 19:59:52,389][gensim.models.word2vec][INFO] - EPOCH 76: training on 318950 raw words (234932 effective words) took 13.9s, 16906 effective words/s
+[2025-04-29 19:59:58,252][gensim.models.word2vec][INFO] - EPOCH 77 - PROGRESS: at 21.87% examples, 8857 words/s, in_qsize 25, out_qsize 1
+[2025-04-29 20:00:01,645][gensim.models.word2vec][INFO] - EPOCH 77 - PROGRESS: at 25.18% examples, 6422 words/s, in_qsize 24, out_qsize 1
+[2025-04-29 20:00:02,944][gensim.models.word2vec][INFO] - EPOCH 77 - PROGRESS: at 28.45% examples, 6349 words/s, in_qsize 23, out_qsize 1
+[2025-04-29 20:00:04,376][gensim.models.word2vec][INFO] - EPOCH 77 - PROGRESS: at 30.73% examples, 6077 words/s, in_qsize 22, out_qsize 1
+[2025-04-29 20:00:05,940][gensim.models.word2vec][INFO] - EPOCH 77 - PROGRESS: at 44.18% examples, 7642 words/s, in_qsize 18, out_qsize 1
+[2025-04-29 20:00:06,875][gensim.models.word2vec][INFO] - EPOCH 77: training on 318950 raw words (234579 effective words) took 14.4s, 16262 effective words/s
+[2025-04-29 20:00:20,434][gensim.models.word2vec][INFO] - EPOCH 78 - PROGRESS: at 2.91% examples, 514 words/s, in_qsize 31, out_qsize 1
+[2025-04-29 20:00:21,912][gensim.models.word2vec][INFO] - EPOCH 78 - PROGRESS: at 8.11% examples, 1313 words/s, in_qsize 29, out_qsize 1
+[2025-04-29 20:00:22,951][gensim.models.word2vec][INFO] - EPOCH 78 - PROGRESS: at 20.92% examples, 3084 words/s, in_qsize 25, out_qsize 1
+[2025-04-29 20:00:24,003][gensim.models.word2vec][INFO] - EPOCH 78 - PROGRESS: at 54.55% examples, 7550 words/s, in_qsize 14, out_qsize 1
+[2025-04-29 20:00:24,397][gensim.models.word2vec][INFO] - EPOCH 78: training on 318950 raw words (234589 effective words) took 17.4s, 13446 effective words/s
+[2025-04-29 20:00:27,391][gensim.models.word2vec][INFO] - EPOCH 79 - PROGRESS: at 2.88% examples, 2438 words/s, in_qsize 31, out_qsize 1
+[2025-04-29 20:00:35,701][gensim.models.word2vec][INFO] - EPOCH 79 - PROGRESS: at 6.04% examples, 1274 words/s, in_qsize 30, out_qsize 1
+[2025-04-29 20:00:38,649][gensim.models.word2vec][INFO] - EPOCH 79 - PROGRESS: at 11.56% examples, 1947 words/s, in_qsize 28, out_qsize 1
+[2025-04-29 20:00:39,764][gensim.models.word2vec][INFO] - EPOCH 79 - PROGRESS: at 20.41% examples, 3193 words/s, in_qsize 25, out_qsize 1
+[2025-04-29 20:00:40,781][gensim.models.word2vec][INFO] - EPOCH 79 - PROGRESS: at 38.95% examples, 5663 words/s, in_qsize 19, out_qsize 1
+[2025-04-29 20:00:41,665][gensim.models.word2vec][INFO] - EPOCH 79: training on 318950 raw words (234440 effective words) took 17.2s, 13631 effective words/s
+[2025-04-29 20:00:43,278][gensim.models.word2vec][INFO] - EPOCH 80 - PROGRESS: at 16.29% examples, 24329 words/s, in_qsize 27, out_qsize 1
+[2025-04-29 20:00:54,959][gensim.models.word2vec][INFO] - EPOCH 80 - PROGRESS: at 18.57% examples, 3275 words/s, in_qsize 26, out_qsize 1
+[2025-04-29 20:00:56,334][gensim.models.word2vec][INFO] - EPOCH 80 - PROGRESS: at 30.55% examples, 4914 words/s, in_qsize 22, out_qsize 1
+[2025-04-29 20:00:57,379][gensim.models.word2vec][INFO] - EPOCH 80 - PROGRESS: at 67.80% examples, 10201 words/s, in_qsize 10, out_qsize 1
+[2025-04-29 20:00:57,588][gensim.models.word2vec][INFO] - EPOCH 80: training on 318950 raw words (234731 effective words) took 15.8s, 14810 effective words/s
+[2025-04-29 20:01:09,421][gensim.models.word2vec][INFO] - EPOCH 81 - PROGRESS: at 2.93% examples, 594 words/s, in_qsize 31, out_qsize 1
+[2025-04-29 20:01:10,487][gensim.models.word2vec][INFO] - EPOCH 81 - PROGRESS: at 6.07% examples, 1116 words/s, in_qsize 30, out_qsize 1
+[2025-04-29 20:01:12,186][gensim.models.word2vec][INFO] - EPOCH 81 - PROGRESS: at 11.58% examples, 1903 words/s, in_qsize 28, out_qsize 1
+[2025-04-29 20:01:13,320][gensim.models.word2vec][INFO] - EPOCH 81 - PROGRESS: at 14.49% examples, 2205 words/s, in_qsize 27, out_qsize 1
+[2025-04-29 20:01:14,323][gensim.models.word2vec][INFO] - EPOCH 81 - PROGRESS: at 29.37% examples, 4191 words/s, in_qsize 22, out_qsize 1
+[2025-04-29 20:01:15,484][gensim.models.word2vec][INFO] - EPOCH 81 - PROGRESS: at 63.09% examples, 8383 words/s, in_qsize 11, out_qsize 1
+[2025-04-29 20:01:15,757][gensim.models.word2vec][INFO] - EPOCH 81: training on 318950 raw words (234184 effective words) took 18.1s, 12936 effective words/s
+[2025-04-29 20:01:24,294][gensim.models.word2vec][INFO] - EPOCH 82 - PROGRESS: at 8.84% examples, 2494 words/s, in_qsize 29, out_qsize 1
+[2025-04-29 20:01:27,882][gensim.models.word2vec][INFO] - EPOCH 82 - PROGRESS: at 12.08% examples, 2375 words/s, in_qsize 28, out_qsize 1
+[2025-04-29 20:01:28,960][gensim.models.word2vec][INFO] - EPOCH 82 - PROGRESS: at 18.38% examples, 3301 words/s, in_qsize 26, out_qsize 1
+[2025-04-29 20:01:30,593][gensim.models.word2vec][INFO] - EPOCH 82 - PROGRESS: at 24.50% examples, 3909 words/s, in_qsize 24, out_qsize 1
+[2025-04-29 20:01:31,660][gensim.models.word2vec][INFO] - EPOCH 82 - PROGRESS: at 39.61% examples, 5928 words/s, in_qsize 19, out_qsize 1
+[2025-04-29 20:01:32,448][gensim.models.word2vec][INFO] - EPOCH 82: training on 318950 raw words (234449 effective words) took 16.6s, 14107 effective words/s
+[2025-04-29 20:01:38,813][gensim.models.word2vec][INFO] - EPOCH 83 - PROGRESS: at 12.83% examples, 4769 words/s, in_qsize 28, out_qsize 1
+[2025-04-29 20:01:44,624][gensim.models.word2vec][INFO] - EPOCH 83 - PROGRESS: at 15.11% examples, 2956 words/s, in_qsize 27, out_qsize 1
+[2025-04-29 20:01:46,239][gensim.models.word2vec][INFO] - EPOCH 83 - PROGRESS: at 21.14% examples, 3646 words/s, in_qsize 25, out_qsize 1
+[2025-04-29 20:01:47,269][gensim.models.word2vec][INFO] - EPOCH 83 - PROGRESS: at 30.52% examples, 4882 words/s, in_qsize 22, out_qsize 1
+[2025-04-29 20:01:48,283][gensim.models.word2vec][INFO] - EPOCH 83 - PROGRESS: at 66.56% examples, 9993 words/s, in_qsize 10, out_qsize 1
+[2025-04-29 20:01:48,694][gensim.models.word2vec][INFO] - EPOCH 83: training on 318950 raw words (234370 effective words) took 16.2s, 14490 effective words/s
+[2025-04-29 20:01:59,030][gensim.models.word2vec][INFO] - EPOCH 84 - PROGRESS: at 12.89% examples, 2890 words/s, in_qsize 28, out_qsize 1
+[2025-04-29 20:02:01,862][gensim.models.word2vec][INFO] - EPOCH 84 - PROGRESS: at 15.88% examples, 2796 words/s, in_qsize 27, out_qsize 1
+[2025-04-29 20:02:04,530][gensim.models.word2vec][INFO] - EPOCH 84 - PROGRESS: at 28.37% examples, 4186 words/s, in_qsize 23, out_qsize 1
+[2025-04-29 20:02:05,533][gensim.models.word2vec][INFO] - EPOCH 84 - PROGRESS: at 83.70% examples, 11714 words/s, in_qsize 5, out_qsize 1
+[2025-04-29 20:02:05,610][gensim.models.word2vec][INFO] - EPOCH 84: training on 318950 raw words (234410 effective words) took 16.8s, 13918 effective words/s
+[2025-04-29 20:02:16,588][gensim.models.word2vec][INFO] - EPOCH 85 - PROGRESS: at 2.28% examples, 530 words/s, in_qsize 31, out_qsize 1
+[2025-04-29 20:02:21,204][gensim.models.word2vec][INFO] - EPOCH 85 - PROGRESS: at 5.19% examples, 817 words/s, in_qsize 30, out_qsize 1
+[2025-04-29 20:02:23,252][gensim.models.word2vec][INFO] - EPOCH 85 - PROGRESS: at 8.23% examples, 1135 words/s, in_qsize 29, out_qsize 1
+[2025-04-29 20:02:24,331][gensim.models.word2vec][INFO] - EPOCH 85 - PROGRESS: at 54.21% examples, 6876 words/s, in_qsize 14, out_qsize 1
+[2025-04-29 20:02:24,711][gensim.models.word2vec][INFO] - EPOCH 85: training on 318950 raw words (234589 effective words) took 19.0s, 12319 effective words/s
+[2025-04-29 20:02:33,218][gensim.models.word2vec][INFO] - EPOCH 86 - PROGRESS: at 6.23% examples, 1761 words/s, in_qsize 30, out_qsize 1
+[2025-04-29 20:02:35,618][gensim.models.word2vec][INFO] - EPOCH 86 - PROGRESS: at 9.18% examples, 2016 words/s, in_qsize 29, out_qsize 1
+[2025-04-29 20:02:38,549][gensim.models.word2vec][INFO] - EPOCH 86 - PROGRESS: at 11.46% examples, 2009 words/s, in_qsize 28, out_qsize 1
+[2025-04-29 20:02:39,827][gensim.models.word2vec][INFO] - EPOCH 86 - PROGRESS: at 14.61% examples, 2327 words/s, in_qsize 27, out_qsize 1
+[2025-04-29 20:02:40,882][gensim.models.word2vec][INFO] - EPOCH 86 - PROGRESS: at 26.46% examples, 3924 words/s, in_qsize 23, out_qsize 1
+[2025-04-29 20:02:41,887][gensim.models.word2vec][INFO] - EPOCH 86 - PROGRESS: at 57.32% examples, 7960 words/s, in_qsize 13, out_qsize 1
+[2025-04-29 20:02:42,270][gensim.models.word2vec][INFO] - EPOCH 86: training on 318950 raw words (234600 effective words) took 17.5s, 13402 effective words/s
+[2025-04-29 20:02:44,028][gensim.models.word2vec][INFO] - EPOCH 87 - PROGRESS: at 9.44% examples, 21466 words/s, in_qsize 10, out_qsize 122
+[2025-04-29 20:02:45,875][gensim.models.word2vec][INFO] - EPOCH 87 - PROGRESS: at 15.72% examples, 10483 words/s, in_qsize 27, out_qsize 1
+[2025-04-29 20:02:53,123][gensim.models.word2vec][INFO] - EPOCH 87 - PROGRESS: at 18.86% examples, 4125 words/s, in_qsize 26, out_qsize 1
+[2025-04-29 20:02:55,366][gensim.models.word2vec][INFO] - EPOCH 87 - PROGRESS: at 21.14% examples, 3860 words/s, in_qsize 25, out_qsize 1
+[2025-04-29 20:02:56,610][gensim.models.word2vec][INFO] - EPOCH 87 - PROGRESS: at 36.05% examples, 6007 words/s, in_qsize 20, out_qsize 1
+[2025-04-29 20:02:57,629][gensim.models.word2vec][INFO] - EPOCH 87 - PROGRESS: at 76.83% examples, 11829 words/s, in_qsize 7, out_qsize 1
+[2025-04-29 20:02:57,799][gensim.models.word2vec][INFO] - EPOCH 87: training on 318950 raw words (234504 effective words) took 15.5s, 15168 effective words/s
+[2025-04-29 20:03:09,665][gensim.models.word2vec][INFO] - EPOCH 88 - PROGRESS: at 6.43% examples, 1269 words/s, in_qsize 30, out_qsize 1
+[2025-04-29 20:03:10,720][gensim.models.word2vec][INFO] - EPOCH 88 - PROGRESS: at 8.71% examples, 1613 words/s, in_qsize 29, out_qsize 1
+[2025-04-29 20:03:12,106][gensim.models.word2vec][INFO] - EPOCH 88 - PROGRESS: at 11.86% examples, 1970 words/s, in_qsize 28, out_qsize 1
+[2025-04-29 20:03:13,534][gensim.models.word2vec][INFO] - EPOCH 88 - PROGRESS: at 17.80% examples, 2687 words/s, in_qsize 26, out_qsize 1
+[2025-04-29 20:03:14,568][gensim.models.word2vec][INFO] - EPOCH 88 - PROGRESS: at 51.15% examples, 7261 words/s, in_qsize 15, out_qsize 1
+[2025-04-29 20:03:15,188][gensim.models.word2vec][INFO] - EPOCH 88: training on 318950 raw words (234730 effective words) took 17.3s, 13553 effective words/s
+[2025-04-29 20:03:16,368][gensim.models.word2vec][INFO] - EPOCH 89 - PROGRESS: at 21.80% examples, 46200 words/s, in_qsize 0, out_qsize 0
+[2025-04-29 20:03:17,570][gensim.models.word2vec][INFO] - EPOCH 89 - PROGRESS: at 28.00% examples, 28430 words/s, in_qsize 22, out_qsize 3
+[2025-04-29 20:03:24,572][gensim.models.word2vec][INFO] - EPOCH 89 - PROGRESS: at 37.32% examples, 9448 words/s, in_qsize 20, out_qsize 1
+[2025-04-29 20:03:25,793][gensim.models.word2vec][INFO] - EPOCH 89 - PROGRESS: at 42.63% examples, 9583 words/s, in_qsize 18, out_qsize 1
+[2025-04-29 20:03:26,847][gensim.models.word2vec][INFO] - EPOCH 89 - PROGRESS: at 60.88% examples, 12416 words/s, in_qsize 12, out_qsize 1
+[2025-04-29 20:03:27,049][gensim.models.word2vec][INFO] - EPOCH 89: training on 318950 raw words (234819 effective words) took 11.8s, 19916 effective words/s
+[2025-04-29 20:03:32,570][gensim.models.word2vec][INFO] - EPOCH 90 - PROGRESS: at 19.51% examples, 8306 words/s, in_qsize 26, out_qsize 1
+[2025-04-29 20:03:38,888][gensim.models.word2vec][INFO] - EPOCH 90 - PROGRESS: at 22.66% examples, 4474 words/s, in_qsize 25, out_qsize 1
+[2025-04-29 20:03:40,730][gensim.models.word2vec][INFO] - EPOCH 90 - PROGRESS: at 30.89% examples, 5340 words/s, in_qsize 22, out_qsize 1
+[2025-04-29 20:03:41,761][gensim.models.word2vec][INFO] - EPOCH 90 - PROGRESS: at 36.75% examples, 5911 words/s, in_qsize 20, out_qsize 1
+[2025-04-29 20:03:42,487][gensim.models.word2vec][INFO] - EPOCH 90: training on 318950 raw words (234706 effective words) took 15.4s, 15272 effective words/s
+[2025-04-29 20:03:54,593][gensim.models.word2vec][INFO] - EPOCH 91 - PROGRESS: at 3.03% examples, 594 words/s, in_qsize 31, out_qsize 1
+[2025-04-29 20:03:55,636][gensim.models.word2vec][INFO] - EPOCH 91 - PROGRESS: at 6.18% examples, 1102 words/s, in_qsize 30, out_qsize 1
+[2025-04-29 20:03:56,638][gensim.models.word2vec][INFO] - EPOCH 91 - PROGRESS: at 17.53% examples, 2957 words/s, in_qsize 26, out_qsize 1
+[2025-04-29 20:03:57,678][gensim.models.word2vec][INFO] - EPOCH 91 - PROGRESS: at 24.53% examples, 3798 words/s, in_qsize 24, out_qsize 1
+[2025-04-29 20:03:58,802][gensim.models.word2vec][INFO] - EPOCH 91 - PROGRESS: at 49.02% examples, 7084 words/s, in_qsize 16, out_qsize 1
+[2025-04-29 20:03:59,385][gensim.models.word2vec][INFO] - EPOCH 91: training on 318950 raw words (234228 effective words) took 16.8s, 13922 effective words/s
+[2025-04-29 20:04:11,497][gensim.models.word2vec][INFO] - EPOCH 92 - PROGRESS: at 3.15% examples, 611 words/s, in_qsize 31, out_qsize 1
+[2025-04-29 20:04:13,342][gensim.models.word2vec][INFO] - EPOCH 92 - PROGRESS: at 8.58% examples, 1469 words/s, in_qsize 29, out_qsize 1
+[2025-04-29 20:04:14,365][gensim.models.word2vec][INFO] - EPOCH 92 - PROGRESS: at 18.70% examples, 2906 words/s, in_qsize 26, out_qsize 1
+[2025-04-29 20:04:15,424][gensim.models.word2vec][INFO] - EPOCH 92 - PROGRESS: at 24.82% examples, 3634 words/s, in_qsize 24, out_qsize 1
+[2025-04-29 20:04:16,473][gensim.models.word2vec][INFO] - EPOCH 92 - PROGRESS: at 73.55% examples, 10181 words/s, in_qsize 8, out_qsize 1
+[2025-04-29 20:04:16,612][gensim.models.word2vec][INFO] - EPOCH 92: training on 318950 raw words (234214 effective words) took 17.2s, 13652 effective words/s
+[2025-04-29 20:04:28,087][gensim.models.word2vec][INFO] - EPOCH 93 - PROGRESS: at 2.28% examples, 509 words/s, in_qsize 31, out_qsize 1
+[2025-04-29 20:04:31,466][gensim.models.word2vec][INFO] - EPOCH 93 - PROGRESS: at 5.33% examples, 873 words/s, in_qsize 30, out_qsize 1
+[2025-04-29 20:04:32,818][gensim.models.word2vec][INFO] - EPOCH 93 - PROGRESS: at 8.24% examples, 1224 words/s, in_qsize 29, out_qsize 1
+[2025-04-29 20:04:33,947][gensim.models.word2vec][INFO] - EPOCH 93 - PROGRESS: at 19.95% examples, 2773 words/s, in_qsize 25, out_qsize 1
+[2025-04-29 20:04:34,905][gensim.models.word2vec][INFO] - EPOCH 93: training on 318950 raw words (234557 effective words) took 18.2s, 12868 effective words/s
+[2025-04-29 20:04:44,597][gensim.models.word2vec][INFO] - EPOCH 94 - PROGRESS: at 18.75% examples, 4560 words/s, in_qsize 26, out_qsize 1
+[2025-04-29 20:04:47,389][gensim.models.word2vec][INFO] - EPOCH 94 - PROGRESS: at 21.84% examples, 4134 words/s, in_qsize 25, out_qsize 1
+[2025-04-29 20:04:48,508][gensim.models.word2vec][INFO] - EPOCH 94 - PROGRESS: at 28.14% examples, 4862 words/s, in_qsize 23, out_qsize 1
+[2025-04-29 20:04:49,567][gensim.models.word2vec][INFO] - EPOCH 94 - PROGRESS: at 37.39% examples, 5994 words/s, in_qsize 20, out_qsize 1
+[2025-04-29 20:04:50,579][gensim.models.word2vec][INFO] - EPOCH 94 - PROGRESS: at 83.53% examples, 12568 words/s, in_qsize 5, out_qsize 1
+[2025-04-29 20:04:50,649][gensim.models.word2vec][INFO] - EPOCH 94: training on 318950 raw words (234451 effective words) took 15.7s, 14952 effective words/s
+[2025-04-29 20:04:52,047][gensim.models.word2vec][INFO] - EPOCH 95 - PROGRESS: at 12.43% examples, 21997 words/s, in_qsize 25, out_qsize 202
+[2025-04-29 20:05:03,177][gensim.models.word2vec][INFO] - EPOCH 95 - PROGRESS: at 24.59% examples, 4665 words/s, in_qsize 24, out_qsize 1
+[2025-04-29 20:05:04,354][gensim.models.word2vec][INFO] - EPOCH 95 - PROGRESS: at 44.75% examples, 7812 words/s, in_qsize 17, out_qsize 1
+[2025-04-29 20:05:05,476][gensim.models.word2vec][INFO] - EPOCH 95 - PROGRESS: at 73.12% examples, 11716 words/s, in_qsize 8, out_qsize 1
+[2025-04-29 20:05:05,650][gensim.models.word2vec][INFO] - EPOCH 95: training on 318950 raw words (234818 effective words) took 14.9s, 15729 effective words/s
+[2025-04-29 20:05:17,007][gensim.models.word2vec][INFO] - EPOCH 96 - PROGRESS: at 3.08% examples, 660 words/s, in_qsize 31, out_qsize 1
+[2025-04-29 20:05:21,935][gensim.models.word2vec][INFO] - EPOCH 96 - PROGRESS: at 5.37% examples, 820 words/s, in_qsize 30, out_qsize 1
+[2025-04-29 20:05:24,168][gensim.models.word2vec][INFO] - EPOCH 96 - PROGRESS: at 8.25% examples, 1107 words/s, in_qsize 29, out_qsize 1
+[2025-04-29 20:05:25,232][gensim.models.word2vec][INFO] - EPOCH 96 - PROGRESS: at 25.82% examples, 3189 words/s, in_qsize 23, out_qsize 1
+[2025-04-29 20:05:26,238][gensim.models.word2vec][INFO] - EPOCH 96 - PROGRESS: at 92.31% examples, 10613 words/s, in_qsize 2, out_qsize 1
+[2025-04-29 20:05:26,293][gensim.models.word2vec][INFO] - EPOCH 96: training on 318950 raw words (234578 effective words) took 20.6s, 11400 effective words/s
+[2025-04-29 20:05:29,585][gensim.models.word2vec][INFO] - EPOCH 97 - PROGRESS: at 10.57% examples, 7351 words/s, in_qsize 29, out_qsize 1
+[2025-04-29 20:05:32,005][gensim.models.word2vec][INFO] - EPOCH 97 - PROGRESS: at 14.25% examples, 5644 words/s, in_qsize 28, out_qsize 1
+[2025-04-29 20:05:33,798][gensim.models.word2vec][INFO] - EPOCH 97 - PROGRESS: at 17.47% examples, 5289 words/s, in_qsize 27, out_qsize 1
+[2025-04-29 20:05:37,962][gensim.models.word2vec][INFO] - EPOCH 97 - PROGRESS: at 20.36% examples, 4005 words/s, in_qsize 26, out_qsize 1
+[2025-04-29 20:05:39,608][gensim.models.word2vec][INFO] - EPOCH 97 - PROGRESS: at 23.50% examples, 4064 words/s, in_qsize 25, out_qsize 1
+[2025-04-29 20:05:40,696][gensim.models.word2vec][INFO] - EPOCH 97 - PROGRESS: at 31.61% examples, 5142 words/s, in_qsize 22, out_qsize 1
+[2025-04-29 20:05:41,737][gensim.models.word2vec][INFO] - EPOCH 97 - PROGRESS: at 68.07% examples, 10388 words/s, in_qsize 10, out_qsize 1
+[2025-04-29 20:05:42,003][gensim.models.word2vec][INFO] - EPOCH 97: training on 318950 raw words (234539 effective words) took 15.6s, 14997 effective words/s
+[2025-04-29 20:05:45,677][gensim.models.word2vec][INFO] - EPOCH 98 - PROGRESS: at 6.56% examples, 4249 words/s, in_qsize 30, out_qsize 1
+[2025-04-29 20:05:48,580][gensim.models.word2vec][INFO] - EPOCH 98 - PROGRESS: at 12.66% examples, 4540 words/s, in_qsize 28, out_qsize 1
+[2025-04-29 20:05:54,558][gensim.models.word2vec][INFO] - EPOCH 98 - PROGRESS: at 15.53% examples, 2936 words/s, in_qsize 27, out_qsize 1
+[2025-04-29 20:05:55,601][gensim.models.word2vec][INFO] - EPOCH 98 - PROGRESS: at 24.06% examples, 4211 words/s, in_qsize 24, out_qsize 1
+[2025-04-29 20:05:57,082][gensim.models.word2vec][INFO] - EPOCH 98 - PROGRESS: at 27.37% examples, 4302 words/s, in_qsize 23, out_qsize 1
+[2025-04-29 20:05:58,243][gensim.models.word2vec][INFO] - EPOCH 98 - PROGRESS: at 36.46% examples, 5309 words/s, in_qsize 20, out_qsize 1
+[2025-04-29 20:05:58,944][gensim.models.word2vec][INFO] - EPOCH 98: training on 318950 raw words (234454 effective words) took 16.9s, 13889 effective words/s
+[2025-04-29 20:06:00,166][gensim.models.word2vec][INFO] - EPOCH 99 - PROGRESS: at 13.06% examples, 25903 words/s, in_qsize 0, out_qsize 1
+[2025-04-29 20:06:01,908][gensim.models.word2vec][INFO] - EPOCH 99 - PROGRESS: at 25.41% examples, 20341 words/s, in_qsize 24, out_qsize 1
+[2025-04-29 20:06:05,084][gensim.models.word2vec][INFO] - EPOCH 99 - PROGRESS: at 28.39% examples, 10882 words/s, in_qsize 23, out_qsize 1
+[2025-04-29 20:06:06,152][gensim.models.word2vec][INFO] - EPOCH 99 - PROGRESS: at 34.66% examples, 11303 words/s, in_qsize 21, out_qsize 1
+[2025-04-29 20:06:08,412][gensim.models.word2vec][INFO] - EPOCH 99 - PROGRESS: at 43.96% examples, 10937 words/s, in_qsize 18, out_qsize 1
+[2025-04-29 20:06:09,965][gensim.models.word2vec][INFO] - EPOCH 99 - PROGRESS: at 49.48% examples, 10588 words/s, in_qsize 16, out_qsize 1
+[2025-04-29 20:06:10,985][gensim.models.word2vec][INFO] - EPOCH 99 - PROGRESS: at 61.43% examples, 12064 words/s, in_qsize 12, out_qsize 1
+[2025-04-29 20:06:11,822][gensim.models.word2vec][INFO] - EPOCH 99: training on 318950 raw words (234303 effective words) took 12.8s, 18266 effective words/s
+[2025-04-29 20:06:11,823][gensim.utils][INFO] - Doc2Vec lifecycle event {'msg': 'training on 31895000 raw words (23456008 effective words) took 1602.1s, 14641 effective words/s', 'datetime': '2025-04-29T20:06:11.823491', 'gensim': '4.3.3', 'python': '3.8.20 (default, Sep 27 2024, 06:05:23) \n[GCC 12.2.0]', 'platform': 'Linux-6.8.0-54-generic-x86_64-with-glibc2.34', 'event': 'train'}
+[2025-04-29 20:06:11,823][mdl.emb.d2v][INFO] - Saving model at ../output/imdb/title.basics.tsv.mt10.ts2/d128.e100.d2v.w5.dm1.skill ...
+[2025-04-29 20:06:11,824][gensim.utils][INFO] - Doc2Vec lifecycle event {'fname_or_handle': '../output/imdb/title.basics.tsv.mt10.ts2/d128.e100.d2v.w5.dm1.skill', 'separately': 'None', 'sep_limit': 10485760, 'ignore': frozenset(), 'datetime': '2025-04-29T20:06:11.824291', 'gensim': '4.3.3', 'python': '3.8.20 (default, Sep 27 2024, 06:05:23) \n[GCC 12.2.0]', 'platform': 'Linux-6.8.0-54-generic-x86_64-with-glibc2.34', 'event': 'saving'}
+[2025-04-29 20:06:11,825][gensim.utils][INFO] - storing np array 'vectors' to ../output/imdb/title.basics.tsv.mt10.ts2/d128.e100.d2v.w5.dm1.skill.dv.vectors.npy
+[2025-04-29 20:06:11,904][gensim.utils][INFO] - not storing attribute cum_table
+[2025-04-29 20:06:11,964][gensim.utils][INFO] - saved ../output/imdb/title.basics.tsv.mt10.ts2/d128.e100.d2v.w5.dm1.skill
