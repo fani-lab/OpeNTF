@@ -58,7 +58,7 @@ From Figure 2, recently, a paradigm shift to machine learning-based methods, inc
 Although learning-based literature is novel, it is still in its early stages. We chose to survey the graph-based approaches as they comprise the mainstream and a relatively larger body of research to be investigated in a survey such as the present one. Further, this body of work serves as a prelude to the learning-based works, especially the ones based on graph neural network in terms of the Expert Team Formation problem definition as well as experimental and evaluation settings. We are however tracing the learning-based paradigm's literature and its progress for a future potential survey.
 
 <p align="center">
-<img src="figures/figs_draft/alluvial_new.png" alt="Figure2: Expert Team Formation methods in time;.">
+<img src="figures/figs_draft/alluvial/alluvial_new.png" alt="Figure2: Expert Team Formation methods in time;.">
   <p align="center"><em>Figure2: Expert Team Formation methods in time;.</em></p>
 </p>
 
