@@ -74,6 +74,299 @@ After screening 126 papers addressing Team Formation problems using computationa
 
 The examined papers in this survey can be categorized as follows:
 
+ - **team formation applications**
+      - **group learning**
+        - [2025--Leveraging Multicriteria Integer Programming Optimization for Effective Team Formation](https://doi.org/10.1109/tlt.2024.3401734)
+        - [2023--An Integer Linear Programming Model for Team Formation in the Classroom with Constraints](https://link.springer.com/chapter/10.1007/978-3-031-40725-3_34)
+        - [2014--A Method for Group Formation Using Genetic Algorithm](https://www.researchgate.net/profile/Azman-Yasin/publication/229035954_A_Method_for_Group_Formation_Using_Genetic_Algorithm/links/0deec53852db22592c000000/A-Method-for-Group-Formation-Using-Genetic-Algorithm.pdf)
+        - [2013--Predicting teamwork results from social network analysis](https://onlinelibrary.wiley.com/doi/full/10.1111/exsy.12038)
+        - [2012--A genetic algorithm approach for group formation in collaborative learning considering multiple student characteristics](https://www.sciencedirect.com/science/article/pii/S0360131511002284)
+        - [2010--Forming Reasonably Optimal Groups (FROG)](https://dl.acm.org/doi/pdf/10.1145/1880071.1880094)
+      - **health care**
+        - [2024--Understanding knowledge](https://doi.org/10.1055/b000000969)
+      - **peer review**
+        - [2025--Peer review expert group recommendation A multi-subject](https://doi.org/10.1016/j.eswa.2024.125971)
+        - [2023--Reviewer Assignment Problem](https://doi.org/10.1111/j.1540-5915.1999.tb00910.x)
+        - [2024--Reviewerly Modeling the Reviewer Assignment Task as an](https://doi.org/10.1145/3627673.3679081)
+      - **reviewer assignment**
+        - [Article Production 01.04.23](https://doi.org/10.1163/2214-8345-ncho-nch_1851_001_0023)
+        - [NeurIPS-2023-a-one-size-fits-all-approach-to-improving-randomness-in-paper-assignment-Paper-Conference](https://doi.org/10.1002/int.1055)
+        - [NeurIPS-2023-counterfactual-evaluation-of-peer-review-assignment-policies-Paper-Conference](https://doi.org/10.1002/int.1055)
+        - [NeurIPS-2023-group-fairness-in-peer-review-Paper-Conference](https://doi.org/10.1088/2058-7058/27/06/26)
+        - [Reviewer Assignment Decision Support in an Academic Journal based on Multicriteria Assessment and Text Mining](https://doi.org/10.1109/itnt57377.2023.10139187)
+        - [review assignment](https://doi.org/10.1177/004711785700100215)
+- **team formation constraints**
+  - **authority**
+    - [2021 A unified framework for effective team formation in social networks](https://doi.org/10.1016/j.eswa.2021.114886)
+    - [2017 SNA EDBT Authority-based Team Discovery in Social Networks (related to 6)](https://doi.org/10.1137/1.9781611972818.45)
+    - [2018 SNA Effective Team Formation in Expert Networks](https://doi.org/10.26686/wgtn.17065262)
+  - **communication cost**
+    - **dense subgraph**
+      - [2018 A Multi-objective Formulation of the Team Formation Problem](https://doi.org/10.1145/3205455.3205634)
+      - [2010 Team Formation for Generalized Tasks](https://doi.org/10.1109/socialcom.2010.12)
+      - [2017 TeamGen An Interactive Team Formation System Based](https://doi.org/10.1145/3041021.3054725)
+      - [2012 Multi-skill Collaborative Teams based on Densest Subgraphs](https://doi.org/10.1137/1.9781611972825.15)
+      - [2013 Towards Realistic Team Formation in Social Networks](https://doi.org/10.1145/2488388.2488482)
+      - [2011 OR SNA DKE Interaction mining and skill-dependent recommendations for multi-objective team composition (1)](https://doi.org/10.1016/j.datak.2011.06.004)
+    - **diameter**
+      - [2009 Finding a Team of Experts in Social Networks](https://doi.org/10.1145/1557019.1557074)
+      - [2012 Online Team Formation in Social Networks](https://doi.org/10.1145/2187836.2187950)
+      - [2012 Multi-skill Collaborative Teams based on Densest Subgraphs](https://doi.org/10.1137/1.9781611972825.15)
+      - [2012 Capacitated Team Formation Problem on Social Networks](https://doi.org/10.1145/2339530.2339690)
+    - **steiner tree**
+      - [2009 Finding a Team of Experts in Social Networks](https://doi.org/10.1145/1557019.1557074)
+      - [2010 Team Formation for Generalized Tasks](https://doi.org/10.1109/socialcom.2010.12)
+      - [2012 Online Team Formation in Social Networks](https://doi.org/10.1145/2187836.2187950)
+      - [2012 Capacitated Team Formation Problem on Social Networks](https://doi.org/10.1145/2339530.2339690)
+    - **sum of edge weight**
+      - [2011 Discovering Top-k Teams of Experts](https://doi.org/10.1145/2063576.2063718)
+      - [2021 A unified framework for effective team formation in social networks](https://doi.org/10.1016/j.eswa.2021.114886)
+      - [P-2017 SNA EDBT Authority-based Team Discovery in Social Networks (related to 6)](https://doi.org/10.1137/1.9781611972818.45)
+      - [2016 Forming Grouped Teams with Efficient](https://doi.org/10.1093/comjnl/bxw088)
+      - [2019 Optimized group formation for solving collaborative](https://doi.org/10.1007/s00778-018-0516-7)
+  - **geographical proximiti**
+    - [2021 A unified framework for effective team formation in social networks](https://doi.org/10.1016/j.eswa.2021.114886)
+    - [2020 AI Negotiating team formation using deep reinforcement learning](https://doi.org/10.1016/j.artint.2020.103356)
+    - [2013 Towards Realistic Team Formation in Social Networks (1)](https://doi.org/10.1145/2488388.2488482)
+  - **trust**
+    - [2021 A unified framework for effective team formation in social networks](https://doi.org/10.1016/j.eswa.2021.114886)
+  - **workload**
+    - [2012 Online Team Formation in Social Networks](https://doi.org/10.1145/2187836.2187950)
+- **dynamic network**
+    - [2021 teamJounalmain](https://doi.org/10.1515/sug-2021-0028)
+    - [2018Graph Pattern Matching for Dynamic Team Formation](https://doi.org/10.1109/icccbda61447.2024.10569868)
+    - [2020 Efficient Team Formation in Social Networks based](https://doi.org/10.1007/978-3-642-33486-3_31)
+    - [2015 Replacing the Irreplaceable Fast Algorithms for Team Member](https://doi.org/10.1145/2736277.2741132)
+    - [Copy of 132--2024--A Training Strategy for Future Collaborative](https://doi.org/10.17238/issn1998-5320.2019.36.78)
+- **efficiency**
+    - [2020 Efficient Team Formation in Social Networks based](https://doi.org/10.1007/978-3-642-33486-3_31)
+    - [2015 Replacing the Irreplaceable Fast Algorithms for Team Member](https://doi.org/10.1145/2736277.2741132)
+    - [2014 Two-Phase Pareto Set Discovery for Team Formation2014( related to 6)](https://doi.org/10.1109/wi-iat.2014.112)
+    - [2016 Top-k Team Recommendation in Spatial](https://doi.org/10.1007/978-3-319-39937-9_15)
+    - [2017 TeamGen An Interactive Team Formation System Based](https://doi.org/10.1145/3041021.3054725)
+    - [2016 Forming Grouped Teams with Efficient](https://doi.org/10.1093/comjnl/bxw088)
+    - [2018 SNA Effective Team Formation in Expert Networks](https://doi.org/10.26686/wgtn.17065262)
+    - [2012 Online Team Formation in Social Networks](https://doi.org/10.1145/2187836.2187950)
+    - [2012 Capacitated Team Formation Problem on Social Networks](https://doi.org/10.1145/2339530.2339690)
+- **grouped team**
+    - [2010 Team Formation for Generalized Tasks](https://doi.org/10.1109/socialcom.2010.12)
+    - [2016 Forming Grouped Teams with Efficient](https://doi.org/10.1093/comjnl/bxw088)
+    - [2019 Optimized group formation for solving collaborative](https://doi.org/10.1007/s00778-018-0516-7)
+- **history-old**
+    - **education**
+        - [2010 Forming reasonably optimal groups (FROG)](https://doi.org/10.1145/1880071.1880094)
+    - **engineering**
+        - [2004 IEEE Trans Modeling team member characteristics for the formation of a multifunctional team in concurrent engineering](https://doi.org/10.1109/tem.2004.826011)
+        - [2005CERAFrameworkPaper-Chen](https://doi.org/10.5040/9781501365171.854)
+    - **multi-skill heuristic solution**
+        - [2016 Forming Grouped Teams with Efficient](https://doi.org/10.1093/comjnl/bxw088)
+        - [2004 IEEE Trans Modeling team member characteristics for the formation of a multifunctional team in concurrent engineering](https://doi.org/10.1109/tem.2004.826011)
+        - [2005 OR JCIE Forming effective worker teams with multi-functional skill requirements](https://doi.org/10.1016/j.cie.2004.12.014)
+    - **network**
+        - [2003 Team Formation in Complex Networks](https://doi.org/10.1007/978-3-642-02469-6_77)
+        - [2004 SNA AAAI Adapting Network Structure for Efficient Team Formation](https://doi.org/10.1061/9780784413517.207)
+        - [2006 SNA Application of Social Network Analysis to Collaborative Team Formation](https://doi.org/10.1109/cts.2006.18)
+        - [2010 A multi-level study of free-loading in dynamic groups the importance of initial network topology](https://doi.org/10.1109/incos.2010.96)
+        - [2010 ACM Trans The small-world effect The influence of macro-level properties of developer collaboration networks on open-source project success](https://doi.org/10.1007/978-3-642-13244-5_39)
+    - **Performance**
+        - [1992 The Role of Mental Models in Team Performance](https://doi.org/10.5465/amproc.2023.54bp)
+        - [1993 Book The Wisdom of Teams](https://doi.org/10.1525/9780520965355-029)
+        - [2005CERAFrameworkPaper-Chen](https://doi.org/10.5040/9781501365171.854)
+        - [FACTORS AFFECTING TEAM PERFORMANCE IN IT SECTOR](https://doi.org/10.46799/jsa.v5i6.1172)
+    - **team member characteristic**
+        - [32--2004 IEEE Trans Modeling team member characteristics for the formation of a multifunctional team in concurrent engineering](https://doi.org/10.1109/tem.2004.826011)
+    - **other**
+        - [1997 toward flexible teemworks](https://doi.org/10.1056/nejm199705223362108)
+        - [1997 On Team Formation](https://doi.org/10.3200/wewi.59.6.18-19)
+        - [2000 Teamwork in multi person systems a review and analysis](https://doi.org/10.1080/00140130050084879)
+        - [1999 OR IIETrans Forming Teams An Analytical Approach](https://doi.org/10.1080/07408179908969808)
+        - [2001 USING STUDENT CONATIVE BEHAVIORS AND TECHNICAL SKILLS TO](https://doi.org/10.1109/fie.2001.964039)
+        - [Tuckman 1965 Developmental sequence in small groups](https://doi.org/10.1037/h0022100)
+        - [salas-et-al-2008-on-teams-teamwork-and-team-performance-discoveries-and-developments](https://doi.org/10.1518/001872008x288457)
+- **keyword search and community discovery**
+    - [2020 SNA TKDE Effective Keyword Search over Weighted Graphs](https://doi.org/10.1109/tkde.2020.2985376)
+    - [2016 SNA VLDB Effective community search for large attributed graphs](https://doi.org/10.14778/2994509.2994538)
+    - [2020 IPM Compact group discovery in attributed graphs and social networks](https://doi.org/10.1016/j.ipm.2019.102054)
+    - [2020 IRJ Robust keyword search in large attributed graphs](https://doi.org/10.1007/s10791-020-09379-9)
+    - [2008 Keyword proximity search in complex data graphs](https://doi.org/10.1145/1376616.1376708)
+    - [42009 Querying Communities in Relational Databases](https://doi.org/10.1109/icde.2009.67)
+    - [2010 RecSys Breaking out of the box of recommendations from items to packages](https://doi.org/10.1007/s11704-012-2014-1)
+    - [2011 Keyword Search in Graphs Finding r-cliques](https://doi.org/10.1007/s10115-014-0736-0)
+    - [2018 Multityped Community Discovery in Time-Evolving Heterogeneous Information Networks Based on Tensor Decomposition](https://doi.org/10.1155/2018/9653404)
+- **learning-based**
+  - **main**
+    - [2021 Retrieving Skill-Based Teams from Collaboration Networks](https://doi.org/10.1145/3404835.3463105)
+    - [2022--Effective Neural Team Formation via Negative Samples](https://doi.org/10.1145/3511808.3557590)
+    - [2022--A Benchmark Library for Neural Team Formation](https://doi.org/10.1145/3511808.3557526)
+    - [2021--PyTFL A Python-based Neural Team Formation Toolkit](https://doi.org/10.31234/osf.io/pz98q)
+    - [2022--A Neural Approach to Forming Coherent Teams in](https://doi.org/10.1080/07408179908969808)
+    - [2022--Subgraph Representation Learning for Team Mining](https://doi.org/10.1145/3501247.3531578)
+    - [Learning to Form Skill-based Teams of Experts](https://doi.org/10.1145/3340531.3412140)
+    - [2023--A Variational Neural Architecture for Skill-based Team](https://doi.org/10.1145/3589762)
+    - [2023--Learning heterogeneous subgraph representations for team discovery](https://doi.org/10.21203/rs.3.rs-2318594/v1)
+    - [2023--Transfer Learning with Graph Attention Networks](https://doi.org/10.1109/ijcnn54540.2023.10191717)
+    - [2024--A Training Strategy for Future Collaborative](https://doi.org/10.17238/issn1998-5320.2019.36.78)
+    - [2025--A QUBO Framework for Team Formation](https://doi.org/10.1109/ice/itmc52061.2021.9570216)
+    - [25520-Article Text-29583-1-2-20230626](https://doi.org/10.1163/2210-7886_asc-29583)
+    - [2019 Deep Neural Networks for Optimal](https://doi.org/10.3389/fdata.2019.00014)
+    - [2020Learning the Value of Teamwork to Form Efficient Teams](https://doi.org/10.1609/aaai.v34i05.6192)
+    - [2020 AI Negotiating team formation using deep reinforcement learning](https://doi.org/10.1016/j.artint.2020.103356)
+    - [2014 AI Weighted synergy graphs for effective team formation with heterogeneous ad hoc agents](https://doi.org/10.1016/j.artint.2013.12.002)
+    - [2019 Optimized group formation for solving collaborative](https://doi.org/10.1007/s00778-018-0516-7)
+    - [2007 Local strategy learning in networked multi-agent t](https://doi.org/10.1007/s10458-006-0007-x)
+  - **crowdsourcing**
+      - [2020--Schwarz et al What Makes a Team Successful - Project Report](https://doi.org/10.1061/40695(2004)7)
+      - [2021--Self-Organizing Teams in Online Work Settings](https://doi.org/10.1016/j.econlet.2017.08.012)
+      - [2021--Understanding Matchmakers’ Experiences,](https://doi.org/10.1007/s10606-021-09413-4)
+      - [2022--Crowdsourcing Team Formation With](https://doi.org/10.3389/frai.2022.818562)
+   - **game theory**
+        - [2020 AI Negotiating team formation using deep reinforcement learning](https://doi.org/10.1016/j.artint.2020.103356)
+   - **learning-search-based**
+        - [2020 SNA J Using machine learning to predict links and improve Steiner tree solutions to team formation problems-a cross company study](https://doi.org/10.1007/s41109-020-00306-x)
+   - **reinforcement learning**
+        - [2018--In Search of the Dream Team](https://doi.org/10.1145/3173574.3173682)
+        - [2020--Monotonic Value Function Factorisation for Deep](https://doi.org/10.1145/3656766.3656806)
+        - [2019--Negotiating team formation using deep reinforcement learning](https://doi.org/10.1016/j.artint.2020.103356)
+        - [2020--Google Research Football A Novel Reinforcement Learning Environment](https://doi.org/10.1609/aaai.v34i04.5878)
+        - [2004--Organization-based cooperative coalition formation](https://doi.org/10.1109/iat.2004.1342939)
+        - [2020--Negotiating team formation using deep reinforcement learning](https://doi.org/10.1016/j.artint.2020.103356)
+        - [2024--Graph Enhanced Reinforcement Learning for](https://doi.org/10.1145/3397271.3401174)
+- **multi objectives**
+   - [2021 A unified framework for effective team formation in social networks](https://doi.org/10.1016/j.eswa.2021.114886)
+   - [2018 A Multi-objective Formulation of the Team Formation Problem](https://doi.org/10.1145/3205455.3205634)
+   - [2014 Two-Phase Pareto Set Discovery for Team Formation2014( related to 6)](https://doi.org/10.1109/wi-iat.2014.112)
+   - [P-2017 SNA EDBT Authority-based Team Discovery in Social Networks(related to 6)](https://doi.org/10.1137/1.9781611972818.45)
+   - [Finding Affordable and Collaborative Teams 2013(related to 6)](https://doi.org/10.1137/1.9781611972832.65)
+   - [Efficient Bi-objective Team Formation 2012 (related to 6)](https://doi.org/10.1007/978-3-642-33486-3_31)
+   - [2018 SNA Effective Team Formation in Expert Networks](https://doi.org/10.26686/wgtn.17065262)
+   - [2012 Online Team Formation in Social Networks](https://doi.org/10.1145/2187836.2187950)
+   - [2012 Capacitated Team Formation Problem on Social Networks](https://doi.org/10.1145/2339530.2339690)
+   - [2011 WWW Demo T-recs team recommendation system through expertise and cohesiveness](https://doi.org/10.1007/978-3-642-24704-0_33)
+   - [2011 OR SNA DKE Interaction mining and skill-dependent recommendations for multi-objective team composition](https://doi.org/10.1016/j.datak.2011.06.004)
+   - [2010 SNA KDD The community-search problem and how to plan a successful cocktail party](https://doi.org/10.1145/1835804.1835923)
+- **number of formed teams**
+  - **Set of Teams**
+    - **pareto set**
+      - [2014 Two-Phase Pareto Set Discovery for Team Formation2014( related to 6)](https://doi.org/10.1109/wi-iat.2014.112)
+      - [Finding Affordable and Collaborative Teams 2013(related to 6)](https://doi.org/10.1137/1.9781611972832.65)
+    - **top k**
+      - [2011 Discovering Top-k Teams of Experts](https://doi.org/10.1145/2063576.2063718)
+      - [2018Graph Pattern Matching for Dynamic Team Formation](https://doi.org/10.1109/icccbda61447.2024.10569868)
+      - [2015 Replacing the Irreplaceable Fast Algorithms for Team Member](https://doi.org/10.1145/2736277.2741132)
+      - [2016 Top-k Team Recommendation in Spatial](https://doi.org/10.1007/978-3-319-39937-9_15)
+    - **other**
+      - [2021 A unified framework for effective team formation in social networks](https://doi.org/10.1016/j.eswa.2021.114886)
+      - [2020 Team Recommendation Using Order-Based Fuzzy](https://doi.org/10.1109/access.2020.2982647)
+      - [2018 The sociotechnical teams formation problem a mathematical optimization approach](https://doi.org/10.1007/s10479-018-2759-5)
+  - **single team**
+      - [2012 Workshop Teamfinder A co-clustering based framework for finding an effective team of experts in social networks](https://doi.org/10.1109/icdmw.2012.54)
+      - [2009 Finding a Team of Experts in Social Networks](https://doi.org/10.1145/1557019.1557074)
+      - [2011 Discovering Top-k Teams of Experts](https://doi.org/10.1145/2063576.2063718)
+      - [2017 SNA EDBT Authority-based Team Discovery in Social Networks(related to 6)](https://doi.org/10.1137/1.9781611972818.45)
+      - [Efficient Bi-objective Team Formation 2012 (related to 6)](https://doi.org/10.1007/978-3-642-33486-3_31)
+      - [2012 Capacitated Team Formation Problem on Social Networks](https://doi.org/10.1145/2339530.2339690)
+      - [2020 SNA J Using machine learning to predict links and improve Steiner tree solutions to team formation problems-a cross company study](https://doi.org/10.1007/s41109-020-00306-x)
+- **OR-based**
+  - **fuzzy**
+     - [2007 OR J PROJECT TEAM SELECTION USING FUZZY OPTIMIZATION APPROACH](https://doi.org/10.1080/01969720601139041)
+     - [2009 OR ESA A team formation model based on knowledge and collaboration](https://doi.org/10.1016/j.eswa.2008.12.031)
+     - [2020 Team Recommendation Using Order-Based Fuzzy](https://doi.org/10.1109/access.2020.2982647)
+     - [2019 A-Fuzzy-Approach-To-Project-Team-Selection](https://doi.org/10.1080/01969720601139041)
+  - **genetic algorithm**
+     - [23--2018 A Multi-objective Formulation of the Team Formation Problem](https://doi.org/10.1145/3205455.3205634)
+     - [39--2009 OR ESA A team formation model based on knowledge and collaboration](https://doi.org/10.1016/j.eswa.2008.12.031)
+     - [4--2020 Team Recommendation Using Order-Based Fuzzy](https://doi.org/10.1109/access.2020.2982647)
+     - [52--2019 Application of Genetic Algorithms to the Multiple team formation problem](https://doi.org/10.1109/icsmc.2007.4414040)
+     - [58--2014 ESA Non-additive multi-objective robot coalition formation](https://doi.org/10.1016/j.eswa.2013.11.044)
+     - [60--2014 A Method for Group Formation Using Genetic Algorit](https://doi.org/10.1007/978-3-319-18833-1_35)
+     - [65--2012 A genetic algorithm approach for group formation in collaborative learning considering multiple student characteristics](https://doi.org/10.1016/j.compedu.2011.09.011)
+  - **graph + OR**
+  - **hierarchical**
+     - [54--2017 TeamGen An Interactive Team Formation System Based](https://doi.org/10.1145/3041021.3054725)
+     - [55--2016 Forming Grouped Teams with Efficient](https://doi.org/10.1093/comjnl/bxw088)
+  - **integer programming**
+     - [17--2005Forming effective worker teams with multi-functional skill requirements](https://doi.org/10.1016/j.cie.2004.12.014)
+     - [2025--Leveraging Multicriteria Integer Programming](https://doi.org/10.1109/tlt.2024.3401734)
+     - [56--2014 OR Using hybrid scheduling for the semi-autonomous formation of Expert Teams](https://doi.org/10.1016/j.future.2013.04.008)
+     - [67--2010 Forming Teams in Large-Scale Community Systems](https://doi.org/10.1007/978-3-319-11283-1_7)
+     - [72--2001 Forming eŒective worker teams for cellular manufacturing](https://doi.org/10.1080/00207540110040466)
+     - [8--2018 The sociotechnical teams formation problem a mathematical optimization approach](https://doi.org/10.1007/s10479-018-2759-5)
+  - **linear programming**
+     - [77--2013 Towards Realistic Team Formation in Social Networks](https://doi.org/10.1145/2488388.2488482)
+  - **multi factorial optimization**
+     - [1-s2.0-S1568494621009765-main](https://doi.org/10.7717/peerj.12868/supp-2)
+     - [2001.06585v2](https://doi.org/10.14361/9783839403396-038)
+     - [2016--Multifactorial Evolution Toward Evolutionary Multitasking](https://doi.org/10.1109/tevc.2015.2458037)
+     - [2017--Multiobjective Multifactorial Optimization in Evolutionary Multitasking](https://doi.org/10.1109/tcyb.2016.2554622)
+     - [2020--Multi-factorial Optimization for Large-scale Virtual  Machine Placement in Cloud Computing](https://doi.org/10.1109/isncc.2017.8072013)
+     - [2021--Distance Minimization Problems for Multi-factorial Evolutionary Optimization Benchmarking](https://doi.org/10.1007/978-3-030-73050-5_69)
+     - [2022--An information entropy-based evolutionary computation for multi-factorial optimization](https://doi.org/10.1016/j.asoc.2021.108071)
+     - [A Multifactorial Optimization Framework Based on Adaptive Intertask Coordinate System](https://doi.org/10.1109/tcyb.2020.3043509)
+  - **simulation**
+     - [2022-frai-05-818562](https://doi.org/10.33383/2022-05)
+  - **task generation**
+     - [1902.05808v1](https://doi.org/10.1002/asna.19031611604)
+     - [task generation 1](https://doi.org/10.1109/nrsc.2006.386361)
+     - [task generation 2](https://doi.org/10.1109/nrsc.2006.386361)
+  - **other**
+      - [2024--A multi-objective formulation for the team formation problem using](https://doi.org/10.1145/3205455.3205634)
+      - [45--2010 Forming reasonably optimal groups (FROG)](https://doi.org/10.1145/1880071.1880094)
+      - [52--2019 Application of Genetic Algorithms to the Multiple team formation problem](https://doi.org/10.1109/icsmc.2007.4414040)
+      - [53--2016 Top-k Team Recommendation in Spatial](https://doi.org/10.1007/978-3-319-39937-9_15)
+      - [57--2014 Neuro Role and member selection in team formation using resource estimation for large-scale multi-agent systems](https://doi.org/10.1016/j.neucom.2014.04.059)
+      - [68--2010 RecSys Breaking out of the box of recommendations from items to packages](https://doi.org/10.1007/s11704-012-2014-1)
+      - [70--2011 OR SNA DKE Interaction mining and skill-dependent recommendations for multi-objective team composition](https://doi.org/10.1016/j.datak.2011.06.004)
+      - [74--2019 Optimized group formation for solving collaborative](https://doi.org/10.1007/s00778-018-0516-7)
+      - [out](https://doi.org/10.4159/harvard.9780674335486.c19)
+- **similarity between two graphs**
+  - **pattern graph**
+    - [20--2018Graph Pattern Matching for Dynamic Team Formation](https://doi.org/10.1109/icccbda61447.2024.10569868)
+    - [21--2020 Efficient Team Formation in Social Networks based](https://doi.org/10.1007/978-3-642-33486-3_31)
+  - **kernel graph**
+    - [22--2015 Replacing the Irreplaceable Fast Algorithms for Team Member](https://doi.org/10.1145/2736277.2741132)
+- **survey samples**
+    - [123--2021-- survay](https://doi.org/10.5194/wes-2021-123-rc1)
+    - [133--2020--A Taxonomy of Team-Assembly Systems Understanding](https://doi.org/10.1145/3415252)
+    - [19--2015 A comparative study of team formation in social networks](https://doi.org/10.1007/978-3-319-18120-2_23)
+    - [2022--Evolutionary design of neural network architectures](https://doi.org/10.1109/sbrn.1997.645849)
+    - [2024--A Comprehensive Survey on Deep Graph Representation Learning](https://doi.org/10.1016/j.neunet.2024.106207)
+    - [2024--A Survey on Hypergraph Neural Networks](https://doi.org/10.1609/aaai.v33i01.33013558)
+    - [2024--Fairness-Aware Graph Neural Networks A Survey](https://doi.org/10.1145/3649142)
+    - [2025--Status and Opportunities of Machine Learning-review](https://doi.org/10.1109/mnet.011.2000141)
+    - [24--2016 IEEE Trans USTF A Unified System of Team Formation](https://doi.org/10.1109/tbdata.2016.2546303)
+    - [28--2000 Teamwork in multi person systems a review and analysis](https://doi.org/10.1080/00140130050084879)
+    - [5--2020 IEEE Access Team Formation in Software Engineering A Systematic Mapping Study](https://doi.org/10.1109/access.2020.3015017)
+    - [2000 Teamwork in multi person systems a review and analysis](https://doi.org/10.1080/00140130050084879)
+    - [2019 TKDE A survey on network embedding (1)](https://doi.org/10.1109/tkde.2007.190685)
+    - [A  Survey(Graph Embedding)2018](https://doi.org/10.1109/transai54797.2022.00031)
+    - [A Survey (Microblogging Social)2018](https://doi.org/10.1007/s11257-018-9207-8)
+    - [A Survey on Deep Learning for Named Entity Recognition](https://doi.org/10.1007/s00521-024-09646-6)
+    - [Deep Learning based Recommender System- A Survey and New Perspectives](https://doi.org/10.1504/ijiids.2020.109457)
+    - [Graph Neural Networks survey 2021](https://doi.org/10.1109/access.2024.3456913)
+    - [META-LEARNING WITH GRAPH NEURAL NETWORKS](https://doi.org/10.1109/ijcnn60899.2024.10650709)
+    - [survey sample ( nice visualisation)](https://doi.org/10.1007/978-3-8349-9514-8_3)
+    - [surveyAffective Image Content Analysis Two Decades](https://doi.org/10.1109/tpami.2021.3094362)
+- **team size**
+   - **at least k person for each skill**
+     - [38--2010 Team Formation for Generalized Tasks](https://doi.org/10.1109/socialcom.2010.12)
+     - [62--2012 On team formation with expertise query in collaborative](https://doi.org/10.1007/s10115-013-0695-x)
+     - [63--2012 Multi-skill Collaborative Teams based on Densest Subgraphs](https://doi.org/10.1137/1.9781611972825.15)
+   - **at most k responsiblity for each person**
+     - [64--2012 Capacitated Team Formation Problem on Social Networks](https://doi.org/10.1145/2339530.2339690)
+   - **small teams**
+     - [7--2020 SNA J Using machine learning to predict links and improve Steiner tree solutions to team formation problems-a cross company study](https://doi.org/10.1007/s41109-020-00306-x)
+   - **other**
+     - [14--2009 Finding a Team of Experts in Social Networks](https://doi.org/10.1145/1557019.1557074)
+     - [67--2010 Forming Teams in Large-Scale Community Systems](https://doi.org/10.1007/978-3-319-11283-1_7)
+     - [71--2010 SNA KDD The community-search problem and how to plan a successful cocktail party](https://doi.org/10.1145/1835804.1835923)
+     - [77--2013 Towards Realistic Team Formation in Social Networks](https://doi.org/10.1145/2488388.2488482)
+     - [8--2018 The sociotechnical teams formation problem a mathematical optimization approach](https://doi.org/10.1007/s10479-018-2759-5)
+- **teams with leader**
+  - [2016--Forming Grouped Teams with Efficient Collaboration in Social Networks](https://doi.org/10.1093/comjnl/bxw088)
+  - [2011--Discovering top-k teams of experts with/without a leader in social networks](https://doi.org/10.1145/2063576.2063718)
+  - [2009--A team formation model based on knowledge and collaboration](https://doi.org/10.1016/j.eswa.2008.12.031)
+  
+
 [^1]: M. Muniz et al. A column generation approach for the team formation problem. https://www.sciencedirect.com/science/article/pii/S0305054823002708.
 [^2]: A. Anagnostopoulos et al. Power in unity: forming teams in large-scale community systems. https://dl.acm.org/doi/pdf/10.1145/1871437.1871515.
 [^3]: E. Fitzpatrick et al. Forming effective worker teams with multi-functional skill requirements. https://www.sciencedirect.com/science/article/pii/S0360835204002049.
@@ -99,62 +392,6 @@ The examined papers in this survey can be categorized as follows:
 [^23]: B. Liu et al. Coach-Player Multi-agent Reinforcement Learning for Dynamic Team Composition. https://proceedings.mlr.press/v139/liu21m/liu21m.pdf.
 
 
-```
-
-
-
-
-─categirized_papers
-      ├───capacity_of_team_members
-      ├───constraint
-      │   ├───authority
-      │   ├───communication_cost
-      │   │   ├───buttleneck
-      │   │   ├───dense
-      │   │   ├───diameter
-      │   │   ├───graph_clustering
-      │   │   ├───stainertree
-      │   │   └───sum_of_edge_weight
-      │   ├───geographical proximity
-      │   ├───trust
-      │   └───workload
-      ├───dynamic_network
-      ├───efficiency
-      ├───fairness
-      ├───grouped_team
-      ├───keyword_search_and_community_search
-      ├───learning_based
-      │   ├───game_theory
-      │   └───learning_search_based
-      ├───multi_objectiver
-      ├───number_of_created_teams
-      │   ├───more_than _one
-      │   │   ├───pareto_set
-      │   │   └───top_k
-      │   └───one
-      ├───old
-      │   ├───education
-      │   ├───engineering
-      │   ├───multi_skill_heuristic_solution
-      │   ├───network
-      │   ├───performance
-      │   └───team_member_characteristic
-      ├───operation_research
-      │   ├───fuzzy
-      │   ├───genetic_algorithm
-      │   ├───hierarchical
-      │   ├───integer_programming
-      │   └───linear_programming
-      ├───similarity_between_two_graphs
-      │   ├───graph_pattern
-      │   └───kernel_replacing_a_member
-      ├───surveys
-      ├───team with leader
-      └───team_size
-          ├───at_least_k_person_for_each_skill
-          ├───at_most_k_responsiblity_for_each_person
-          └───small_teams
-```
 
 
 
