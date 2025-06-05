@@ -25,10 +25,51 @@ hf_api = HfApi(token=os.getenv("HF_API_TOKEN"))
 # )
 
 
-# Upload individual files
-# hf_api.upload_file(
-#     path_or_fileobj="./output/gith/toy.repos.csv.mt10.ts2/teamsvecs.pkl",
-#     path_in_repo="/output/gith/toy.repos.csv.mt10.ts2/teamsvecs.pkl",
+# Upload teamsvecs from toy dblp
+hf_api.upload_file(
+    path_or_fileobj="../output/dblp/toy.dblp.v12.json/teamsvecs.pkl",
+    path_in_repo="/output/dblp/toy.dblp.v12.json/teamsvecs.pkl",
+    repo_id="fani-lab/OpeNTF-teamsvecs",
+    repo_type="dataset"
+)
+
+# Upload teamsvecs from toy gith
+hf_api.upload_file(
+    path_or_fileobj="../output/gith/toy.repos.csv/teamsvecs.pkl",
+    path_in_repo="/output/gith/toy.repos.csv/teamsvecs.pkl",
+    repo_id="fani-lab/OpeNTF-teamsvecs",
+    repo_type="dataset"
+)
+
+
+# Upload teamsvecs from toy imdb
+hf_api.upload_file(
+    path_or_fileobj="../output/imdb/toy.title.basics.tsv/teamsvecs.pkl",
+    path_in_repo="/output/imdb/toy.title.basics.tsv/teamsvecs.pkl",
+    repo_id="fani-lab/OpeNTF-teamsvecs",
+    repo_type="dataset"
+)
+
+
+# Upload teamsvecs from toy uspt
+hf_api.upload_file(
+    path_or_fileobj="../output/uspt/toy.patent.tsv/teamsvecs.pkl",
+    path_in_repo="/output/uspt/toy.patent.tsv/teamsvecs.pkl",
+    repo_id="fani-lab/OpeNTF-teamsvecs",
+    repo_type="dataset"
+)
+
+
+
+
+# hf_api.delete_folder(
+#     path_in_repo="/output/",
+#     repo_id="fani-lab/OpeNTF-test",
+#     repo_type="dataset"
+# )
+
+# hf_api.delete_file(
+#     path_in_repo="teamsvecs.pkl",
 #     repo_id="fani-lab/OpeNTF-test",
 #     repo_type="dataset"
 # )

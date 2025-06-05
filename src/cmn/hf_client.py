@@ -18,6 +18,7 @@ class HFClient(object):
                 self.hf_api.hf_hub_download(repo_id=self.repo_id, repo_type=self.repo_type, filename=filename, local_dir='../')
                 return True
             
+            log.info(f"File {filename} does not exist in the repository {self.repo_id}.")
             return False
         except Exception as e:
             log.error(f"Error downloading file: {e}")
