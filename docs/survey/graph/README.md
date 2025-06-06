@@ -79,27 +79,27 @@ The examined papers in this survey can be categorized as follows:
         - [2025--Leveraging Multicriteria Integer Programming Optimization for Effective Team Formation](https://doi.org/10.1109/tlt.2024.3401734)
         - [2023--An Integer Linear Programming Model for Team Formation in the Classroom with Constraints](https://link.springer.com/chapter/10.1007/978-3-031-40725-3_34)
         - [2014--A Method for Group Formation Using Genetic Algorithm](https://www.researchgate.net/profile/Azman-Yasin/publication/229035954_A_Method_for_Group_Formation_Using_Genetic_Algorithm/links/0deec53852db22592c000000/A-Method-for-Group-Formation-Using-Genetic-Algorithm.pdf)
-        - [2013--Predicting teamwork results from social network analysis](https://onlinelibrary.wiley.com/doi/full/10.1111/exsy.12038)
+        - [2013--Support group formation for users with depression in social networks](https://onlinelibrary.wiley.com/doi/full/10.1111/exsy.12038)
         - [2012--A genetic algorithm approach for group formation in collaborative learning considering multiple student characteristics](https://www.sciencedirect.com/science/article/pii/S0360131511002284)
         - [2010--Forming Reasonably Optimal Groups (FROG)](https://dl.acm.org/doi/pdf/10.1145/1880071.1880094)
       - **health care**
-        - [2024--Understanding knowledge](https://doi.org/10.1055/b000000969)
+        - [2025--Support group formation for users with depression in social networks](https://www.sciencedirect.com/science/article/pii/S0957417425007298)
+        - [2023--Understanding knowledge leadership in improving team outcomes in the health sector: a Covid-19 study](https://www.emerald.com/insight/content/doi/10.1108/bpmj-08-2022-0386/full/pdf)
       - **peer review**
-        - [2025--Peer review expert group recommendation A multi-subject](https://doi.org/10.1016/j.eswa.2024.125971)
-        - [2023--Reviewer Assignment Problem](https://doi.org/10.1111/j.1540-5915.1999.tb00910.x)
-        - [2024--Reviewerly Modeling the Reviewer Assignment Task as an](https://doi.org/10.1145/3627673.3679081)
+        - [2025--Peer review expert group recommendation: A multi-subject coverage-based approach](https://doi.org/10.1016/j.eswa.2024.125971)
+        - [2024--Reviewerly: Modeling the Reviewer Assignment Task as an Information Retrieval Problem](https://doi.org/10.1145/3627673.3679081)
       - **reviewer assignment**
-        - [Article Production 01.04.23](https://doi.org/10.1163/2214-8345-ncho-nch_1851_001_0023)
-        - [NeurIPS-2023-a-one-size-fits-all-approach-to-improving-randomness-in-paper-assignment-Paper-Conference](https://doi.org/10.1002/int.1055)
-        - [NeurIPS-2023-counterfactual-evaluation-of-peer-review-assignment-policies-Paper-Conference](https://doi.org/10.1002/int.1055)
-        - [NeurIPS-2023-group-fairness-in-peer-review-Paper-Conference](https://doi.org/10.1088/2058-7058/27/06/26)
-        - [Reviewer Assignment Decision Support in an Academic Journal based on Multicriteria Assessment and Text Mining](https://doi.org/10.1109/itnt57377.2023.10139187)
-        - [review assignment](https://doi.org/10.1177/004711785700100215)
+        - [2024--A System and Method for Recommending Expert Reviewers for Performing Quality Assessment of an Electronic Work](https://patents.google.com/patent/US20240005230A1/en)
+        - [2024--Reviewer Assignment Decision Support in an Academic Journal based on Multicriteria Assessment and Text Mining](https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=10139187)
+        - [2023--Reviewer Assignment Problem: A Systematic Review of the Literature](https://dl.acm.org/doi/pdf/10.1613/jair.1.14318)
+        - [2023--A One-Size-Fits-All Approach to Improving Randomness in Paper Assignment](https://proceedings.neurips.cc/paper_files/paper/2023/file/2e9f9cde1b709281a06dd14f679e4c51-Paper-Conference.pdf)
+        - [2023--Counterfactual Evaluation of Peer-Review Assignment Policies](https://proceedings.neurips.cc/paper_files/paper/2023/file/b7d795e655c1463d7299688d489e8ef4-Paper-Conference.pdf)
+        - [2023--Group Fairness in Peer Review](https://proceedings.neurips.cc/paper_files/paper/2023/file/ccba10dd4e80e7276054222bb95d467c-Paper-Conference.pdf)
 - **team formation constraints**
   - **authority**
-    - [2021 A unified framework for effective team formation in social networks](https://doi.org/10.1016/j.eswa.2021.114886)
-    - [2017 SNA EDBT Authority-based Team Discovery in Social Networks (related to 6)](https://doi.org/10.1137/1.9781611972818.45)
-    - [2018 SNA Effective Team Formation in Expert Networks](https://doi.org/10.26686/wgtn.17065262)
+    - [2021--A unified framework for effective team formation in social networks](https://doi.org/10.1016/j.eswa.2021.114886)
+    - [2018--Effective Team Formation in Expert Networks](https://ceur-ws.org/Vol-2100/paper4.pdf)
+    - [2017--Authority-Based Team Discovery in Social Networks](https://arxiv.org/pdf/1611.02992)
   - **communication cost**
     - **dense subgraph**
       - [2018 A Multi-objective Formulation of the Team Formation Problem](https://doi.org/10.1145/3205455.3205634)
