@@ -2,7 +2,7 @@ This repository contains supplementary materials for our published survey paper:
 
 
 <h1 align="center" style="border-bottom: none;">
-  <a href="https://[example.com](https://hosseinfani.github.io/res/papers/2025_CSUR_A_Survey_of_Subgraph_Optimization_for_Expert_Team_Formation.pdf)"><strong>A Survey of Subgraph Optimization for Expert Team Formation</strong></a>
+  <a href="https://(https://hosseinfani.github.io/res/papers/2025_CSUR_A_Survey_of_Subgraph_Optimization_for_Expert_Team_Formation.pdf)"><strong>A Survey of Subgraph Optimization for Expert Team Formation</strong></a>
 </h1>
 
 ![#25D9C8](https://placehold.co/15x15/25D9C8/25D9C8.png) **Journal Highlight** 
