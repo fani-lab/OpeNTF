@@ -2,15 +2,17 @@ This repository contains supplementary materials for our published survey paper:
 
 
 <h1 align="center" style="border-bottom: none;">
-  <a href="https://hosseinfani.github.io/res/papers/2025_CSUR_A_Survey_of_Subgraph_Optimization_for_Expert_Team_Formation.pdf">
+  <a href="https://hosseinfani.github.io/res/papers/2025_CSUR_A_Survey_of_Subgraph_Optimization_for_Expert_Team_Formation.pdf" target="_blank">
     <strong>A Survey of Subgraph Optimization for Expert Team Formation</strong>
   </a>
 </h1>
 
 
+
 ![#25D9C8](https://placehold.co/15x15/25D9C8/25D9C8.png) **Journal Highlight** 
 
-> **[ACM Computing Surveys](https://dl.acm.org/journal/csur):**
+> **<a href="https://dl.acm.org/journal/csur" target="_blank">ACM Computing Surveys</a>:**
+
       
     
 > **Impact Factor:**
@@ -32,14 +34,17 @@ June 5, 2021
 > **Submitted:**
 November 22, 2023
 
-> **[First Round Review:](https://hosseinfani.github.io/res/papers/2025_CSUR_R1_A_Survey_of_Subgraph_Optimization_for_Expert_Team_Formation.pdf)**
+> **<a href="https://hosseinfani.github.io/res/papers/2025_CSUR_R1_A_Survey_of_Subgraph_Optimization_for_Expert_Team_Formation.pdf" target="_blank">First Round Review:</a>**
 October 11, 2024
 
-> **[Second Round Review:](https://hosseinfani.github.io/res/papers/2025_CSUR_R2_A_Survey_of_Subgraph_Optimization_for_Expert_Team_Formation.pdf)**
+
+> **<a href="https://hosseinfani.github.io/res/papers/2025_CSUR_R2_A_Survey_of_Subgraph_Optimization_for_Expert_Team_Formation.pdf" target="_blank">Second Round Review:</a>**
 March 1, 2025
 
-> **[Notification of Acceptance:](https://hosseinfani.github.io/res/papers/2025_CSUR_R3_A_Survey_of_Subgraph_Optimization_for_Expert_Team_Formation.txt)**
+
+> **<a href="https://hosseinfani.github.io/res/papers/2025_CSUR_R3_A_Survey_of_Subgraph_Optimization_for_Expert_Team_Formation.txt" target="_blank">Notification of Acceptance:</a>**
 May 8, 2025
+
 
 
 ________________________________________________________________________________________________________________________________________________________
@@ -81,12 +86,12 @@ The examined papers in this survey can be categorized as follows:
 
  - **team formation applications**
       - **group learning**
-        - [2025--Leveraging Multicriteria Integer Programming Optimization for Effective Team Formation](https://doi.org/10.1109/tlt.2024.3401734)
-        - [2023--An Integer Linear Programming Model for Team Formation in the Classroom with Constraints](https://link.springer.com/chapter/10.1007/978-3-031-40725-3_34)
-        - [2014--A Method for Group Formation Using Genetic Algorithm](https://www.researchgate.net/profile/Azman-Yasin/publication/229035954_A_Method_for_Group_Formation_Using_Genetic_Algorithm/links/0deec53852db22592c000000/A-Method-for-Group-Formation-Using-Genetic-Algorithm.pdf)
-        - [2013--Support group formation for users with depression in social networks](https://onlinelibrary.wiley.com/doi/full/10.1111/exsy.12038)
-        - [2012--A genetic algorithm approach for group formation in collaborative learning considering multiple student characteristics](https://www.sciencedirect.com/science/article/pii/S0360131511002284)
-        - [2010--Forming Reasonably Optimal Groups (FROG)](https://dl.acm.org/doi/pdf/10.1145/1880071.1880094)
+        - <a href="https://doi.org/10.1109/tlt.2024.3401734" target="_blank">2025--Leveraging Multicriteria Integer Programming Optimization for Effective Team Formation</a>
+        - <a href="https://link.springer.com/chapter/10.1007/978-3-031-40725-3_34" target="_blank">2023--An Integer Linear Programming Model for Team Formation in the Classroom with Constraints</a>
+        - <a href="https://www.researchgate.net/profile/Azman-Yasin/publication/229035954_A_Method_for_Group_Formation_Using_Genetic_Algorithm/links/0deec53852db22592c000000/A-Method-for-Group-Formation-Using-Genetic-Algorithm.pdf" target="_blank">2014--A Method for Group Formation Using Genetic Algorithm</a>
+        - <a href="https://onlinelibrary.wiley.com/doi/full/10.1111/exsy.12038" target="_blank">2013--Support group formation for users with depression in social networks</a>
+        - <a href="https://www.sciencedirect.com/science/article/pii/S0360131511002284" target="_blank">2012--A genetic algorithm approach for group formation in collaborative learning considering multiple student characteristics</a>
+        - <a href="https://dl.acm.org/doi/pdf/10.1145/1880071.1880094" target="_blank">2010--Forming Reasonably Optimal Groups (FROG)</a>
       - **health care**
         - [2025--Support group formation for users with depression in social networks](https://www.sciencedirect.com/science/article/pii/S0957417425007298)
         - [2023--Understanding knowledge leadership in improving team outcomes in the health sector: a Covid-19 study](https://www.emerald.com/insight/content/doi/10.1108/bpmj-08-2022-0386/full/pdf)
