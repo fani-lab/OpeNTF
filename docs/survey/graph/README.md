@@ -7,22 +7,19 @@ This repository contains supplementary materials for our published survey paper:
   </a>
 </h1>
 
-![#25D9C8](https://placehold.co/15x15/25D9C8/25D9C8.png) **Journal Highlight:** 
+![#3282F6](https://placehold.co/15x15/25D9C8/25D9C8.png) **Journal Highlight:** 
 <a href="https://dl.acm.org/journal/csur" target="_blank">ACM Computing Surveys</a>, 
 Impact Factor: 23.8,
 H-Index: 232,
-Ranking: 1st out of 143 journals in Computer Science – Theory & Methods   
+1st/143 journals in Computer Science – Theory & Methods.   
 
   
 ![#25D9C8](https://placehold.co/15x15/25D9C8/25D9C8.png)   **Timeline:** 
-Started on June 5, 2021, 
-Submitted on November 22, 2023, 
-<a href="https://hosseinfani.github.io/res/papers/2025_CSUR_R1_A_Survey_of_Subgraph_Optimization_for_Expert_Team_Formation.pdf" target="_blank">First Round Review </a>
-: October 11, 2024, 
-<a href="https://hosseinfani.github.io/res/papers/2025_CSUR_R2_A_Survey_of_Subgraph_Optimization_for_Expert_Team_Formation.pdf" target="_blank">Second Round Review </a>
-: March 1, 2025, 
-<a href="https://hosseinfani.github.io/res/papers/2025_CSUR_R3_A_Survey_of_Subgraph_Optimization_for_Expert_Team_Formation.txt" target="_blank">Notification of Acceptance </a>
-: May 8, 2025.
+Started 05-Jun-2021, 
+Submitted 22-Nov-2023, 
+<a href="https://hosseinfani.github.io/res/papers/2025_CSUR_R1_A_Survey_of_Subgraph_Optimization_for_Expert_Team_Formation.pdf" target="_blank">First Review </a>: 11-Oct-2024, 
+<a href="https://hosseinfani.github.io/res/papers/2025_CSUR_R2_A_Survey_of_Subgraph_Optimization_for_Expert_Team_Formation.pdf" target="_blank">Second Review </a>: 01-Mar-2025, 
+<a href="https://hosseinfani.github.io/res/papers/2025_CSUR_R3_A_Survey_of_Subgraph_Optimization_for_Expert_Team_Formation.txt" target="_blank"> Accept </a>: 08-Ma-2025.
 
 
 
