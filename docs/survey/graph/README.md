@@ -31,8 +31,6 @@ journal = {ACM Comput. Surv.},
 month = may,
 keywords = {Subgraph Optimization, Expert Team Formation, Social Information Retrieval}
 }
-
-
   ```  
 
 
