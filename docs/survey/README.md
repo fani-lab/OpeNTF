@@ -2,7 +2,7 @@
 
 
 <div align="center">
-  <img src="graph/figures/figs_draft/taxonomy.png" alt="Figure1: A taxonomy of the Team Formation methods." >
+  <img src="figures/taxonomy.png" alt="Figure1: A taxonomy of the Team Formation methods." >
   <p align="center"><em>Figure1: A taxonomy of the computational Expert Team Formation methods.</em></p>
 </div>
 
@@ -11,7 +11,7 @@ Team formarion involves selecting skillful experts to form an *almost surely* su
 Within the search-based category, operations research, optimizes the mutually independent selection of experts, overlooking the organizational and collaborative ties among individuals [^1][^4][^5][^6]. However, graph-based approaches view teams as inherently relational, emphasizing the importance of expert interactions and collaboration. Moreover, learning-based methods have been proposed to bring efficiency while enhancing efficacy due to their iterative and online learning procedure [^7][^8]. As seen in Figure 2, there is an overlap between team formation approaches. As an instance, graph-based and operations research-based methods, where optimization functions have been defined based on linear or nonlinear equation of Boolean variables representing edges on the expert graph [^9]. Additionally, learning-based methods utilize the expert graph to learn vector representations of skills using graph neural networks (GNNs), which helps reduce the complexity of neural models at the input layer [^12]. Specifically, graph neural networks [^10][^11] provide an effective and efficient general framework for solving graph analytics problems by converting a graph into a low-dimensional vector space while preserving its graph-structured information. Having demonstrated strong performances across a wide range of problems, including natural language processing [^13], knowledge graphs [^14] and recommender systems [^15], graph neural networks are gradually finding their application in Expert Team Formation [^12]. 
 
 <p align="center">
-  <img src="graph/figures/figs_draft/venn.png" alt="Figure2: Overlapping Team Formation Approaches">
+  <img src="figures/venn_gray.png" alt="Figure2: Overlapping Team Formation Approaches">
 </p>
 
 [^1]: M. Muniz et al. A column generation approach for the team formation problem. https://www.sciencedirect.com/science/article/pii/S0305054823002708.
