@@ -7,7 +7,7 @@ This repository contains supplementary materials for our published survey paper:
   </a>
 </h1>
 
-[A Survey of Subgraph Optimization for Expert Team Formation]([url](https://hosseinfani.github.io/res/papers/2025_CSUR_A_Survey_of_Subgraph_Optimization_for_Expert_Team_Formation.pdf)){:target="_blank"}
+[A Survey of Subgraph Optimization for Expert Team Formation](https://hosseinfani.github.io/res/papers/2025_CSUR_A_Survey_of_Subgraph_Optimization_for_Expert_Team_Formation.pdf){:target="_blank"}
 
 ![#3282F6](https://placehold.co/15x15/3282F6/3282F6.png)   **Timeline:** 
 Started Jun. 5, 2021, Submitted Nov. 22, 2023, <a href="https://hosseinfani.github.io/res/papers/2025_CSUR_R1_A_Survey_of_Subgraph_Optimization_for_Expert_Team_Formation.pdf" target="_blank">Major Revision</a>: Oct. 11, 2024, 
