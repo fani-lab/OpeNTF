@@ -2,41 +2,25 @@ This repository contains supplementary materials for our published survey paper:
 
 
 <h1 align="center" style="border-bottom: none;">
-  <a href="https://[example.com](https://hosseinfani.github.io/res/papers/2025_CSUR_A_Survey_of_Subgraph_Optimization_for_Expert_Team_Formation.pdf)"><strong>A Survey of Subgraph Optimization for Expert Team Formation</strong></a>
+  <a href="https://hosseinfani.github.io/res/papers/2025_CSUR_A_Survey_of_Subgraph_Optimization_for_Expert_Team_Formation.pdf" target="_blank">
+    <strong>A Survey of Subgraph Optimization for Expert Team Formation</strong>
+  </a>
 </h1>
 
-![#25D9C8](https://placehold.co/15x15/25D9C8/25D9C8.png) **Journal Highlight** 
-
-> **[ACM Computing Surveys](https://dl.acm.org/journal/csur):**
-      
-    
-> **Impact Factor:**
-23.8
-
-> **H-Index:**
-232
-
-> **Ranking:**
-1st out of 143 journals in Computer Science – Theory & Methods   
+![#3282F6](https://placehold.co/15x15/3282F6/3282F6.png) **Journal Highlight:** 
+<a href="https://dl.acm.org/journal/csur" target="_blank">ACM Computing Surveys</a>, 
+Impact Factor: 23.8,
+H-Index: 232,
+1st/143 journals in Computer Science – Theory & Methods.   
 
   
-![#25D9C8](https://placehold.co/15x15/25D9C8/25D9C8.png) **Timeline**  
+![#3282F6](https://placehold.co/15x15/3282F6/3282F6.png)   **Timeline:** 
+Started 05-Jun-2021, 
+Submitted 22-Nov-2023, 
+<a href="https://hosseinfani.github.io/res/papers/2025_CSUR_R1_A_Survey_of_Subgraph_Optimization_for_Expert_Team_Formation.pdf" target="_blank">First Review </a>: 11-Oct-2024, 
+<a href="https://hosseinfani.github.io/res/papers/2025_CSUR_R2_A_Survey_of_Subgraph_Optimization_for_Expert_Team_Formation.pdf" target="_blank">Second Review </a>: 01-Mar-2025, 
+<a href="https://hosseinfani.github.io/res/papers/2025_CSUR_R3_A_Survey_of_Subgraph_Optimization_for_Expert_Team_Formation.txt" target="_blank"> Accept </a>: 08-May-2025.
 
-> **Started:**
-June 5, 2021
-
-
-> **Submitted:**
-November 22, 2023
-
-> **[First Round Review:](https://hosseinfani.github.io/res/papers/2025_CSUR_R1_A_Survey_of_Subgraph_Optimization_for_Expert_Team_Formation.pdf)**
-October 11, 2024
-
-> **[Second Round Review:](https://hosseinfani.github.io/res/papers/2025_CSUR_R2_A_Survey_of_Subgraph_Optimization_for_Expert_Team_Formation.pdf)**
-March 1, 2025
-
-> **[Notification of Acceptance:](https://hosseinfani.github.io/res/papers/2025_CSUR_R3_A_Survey_of_Subgraph_Optimization_for_Expert_Team_Formation.txt)**
-May 8, 2025
 
 
 ________________________________________________________________________________________________________________________________________________________
@@ -53,7 +37,7 @@ future successful teams.
   <p align="center"><em>Figure1: A taxonomy of the computational Expert Team Formation methods.</em></p>
 </div>
 
-Within the search-based category, operations research, by and large, optimizes the mutually independent selection of experts, overlooking  the organizational and collaborative ties among individuals [[1](https://www.sciencedirect.com/science/article/pii/S0305054823002708.), [4](https://www.sciencedirect.com/science/article/pii/S0167739X1300068X.), [5](https://www.sciencedirect.com/science/article/pii/S2666222121000022. ), [6](https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=9044841.)]. However, graph-based methods rely on the premise that a team is inherently relational and is a property of the interaction among the experts and how effectively they can collaborate. Moreover, learning-based methods have been proposed to bring efficiency while enhancing efficacy due to their iterative and online learning procedure [[7](https://dl.acm.org/doi/pdf/10.1145/3459637.3481992.), [8](https://dl.acm.org/doi/pdf/10.1145/3511808.3557590)]. As seen in Figure 1, there is an overlap between team formation approaches. As an instance, graph-based and operations research-based methods, where optimization functions have been defined based on linear or nonlinear equation of Boolean variables representing edges on the expert graph [[9](https://link.springer.com/content/pdf/10.1007/s10479-018-2759-5.pdf)]. 
+Within the search-based category, operations research, by and large, optimizes the mutually independent selection of experts, overlooking  the organizational and collaborative ties among individuals [[1](https://www.sciencedirect.com/science/article/pii/S0305054823002708.), [4](https://www.sciencedirect.com/science/article/pii/S0167739X1300068X.), [5](https://www.sciencedirect.com/science/article/pii/S2666222121000022. ), [6](https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=9044841.)]. However, graph-based methods rely on the premise that a team is inherently relational and is a property of the interaction among the experts and how effectively they can collaborate. Moreover, learning-based methods have been proposed to bring efficiency while enhancing efficacy due to their iterative and online learning procedure [[7](https://dl.acm.org/doi/pdf/10.1145/3459637.3481992), [8](https://dl.acm.org/doi/pdf/10.1145/3511808.3557590)]. As seen in Figure 1, there is an overlap between team formation approaches. As an instance, graph-based and operations research-based methods, where optimization functions have been defined based on linear or nonlinear equation of Boolean variables representing edges on the expert graph [[9](https://link.springer.com/content/pdf/10.1007/s10479-018-2759-5.pdf)]. 
 
 From Figure 2, recently, a paradigm shift to machine learning-based methods, including artificial neural networks and graph neural networks [[10](https://link.springer.com/content/pdf/10.1007/s10791-023-09421-6.pdf), [11](https://link.springer.com/chapter/10.1007/978-981-96-0567-5_15), [12](https://link.springer.com/chapter/10.1007/978-3-031-56027-9_20 ), [13](https://dl.acm.org/doi/pdf/10.1145/3701551.3703574), [14](https://hosseinfani.github.io/res/papers/2025_SIGIR_Translative_Neural_Team_Recommendation_From_Multilabel_Classification_to_Sequence_Prediction.pdf)], has been observed due to advanced hardware computing power, especially graphic processing units (GPUs) and tensor processing units (TPUs), that reduced elapsed time from months to days and/or hours opening doors to the analysis of massive collections of candidates coming from different fields. These methods are different from search-based solutions in that they *learn* the inherent structure of the ties among candidates and their skills. Wherein, all past successful and *un*successful team compositions are considered as training samples to predict future teams and the team's performance. Learning-based methods bring efficiency while enhancing efficacy due to the inherently *iterative* and *online* learning procedure, and can address the limitations of search-based solutions with respect to scalability. This line of research started with Sapienza et al. [[18](https://doi.org/10.3389/fdata.2019.00014)] who employed a non-variational autoencoder neural network architecture and is being followed by researchers through other neural-based architectures such as variational Bayesian neural network [[8](https://dl.acm.org/doi/pdf/10.1145/3511808.3557590), [7](https://dl.acm.org/doi/pdf/10.1145/3459637.3481992), [15](https://dl.acm.org/doi/pdf/10.1145/3340531.3412140), [16](https://dl.acm.org/doi/pdf/10.1145/3589762), [17](https://proceedings.mlr.press/v139/liu21m/liu21m.pdf)].
 
@@ -78,12 +62,12 @@ The examined papers in this survey can be categorized as follows:
 
  - **team formation applications**
       - **group learning**
-        - [2025--Leveraging Multicriteria Integer Programming Optimization for Effective Team Formation](https://doi.org/10.1109/tlt.2024.3401734)
-        - [2023--An Integer Linear Programming Model for Team Formation in the Classroom with Constraints](https://link.springer.com/chapter/10.1007/978-3-031-40725-3_34)
-        - [2014--A Method for Group Formation Using Genetic Algorithm](https://www.researchgate.net/profile/Azman-Yasin/publication/229035954_A_Method_for_Group_Formation_Using_Genetic_Algorithm/links/0deec53852db22592c000000/A-Method-for-Group-Formation-Using-Genetic-Algorithm.pdf)
-        - [2013--Support group formation for users with depression in social networks](https://onlinelibrary.wiley.com/doi/full/10.1111/exsy.12038)
-        - [2012--A genetic algorithm approach for group formation in collaborative learning considering multiple student characteristics](https://www.sciencedirect.com/science/article/pii/S0360131511002284)
-        - [2010--Forming Reasonably Optimal Groups (FROG)](https://dl.acm.org/doi/pdf/10.1145/1880071.1880094)
+        - <a href="https://doi.org/10.1109/tlt.2024.3401734" target="_blank">2025--Leveraging Multicriteria Integer Programming Optimization for Effective Team Formation</a>
+        - <a href="https://link.springer.com/chapter/10.1007/978-3-031-40725-3_34" target="_blank">2023--An Integer Linear Programming Model for Team Formation in the Classroom with Constraints</a>
+        - <a href="https://www.researchgate.net/profile/Azman-Yasin/publication/229035954_A_Method_for_Group_Formation_Using_Genetic_Algorithm/links/0deec53852db22592c000000/A-Method-for-Group-Formation-Using-Genetic-Algorithm.pdf" target="_blank">2014--A Method for Group Formation Using Genetic Algorithm</a>
+        - <a href="https://onlinelibrary.wiley.com/doi/full/10.1111/exsy.12038" target="_blank">2013--Support group formation for users with depression in social networks</a>
+        - <a href="https://www.sciencedirect.com/science/article/pii/S0360131511002284" target="_blank">2012--A genetic algorithm approach for group formation in collaborative learning considering multiple student characteristics</a>
+        - <a href="https://dl.acm.org/doi/pdf/10.1145/1880071.1880094" target="_blank">2010--Forming Reasonably Optimal Groups (FROG)</a>
       - **health care**
         - [2025--Support group formation for users with depression in social networks](https://www.sciencedirect.com/science/article/pii/S0957417425007298)
         - [2023--Understanding knowledge leadership in improving team outcomes in the health sector: a Covid-19 study](https://www.emerald.com/insight/content/doi/10.1108/bpmj-08-2022-0386/full/pdf)
