@@ -20,7 +20,7 @@ Started Jun. 5, 2021, Submitted Nov. 22, 2023, <a href="https://hosseinfani.gith
 @article{DBLP:journals/csur/SaeediHWF25,
 author = {Mahdis Saeedi and Hawre Hosseini and Christine Wong and Hossein Fani},
 title = {A Survey of Subgraph Optimization for Expert Team Formation},
-journal = {{ACM} Comput. Surv.},
+journal = {ACM Comput. Surv.},
 note = {Just Accepted},
 year = {2025},
 month = may
