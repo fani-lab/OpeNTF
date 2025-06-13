@@ -6,7 +6,7 @@ from mdl.ntf import Ntf
 
 class tNtf(Ntf):
     def __init__(self, model, tfold, step_ahead):
-        super(tNtf, self).__init__()
+        super(tNtf, self).__init__(None)
         self.model = model
         self.tfold = tfold
         self.step_ahead = step_ahead #for now, only 1 step ahead

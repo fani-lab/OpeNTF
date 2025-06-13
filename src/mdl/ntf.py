@@ -4,7 +4,7 @@ log = logging.getLogger(__name__)
 
 import pkgmgr as opentf
 class Ntf:
-    def __init__(self): super(Ntf, self).__init__()
+    def __init__(self, pytorch): Ntf.torch = opentf.install_import(pytorch, 'torch') if pytorch else None
 
     def name(self): return self.__class__.__name__.lower()
 

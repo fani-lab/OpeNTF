@@ -56,12 +56,12 @@ data: #required for 'prep' step
 
 models:
   instances:
-    - mdl.rnd.Rnd()
+    - mdl.rnd.Rnd('${pytorch}')
     #- mdl.fnn.Fnn() #input skills could be multihot (default), embeddings by d2v, n2v, m2v, ... see above data.embedding.class_method
     #- mdl.bnn.Bnn()
     #- mdl.nmt.Nmt()
     #- mdl.tnmt.tNmt
-    - mdl.tntf.tNtf(mdl.rnd.Rnd(), ${train.nfolds}, ${train.step_ahead})   #underlying base model could be fnn and bnn. future: tgnn?
+    - mdl.tntf.tNtf(mdl.rnd.Rnd('${pytorch}'), ${train.nfolds}, ${train.step_ahead})   #underlying base model could be fnn and bnn. future: tgnn?
     #- mdl.caser.Caser #external baseline
     #- mdl.rrn.Rrn     #external baseline
 
@@ -71,7 +71,7 @@ train:
   nfolds: 3 #ends with nfolds models each with nfolds-1 train splits and one fold valid split, nfolds results, averaged on a single test split
   train_test_ratio: 0.85 #the nfolds will be on the trainig part.
   merge_teams_w_same_skills: True # for explanation >> https://github.com/fani-lab/OpeNTF/issues/156
-  step_ahead: 1 #if streaming/temporal training. for now, it means that whatever are in the last [step_ahead] time interval will be the test set!
+  step_ahead: #if streaming/temporal training. for now, it means that whatever are in the last [step_ahead] time interval will be the test set!
   save_per_epoch: False
 
 test:
