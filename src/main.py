@@ -96,7 +96,7 @@ def run(cfg):
             # Use '+data.embedding.{...}=value' to override
             # Use '+data.embedding.{...}=null' to drop. The '~data.embedding.{...}' cannot be used here.
             emb_overrides = [o.replace('+data.embedding.', '') for o in HydraConfig.get().overrides.task if '+data.embedding.' in o]
-            embcfg = OmegaConf.merge(OmegaConf.load('mdl/emb/__config__.yaml'), OmegaConf.from_dotlist(emb_overrides))
+            embcfg = OmegaConf.merge(OmegaConf.load(cfg.data.embedding.config), OmegaConf.from_dotlist(emb_overrides))
             embcfg.model.seed = cfg.seed
             embcfg.model.gnn.pytorch = cfg.pytorch
             OmegaConf.resolve(embcfg)
@@ -118,7 +118,7 @@ def run(cfg):
 
         # non-temporal (no streaming scenario, bag of teams)
 
-        assert len(cfg.models.instances) > 0, f'{opentf.textcolor["red"]}No model instance for training! Check ./src/config.yaml and models.instances ... {opentf.textcolor["reset"]}'
+        assert len(cfg.models.instances) > 0, f'{opentf.textcolor["red"]}No model instance for training! Check ./src/__config__.yaml and models.instances ... {opentf.textcolor["reset"]}'
 
         if cfg.train.merge_teams_w_same_skills: domain_cls.merge_teams_by_skills(vecs, inplace=True)
 
@@ -128,6 +128,15 @@ def run(cfg):
             assert skill_vecs.shape[0] == vecs['skill'].shape[0], f'{opentf.textcolor["red"]}Incorrect number of embeddings for teams subset of skills!{opentf.textcolor["reset"]}'
             vecs['skill'] = skill_vecs
 
+        # Get command-line overrides for models. Kinda tricky as we dynamically override a subconfig.
+        # Use '+models.{...}=value' to override
+        # Use '+models.{...}=null' to drop
+        mdl_overrides = [o.replace('+models.', '') for o in HydraConfig.get().overrides.task if '+models.' in o]
+        mdlcfg = OmegaConf.merge(OmegaConf.load(cfg.models.config), OmegaConf.from_dotlist(mdl_overrides))
+        mdlcfg.seed = cfg.seed
+        mdlcfg.pytorch = cfg.pytorch
+        OmegaConf.resolve(mdlcfg)
+        cfg.models.config = mdlcfg
         for m in cfg.models.instances:
             import mdl # required for all models. Also, mdl/__init__.py should expose all submodules
             models[m] = eval(m, {'mdl': mdl})
@@ -136,20 +145,10 @@ def run(cfg):
             # find a way to show model-emb pair setting
             # make_popular_and_nonpopular_matrix(vecs_, data_list[0])
 
-            # Get command-line overrides for models. Kinda tricky as we dynamically override a subconfig.
-            # Use '+models.{...}=value' to override
-            # Use '+models.{...}=null' to drop
-            mdl_overrides = [o.replace('+models.', '') for o in HydraConfig.get().overrides.task if '+models.' in o]
-            mdlcfg = OmegaConf.merge(OmegaConf.load('mdl/__config__.yaml'), OmegaConf.from_dotlist(mdl_overrides))
-            mdlcfg.seed = cfg.seed
-            mdlcfg.pytorch = cfg.pytorch
-            OmegaConf.resolve(mdlcfg)
-            cfg.models.config = mdlcfg
+            output_ = (t2v.modelfilepath if t2v else cfg.data.output) + f'_{models[m].name()}' #cannot have file and folder with same name if t2v
+            if not os.path.isdir(output_): os.makedirs(output_)
 
-            output_ = (t2v.modelfilepath if t2v else cfg.data.output) + f'_{self.__class__.__name__.lower()}'
-            if not os.path.isdir(output): os.makedirs(output_)
-
-            if 'train' in cfg.cmd: models[m].learn(vecs, indexes, splits, cfg.models.config[models[m].__class__.__name__.lower()], None, output_)
+            if 'train' in cfg.cmd: models[m].learn(vecs, indexes, splits, cfg.models.config[models[m].model.__class__.__name__.lower()] if isinstance(models[m], mdl.tntf.tNtf) else cfg.models.config[models[m].__class__.__name__.lower()], None, output_)
 
         # # streaming scenario (no vector for time)
         # if 'tfnn' in model_list: models['tfnn'] = tNtf(Fnn(), cfg.train.nfolds, cfg.train.step_ahead)

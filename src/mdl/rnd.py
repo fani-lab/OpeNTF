@@ -27,6 +27,4 @@ class Rnd(Ntf):
             torch.save(self, f'{model_path}/state_dict_model.f{foldidx}.pt', pickle_protocol=4)#dummy model save
             torch.save(y_pred, f'{model_path}/f{foldidx}.test.pred', pickle_protocol=4)
 
-    def forward(self, x, y):
-        import torch
-        return torch.clamp(torch.rand(y.shape), min=1.e-6, max=1. - 1.e-6)
+    def forward(self, x, y): return np.clip(np.random.rand(*y.shape), a_min=1e-6, a_max=1. - 1e-6)

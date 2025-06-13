@@ -6,6 +6,8 @@ import pkgmgr as opentf
 class Ntf:
     def __init__(self): super(Ntf, self).__init__()
 
+    def name(self): return self.__class__.__name__.lower()
+
     def learn(self, teamsvecs, indexes, splits, cfg, prev_model, output): pass
     def test(self, teamsvecs, indexes, splits, cfg, model_path, on_train=False, per_epoch=False): pass
     def evaluate(self, teamsvecs, splits, model_path, on_train=False, per_instance=False, per_epoch=False):

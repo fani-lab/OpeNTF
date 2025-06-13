@@ -22,31 +22,24 @@ from mdl.superloss import SuperLoss
 
 
 class Fnn(Ntf):
-    def __init__(self):
-        super(Fnn, self).__init__()
+    def __init__(self): super(Fnn, self).__init__()
 
     def init(self, input_size, output_size, param):
         self.fc1 = nn.Linear(input_size, param['l'][0])
         hl = []
-        for i in range(1, len(param['l'])):
-            hl.append(nn.Linear(param['l'][i - 1], param['l'][i]))
+        for i in range(1, len(param['l'])): hl.append(nn.Linear(param['l'][i - 1], param['l'][i]))
         self.hidden_layer = nn.ModuleList(hl)
         self.fc2 = nn.Linear(param['l'][-1], output_size)
-        self.initialize_weights()
+        for m in self.modules():
+            if isinstance(m, nn.Linear): nn.init.xavier_uniform_(m.weight)
         return self
 
     def forward(self, x):
         x = leaky_relu(self.fc1(x))
-        for i, l in enumerate(self.hidden_layer):
-            x = leaky_relu(l(x))
+        for i, l in enumerate(self.hidden_layer): x = leaky_relu(l(x))
         x = self.fc2(x)
         x = torch.clamp(torch.sigmoid(x), min=1.e-6, max=1. - 1.e-6)
         return x
-
-    def initialize_weights(self):
-        for m in self.modules():
-            if isinstance(m, nn.Linear):
-                nn.init.xavier_uniform_(m.weight)
 
     def cross_entropy(self, y_, y, ns, nns, unigram, weight):
         if ns == "uniform": return self.ns_uniform(y_, y, nns)
@@ -71,7 +64,6 @@ class Fnn(Ntf):
         logits = logits.squeeze(1)
         return (-targets * torch.log(logits)).sum()
 
-
     def ns_uniform(self, logits, targets, neg_samples=5):
         targets = targets.squeeze(1)
         logits = logits.squeeze(1)
@@ -80,8 +72,7 @@ class Fnn(Ntf):
             k_neg_idx = torch.randint(0, targets.shape[1], (neg_samples,))
             cor_idx = torch.nonzero(targets[b].cpu(), as_tuple=True)[0]
             for idx in k_neg_idx:
-                if idx not in cor_idx:
-                    random_samples[b][idx] = 1
+                if idx not in cor_idx: random_samples[b][idx] = 1
         return (-targets * torch.log(logits) - random_samples * torch.log(1 - logits)).sum()
 
     def ns_unigram(self, logits, targets, unigram, neg_samples=5):
@@ -93,8 +84,7 @@ class Fnn(Ntf):
             k_neg_idx = list(set(random.choices(range(targets.shape[1]), weights=np.array(unigram)[0], k=neg_samples)))
             cor_idx = torch.nonzero(targets[b], as_tuple=True)[0]
             for idx in k_neg_idx:
-                if idx not in cor_idx:
-                    random_samples[b][idx] = 1
+                if idx not in cor_idx: random_samples[b][idx] = 1
         return (-targets * torch.log(logits) - random_samples * torch.log(1 - logits)).sum()
 
     def ns_unigram_mini_batch(self, logits, targets, neg_samples=5):
@@ -112,7 +102,6 @@ class Fnn(Ntf):
                     random_samples[b][idx] = 1
         return (-targets * torch.log(logits) - random_samples * torch.log(1 - logits)).sum()
 
-    
     def ns_inverse_unigram(self, logits, targets, unigram, neg_samples=5):
         targets = targets.squeeze(1)
         logits = logits.squeeze(1)
@@ -124,8 +113,7 @@ class Fnn(Ntf):
             k_neg_idx = np.random.choice(neg_idx, neg_samples)
             cor_idx = torch.nonzero(targets[b], as_tuple=True)[0]
             for idx in k_neg_idx:
-                if idx not in cor_idx:
-                    random_samples[b][idx] = 1
+                if idx not in cor_idx: random_samples[b][idx] = 1
         return (-targets * torch.log(logits) - random_samples * torch.log(1 - logits)).sum()
 
     def ns_inverse_unigram_mini_batch(self, logits, targets, neg_samples=5):
@@ -142,8 +130,7 @@ class Fnn(Ntf):
             k_neg_idx = np.random.choice(neg_idx, neg_samples)
             cor_idx = torch.nonzero(targets[b], as_tuple=True)[0]
             for idx in k_neg_idx:
-                if idx not in cor_idx:
-                    random_samples[b][idx] = 1
+                if idx not in cor_idx: random_samples[b][idx] = 1
         return (-targets * torch.log(logits) - random_samples * torch.log(1 - logits)).sum()
 
     def learn(self, splits, indexes, vecs, params, prev_model, output):
