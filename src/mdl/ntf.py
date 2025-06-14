@@ -1,10 +1,20 @@
-import os, pickle, re, logging
+import os, pickle, re, logging, scipy.sparse
 from functools import partial
 log = logging.getLogger(__name__)
 
 import pkgmgr as opentf
 class Ntf:
-    def __init__(self, pytorch): Ntf.torch = opentf.install_import(pytorch, 'torch') if pytorch else None
+    def __init__(self, pytorch):
+        Ntf.torch = opentf.install_import(pytorch, 'torch') if pytorch else None
+        class NtfDataset(Ntf.torch.utils.data.Dataset):
+            def __init__(self, input_matrix, output_matrix):
+                super().__init__()
+                self.input, self.output = input_matrix, output_matrix
+            def __len__(self): return self.input.shape[0]
+            def __getitem__(self, index):
+                if scipy.sparse.issparse(self.input): return Ntf.torch.as_tensor(self.input[index].toarray()).float(), Ntf.torch.as_tensor(self.output[index].toarray())
+                else: return Ntf.torch.as_tensor(self.input[index]).float(), Ntf.torch.as_tensor(self.output[index].toarray())
+        Ntf.dataset = NtfDataset
 
     def name(self): return self.__class__.__name__.lower()
 
@@ -133,5 +143,4 @@ class Ntf:
             plt.legend()
             plt.savefig(f'{model_path}/{pred_set}.roc.png', dpi=100, bbox_inches='tight')
             plt.show()
-
 

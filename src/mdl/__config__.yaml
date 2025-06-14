@@ -4,6 +4,22 @@ batch_size: 1000 # batch_size for loaders
 epochs: 100 # num max epochs
 ns: 5 # number of negative samples for each positive sample
 lr: 0.001 #learning rate
+h: [128] #linear layers
+save_per_epoch: False
 
 rnd:
   seed: ${seed}
+
+fnn:
+  b: ${batch_size}
+  e: ${epochs}
+  ns: ${ns}
+  lr: ${lr}
+  h: ${h}
+  save_per_epoch: ${save_per_epoch}
+  l: bce  # bce: binary x-entropy, csl: curriculum superloss, cdp: curriculum data parameters,
+  #E.g., 1M experts/labels but each team has 5 experts at max, so, p=5/1M. When 1/p, it becomes very large and creates training istability though!
+  tpw: 10 # 10–20 (start), tune carefully up to 1/p where p is the average ratio of TP labels (true experts), emphasizes rare positives.
+  tnw: 1 # usually leave as is, or reduce slightly
+  nsd: # negetative sampling distribution (heuristics): uniform, unigram, unigram_b
+

@@ -57,7 +57,7 @@ data: #required for 'prep' step
 models:
   instances:
     - mdl.rnd.Rnd('${pytorch}')
-    #- mdl.fnn.Fnn() #input skills could be multihot (default), embeddings by d2v, n2v, m2v, ... see above data.embedding.class_method
+    - mdl.fnn.Fnn() #input skills can be multihot (default), embeddings by d2v, n2v, m2v, ... see above data.embedding.class_method
     #- mdl.bnn.Bnn()
     #- mdl.nmt.Nmt()
     #- mdl.tnmt.tNmt

@@ -1,70 +1,39 @@
-import os, time, json, re, random
-import numpy as np
-import matplotlib.pyplot as plt
+import os, time, json, re, random, numpy as np
 
-import torch
-from torch import nn
-from torch.nn.functional import leaky_relu
-from torch import optim
-from torch.utils.data import DataLoader
-from torch.optim.lr_scheduler import StepLR, ReduceLROnPlateau
+from .ntf import Ntf
+from .earlystopping import EarlyStopping
 
-from mdl.ntf import Ntf
-from mdl.cds import TFDataset
-
-from cmn.team import Team
-from cmn.tools import merge_teams_by_skills
-
-from mdl.earlystopping import EarlyStopping
-from cmn.tools import get_class_data_params_n_optimizer, adjust_learning_rate, apply_weight_decay_data_parameters
-from mdl.cds import SuperlossDataset
-from mdl.superloss import SuperLoss
-
+# these two only when curriculum learning
+from .tools import get_class_data_params_n_optimizer, adjust_learning_rate, apply_weight_decay_data_parameters
+from .superloss import SuperLoss
 
 class Fnn(Ntf):
-    def __init__(self): super(Fnn, self).__init__()
+    def __init__(self, pytorch): super(Fnn, self).__init__(pytorch)
 
-    def init(self, input_size, output_size, param):
-        self.fc1 = nn.Linear(input_size, param['l'][0])
-        hl = []
-        for i in range(1, len(param['l'])): hl.append(nn.Linear(param['l'][i - 1], param['l'][i]))
-        self.hidden_layer = nn.ModuleList(hl)
-        self.fc2 = nn.Linear(param['l'][-1], output_size)
-        for m in self.modules():
-            if isinstance(m, nn.Linear): nn.init.xavier_uniform_(m.weight)
+    def init(self, input_size, output_size, cfg):
+        self.layers = Ntf.torch.nn.ModuleList()
+        self.layers.append(Ntf.torch.nn.Linear(input_size, cfg.h[0]))
+        for i in range(1, len(cfg.h)): self.hidden_layer.append(Ntf.torch.nn.Linear(cfg.h[i - 1], cfg.h[i]))
+        self.layers.append(Ntf.torch.nn.Linear(cfg.h[-1], output_size))
+        for m in self.layers: Ntf.torch.nn.init.xavier_uniform_(m.weight)
         return self
 
     def forward(self, x):
-        x = leaky_relu(self.fc1(x))
-        for i, l in enumerate(self.hidden_layer): x = leaky_relu(l(x))
-        x = self.fc2(x)
-        x = torch.clamp(torch.sigmoid(x), min=1.e-6, max=1. - 1.e-6)
+        for i, l in enumerate(self.layers): x = Ntf.torch.nn.functional.leaky_relu(l(x))
         return x
+        #leave the sigmoid to be handled by the BCEWithLogitsLoss()
+        #return Ntf.torch.clamp(Ntf.torch.sigmoid(x), min=1.e-6, max=1. - 1.e-6)
 
-    def cross_entropy(self, y_, y, ns, nns, unigram, weight):
-        if ns == "uniform": return self.ns_uniform(y_, y, nns)
-        if ns == "unigram" or ns.startswith("temporal_unigram"): return self.ns_unigram(y_, y, unigram, nns)
-        if ns == "unigram_b": return self.ns_unigram_mini_batch(y_, y, nns)
-        if ns == "inverse_unigram" or ns.startswith("temporal_inverse_unigram"): return self.ns_inverse_unigram(y_, y, unigram, nns)
-        if ns == "inverse_unigram_b": return self.ns_inverse_unigram_mini_batch(y_, y, nns)
-        # return self.weighted(y_, y)
-        if ns == "weighted": return self.weighted(y_, y, weight)
-        if ns == "pos-ce": return self.weighted2(y_, y) # positive cross-entropy
-        cri = nn.BCELoss()
-        return cri(y_.squeeze(1), y.squeeze(1))
+    def cross_entropy(self, y_, y):
+        if self.cfg.nsd == 'uniform': return self.ns_uniform(y_, y)
+        if self.cfg.nsd == 'unigram': return self.ns_unigram(y_, y)
+        if self.cfg.nsd == 'unigram_b': return self.ns_unigram_mini_batch(y_, y)
+        if self.cfg.nsd == 'inverse_unigram': return self.ns_inverse_unigram(y_, y)
+        if self.cfg.nsd == 'inverse_unigram_b': return self.ns_inverse_unigram_mini_batch(y_, y)
+        #why squeeze?
+        return Ntf.torch.nn.functional.binary_cross_entropy_with_logits(y_.squeeze(1), y.squeeze(1), weight=Ntf.torch.where(y == 1, self.cfg.tpw, self.tnw), reduction='sum')
 
-    def weighted(self, logits, targets, pos_weight=2.5):
-        targets = targets.squeeze(1)
-        logits = logits.squeeze(1)
-        return (-targets * torch.log(logits) * pos_weight + (1 - targets) * - torch.log(1 - logits)).sum() # we both reward the TP and penalize the FP
-
-    # we only consider the loss on TP (the members which should be part of the final team)
-    def weighted2(self, logits, targets):
-        targets = targets.squeeze(1)
-        logits = logits.squeeze(1)
-        return (-targets * torch.log(logits)).sum()
-
-    def ns_uniform(self, logits, targets, neg_samples=5):
+    def ns_uniform(self, logits, targets):
         targets = targets.squeeze(1)
         logits = logits.squeeze(1)
         random_samples = torch.zeros_like(targets)
@@ -75,7 +44,7 @@ class Fnn(Ntf):
                 if idx not in cor_idx: random_samples[b][idx] = 1
         return (-targets * torch.log(logits) - random_samples * torch.log(1 - logits)).sum()
 
-    def ns_unigram(self, logits, targets, unigram, neg_samples=5):
+    def ns_unigram(self, logits, targets, unigram):
         targets = targets.squeeze(1)
         logits = logits.squeeze(1)
         random_samples = torch.zeros_like(targets)
@@ -87,7 +56,7 @@ class Fnn(Ntf):
                 if idx not in cor_idx: random_samples[b][idx] = 1
         return (-targets * torch.log(logits) - random_samples * torch.log(1 - logits)).sum()
 
-    def ns_unigram_mini_batch(self, logits, targets, neg_samples=5):
+    def ns_unigram_mini_batch(self, logits, targets):
         targets = targets.squeeze(1)
         logits = logits.squeeze(1)
         random_samples = torch.zeros_like(targets)
@@ -102,7 +71,7 @@ class Fnn(Ntf):
                     random_samples[b][idx] = 1
         return (-targets * torch.log(logits) - random_samples * torch.log(1 - logits)).sum()
 
-    def ns_inverse_unigram(self, logits, targets, unigram, neg_samples=5):
+    def ns_inverse_unigram(self, logits, targets, unigram):
         targets = targets.squeeze(1)
         logits = logits.squeeze(1)
         random_samples = torch.zeros_like(targets)
@@ -116,7 +85,7 @@ class Fnn(Ntf):
                 if idx not in cor_idx: random_samples[b][idx] = 1
         return (-targets * torch.log(logits) - random_samples * torch.log(1 - logits)).sum()
 
-    def ns_inverse_unigram_mini_batch(self, logits, targets, neg_samples=5):
+    def ns_inverse_unigram_mini_batch(self, logits, targets):
         targets = targets.squeeze(1)
         logits = logits.squeeze(1)
         random_samples = torch.zeros_like(targets)
@@ -134,36 +103,13 @@ class Fnn(Ntf):
         return (-targets * torch.log(logits) - random_samples * torch.log(1 - logits)).sum()
 
     def learn(self, splits, indexes, vecs, params, prev_model, output):
-        print(f'\n.............. starting learn .................\n')
-        loss_type = params['loss']
-
-        learning_rate = params['lr']
-        batch_size = params['b']
-        num_epochs = params['e']
-        nns = params['nns']
-        ns = params['ns']
-        weight = params['weight'] # if the ns == weighted
         input_size = vecs['skill'].shape[1]
-        output_size = len(indexes['i2c'])
-        # output_size = vecs['member'].shape[1]
-
+        output_size = vecs['member'].shape[1]
         unigram = Team.get_unigram(vecs['member'])
-        
-        if ns.startswith('temporal'):
-            cur_year = int(output.split('/')[-1])
-            index_cur_year = next((i for i, (idx, yr) in enumerate(indexes['i2y']) if yr == cur_year), None)
-            window_size = int(ns.split('_')[-1])
-            if index_cur_year - window_size >= 0:
-                start = indexes['i2y'][index_cur_year-window_size][0] if 'until' not in ns else 0
-                end = indexes['i2y'][index_cur_year][0] if 'until' in ns else indexes['i2y'][index_cur_year-window_size+1][0]
-                unigram = Team.get_unigram(vecs['member'][start:end])
-            else:
-                unigram = np.zeros(unigram.shape)
-
         # Prime a dict for train and valid loss
         train_valid_loss = dict()
         for i in range(len(splits['folds'].keys())):
-            train_valid_loss[i] = {'train': [], 'valid': []}
+            train_valid_loss[i] = {'train': [], 'valid': []} #tensorboard
 
         start_time = time.time()
         # Training K-fold
