@@ -1,39 +1,23 @@
-import pickle
-
-import numpy as np
+import pickle, numpy as np, scipy.sparse
 import pandas as pd
-import scipy.sparse
 import torch
 from scipy.sparse import lil_matrix
-from cmn.sparse_sgd import SparseSGD
+from .sparse_sgd import SparseSGD
 
 def get_class_data_params_n_optimizer(nr_classes, lr, device):
-    class_parameters = torch.tensor(np.ones(nr_classes) * np.log(1.0),
-                                    dtype=torch.float32,
-                                    requires_grad=True,
-                                    device=device)
-    optimizer_class_param = SparseSGD([class_parameters],
-                                      lr=lr,
-                                      momentum=0.9,
-                                      skip_update_zero_grad=True)
+    class_parameters = torch.tensor(np.ones(nr_classes) * np.log(1.0), dtype=torch.float32, requires_grad=True, device=device)
+    optimizer_class_param = SparseSGD([class_parameters], lr=lr, momentum=0.9, skip_update_zero_grad=True)
     print('Initialized class_parameters with: {}'.format(1.0))
     print('optimizer_class_param:')
     print(optimizer_class_param)
 
     return class_parameters, optimizer_class_param
 
-
 def adjust_learning_rate(model_initial_lr, optimizer, gamma, step):
     lr = model_initial_lr * (gamma ** step)
-    for param_group in optimizer.param_groups:
-        param_group['lr'] = lr
+    for param_group in optimizer.param_groups: param_group['lr'] = lr
 
-
-def apply_weight_decay_data_parameters(loss, class_parameter_minibatch, weight_decay):
-    loss = loss + 0.5 * weight_decay * (class_parameter_minibatch ** 2).sum()
-
-    return loss
-
+def apply_weight_decay_data_parameters(loss, class_parameter_minibatch, weight_decay): return (loss + 0.5 * weight_decay * (class_parameter_minibatch ** 2).sum())
 
 def generate_popular_and_nonpopular(vecs, input_path):
     """
@@ -53,8 +37,7 @@ def generate_popular_and_nonpopular(vecs, input_path):
     This function needs a **popularity matrix** that can be generated from Adila submodule.
     The objective of this function is to divide teams into popular and non-popular subsets.
     """
-    try:
-        popularity = pd.read_csv(input_path + '/popularity.csv', index_col='memberidx')
+    try: popularity = pd.read_csv(input_path + '/popularity.csv', index_col='memberidx')
     except FileNotFoundError:
         print(f"To start, copy and paste popularity file in {input_path}.")
         return FileNotFoundError

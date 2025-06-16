@@ -1,13 +1,33 @@
-import os, pickle, re, logging
+import os, pickle, re, logging, scipy.sparse
 from functools import partial
 log = logging.getLogger(__name__)
 
 import pkgmgr as opentf
 class Ntf:
-    def __init__(self): super(Ntf, self).__init__()
+    def __init__(self, output, pytorch, device, seed, cgf):
+        self.cfg = cgf
+        self.seed = seed
+        self.device = device
+        Ntf.torch = opentf.install_import(pytorch, 'torch')
+        opentf.set_seed(self.seed, Ntf.torch)
+        opentf.install_import('tensorboard==2.14.0', 'tensorboard')
+        self.output = output
+        if not os.path.isdir(output): os.makedirs(output)
+        self.writer = opentf.install_import('tensorboardX==2.6.2.2', 'tensorboardX', 'SummaryWriter')
+        class NtfDataset(Ntf.torch.utils.data.Dataset):
+            def __init__(self, input_matrix, output_matrix):
+                super().__init__()
+                self.input, self.output = input_matrix, output_matrix
+            def __len__(self): return self.input.shape[0]
+            def __getitem__(self, index):
+                if scipy.sparse.issparse(self.input): return Ntf.torch.as_tensor(self.input[index].toarray()).float(), Ntf.torch.as_tensor(self.output[index].toarray()).float()
+                else: return Ntf.torch.as_tensor(self.input[index]).float(), Ntf.torch.as_tensor(self.output[index].toarray()).float()
+        Ntf.dataset = NtfDataset
 
-    def learn(self, teamsvecs, indexes, splits, cfg, prev_model, output): pass
-    def test(self, teamsvecs, indexes, splits, cfg, model_path, on_train=False, per_epoch=False): pass
+    def name(self): return self.__class__.__name__.lower()
+
+    def learn(self, teamsvecs, indexes, splits, prev_model): pass
+    def test(self, teamsvecs, indexes, splits, model_path, on_train=False, per_epoch=False): pass
     def evaluate(self, teamsvecs, splits, model_path, on_train=False, per_instance=False, per_epoch=False):
         import pandas as pd
         import torch
@@ -131,5 +151,4 @@ class Ntf:
             plt.legend()
             plt.savefig(f'{model_path}/{pred_set}.roc.png', dpi=100, bbox_inches='tight')
             plt.show()
-
 

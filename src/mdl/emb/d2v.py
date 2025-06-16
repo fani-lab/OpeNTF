@@ -71,7 +71,7 @@ class D2v(T2v):
             if self.cfg.save_per_epoch:
                 import random
                 random.shuffle(self.data)
-                for epoch in range(1, self.cfg.e + 1):
+                for epoch in range(self.cfg.e):
                     self.model.train(self.data, total_examples=self.model.corpus_count, epochs=1)
                     delta = (self.model.alpha - self.model.min_alpha) / (self.cfg.e - 1)
                     self.model.alpha = max(self.model.alpha - delta, self.model.min_alpha)

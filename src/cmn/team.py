@@ -519,8 +519,6 @@ class Team(object):
             fig.savefig(f'{output}/{k}.pdf', dpi=100, bbox_inches='tight')
             plt.show()
 
-    @staticmethod
-    def get_unigram(membervecs): return membervecs.sum(axis=0)/membervecs.shape[0]
 
     # needs code review
     # def loc_heatmap_skills(dataset, output):

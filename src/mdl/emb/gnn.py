@@ -267,24 +267,26 @@ class Gnn(T2v):
         def _(e, loader, optimizer=None):
             if optimizer: self.model.train()
             else: self.model.eval()
-            loss = 0
+            e_loss = 0
             for batch in loader:
                 batch = batch.to(self.device)
                 if optimizer: optimizer.zero_grad()
                 x = self.model.forward(batch.edge_index)
                 pred = self.model.decode(x[batch.edge_label_index[0]], x[batch.edge_label_index[1]])
-                loss = self.torch.nn.functional.binary_cross_entropy_with_logits(pred, batch.edge_label.float())
+                loss = self.torch.nn.functional.binary_cross_entropy_with_logits(pred, batch.edge_label.float(), reduction='mean')
                 if optimizer: loss.backward(); optimizer.step();
-                loss += loss.item()
+                e_loss += loss.item()
+                #this is just the embeddings of the nodes in the current batch, not all the node embeddings
+                #better way is to render the all skill node embeddings
+                #self.writer.add_embedding(tag='node_emb' if optimizer else 'v_loss', mat=x, global_step=e)
 
-                self.writer.add_scalar(tag='t_loss' if optimizer else 'v_loss', scalar_value=loss, global_step=e)
-                self.writer.add_embedding(tag='t_loss' if optimizer else 'v_loss', mat=x, global_step=e)
+            self.writer.add_scalar(tag='t_loss' if optimizer else 'v_loss', scalar_value=e_loss, global_step=e)
 
-            return (loss / len(loader)) if len(loader) > 0 else float('inf')
+            return (e_loss / len(loader)) if len(loader) > 0 else float('inf')
 
         optimizer = self.torch.optim.Adam(self.model.parameters(), lr=self.cfg.model.lr)
         self.torch.cuda.empty_cache()
-        for e in range(1, self.cfg.model.e + 1):
+        for e in range(self.cfg.model.e):
             log.info(f'Epoch {e}, {opentf.textcolor["blue"]}Train Loss: {(t_loss:=_(e, train_l, optimizer)):.4f}{opentf.textcolor["reset"]}')
             log.info(f'Epoch {e}, {opentf.textcolor["magenta"]}Valid Loss: {(v_loss:=_(e, valid_l)):.4f}{opentf.textcolor["reset"]}')
             if self.cfg.model.save_per_epoch:
@@ -292,7 +294,7 @@ class Gnn(T2v):
                 self.torch.save({'model_state_dict': self.model.state_dict(), 'cfg': self.cfg, 'e': e, 't_loss': t_loss, 'v_loss': v_loss}, f'{output}.e{e}')
                 log.info(f'{self.name} model with {opentf.cfg2str(self.cfg.model)} saved at {output}.e{e}')
 
-        log.info(f'{opentf.textcolor["yellow"]}Test Loss: {(tst_loss:=_(self.cfg.model.e + 1, test_l)):.4f}')
+        log.info(f'{opentf.textcolor["yellow"]}Test Loss: {(tst_loss:=_(self.cfg.model.e, test_l)):.4f}')
         #self.model.eval()
         self.torch.save({'model_state_dict': self.model.state_dict(), 'cfg': self.cfg, 'e': e, 't_loss': t_loss, 'v_loss': v_loss, 'tst_loss': tst_loss}, output)
         log.info(f'{self.name} model with {opentf.cfg2str(self.cfg.model)} saved at {output}.')
@@ -302,11 +304,11 @@ class Gnn(T2v):
         optimizer = self.torch.optim.Adam(self.model.parameters(), lr=self.cfg.model.lr)
         loader = self.model.loader(batch_size=self.cfg.model.b, shuffle=True)  # num_workers=os.cpu_count() not working in windows! also, cuda won't engage for the loader if num_workers param is passed
         self.torch.cuda.empty_cache()
-        for e in range(1, self.cfg.model.e + 1):
+        for e in range(self.cfg.model.e):
             e_loss = 0; self.model.train()
             for pos_rw, neg_rw in loader:
                 optimizer.zero_grad()
-                loss = self.model.loss(pos_rw.to(self.device), neg_rw.to(self.device))
+                loss = self.model.loss(pos_rw.to(self.device), neg_rw.to(self.device)) #reduction is always 'mean'
                 loss.backward(); optimizer.step(); e_loss += loss.item()
             e_loss /= len(loader)
             log.info(f'Epoch {e}, {opentf.textcolor["blue"]}Train Loss: {e_loss:.4f}{opentf.textcolor["reset"]}')
