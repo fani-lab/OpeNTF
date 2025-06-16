@@ -71,7 +71,7 @@ train:
   nfolds: 3 #ends with nfolds models each with nfolds-1 train splits and one fold valid split, nfolds results, averaged on a single test split
   train_test_ratio: 0.85 #the nfolds will be on the trainig part.
   merge_teams_w_same_skills: True # for explanation >> https://github.com/fani-lab/OpeNTF/issues/156
-  step_ahead: #if streaming/temporal training. for now, it means that whatever are in the last [step_ahead] time interval will be the test set!
+  step_ahead: 1 #if streaming/temporal training. for now, it means that whatever are in the last [step_ahead] time interval will be the test set!
   save_per_epoch: False
 
 test:

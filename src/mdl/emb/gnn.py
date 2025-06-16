@@ -276,9 +276,11 @@ class Gnn(T2v):
                 loss = self.torch.nn.functional.binary_cross_entropy_with_logits(pred, batch.edge_label.float(), reduction='mean')
                 if optimizer: loss.backward(); optimizer.step();
                 e_loss += loss.item()
+                #this is just the embeddings of the nodes in the current batch, not all the node embeddings
+                #better way is to render the all skill node embeddings
+                #self.writer.add_embedding(tag='node_emb' if optimizer else 'v_loss', mat=x, global_step=e)
 
             self.writer.add_scalar(tag='t_loss' if optimizer else 'v_loss', scalar_value=e_loss, global_step=e)
-            self.writer.add_embedding(tag='t_loss' if optimizer else 'v_loss', mat=x, global_step=e)
 
             return (e_loss / len(loader)) if len(loader) > 0 else float('inf')
 
