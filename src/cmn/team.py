@@ -222,7 +222,7 @@ class Team(object):
     @classmethod
     def gen_teamsvecs(cls, datapath, output, cfg):
         pkl = f'{output}/teamsvecs.pkl'
-        hf = HFClient(repo_id="fani-lab/OpeNTF-teamsvecs", repo_type="dataset")
+        hf = HFClient(repo_id="fani-lab/OpeNTF", repo_type="dataset")
         try:
             return cls.__load_teamsvecs_from_file(cls, datapath, output, cfg, pkl)
         except FileNotFoundError as e:
