@@ -77,11 +77,11 @@ def run(cfg):
         domain_cls = get_class(cfg.data.domain)
 
         # this will call the Team.generate_sparse_vectors(), which itself may (lazy) call Team.read_data(), which itself may (lazy) call {Publication|Movie|Repo|Patent}.read_data()
-        vecs, indexes = domain_cls.gen_teamsvecs(cfg.data.source, cfg.data.output, cfg.data)
+        teamsvecs, indexes = domain_cls.gen_teamsvecs(cfg.data.source, cfg.data.output, cfg.data)
 
         #TODO? move this call for evaluation part?
         # skill coverage metric, all skills of each expert, all expert of each skills (supports of each skill, like in RarestFirst)
-        vecs['skillcoverage'] = domain_cls.gen_skill_coverage(vecs, cfg.data.output) # after we have a sparse vector, we create es_vecs from that
+        teamsvecs['skillcoverage'] = domain_cls.gen_skill_coverage(teamsvecs, cfg.data.output) # after we have a sparse vector, we create es_vecs from that
 
         year_idx = []
         for i in range(1, len(indexes['i2y'])): #e.g, [(0, 1900), (6, 1903), (14, 1906)] => the i shows the starting index for teams of the year
@@ -89,7 +89,7 @@ def run(cfg):
         year_idx.append(indexes['i2y'][-1])
         indexes['i2y'] = year_idx
 
-        splits = get_splits(vecs['skill'].shape[0], cfg.train.nfolds, cfg.train.train_test_ratio, cfg.data.output, cfg.seed, indexes['i2y'] if cfg.train.step_ahead else None, step_ahead=cfg.train.step_ahead)
+        splits = get_splits(teamsvecs['skill'].shape[0], cfg.train.nfolds, cfg.train.train_test_ratio, cfg.data.output, cfg.seed, indexes['i2y'] if cfg.train.step_ahead else None, step_ahead=cfg.train.step_ahead)
 
         if 'embedding' in cfg.data and cfg.data.embedding.class_method:
             # Get command-line overrides for embedding. Kinda tricky as we dynamically override a subconfig.
@@ -105,7 +105,7 @@ def run(cfg):
             cls = get_class(cls)
             t2v = cls(cfg.data.output, cfg.data.acceleration, cfg.data.embedding.config.model[cls.__name__.lower()])
             t2v.name = method
-            t2v.train(vecs, indexes, splits)
+            t2v.train(teamsvecs, indexes, splits)
 
     if any(c in cfg.cmd for c in ['train', 'test']):
 
@@ -120,13 +120,13 @@ def run(cfg):
 
         assert len(cfg.models.instances) > 0, f'{opentf.textcolor["red"]}No model instance for training! Check ./src/__config__.yaml and models.instances ... {opentf.textcolor["reset"]}'
 
-        if cfg.train.merge_teams_w_same_skills: domain_cls.merge_teams_by_skills(vecs, inplace=True)
+        if cfg.train.merge_teams_w_same_skills: domain_cls.merge_teams_by_skills(teamsvecs, inplace=True)
 
         if 'embedding' in cfg.data and cfg.data.embedding.class_method:
             # t2v object knows the embedding method and ...
             skill_vecs = t2v.get_dense_vecs(vectype='skill')
-            assert skill_vecs.shape[0] == vecs['skill'].shape[0], f'{opentf.textcolor["red"]}Incorrect number of embeddings for teams subset of skills!{opentf.textcolor["reset"]}'
-            vecs['skill'] = skill_vecs
+            assert skill_vecs.shape[0] == teamsvecs['skill'].shape[0], f'{opentf.textcolor["red"]}Incorrect number of embeddings for teams subset of skills!{opentf.textcolor["reset"]}'
+            teamsvecs['skill'] = skill_vecs
 
         # Get command-line overrides for models. Kinda tricky as we dynamically override a subconfig.
         # Use '+models.{...}=value' to override
@@ -135,20 +135,25 @@ def run(cfg):
         mdlcfg = OmegaConf.merge(OmegaConf.load(cfg.models.config), OmegaConf.from_dotlist(mdl_overrides))
         mdlcfg.seed = cfg.seed
         mdlcfg.pytorch = cfg.pytorch
+        mdlcfg.tntf.tfolds = cfg.train.nfolds
+        mdlcfg.tntf.step_ahead = cfg.train.step_ahead
+        mdlcfg.pytorch = cfg.pytorch
         OmegaConf.resolve(mdlcfg)
         cfg.models.config = mdlcfg
         for m in cfg.models.instances:
-            import mdl # required for all models. Also, mdl/__init__.py should expose all submodules
-            models[m] = eval(m, {'mdl': mdl})
-            # if m_name.endswith('a1'): vecs_['skill'] = lil_matrix(scipy.sparse.hstack((vecs_['skill'], lil_matrix(np.ones((vecs_['skill'].shape[0], 1))))))
+            cls_method = m.split('_')
+            cls = get_class(cls_method[0])
+            output_ = (t2v.modelfilepath + '_' if t2v else cfg.data.output) + f'/{cls.__name__.lower()}' #cannot have file and folder with same name if t2v
+            models[m] = cls(output_, cfg.pytorch, cfg.acceleration, cfg.seed, cfg.models.config[cls.__name__.lower()])
+            if len(cls_method) > 1: #e.g., in mdl.tntf.tNtf that we need the core model
+                cls = get_class(cls_method[1])
+                models[m].model = cls(output_ + f'/{cls.__name__.lower()}', cfg.pytorch, cfg.acceleration, cfg.seed, cfg.models.config[cls.__name__.lower()])
             log.info(f'Training team recommender instance {m} ... ')
             # find a way to show model-emb pair setting
+            if 'train' in cfg.cmd: models[m].learn(teamsvecs, indexes, splits, None)
+
+            # if m_name.endswith('a1'): vecs_['skill'] = lil_matrix(scipy.sparse.hstack((vecs_['skill'], lil_matrix(np.ones((vecs_['skill'].shape[0], 1))))))
             # make_popular_and_nonpopular_matrix(vecs_, data_list[0])
-
-            output_ = (t2v.modelfilepath if t2v else cfg.data.output) + f'_{models[m].name()}' #cannot have file and folder with same name if t2v
-            if not os.path.isdir(output_): os.makedirs(output_)
-
-            if 'train' in cfg.cmd: models[m].learn(vecs, indexes, splits, cfg.models.config[models[m].model.__class__.__name__.lower()] if isinstance(models[m], mdl.tntf.tNtf) else cfg.models.config[models[m].__class__.__name__.lower()], None, output_)
 
         # # streaming scenario (no vector for time)
         # if 'tfnn' in model_list: models['tfnn'] = tNtf(Fnn(), cfg.train.nfolds, cfg.train.step_ahead)

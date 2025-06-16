@@ -3,13 +3,13 @@ import numpy as np
 from .ntf import Ntf
 
 class Rnd(Ntf):
-    def __init__(self, pytorch): super(Rnd, self).__init__(pytorch)
+    def __init__(self, output, device, pytorch, seed, cgf): super(Rnd, self).__init__(output, device, pytorch, seed, cgf)
 
     def test(self, model_path, splits, indexes, vecs, params, on_train_valid_set=False, per_epoch=False, merge_skills=False):
         X_test = vecs['skill'][splits['test'], :]
         y_test = vecs['member'][splits['test']]
         test_matrix = Ntf.dataset(X_test, y_test)
-        test_dl = Ntf.torch.utils.data.DataLoader(test_matrix, batch_size=params['b'], shuffle=True, num_workers=0)
+        test_dl = Ntf.torch.utils.data.DataLoader(test_matrix, batch_size=self.cfg.b, shuffle=True)# num_workers=os.cpu_count() not working in windows! also, cuda won't engage for the loader if num_workers param is passed
 
         for foldidx in splits['folds'].keys():
             Ntf.torch.cuda.empty_cache()

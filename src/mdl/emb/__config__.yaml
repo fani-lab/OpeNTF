@@ -44,7 +44,7 @@ model:
         #d8.e100.w10.d2v.dm1.skill  # skill, team
         #d9.e100.w10.d2v.dm1.skill  # if not exists, train from scratch!
 
-    pytorch: #will be overriden dynamically in ./src/main.py from root ./config.yml
+    pytorch: #will be overriden dynamically in ./src/main.py from root ./__config__.yaml
     seed: ${model.seed}
     model:   #dummy tag as placeholder. don't worry or touch it.
 

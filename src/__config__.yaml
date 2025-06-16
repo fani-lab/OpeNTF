@@ -56,12 +56,12 @@ data: #required for 'prep' step
 
 models:
   instances:
-    - mdl.rnd.Rnd('${pytorch}')
-    - mdl.fnn.Fnn() #input skills can be multihot (default), embeddings by d2v, n2v, m2v, ... see above data.embedding.class_method
-    #- mdl.bnn.Bnn()
-    #- mdl.nmt.Nmt()
+    - mdl.rnd.Rnd
+    - mdl.fnn.Fnn #input skills can be multihot (default), embeddings by d2v, n2v, m2v, ... see above data.embedding.class_method
+    #- mdl.bnn.Bnn
+    #- mdl.nmt.Nmt
     #- mdl.tnmt.tNmt
-    - mdl.tntf.tNtf(mdl.rnd.Rnd('${pytorch}'), ${train.nfolds}, ${train.step_ahead})   #underlying base model could be fnn and bnn. future: tgnn?
+    - mdl.tntf.tNtf_mdl.rnd.Rnd   #underlying base model could be fnn and bnn. future: tgnn?
     #- mdl.caser.Caser #external baseline
     #- mdl.rrn.Rrn     #external baseline
 

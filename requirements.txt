@@ -25,11 +25,14 @@ python-dateutil==2.9
 # gensim==4.3.3 #needs numpy 1.24.4
 ## mdl.emb.d2v.D2v.train()
 # torch==2.2.2 --index-url https://download.pytorch.org/whl/cu124
-## mdl.emb.gnn.Gnn.__init__() __config__.yaml.pytorch
+## mdl.emb.gnn.Gnn.__init__() ./mdl/emb/__config__.yaml.pytorch
+## mdl.ntf.Ntf.__init__() ./mdl/__config__.yaml.pytorch
 # torch_geometric==2.6.1 torch_cluster==1.6.3 torch_sparse==0.6.18 torch_scatter==2.1.2 -f https://data.pyg.org/whl/torch-{Gnn.torch.__version__}.html
 ## mdl.emb.gnn.Gnn.__init__()
+## mdl.ntf.Ntf.__init__()
 # tensorboard==2.14.0 tensorboardX==2.6.2.2
 ## mdl.emb.gnn.Gnn.__init__()
+## mdl.ntf.Ntf.__init__()
 
 # yet to be reached and checked
 #pytrec-eval-terrier==0.5.2
