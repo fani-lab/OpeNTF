@@ -228,9 +228,10 @@ class Team(object):
             log.info(f"Loading teamsvecs matrices from {pkl} ...")
             return __load_teamsvecs_from_file(datapath, output, cfg, pkl)
         except FileNotFoundError as e:
-            # NOTE: in hugging face, the pkl file is in the same path as output, except the '../' is removed
-            if(opentf.get_from_hf(repo_type='dataset', filename=pkl.replace('../', ''), path='../') and
-               opentf.get_from_hf(repo_type='dataset', filename=f'{output.replace("../","")}/indexes.pkl', path='../')):
+            # retry to download from hugging face. The pkl file is in the same path as output, except the '../' is removed
+            if( 'hf' in cfg and cfg.hf and
+                opentf.get_from_hf(repo_type='dataset', filename=pkl.replace('../', '')) and
+                opentf.get_from_hf(repo_type='dataset', filename=f'{output.replace("../","")}/indexes.pkl')):
                 return __load_teamsvecs_from_file(datapath, output, cfg, pkl)
             
             log.info("Teamsvecs matrices and/or indexes not found! Generating ...")

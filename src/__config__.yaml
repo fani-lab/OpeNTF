@@ -18,6 +18,7 @@ cmd:
   #- agg
   #- fair
 data: #required for 'prep' step
+  hf: True
   domain:
     cmn.publication.Publication
     #cmn.movie.Movie

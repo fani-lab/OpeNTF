@@ -60,9 +60,10 @@ textcolor = {
     'reset':  '\033[0m'
 }
 hf_token = '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'
-def get_from_hf(repo_type, filename, path) -> bool:
+def get_from_hf(repo_type, filename) -> bool:
     hf_api = install_import('huggingface-hub==0.33.0', 'huggingface_hub', 'HfApi')()
-    log.info(f"Downloading {filename} from huggingface ...")
+    repo_id = 'fani-lab/OpeNTF'
+    log.info(f"Downloading {filename} from https://huggingface.co/{repo_type}/{repo_id} ...")
     # if the file is public, token=hf_token is ignored
-    try: return hf_api.hf_hub_download(repo_id='fani-lab/OpeNTF', repo_type=repo_type, filename=filename, local_dir=path, force_download=True, token=hf_token)
+    try: return hf_api.hf_hub_download(repo_id='fani-lab/OpeNTF', repo_type=repo_type, filename=filename, local_dir='../', force_download=True, token=hf_token)
     except Exception as e: log.error(f'Error downloading {filename} from {repo_id}! {e}'); return None
