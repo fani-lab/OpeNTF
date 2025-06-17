@@ -61,8 +61,15 @@ class Fnn(Ntf):
         mask_upweight_0s = (y == 0)
         weight_matrix = self.unigram.expand(y.shape[0], -1)
         sampling_weights = Ntf.torch.where(mask_upweight_0s, weight_matrix, Ntf.torch.zeros_like(weight_matrix))
-        # use torch.multinomial to sample ns negatives per team instance (row or batch item)
-        topk_indices = Ntf.torch.multinomial(sampling_weights, self.cfg.ns, replacement=False)  # [B, n]
+
+        # RuntimeError: invalid multinomial distribution (sum of probabilities <= 0)
+        # happens very rarely (like in toy imdb) for unigram_b where the frequencies of ALL neg experts are 0
+        # so the final vector of prob weights are all zero
+        row_sums = sampling_weights.sum(dim=1)
+        uniform_weights = Ntf.torch.ones_like(sampling_weights) #fallback to uniform
+        sampling_weights[row_sums == 0] = uniform_weights[row_sums == 0]
+
+        topk_indices = Ntf.torch.multinomial(sampling_weights, self.cfg.ns, replacement=False)  # [batch, ns]
         return topk_indices
 
     def ns_unigram_batch(self, y):

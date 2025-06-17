@@ -28,15 +28,15 @@ jobs:
 
           - config: '+id=025 cmd=train data.domain=cmn.repository.Repository data.source=../data/gith/toy.repos.csv data.output=../output/gith/toy.repos.csv ~data.filter ~data.embedding'
           - config: '+id=026 cmd=train data.domain=cmn.repository.Repository data.source=../data/gith/toy.repos.csv data.output=../output/gith/toy.repos.csv ~data.filter +models.fnn.save_per_epoch=True'
-          - config: '+id=025 cmd=train data.domain=cmn.repository.Repository data.source=../data/gith/toy.repos.csv data.output=../output/gith/toy.repos.csv ~data.filter ~data.embedding +models.batch_size=2 +models.fnn.nsd=uniform'
-          - config: '+id=025 cmd=train data.domain=cmn.repository.Repository data.source=../data/gith/toy.repos.csv data.output=../output/gith/toy.repos.csv ~data.filter ~data.embedding +models.batch_size=2 +models.fnn.nsd=unigram'
-          - config: '+id=025 cmd=train data.domain=cmn.repository.Repository data.source=../data/gith/toy.repos.csv data.output=../output/gith/toy.repos.csv ~data.filter ~data.embedding +models.batch_size=2 +models.fnn.nsd=unigram_b'
+          - config: '+id=027 cmd=train data.domain=cmn.repository.Repository data.source=../data/gith/toy.repos.csv data.output=../output/gith/toy.repos.csv ~data.filter ~data.embedding +models.batch_size=2 +models.fnn.nsd=uniform'
+          - config: '+id=028 cmd=train data.domain=cmn.repository.Repository data.source=../data/gith/toy.repos.csv data.output=../output/gith/toy.repos.csv ~data.filter ~data.embedding +models.batch_size=2 +models.fnn.nsd=unigram'
+          - config: '+id=029 cmd=train data.domain=cmn.repository.Repository data.source=../data/gith/toy.repos.csv data.output=../output/gith/toy.repos.csv ~data.filter ~data.embedding +models.batch_size=2 +models.fnn.nsd=unigram_b'
 
           - config: '+id=036 cmd=train data.domain=cmn.patent.Patent data.source=../data/uspt/toy.patent.tsv data.output=../output/uspt/toy.patent.tsv ~data.filter ~data.embedding'
           - config: '+id=037 cmd=train data.domain=cmn.patent.Patent data.source=../data/uspt/toy.patent.tsv data.output=../output/uspt/toy.patent.tsv ~data.filter +models.fnn.save_per_epoch=True'
-          - config: '+id=036 cmd=train data.domain=cmn.patent.Patent data.source=../data/uspt/toy.patent.tsv data.output=../output/uspt/toy.patent.tsv ~data.filter ~data.embedding +models.batch_size=2 +models.fnn.nsd=uniform'
-          - config: '+id=036 cmd=train data.domain=cmn.patent.Patent data.source=../data/uspt/toy.patent.tsv data.output=../output/uspt/toy.patent.tsv ~data.filter ~data.embedding +models.batch_size=2 +models.fnn.nsd=unigram'
-          - config: '+id=036 cmd=train data.domain=cmn.patent.Patent data.source=../data/uspt/toy.patent.tsv data.output=../output/uspt/toy.patent.tsv ~data.filter ~data.embedding +models.batch_size=2 +models.fnn.nsd=unigram_b'
+          - config: '+id=038 cmd=train data.domain=cmn.patent.Patent data.source=../data/uspt/toy.patent.tsv data.output=../output/uspt/toy.patent.tsv ~data.filter ~data.embedding +models.batch_size=2 +models.fnn.nsd=uniform'
+          - config: '+id=039 cmd=train data.domain=cmn.patent.Patent data.source=../data/uspt/toy.patent.tsv data.output=../output/uspt/toy.patent.tsv ~data.filter ~data.embedding +models.batch_size=2 +models.fnn.nsd=unigram'
+          - config: '+id=040 cmd=train data.domain=cmn.patent.Patent data.source=../data/uspt/toy.patent.tsv data.output=../output/uspt/toy.patent.tsv ~data.filter ~data.embedding +models.batch_size=2 +models.fnn.nsd=unigram_b'
 
       # Set to false if you want parallel runs:
       fail-fast: false
