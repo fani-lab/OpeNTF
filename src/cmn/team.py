@@ -2,7 +2,6 @@ import os, scipy.sparse, pickle, numpy as np, logging
 from collections import Counter
 from functools import partial
 from dateutil import parser
-from cmn.hf_client import HFClient
 
 log = logging.getLogger(__name__)
 
@@ -211,26 +210,30 @@ class Team(object):
                               f'Based on the underlying dataset/domain, it may be valid like in uspt, or invalid like dblp.\n{e}')
 
         return (True, '')
-    
-    def __load_teamsvecs_from_file(cls, datapath, output, cfg, pkl):
-        log.info(f"Loading teamsvecs matrices from {pkl} ...")
-        with open(pkl, 'rb') as infile: vecs = pickle.load(infile)
-        indexes, _ = cls.read_data(datapath, output, cfg, indexes_only=True)
-        log.info(f"Teamsvecs matrices for skills {vecs['skill'].shape}, members {vecs['member'].shape}, and locations {vecs['loc'].shape if vecs['loc'] is not None else None} are loaded.")
-        return vecs, indexes
-    
+
     @classmethod
     def gen_teamsvecs(cls, datapath, output, cfg):
+        def __load_teamsvecs_from_file(datapath, output, cfg, pkl):
+            with open(pkl, 'rb') as infile: vecs = pickle.load(infile)
+            indexes, _ = cls.read_data(datapath, output, cfg, indexes_only=True)
+            log.info(f"Teamsvecs matrices and indexes for skills {vecs['skill'].shape}, members {vecs['member'].shape}, and locations {vecs['loc'].shape if vecs['loc'] is not None else None} are loaded.")
+            assert vecs['skill'].shape[1] == len(indexes['i2s']) or \
+                   vecs['member'].shape[1] == len(indexes['i2c']) or \
+                  (vecs['loc'] is not None and vecs['loc'].shape[1] == len(indexes['i2l'])) , \
+                f'{opentf.textcolor["red"]}Incompatible teamsvecs and indexes!{opentf.textcolor["reset"]}'
+            return vecs, indexes
+
         pkl = f'{output}/teamsvecs.pkl'
-        hf = HFClient(repo_id="fani-lab/OpeNTF", repo_type="dataset")
         try:
-            return cls.__load_teamsvecs_from_file(cls, datapath, output, cfg, pkl)
+            log.info(f"Loading teamsvecs matrices from {pkl} ...")
+            return __load_teamsvecs_from_file(datapath, output, cfg, pkl)
         except FileNotFoundError as e:
             # NOTE: in hugging face, the pkl file is in the same path as output, except the '../' is removed
-            if(pkl.startswith("../") and hf.download_file(filename=pkl[3:])):
-                return cls.__load_teamsvecs_from_file(cls, datapath, output, cfg, pkl)
+            if(opentf.get_from_hf(repo_type='dataset', filename=pkl.replace('../', ''), path='../') and
+               opentf.get_from_hf(repo_type='dataset', filename=f'{output.replace("../","")}/indexes.pkl', path='../')):
+                return __load_teamsvecs_from_file(datapath, output, cfg, pkl)
             
-            log.info("Teamsvecs matrices not found! Generating ...")
+            log.info("Teamsvecs matrices and/or indexes not found! Generating ...")
             indexes, teams = cls.read_data(datapath, output, cfg, indexes_only=False)
 
             # there should be no difference in content of teavsvecs when using different acceleration method

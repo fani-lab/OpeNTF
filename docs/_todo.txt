@@ -2,10 +2,12 @@ multilayer neural classifiers
 
 fnn_weighted_bce
 fnn_neg_samplings
-fnn_cl
 emb_fnn_*
 
 bnn_*
+
+{fnn,bnn}_cl
+
 
 
 Let's start the transfer part for now. I'll complete the tasks when I come to e2e

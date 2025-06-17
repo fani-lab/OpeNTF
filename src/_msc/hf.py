@@ -1,8 +1,6 @@
-import os 
-from huggingface_hub import HfApi
-from dotenv import load_dotenv
+import os
 
-load_dotenv()
+import pkgmgr as opentf
 
 '''
 Obtain hf token:
@@ -13,7 +11,9 @@ Obtain hf token:
     - Write access to contents/settings of selected repos
 4.In src/.env, add the token to the line with HF_API_TOKEN
 '''
-hf_api = HfApi(token=os.getenv("HF_API_TOKEN"))
+
+HfApi = opentf.install_import('huggingface-hub==0.33.0', 'huggingface_hub', 'HfApi')
+hf_api = HfApi(token=opentf.hf_token)
 
 
 # Upload as a folder
