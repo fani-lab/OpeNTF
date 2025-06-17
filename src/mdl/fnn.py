@@ -1,4 +1,4 @@
-import os, re, random, numpy as np, logging
+import os, re, random, numpy as np, logging, time
 
 log = logging.getLogger(__name__)
 
@@ -31,91 +31,53 @@ class Fnn(Ntf):
 
         return Model(self.cfg, input_size, output_size)
     def cross_entropy(self, y_, y):
-        if self.cfg.nsd == 'uniform': return self.ns_uniform(y_, y)
-        if self.cfg.nsd == 'unigram': return self.ns_unigram(y_, y)
-        if self.cfg.nsd == 'unigram_b': return self.ns_unigram_mini_batch(y_, y)
-        if self.cfg.nsd == 'inverse_unigram': return self.ns_inverse_unigram(y_, y)
-        if self.cfg.nsd == 'inverse_unigram_b': return self.ns_inverse_unigram_mini_batch(y_, y)
-        return Ntf.torch.nn.functional.binary_cross_entropy_with_logits(y_, y, weight=Ntf.torch.where(y == 1, self.cfg.tpw, self.cfg.tnw), reduction='sum')
+        condition = (y == 1) # positive (correct) experts
+        if self.cfg.nsd == 'uniform': topk_indices = self.ns_uniform(y) #upscale selected neg experts
+        elif self.cfg.nsd == 'unigram': topk_indices = self.ns_unigram(y)
+        elif self.cfg.nsd == 'unigram_b': topk_indices = self.ns_unigram_batch(y)
+        # elif self.cfg.nsd == 'inverse_unigram': weight = self.ns_inverse_unigram(y_, y)
+        # elif self.cfg.nsd == 'inverse_unigram_b': weight = self.ns_inverse_unigram_mini_batch(y_, y)
+        if self.cfg.nsd:
+            selected_mask = Ntf.torch.zeros_like(y, dtype=Ntf.torch.bool)
+            batch_indices = Ntf.torch.arange(y.shape[0], device=y.device).unsqueeze(1).expand(-1, self.cfg.ns)  # shape [B, ns]
+            selected_mask[batch_indices, topk_indices] = True
+            condition = condition | selected_mask #those selected neg experts, same loss weight as pos expert
 
-    def ns_uniform(self, logits, targets):
-        targets = targets.squeeze(1)
-        logits = logits.squeeze(1)
-        random_samples = Ntf.torch.zeros_like(targets)
-        for b in range(targets.shape[0]):
-            k_neg_idx = Ntf.torch.randint(0, targets.shape[1], (neg_samples,))
-            cor_idx = Ntf.torch.nonzero(targets[b].cpu(), as_tuple=True)[0]
-            for idx in k_neg_idx:
-                if idx not in cor_idx: random_samples[b][idx] = 1
-        return (-targets * Ntf.torch.log(logits) - random_samples * Ntf.torch.log(1 - logits)).sum()
+        weight = Ntf.torch.where(condition, self.cfg.tpw, self.cfg.tnw) # the rest neg experts. if this is 0, pure neg sampling
+        return Ntf.torch.nn.functional.binary_cross_entropy_with_logits(y_, y, weight, reduction='sum')
 
-    def ns_unigram(self, logits, targets, unigram):
-        targets = targets.squeeze(1)
-        logits = logits.squeeze(1)
-        random_samples = torch.zeros_like(targets)
+    def ns_uniform(self, y):
+        # fully batch-wise and gpu-friendly
+        mask_upweight_0s = (y == 0)
+        rand_scores = Ntf.torch.rand_like(y, dtype=Ntf.torch.float)
+        rand_scores = rand_scores.masked_fill(~mask_upweight_0s, -1.0)
+        # for each row, get top-n random scores among negatives
+        # if fewer than n negatives, topk will still return n, but may duplicate
+        _ , topk_indices = Ntf.torch.topk(rand_scores, k=self.cfg.ns, dim=1)
+        return topk_indices
 
-        for b in range(targets.shape[0]):
-            k_neg_idx = list(set(random.choices(range(targets.shape[1]), weights=np.array(unigram)[0], k=neg_samples)))
-            cor_idx = torch.nonzero(targets[b], as_tuple=True)[0]
-            for idx in k_neg_idx:
-                if idx not in cor_idx: random_samples[b][idx] = 1
-        return (-targets * torch.log(logits) - random_samples * torch.log(1 - logits)).sum()
+    def ns_unigram(self, y):
+        # fully batch-wise and gpu-friendly
+        mask_upweight_0s = (y == 0)
+        weight_matrix = self.unigram.expand(y.shape[0], -1)
+        sampling_weights = Ntf.torch.where(mask_upweight_0s, weight_matrix, Ntf.torch.zeros_like(weight_matrix))
+        # use torch.multinomial to sample ns negatives per team instance (row or batch item)
+        topk_indices = Ntf.torch.multinomial(sampling_weights, self.cfg.ns, replacement=False)  # [B, n]
+        return topk_indices
 
-    def ns_unigram_mini_batch(self, logits, targets):
-        targets = targets.squeeze(1)
-        logits = logits.squeeze(1)
-        random_samples = torch.zeros_like(targets)
-        n_paper_per_author = torch.sum(targets, dim=0) + 1
-        unigram = (n_paper_per_author / (targets.shape[0] + targets.shape[1])).cpu()
-
-        for b in range(targets.shape[0]):
-            k_neg_idx = list(set(random.choices(range(targets.shape[1]), weights=unigram, k=neg_samples)))
-            cor_idx = torch.nonzero(targets[b], as_tuple=True)[0]
-            for idx in k_neg_idx:
-                if idx not in cor_idx:
-                    random_samples[b][idx] = 1
-        return (-targets * torch.log(logits) - random_samples * torch.log(1 - logits)).sum()
-
-    def ns_inverse_unigram(self, logits, targets, unigram):
-        targets = targets.squeeze(1)
-        logits = logits.squeeze(1)
-        random_samples = torch.zeros_like(targets)
-        for b in range(targets.shape[0]):
-            rand = np.random.rand(targets.shape[1])
-            neg_rands = (rand > unigram) * 1
-            neg_idx = torch.nonzero(torch.tensor(neg_rands), as_tuple=True)[1]
-            k_neg_idx = np.random.choice(neg_idx, neg_samples)
-            cor_idx = torch.nonzero(targets[b], as_tuple=True)[0]
-            for idx in k_neg_idx:
-                if idx not in cor_idx: random_samples[b][idx] = 1
-        return (-targets * torch.log(logits) - random_samples * torch.log(1 - logits)).sum()
-
-    def ns_inverse_unigram_mini_batch(self, logits, targets):
-        targets = targets.squeeze(1)
-        logits = logits.squeeze(1)
-        random_samples = torch.zeros_like(targets)
-        n_paper_per_author = torch.sum(targets, dim=0) + 1
-        unigram = (n_paper_per_author / (targets.shape[0] + targets.shape[1])).cpu()
-
-        for b in range(targets.shape[0]):
-            rand = torch.rand(targets.shape[1])
-            neg_rands = (rand > unigram) * 1
-            neg_idx = torch.nonzero(torch.tensor(neg_rands), as_tuple=True)[0]
-            k_neg_idx = np.random.choice(neg_idx, neg_samples)
-            cor_idx = torch.nonzero(targets[b], as_tuple=True)[0]
-            for idx in k_neg_idx:
-                if idx not in cor_idx: random_samples[b][idx] = 1
-        return (-targets * torch.log(logits) - random_samples * torch.log(1 - logits)).sum()
+    def ns_unigram_batch(self, y):
+        self.unigram = Ntf.torch.tensor(y.sum(axis=0) / y.shape[0]).to(self.device)  # frequency of each expert in a batch
+        return self.ns_unigram(y)
 
     def learn(self, teamsvecs, indexes, splits, prev_model):
         input_size = teamsvecs['skill'].shape[1]
         output_size = teamsvecs['member'].shape[1]
 
-        if self.cfg.nsd == 'unigram': self.unigram = teamsvecs['member'].sum(axis=0)/teamsvecs['member'].shape[0] # frequency of each expert in all previous teams
+        if self.cfg.nsd == 'unigram': self.unigram = Ntf.torch.tensor(teamsvecs['member'].sum(axis=0)/teamsvecs['member'].shape[0]).to(self.device) # frequency of each expert in all previous teams
         #for 'unigram_b', we can calculate it based on y or y_ as it's size is the size of the batch
 
+        w = self.writer(log_dir=f'{self.output}/logs4tboard/run_{int(time.time())}')
         for foldidx in splits['folds'].keys():
-            w = self.writer(log_dir=f'{self.output}/logs4tfboard/f{foldidx}')
 
             X_train = teamsvecs['skill'][splits['folds'][foldidx]['train'], :]
             y_train = teamsvecs['member'][splits['folds'][foldidx]['train']]
@@ -195,7 +157,7 @@ class Fnn(Ntf):
 
             self.torch.save({'model_state_dict': self.model.state_dict(), 'cfg': self.cfg, 'f': foldidx, 'e': e, 't_loss': t_loss, 'v_loss': v_loss}, f'{self.output}/f{foldidx}.pt')
             log.info(f'{self.name()} model with {opentf.cfg2str(self.cfg)} saved at {self.output}/f{foldidx}.pt')
-            w.close()
+        w.close()
 
 def test(self, model_path, splits, indexes, vecs, params, on_train_valid_set=False, per_epoch=False, merge_skills=False):
         print(f'\n.............. starting test .................\n')

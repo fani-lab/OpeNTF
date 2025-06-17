@@ -1,7 +1,5 @@
 multilayer neural classifiers
 
-fnn_weighted_bce
-fnn_neg_samplings
 emb_fnn_*
 
 bnn_*

@@ -10,7 +10,7 @@ class Ntf:
         self.device = device
         Ntf.torch = opentf.install_import(pytorch, 'torch')
         opentf.set_seed(self.seed, Ntf.torch)
-        opentf.install_import('tensorboard==2.14.0', 'tensorboard')
+        opentf.install_import('tensorboard==2.14.0 protobuf==3.20', 'tensorboard')
         self.output = output
         if not os.path.isdir(output): os.makedirs(output)
         self.writer = opentf.install_import('tensorboardX==2.6.2.2', 'tensorboardX', 'SummaryWriter')

@@ -59,7 +59,7 @@ textcolor = {
     'magenta':'\033[95m',
     'reset':  '\033[0m'
 }
-hf_token = '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'
+hf_token = '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' # this is a read-only token
 def get_from_hf(repo_type, filename) -> bool:
     hf_api = install_import('huggingface-hub==0.33.0', 'huggingface_hub', 'HfApi')()
     repo_id = 'fani-lab/OpeNTF'

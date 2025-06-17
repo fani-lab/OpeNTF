@@ -30,7 +30,7 @@ python-dateutil==2.9
 # torch_geometric==2.6.1 torch_cluster==1.6.3 torch_sparse==0.6.18 torch_scatter==2.1.2 -f https://data.pyg.org/whl/torch-{Gnn.torch.__version__}.html
 ## mdl.emb.gnn.Gnn.__init__()
 ## mdl.ntf.Ntf.__init__()
-# tensorboard==2.14.0 tensorboardX==2.6.2.2
+# tensorboard==2.14.0 tensorboardX==2.6.2.2 protobuf==3.20
 ## mdl.emb.gnn.Gnn.__init__()
 ## mdl.ntf.Ntf.__init__()
 
