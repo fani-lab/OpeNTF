@@ -1,12 +1,15 @@
 multilayer neural classifiers
 
-emb_fnn_*
+    bnn_*
 
-bnn_*
+    emb_fnn_{train/test}
 
-{fnn,bnn}_cl
+    {emb}_{fnn,bnn}_test
 
+    {emb}_{fnn,bnn}_cl_{train/test} >> future
 
+-- end2end
+make a connection between train/vali/test splits of teams and train/valid/test edge lists
 
 Let's start the transfer part for now. I'll complete the tasks when I come to e2e
 
@@ -20,10 +23,8 @@ Our graph are mainly hetero, but gnn methods are mainly designed for homo graph.
 For strict hetero, we will use HeteroConv that wraps gnn methods per node type
 Indeed, it is worth study a mixture of gnn methods for node types :D
 
-to do:
 
-update to readme for cmn layer and main readme 
-
+update to readme for cmn layer and main readme
 
 d2v
 -- strict splits of train/valid/test. I think even if it sees everything, does not produce good embeddings
@@ -63,9 +64,6 @@ han >> pure hetero like m2v
 lant >> not pyg friendly
 gine >> edge-based. not relevant for now as we don't have edge attributes
 
--- end2end
-make a connection between train/vali/test splits of teams and train/valid/test edge lists
-
 node2vec >> we don't have it! but we can, right?
 metapath2vec >> we didnot have it! but we can, right?
 why not d2v when we have team, skill, and member vectors?
@@ -73,6 +71,7 @@ why not d2v when we have team, skill, and member vectors?
 update/check cmn.team.Team.get_stats()
 update/check cmn.patent.Patent.get_stats()
 make cmn.team.Team.get_stats() gpu-friendly
+make cmn.team.Team.get_teamsvecs() gpu-friendly (Kap's pr)
 
 =======================================================
 

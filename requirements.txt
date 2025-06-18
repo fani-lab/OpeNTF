@@ -33,6 +33,9 @@ python-dateutil==2.9
 # tensorboard==2.14.0 tensorboardX==2.6.2.2 protobuf==3.20
 ## mdl.emb.gnn.Gnn.__init__()
 ## mdl.ntf.Ntf.__init__()
+#bayesian-torch==0.5.0
+## mdl.bnn.Bnn.__init__()
+
 
 # yet to be reached and checked
 #pytrec-eval-terrier==0.5.2
@@ -41,4 +44,3 @@ python-dateutil==2.9
 #reranking==0.3.6 # required by Adila submodule
 #fairsearchcore==1.0.4 # required by Adila submodule
 ##schedule
-#bayesian-torch

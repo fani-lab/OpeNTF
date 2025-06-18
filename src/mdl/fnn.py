@@ -1,4 +1,4 @@
-import os, re, random, numpy as np, logging, time
+import os, re, numpy as np, logging, time
 
 log = logging.getLogger(__name__)
 
@@ -29,8 +29,8 @@ class Fnn(Ntf):
                 #leave the sigmoid and clamping to be handled by the BCEWithLogitsLoss()
                 #return Ntf.torch.clamp(Ntf.torch.sigmoid(x), min=1.e-6, max=1. - 1.e-6)
 
-        return Model(self.cfg, input_size, output_size)
-    def cross_entropy(self, y_, y):
+        self.model = Model(self.cfg, input_size, output_size)
+    def bxe(self, y_, y):
         condition = (y == 1) # positive (correct) experts
         if self.cfg.nsd == 'uniform': topk_indices = self.ns_uniform(y) #upscale selected neg experts
         elif self.cfg.nsd == 'unigram': topk_indices = self.ns_unigram(y)
@@ -96,7 +96,7 @@ class Fnn(Ntf):
             data_loaders = {'train': train_dl, 'valid': valid_dl}
 
             # Initialize network
-            self.model = self.init(input_size=input_size, output_size=output_size)
+            self.init(input_size=input_size, output_size=output_size)
             if prev_model: self.model.load_state_dict(Ntf.torch.load(prev_model[foldidx]))
             self.model.to(self.device)
 
@@ -131,8 +131,8 @@ class Fnn(Ntf):
                             #     loss = self.cross_entropy(y_, y)
                             #     cdp_loss = apply_weight_decay_data_parameters(loss, class_parameter_minibatch=class_parameters, weight_decay=0.9)
                             # else:
-                            loss = self.cross_entropy(y_, y) #reduction is 'sum' due to sparsity of multi-hot expert vector in last layer
-
+                            loss = self.bxe(y_, y) #reduction is 'sum' due to sparsity of multi-hot expert vector in last layer
+                            if self.is_bayesian: loss += Fnn.btorch.get_kl_loss(self.model) / y.shape[0]
                             loss.backward(); #shouldn't we have this: if self.cfg.l == 'cdp': cdp_loss.backward()
                             # clip_grad_value_(model.parameters(), 1)
                             optimizer.step(); #self.cfg.l == 'cdp' and optimizer_class_param.step()
@@ -143,7 +143,8 @@ class Fnn(Ntf):
                             y_ = self.model.forward(X)
                             # if self.cfg.l == 'csl': csl_criterion(y_.squeeze(), y.squeeze(), index)
                             # else:
-                            loss = self.cross_entropy(y_, y)
+                            loss = self.bxe(y_, y)
+                            if self.is_bayesian: loss += Fnn.btorch.get_kl_loss(self.model) / y.shape[0]
                             #how about the loss of cdp for each class/expert? cdp_loss
 
                             v_loss += loss.item()

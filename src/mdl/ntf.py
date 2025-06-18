@@ -8,6 +8,8 @@ class Ntf:
         self.cfg = cgf
         self.seed = seed
         self.device = device
+        self.model = None
+        self.is_bayesian = False
         Ntf.torch = opentf.install_import(pytorch, 'torch')
         opentf.set_seed(self.seed, Ntf.torch)
         opentf.install_import('tensorboard==2.14.0 protobuf==3.20', 'tensorboard')
