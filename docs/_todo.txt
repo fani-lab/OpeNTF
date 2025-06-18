@@ -1,10 +1,11 @@
 multilayer neural classifiers
+    {fnn,bnn}_eval
+    emb_{fnn,bnn}_{train,test,eval}
 
-    bnn_*
-
-    emb_fnn_{train/test}
-
-    {emb}_{fnn,bnn}_test
+    nmt
+    tNtf_{emb}_{fnn,bnn}_{train,test}
+    rrn
+    caser
 
     {emb}_{fnn,bnn}_cl_{train/test} >> future
 

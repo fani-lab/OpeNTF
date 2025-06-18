@@ -1,5 +1,7 @@
 import os, re, numpy as np, logging, time
 
+import torch.nn.functional
+
 log = logging.getLogger(__name__)
 
 import pkgmgr as opentf
@@ -28,8 +30,9 @@ class Fnn(Ntf):
                 return x
                 #leave the sigmoid and clamping to be handled by the BCEWithLogitsLoss()
                 #return Ntf.torch.clamp(Ntf.torch.sigmoid(x), min=1.e-6, max=1. - 1.e-6)
-
         self.model = Model(self.cfg, input_size, output_size)
+        return self.model
+
     def bxe(self, y_, y):
         condition = (y == 1) # positive (correct) experts
         if self.cfg.nsd == 'uniform': topk_indices = self.ns_uniform(y) #upscale selected neg experts
@@ -139,7 +142,7 @@ class Fnn(Ntf):
                             t_loss += loss.item()
 
                         else:  # valid
-                            self.model.train(False)  # Set model to valid mode
+                            self.model.eval()  # Set model to valid mode
                             y_ = self.model.forward(X)
                             # if self.cfg.l == 'csl': csl_criterion(y_.squeeze(), y.squeeze(), index)
                             # else:
@@ -153,7 +156,7 @@ class Fnn(Ntf):
                 w.add_scalar(tag=f'{foldidx}_v_loss', scalar_value=v_loss / len(valid_dl), global_step=e)
                 log.info(f'Fold {foldidx}/{len(splits["folds"]) - 1}, Epoch {e}, {opentf.textcolor["blue"]}Train Loss: {t_loss / len(train_dl):.4f}{opentf.textcolor["reset"]}')
                 log.info(f'Fold {foldidx}/{len(splits["folds"]) - 1}, Epoch {e}, {opentf.textcolor["magenta"]}Valid Loss: {(v_loss / len(valid_dl)):.4f}{opentf.textcolor["reset"]}')
-                if self.cfg.save_per_epoch:
+                if self.cfg.spe:
                     # self.model.eval()
                     self.torch.save({'model_state_dict': self.model.state_dict(), 'cfg': self.cfg, 'f': foldidx, 'e': e, 't_loss': t_loss, 'v_loss': v_loss}, f'{self.output}/f{foldidx}.e{e}.pt')
                     log.info(f'{self.name()} model with {opentf.cfg2str(self.cfg)} saved at {self.output}/f{foldidx}.e{e}.pt')
@@ -167,52 +170,51 @@ class Fnn(Ntf):
             log.info(f'{self.name()} model with {opentf.cfg2str(self.cfg)} saved at {self.output}/f{foldidx}.pt')
         w.close()
 
-def test(self, model_path, splits, indexes, vecs, params, on_train_valid_set=False, per_epoch=False, merge_skills=False):
-        print(f'\n.............. starting test .................\n')
-        if not os.path.isdir(model_path): raise Exception("The model does not exist!")
-        # input_size = len(indexes['i2s'])
-        input_size = vecs['skill'].shape[1]
-        output_size = vecs['member'].shape[1]
-        # output_size = len(indexes['i2c'])
+    def test(self, teamsvecs, indexes, splits, on_train=False, per_epoch=False):
+        assert os.path.isdir(self.output), f'{opentf.textcolor["red"]}No folder for {self.output} exist!{opentf.textcolor["reset"]}'
+        input_size = teamsvecs['skill'].shape[1]
+        output_size = teamsvecs['member'].shape[1]
 
-        if merge_skills:
-            vecs = merge_teams_by_skills(vecs)
-            print('running with merged teams by skill')
-
-        X_test = vecs['skill'][splits['test'], :]
-        y_test = vecs['member'][splits['test']]
-        test_matrix = TFDataset(X_test, y_test)
-        test_dl = DataLoader(test_matrix, batch_size=params['b'], shuffle=True, num_workers=0)
+        X_test = teamsvecs['skill'][splits['test'], :]
+        y_test = teamsvecs['member'][splits['test']]
+        test_dl = Ntf.torch.utils.data.DataLoader(Ntf.dataset(X_test, y_test), batch_size=self.cfg.b, shuffle=False)
 
         for foldidx in splits['folds'].keys():
-            modelfiles = [f'{model_path}/state_dict_model.f{foldidx}.pt']
-            if per_epoch: modelfiles += [f'{model_path}/{_}' for _ in os.listdir(model_path) if re.match(f'state_dict_model.f{foldidx}.e\d+.pt', _)]
+            modelfiles = [f'{self.output}/f{foldidx}.pt']
+            if per_epoch: modelfiles += [f'{self.output}/{_}' for _ in os.listdir(self.output) if re.match(f'f{foldidx}.e\d+.pt', _)]
 
             for modelfile in modelfiles:
-                self.init(input_size=input_size, output_size=output_size, param=params).to(self.device)
-                self.load_state_dict(torch.load(modelfile))
-                self.eval()
+                self.init(input_size=input_size, output_size=output_size).to(self.device)
+                self.model.load_state_dict(Ntf.torch.load(modelfile)['model_state_dict'])
+                self.model.eval()
 
-                for pred_set in (['test', 'train', 'valid'] if on_train_valid_set else ['test']):
+                for pred_set in (['test', 'train', 'valid'] if on_train else ['test']):
                     if pred_set != 'test':
-                        X = vecs['skill'][splits['folds'][foldidx][pred_set], :]
-                        y = vecs['member'][splits['folds'][foldidx][pred_set]]
-                        matrix = TFDataset(X, y)
-                        dl = DataLoader(matrix, batch_size=params['b'], shuffle=True, num_workers=0)
-                    else:
-                        X = X_test; y = y_test; matrix = test_matrix
-                        dl = test_dl
+                        X = teamsvecs['skill'][splits['folds'][foldidx][pred_set], :]
+                        y = teamsvecs['member'][splits['folds'][foldidx][pred_set]]
+                        dl = Ntf.torch.utils.data.DataLoader(Ntf.dataset(X, y), batch_size=self.cfg.b, shuffle=False)
+                    else: dl = test_dl
 
-                    torch.cuda.empty_cache()
-                    with torch.no_grad():
-                        y_pred = torch.empty(0, dl.dataset.output.shape[1])
-                        for x, y in dl:
-                            x = x.to(device=self.device)
-                            scores = self.forward(x)
-                            scores = scores.squeeze(1).cpu().numpy()
+                    Ntf.torch.cuda.empty_cache()
+                    with Ntf.torch.no_grad():
+                        y_pred = Ntf.torch.empty(0, dl.dataset.output.shape[1])
+                        for XX, yy in dl:
+                            XX = XX.squeeze(1).to(self.device)
+                            if self.is_bayesian:
+                                output_mc = []; pred_uncertainty = []; model_uncertainty = []
+                                for mc_run in range(self.cfg.nmc):
+                                    logits = self.model(XX)
+                                    probs = torch.nn.functional.sigmoid(logits)
+                                    output_mc.append(probs)
+                                output = torch.stack(output_mc)
+                                butil = opentf.install_import('', 'bayesian_torch.utils.util')
+                                pred_uncertainty.append(butil.predictive_entropy(output.data.cpu().numpy()))
+                                model_uncertainty.append(butil.mutual_information(output.data.cpu().numpy()))
+                                scores = output.mean(dim=0)
+
+                            else: scores = self.model.forward(XX).squeeze(1).cpu().numpy()
                             y_pred = np.vstack((y_pred, scores))
+
                     epoch = modelfile.split('.')[-2] + '.' if per_epoch else ''
                     epoch = epoch.replace(f'f{foldidx}.', '')
-                    torch.save(y_pred, f'{model_path}/f{foldidx}.{pred_set}.{epoch}pred', pickle_protocol=4)
-
-        print(f'\n.............. ending test .................\n')
+                    Ntf.torch.save({'y_pred': y_pred, 'uncertainty': {'pred': pred_uncertainty, 'model': model_uncertainty} if self.is_bayesian else None}, f'{self.output}/f{foldidx}.{pred_set}.{epoch}pred', pickle_protocol=4)

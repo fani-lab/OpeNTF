@@ -1,0 +1,69 @@
+name: inclusive-tests-traintest-toys-main
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test-toy-configs:
+    runs-on: ubuntu-latest
+    if: ${{ !contains(github.event.head_commit.message, 'skip-ci') }}
+
+    strategy:
+      matrix:
+        include:
+          - config: '+id=000 "cmd=[train,test]" data.domain=cmn.publication.Publication data.source=../data/dblp/toy.dblp.v12.json data.output=../output/dblp/toy.dblp.v12.json ~data.filter ~data.embedding'
+          - config: '+id=005 "cmd=[train,test]" data.domain=cmn.publication.Publication data.source=../data/dblp/toy.dblp.v12.json data.output=../output/dblp/toy.dblp.v12.json ~data.filter +models.save_per_epoch=True'
+          - config: '+id=006 "cmd=[train,test]" data.domain=cmn.publication.Publication data.source=../data/dblp/toy.dblp.v12.json data.output=../output/dblp/toy.dblp.v12.json ~data.filter ~data.embedding +models.batch_size=2 +models.nsd=uniform'
+          - config: '+id=007 "cmd=[train,test]" data.domain=cmn.publication.Publication data.source=../data/dblp/toy.dblp.v12.json data.output=../output/dblp/toy.dblp.v12.json ~data.filter ~data.embedding +models.batch_size=2 +models.nsd=unigram'
+          - config: '+id=008 "cmd=[train,test]" data.domain=cmn.publication.Publication data.source=../data/dblp/toy.dblp.v12.json data.output=../output/dblp/toy.dblp.v12.json ~data.filter ~data.embedding +models.batch_size=2 +models.nsd=unigram_b'
+
+          - config: '+id=016 "cmd=[train,test]" data.domain=cmn.movie.Movie data.source=../data/imdb/toy.title.basics.tsv data.output=../output/dblp/toy.title.basics.tsv ~data.filter ~data.embedding'
+          - config: '+id=017 "cmd=[train,test]" data.domain=cmn.movie.Movie data.source=../data/imdb/toy.title.basics.tsv data.output=../output/dblp/toy.title.basics.tsv ~data.filter +models.save_per_epoch=True'
+          - config: '+id=018 "cmd=[train,test]" data.domain=cmn.movie.Movie data.source=../data/imdb/toy.title.basics.tsv data.output=../output/dblp/toy.title.basics.tsv ~data.filter ~data.embedding +models.batch_size=2 +models.nsd=uniform'
+          - config: '+id=019 "cmd=[train,test]" data.domain=cmn.movie.Movie data.source=../data/imdb/toy.title.basics.tsv data.output=../output/dblp/toy.title.basics.tsv ~data.filter ~data.embedding +models.batch_size=2 +models.nsd=unigram'
+          - config: '+id=020 "cmd=[train,test]" data.domain=cmn.movie.Movie data.source=../data/imdb/toy.title.basics.tsv data.output=../output/dblp/toy.title.basics.tsv ~data.filter ~data.embedding +models.batch_size=2 +models.nsd=unigram_b'
+
+          - config: '+id=025 "cmd=[train,test]" data.domain=cmn.repository.Repository data.source=../data/gith/toy.repos.csv data.output=../output/gith/toy.repos.csv ~data.filter ~data.embedding'
+          - config: '+id=026 "cmd=[train,test]" data.domain=cmn.repository.Repository data.source=../data/gith/toy.repos.csv data.output=../output/gith/toy.repos.csv ~data.filter +models.save_per_epoch=True'
+          - config: '+id=027 "cmd=[train,test]" data.domain=cmn.repository.Repository data.source=../data/gith/toy.repos.csv data.output=../output/gith/toy.repos.csv ~data.filter ~data.embedding +models.batch_size=2 +models.nsd=uniform'
+          - config: '+id=028 "cmd=[train,test]" data.domain=cmn.repository.Repository data.source=../data/gith/toy.repos.csv data.output=../output/gith/toy.repos.csv ~data.filter ~data.embedding +models.batch_size=2 +models.nsd=unigram'
+          - config: '+id=029 "cmd=[train,test]" data.domain=cmn.repository.Repository data.source=../data/gith/toy.repos.csv data.output=../output/gith/toy.repos.csv ~data.filter ~data.embedding +models.batch_size=2 +models.nsd=unigram_b'
+
+          - config: '+id=036 "cmd=[train,test]" data.domain=cmn.patent.Patent data.source=../data/uspt/toy.patent.tsv data.output=../output/uspt/toy.patent.tsv ~data.filter ~data.embedding'
+          - config: '+id=037 "cmd=[train,test]" data.domain=cmn.patent.Patent data.source=../data/uspt/toy.patent.tsv data.output=../output/uspt/toy.patent.tsv ~data.filter +models.save_per_epoch=True'
+          - config: '+id=038 "cmd=[train,test]" data.domain=cmn.patent.Patent data.source=../data/uspt/toy.patent.tsv data.output=../output/uspt/toy.patent.tsv ~data.filter ~data.embedding +models.batch_size=2 +models.nsd=uniform'
+          - config: '+id=039 "cmd=[train,test]" data.domain=cmn.patent.Patent data.source=../data/uspt/toy.patent.tsv data.output=../output/uspt/toy.patent.tsv ~data.filter ~data.embedding +models.batch_size=2 +models.nsd=unigram'
+          - config: '+id=040 "cmd=[train,test]" data.domain=cmn.patent.Patent data.source=../data/uspt/toy.patent.tsv data.output=../output/uspt/toy.patent.tsv ~data.filter ~data.embedding +models.batch_size=2 +models.nsd=unigram_b'
+
+      # Set to false if you want parallel runs:
+      fail-fast: false
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Clean up previous outputs
+        run: rm -rf output/
+
+      - name: Echo config index
+        run: |
+          echo 'Config index: ${{ matrix.index }}'
+
+      - name: Run config ${{ matrix.config }}
+        run: |
+          python main.py ${{ matrix.config }}
+        working-directory: ./src
+        continue-on-error: ${{ matrix.label == 'fail.teamsvecs.validate' || matrix.label == 'fail.teamsvecs.validate.nogpu' }}
+

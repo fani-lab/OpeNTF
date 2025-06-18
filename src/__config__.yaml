@@ -12,7 +12,7 @@ acceleration: 'cpu' #cpu for all cores, cpu:3 for 3 cores, 'cuda' or 'cuda:0' fo
 cmd:
   - prep
   - train
-  #- test
+  - test
   #- eval
   #- plot
   #- agg

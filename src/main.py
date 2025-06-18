@@ -148,9 +148,15 @@ def run(cfg):
             if len(cls_method) > 1: #e.g., in mdl.tntf.tNtf that we need the core model
                 cls = get_class(cls_method[1])
                 models[m].model = cls(output_ + f'/{cls.__name__.lower()}', cfg.pytorch, cfg.acceleration, cfg.seed, cfg.models.config[cls.__name__.lower()])
-            log.info(f'Training team recommender instance {m} ... ')
             # find a way to show model-emb pair setting
-            if 'train' in cfg.cmd: models[m].learn(teamsvecs, indexes, splits, None)
+            if 'train' in cfg.cmd:
+                log.info(f'Training team recommender instance {m} ... ')
+                models[m].learn(teamsvecs, indexes, splits, None)
+
+            if 'test'  in cfg.cmd:
+                log.info(f'Testing team recommender instance {m} ... ')
+                models[m].test(teamsvecs, indexes, splits, on_train=cfg.test.on_train, per_epoch=cfg.test.per_epoch)
+
 
             # if m_name.endswith('a1'): vecs_['skill'] = lil_matrix(scipy.sparse.hstack((vecs_['skill'], lil_matrix(np.ones((vecs_['skill'].shape[0], 1))))))
             # make_popular_and_nonpopular_matrix(vecs_, data_list[0])
@@ -178,7 +184,6 @@ def run(cfg):
         # if 'caser' in model_list: models['caser'] = Caser(settings['model']['step_ahead'])
         # if 'rrn' in model_list: models['rrn'] = Rrn(settings['model']['baseline']['rrn']['with_zero'], settings['model']['step_ahead'])
 
-    # if 'test' in cmd: self.test(output, splits, indexes, vecs, settings, on_train_valid_set, per_epoch, merge_skills)
     # if 'eval' in cmd: self.evaluate(output, splits, vecs, on_train_valid_set, per_instance, per_epoch)
     # if 'plot' in cmd: self.plot_roc(output, splits, on_train_valid_set)
     # if 'fair' in cmd: self.fair(output, vecs, splits, fair_settings)

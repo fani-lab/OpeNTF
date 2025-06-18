@@ -13,8 +13,8 @@ class Ntf:
         Ntf.torch = opentf.install_import(pytorch, 'torch')
         opentf.set_seed(self.seed, Ntf.torch)
         opentf.install_import('tensorboard==2.14.0 protobuf==3.20', 'tensorboard')
-        self.output = output
-        if not os.path.isdir(output): os.makedirs(output)
+        self.output = output + '.' + opentf.cfg2str(self.cfg)
+        if not os.path.isdir(self.output): os.makedirs(self.output)
         self.writer = opentf.install_import('tensorboardX==2.6.2.2', 'tensorboardX', 'SummaryWriter')
         class NtfDataset(Ntf.torch.utils.data.Dataset):
             def __init__(self, input_matrix, output_matrix):
@@ -29,7 +29,7 @@ class Ntf:
     def name(self): return self.__class__.__name__.lower()
 
     def learn(self, teamsvecs, indexes, splits, prev_model): pass
-    def test(self, teamsvecs, indexes, splits, model_path, on_train=False, per_epoch=False): pass
+    def test(self, teamsvecs, indexes, splits, on_train=False, per_epoch=False): pass
     def evaluate(self, teamsvecs, splits, model_path, on_train=False, per_instance=False, per_epoch=False):
         import pandas as pd
         import torch
@@ -54,7 +54,7 @@ class Ntf:
                 for foldidx in splits['folds'].keys():
                     if pred_set != 'test': Y = teamsvecs['member'][splits['folds'][foldidx][pred_set]]
                     else: Y = y_test
-                    Y_ = torch.load(f'{model_path}/f{foldidx}.{pred_set}.{epoch}pred')
+                    Y_ = torch.load(f'{model_path}/f{foldidx}.{pred_set}.{epoch}pred')['y_pred']
 
                     actual_skills = teamsvecs['skill_main'][splits['test']].todense().astype(int) # taking the skills from the test teams
                     skill_coverage = metric.skill_coverage(teamsvecs, actual_skills, Y_, [2, 5, 10]) # dict of skill_coverages for list of k's
