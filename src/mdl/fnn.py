@@ -1,7 +1,4 @@
 import os, re, numpy as np, logging, time
-
-import torch.nn.functional
-
 log = logging.getLogger(__name__)
 
 import pkgmgr as opentf
@@ -204,9 +201,9 @@ class Fnn(Ntf):
                                 output_mc = []; pred_uncertainty = []; model_uncertainty = []
                                 for mc_run in range(self.cfg.nmc):
                                     logits = self.model(XX)
-                                    probs = torch.nn.functional.sigmoid(logits)
+                                    probs = Ntf.torch.nn.functional.sigmoid(logits)
                                     output_mc.append(probs)
-                                output = torch.stack(output_mc)
+                                output = Ntf.torch.stack(output_mc)
                                 butil = opentf.install_import('', 'bayesian_torch.utils.util')
                                 pred_uncertainty.append(butil.predictive_entropy(output.data.cpu().numpy()))
                                 model_uncertainty.append(butil.mutual_information(output.data.cpu().numpy()))
@@ -218,3 +215,4 @@ class Fnn(Ntf):
                     epoch = modelfile.split('.')[-2] + '.' if per_epoch else ''
                     epoch = epoch.replace(f'f{foldidx}.', '')
                     Ntf.torch.save({'y_pred': y_pred, 'uncertainty': {'pred': pred_uncertainty, 'model': model_uncertainty} if self.is_bayesian else None}, f'{self.output}/f{foldidx}.{pred_set}.{epoch}pred', pickle_protocol=4)
+                    log.info(f'{self.name()} model predictions for fold{foldidx}.{pred_set}.{epoch} has saved at {self.output}/f{foldidx}.{pred_set}.{epoch}pred')

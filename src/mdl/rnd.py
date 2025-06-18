@@ -1,4 +1,5 @@
-import numpy as np
+import numpy as np, logging
+log = logging.getLogger(__name__)
 
 from .ntf import Ntf
 
@@ -24,3 +25,4 @@ class Rnd(Ntf):
                 y_pred = np.vstack((y_pred, scores))
             Ntf.torch.save({}, f'{self.output}/f{foldidx}.pt', pickle_protocol=4)#dummy model save
             Ntf.torch.save({'y_pred': y_pred, 'uncertainty': None}, f'{self.output}/f{foldidx}.test.pred', pickle_protocol=4)
+            log.info(f'{self.name()} model predictions for fold{foldidx}.test. has saved at {self.output}/f{foldidx}.test.pred')
