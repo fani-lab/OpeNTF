@@ -6,7 +6,7 @@ nsd: # negetative sampling distribution (heuristics): uniform, unigram, unigram_
 ns: 5 # number of negative experts to upweight
 lr: 0.001 #learning rate
 h: [128, 64, 128] #linear layers
-save_per_epoch: False
+save_per_epoch: # will be overriden dynamically in ./src/main.py from root ./__config__.yaml
 
 rnd:
   b: ${batch_size}

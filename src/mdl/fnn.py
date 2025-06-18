@@ -76,7 +76,7 @@ class Fnn(Ntf):
         self.unigram = Ntf.torch.tensor(y.sum(axis=0) / y.shape[0]).to(self.device)  # frequency of each expert in a batch
         return self.ns_unigram(y)
 
-    def learn(self, teamsvecs, indexes, splits, prev_model):
+    def learn(self, teamsvecs, splits, prev_model):
         input_size = teamsvecs['skill'].shape[1]
         output_size = teamsvecs['member'].shape[1]
 
@@ -167,7 +167,7 @@ class Fnn(Ntf):
             log.info(f'{self.name()} model with {opentf.cfg2str(self.cfg)} saved at {self.output}/f{foldidx}.pt')
         w.close()
 
-    def test(self, teamsvecs, indexes, splits, on_train=False, per_epoch=False):
+    def test(self, teamsvecs, splits, on_train=False, per_epoch=False):
         assert os.path.isdir(self.output), f'{opentf.textcolor["red"]}No folder for {self.output} exist!{opentf.textcolor["reset"]}'
         input_size = teamsvecs['skill'].shape[1]
         output_size = teamsvecs['member'].shape[1]
@@ -212,7 +212,7 @@ class Fnn(Ntf):
                             else: scores = self.model.forward(XX).squeeze(1).cpu().numpy()
                             y_pred = np.vstack((y_pred, scores))
 
-                    epoch = modelfile.split('.')[-2] + '.' if per_epoch else ''
-                    epoch = epoch.replace(f'f{foldidx}.', '')
+                    match = re.search(r'(e\d+)\.pt$', os.path.basename(modelfile))
+                    epoch = (match.group(1) + '.') if match else ''
                     Ntf.torch.save({'y_pred': y_pred, 'uncertainty': {'pred': pred_uncertainty, 'model': model_uncertainty} if self.is_bayesian else None}, f'{self.output}/f{foldidx}.{pred_set}.{epoch}pred', pickle_protocol=4)
                     log.info(f'{self.name()} model predictions for fold{foldidx}.{pred_set}.{epoch} has saved at {self.output}/f{foldidx}.{pred_set}.{epoch}pred')

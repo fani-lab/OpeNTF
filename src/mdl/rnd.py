@@ -12,8 +12,8 @@ class Rnd(Ntf):
             def forward(self, x): return Ntf.torch.clamp(Ntf.torch.rand(self.output_size), min=1.e-6, max=1. - 1.e-6)
         self.model = Model(self.cfg, input_size, output_size)
         return self.model
-    def learn(self, teamsvecs, indexes, splits, prev_model): self.init(-1, teamsvecs['member'].shape[1])
-    def test(self, teamsvecs, indexes, splits, on_train=False, per_epoch=False):
+    def learn(self, teamsvecs, splits, prev_model): self.init(-1, teamsvecs['member'].shape[1])
+    def test(self, teamsvecs, splits, on_train=False, per_epoch=False):
         X_test = teamsvecs['skill'][splits['test'], :]
         y_test = teamsvecs['member'][splits['test']]
         test_dl = Ntf.torch.utils.data.DataLoader(Ntf.dataset(X_test, y_test), batch_size=self.cfg.b, shuffle=False)

@@ -107,7 +107,7 @@ def run(cfg):
             t2v.name = method
             t2v.train(teamsvecs, indexes, splits)
 
-    if any(c in cfg.cmd for c in ['train', 'test']):
+    if any(c in cfg.cmd for c in ['train', 'test', 'eval']):
 
         # if a list, all see the exact splits of teams.
         # if individual, they see different teams in splits. But as we show the average results, no big deal, esp., as we do n-fold
@@ -135,6 +135,7 @@ def run(cfg):
         mdlcfg = OmegaConf.merge(OmegaConf.load(cfg.models.config), OmegaConf.from_dotlist(mdl_overrides))
         mdlcfg.seed = cfg.seed
         mdlcfg.pytorch = cfg.pytorch
+        mdlcfg.save_per_epoch = cfg.train.save_per_epoch
         mdlcfg.tntf.tfolds = cfg.train.nfolds
         mdlcfg.tntf.step_ahead = cfg.train.step_ahead
         mdlcfg.pytorch = cfg.pytorch
@@ -150,13 +151,16 @@ def run(cfg):
                 models[m].model = cls(output_ + f'/{cls.__name__.lower()}', cfg.pytorch, cfg.acceleration, cfg.seed, cfg.models.config[cls.__name__.lower()])
             # find a way to show model-emb pair setting
             if 'train' in cfg.cmd:
-                log.info(f'Training team recommender instance {m} ... ')
-                models[m].learn(teamsvecs, indexes, splits, None)
+                log.info(f'{opentf.textcolor["blue"]}Training team recommender instance {m} ... {opentf.textcolor["reset"]}')
+                models[m].learn(teamsvecs, splits, None)
 
             if 'test'  in cfg.cmd:
-                log.info(f'Testing team recommender instance {m} ... ')
-                models[m].test(teamsvecs, indexes, splits, on_train=cfg.test.on_train, per_epoch=cfg.test.per_epoch)
+                log.info(f'{opentf.textcolor["green"]}Testing team recommender instance {m} ... {opentf.textcolor["reset"]}')
+                models[m].test(teamsvecs, splits, on_train=cfg.test.on_train, per_epoch=cfg.test.per_epoch)
 
+            if 'eval'  in cfg.cmd:
+                log.info(f'{opentf.textcolor["magenta"]}Evaluating team recommender instance {m} ... {opentf.textcolor["reset"]}')
+                models[m].evaluate(teamsvecs, splits, on_train=cfg.test.on_train, per_epoch=cfg.test.per_epoch)
 
             # if m_name.endswith('a1'): vecs_['skill'] = lil_matrix(scipy.sparse.hstack((vecs_['skill'], lil_matrix(np.ones((vecs_['skill'].shape[0], 1))))))
             # make_popular_and_nonpopular_matrix(vecs_, data_list[0])
