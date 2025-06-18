@@ -29,9 +29,9 @@ class Ntf:
 
     def learn(self, teamsvecs, splits, prev_model): pass
     def test(self, teamsvecs, splits, on_train=False, per_epoch=False): pass
-    def evaluate(self, teamsvecs, splits, on_train=False, per_epoch=False, per_instance=False):
+    def evaluate(self, teamsvecs, splits, on_train=False, per_epoch=False, per_instance=False, metrics={}):
         assert os.path.isdir(self.output), f'{opentf.textcolor["red"]}No folder for {self.output} exist!{opentf.textcolor["reset"]}'
-        pd = opentf.install_import('pandas==2.0.0')
+        pd = opentf.install_import('pandas==2.0.0', 'pandas')
         import evl.metric as metric
         y_test = teamsvecs['member'][splits['test']]
         for pred_set in (['test', 'train', 'valid'] if on_train else ['test']):
@@ -40,8 +40,8 @@ class Ntf:
             if per_instance: fold_mean_per_instance = pd.DataFrame()
             
             #there is not such files for random model!!
-            predfiles = [f'{self.output}/{_}' for _ in os.listdir(self.output) if re.match('state_dict_model.f\d+.pt', _)]
-            if per_epoch: predfiles += [f'{self.output}/{_}' for _ in os.listdir(self.output) if re.match('state_dict_model.f\d+.e\d+', _)]
+            predfiles = [f'{self.output}/{_}' for _ in os.listdir(self.output) if re.match('f\d+.pt', _)]
+            if per_epoch: predfiles += [f'{self.output}/{_}' for _ in os.listdir(self.output) if re.match('f\d+.e\d+', _)]
 
             epochs = len(predfiles)//len(splits['folds'].keys())
             for e in range(epochs):
@@ -51,17 +51,17 @@ class Ntf:
                     else: Y = y_test
                     Y_ = Ntf.torch.load(f'{self.output}/f{foldidx}.{pred_set}.{epoch}pred')['y_pred']
 
-                    actual_skills = teamsvecs['skill_main'][splits['test']].todense().astype(int) # taking the skills from the test teams
-                    skill_coverage = metric.skill_coverage(teamsvecs, actual_skills, Y_) # dict of skill_coverages for list of k's
-                    df_skc = pd.DataFrame.from_dict(skill_coverage, orient='index', columns=['mean']) # skill_coverage (top_k) per fold
+                    # actual_skills = teamsvecs['skill_main'][splits['test']].todense().astype(int) # taking the skills from the test teams
+                    # skill_coverage = metric.skill_coverage(teamsvecs, actual_skills, Y_) # dict of skill_coverages for list of k's
+                    # df_skc = pd.DataFrame.from_dict(skill_coverage, orient='index', columns=['mean']) # skill_coverage (top_k) per fold
 
-                    df, df_mean, (fpr, tpr) = metric.calculate_metrics(Y, Y_, per_instance)
+                    df, df_mean, (fpr, tpr) = metric.calculate_metrics(Y, Y_, per_instance, metrics)
                     if per_instance: df.to_csv(f'{self.output}/f{foldidx}.{pred_set}.{epoch}pred.eval.per_instance.csv', float_format='%.5f')
                     log.info(f'Saving file per fold as : f{foldidx}.{pred_set}.{epoch}pred.eval.mean.csv')
                     df_mean.to_csv(f'{self.output}/f{foldidx}.{pred_set}.{epoch}pred.eval.mean.csv')
                     with open(f'{self.output}/f{foldidx}.{pred_set}.{epoch}pred.eval.roc.pkl', 'wb') as outfile: pickle.dump((fpr, tpr), outfile)
 
-                    df_mean = pd.concat([df_mean, df_skc], axis=0) # concat df_skc to the last row of df_mean
+                    #df_mean = pd.concat([df_mean, df_skc], axis=0) # concat df_skc to the last row of df_mean
                     fold_mean = pd.concat([fold_mean, df_mean], axis=1)
                     if per_instance: fold_mean_per_instance = fold_mean_per_instance.add(df, fill_value=0)
                 mean_std['mean'] = fold_mean.mean(axis=1)

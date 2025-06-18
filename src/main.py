@@ -70,11 +70,11 @@ def aggregate(output):
 @hydra.main(version_base=None, config_path='.', config_name='__config__')
 def run(cfg):
     t2v = None
-    if any(c in cfg.cmd for c in ['prep', 'train', 'test']):
+    domain_cls = get_class(cfg.data.domain)
+
+    if cfg.cmd and any(c in cfg.cmd for c in ['prep', 'train', 'test', 'eval']):
         cfg.data.output += f'.mt{cfg.data.filter.min_nteam}.ts{cfg.data.filter.min_team_size}' if 'filter' in cfg.data and cfg.data.filter else ''
         if not os.path.isdir(cfg.data.output): os.makedirs(cfg.data.output)
-
-        domain_cls = get_class(cfg.data.domain)
 
         # this will call the Team.generate_sparse_vectors(), which itself may (lazy) call Team.read_data(), which itself may (lazy) call {Publication|Movie|Repo|Patent}.read_data()
         teamsvecs, indexes = domain_cls.gen_teamsvecs(cfg.data.source, cfg.data.output, cfg.data)
@@ -107,7 +107,7 @@ def run(cfg):
             t2v.name = method
             t2v.train(teamsvecs, indexes, splits)
 
-    if any(c in cfg.cmd for c in ['train', 'test', 'eval']):
+    if cfg.cmd and any(c in cfg.cmd for c in ['train', 'test', 'eval']):
 
         # if a list, all see the exact splits of teams.
         # if individual, they see different teams in splits. But as we show the average results, no big deal, esp., as we do n-fold
@@ -115,18 +115,8 @@ def run(cfg):
         # model names t* will follow the streaming scenario
         # model names *_ts have timestamp (year) as a single added feature
         # model names *_ts2v learn temporal skill vectors via d2v when each doc is a stream of (skills: year of the team)
-
         # non-temporal (no streaming scenario, bag of teams)
-
         assert len(cfg.models.instances) > 0, f'{opentf.textcolor["red"]}No model instance for training! Check ./src/__config__.yaml and models.instances ... {opentf.textcolor["reset"]}'
-
-        if cfg.train.merge_teams_w_same_skills: domain_cls.merge_teams_by_skills(teamsvecs, inplace=True)
-
-        if 'embedding' in cfg.data and cfg.data.embedding.class_method:
-            # t2v object knows the embedding method and ...
-            skill_vecs = t2v.get_dense_vecs(vectype='skill')
-            assert skill_vecs.shape[0] == teamsvecs['skill'].shape[0], f'{opentf.textcolor["red"]}Incorrect number of embeddings for teams subset of skills!{opentf.textcolor["reset"]}'
-            teamsvecs['skill'] = skill_vecs
 
         # Get command-line overrides for models. Kinda tricky as we dynamically override a subconfig.
         # Use '+models.{...}=value' to override
@@ -141,6 +131,15 @@ def run(cfg):
         mdlcfg.pytorch = cfg.pytorch
         OmegaConf.resolve(mdlcfg)
         cfg.models.config = mdlcfg
+
+        if cfg.train.merge_teams_w_same_skills: domain_cls.merge_teams_by_skills(teamsvecs, inplace=True)
+
+        if 'embedding' in cfg.data and cfg.data.embedding.class_method:
+            # t2v object knows the embedding method and ...
+            skill_vecs = t2v.get_dense_vecs(vectype='skill')
+            assert skill_vecs.shape[0] == teamsvecs['skill'].shape[0], f'{opentf.textcolor["red"]}Incorrect number of embeddings for teams subset of skills!{opentf.textcolor["reset"]}'
+            teamsvecs['skill'] = skill_vecs
+
         for m in cfg.models.instances:
             cls_method = m.split('_')
             cls = get_class(cls_method[0])
@@ -160,7 +159,8 @@ def run(cfg):
 
             if 'eval'  in cfg.cmd:
                 log.info(f'{opentf.textcolor["magenta"]}Evaluating team recommender instance {m} ... {opentf.textcolor["reset"]}')
-                models[m].evaluate(teamsvecs, splits, on_train=cfg.test.on_train, per_epoch=cfg.test.per_epoch)
+                metrics = set(f'{m}_{",".join([str(i) for i in cfg.eval.topk])}' for m in cfg.eval.metrics) #{'ndcg_cut_2,5,10', 'P_2,5,10', ...}
+                models[m].evaluate(teamsvecs, splits, on_train=cfg.eval.on_train, per_epoch=cfg.eval.per_epoch, metrics=metrics)
 
             # if m_name.endswith('a1'): vecs_['skill'] = lil_matrix(scipy.sparse.hstack((vecs_['skill'], lil_matrix(np.ones((vecs_['skill'].shape[0], 1))))))
             # make_popular_and_nonpopular_matrix(vecs_, data_list[0])
@@ -205,7 +205,7 @@ def run(cfg):
     #   if 'eval' in cmd: self.model.evaluate(output_, splits, vecs, on_train_valid_set, per_instance, per_epoch)
     #   if 'plot' in cmd: self.model.plot_roc(output_, splits, on_train_valid_set)
 
-    if 'agg' in cfg.cmd: aggregate(cfg.data.output)
+    # if 'agg' in cfg.cmd: aggregate(cfg.data.output)
 
 # sample runs for different configs, including different prep, embeddings, model training, ..., are available as unit-test in
 # ./github/workflows/*.yml

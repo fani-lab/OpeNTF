@@ -1,5 +1,6 @@
 multilayer neural classifiers
-    {fnn,bnn}_eval
+    {fnn,bnn}_eval >> skill-coverage
+
     emb_{fnn,bnn}_{train,test,eval}
 
     nmt

@@ -10,9 +10,9 @@ seed: 0
 pytorch: torch==2.2.2 #--index-url https://download.pytorch.org/whl/cu124
 acceleration: 'cpu' #cpu for all cores, cpu:3 for 3 cores, 'cuda' or 'cuda:0' for the only available gpu, 'cuda:3' for gpu3 >> TODO: multiple gpus
 cmd:
-  - prep
-  - train
-  - test
+  #- prep
+  #- train
+  #- test
   #- eval
   #- plot
   #- agg
@@ -81,7 +81,10 @@ test:
   per_epoch: ${train.save_per_epoch} # the test results of each epoch on the test set >> for per-epoch performance. Similar to valid losses during training but here we can have eval metrics
 
 eval:
+  metrics: [P, recall, ndcg_cut, map_cut, success] # see trec_eval for a complete list https://github.com/terrierteam/pytrec_eval/blob/master/tests/pytrec_eval_tests.py
+  topk: [2, 5, 10]
   on_train: ${test.on_train}
+  per_epoch: ${test.per_epoch}
   save_per_instance: True # needed for paired significance tests
 
 fair: #post-hoc reranks of the prediction list

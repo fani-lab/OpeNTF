@@ -4,8 +4,8 @@ log = logging.getLogger(__name__)
 
 import pkgmgr as opentf
 def calculate_metrics(Y, Y_, per_instance=False, metrics={'P_2,5,10', 'recall_2,5,10', 'ndcg_cut_2,5,10', 'map_cut_2,5,10'}):
-    pd = opentf.install_import('pandas==2.0.0')
-    pytrec_eval = opentf.install_import('pytrec-eval-terrier==0.5.2')
+    pd = opentf.install_import('pandas==2.0.0', 'pandas')
+    pytrec_eval = opentf.install_import('pytrec-eval-terrier==0.5.7', 'pytrec_eval')
     # eval_met = dict(zip(metrics, [None]*len(metrics)))
     aucroc, fpr, tpr = calculate_auc_roc(Y, Y_)
     qrel = dict(); run = dict()
@@ -25,7 +25,7 @@ def calculate_metrics(Y, Y_, per_instance=False, metrics={'P_2,5,10', 'recall_2,
     return df if per_instance else None, df_mean, (fpr, tpr) # fpr, tpr is a long string that pandas truncate
 
 def calculate_auc_roc(Y, Y_):
-    scikit = opentf.install_import('scikit-learn==1.2.2', 'sklearn.model_selection')
+    scikit = opentf.install_import('scikit-learn==1.2.2', 'sklearn.metrics')
     log.info(f'Calculating roc_auc_score ...')
     auc = scikit.roc_auc_score(Y.toarray(), Y_, average='micro', multi_class="ovr")
     log.info(f'Calculating roc_curve ...\n')
