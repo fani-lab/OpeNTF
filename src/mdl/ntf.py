@@ -34,12 +34,12 @@ class Ntf:
         pd = opentf.install_import('pandas==2.0.0', 'pandas')
         import evl.metric as metric
         y_test = teamsvecs['member'][splits['test']]
+        # Rnd model does only have f*.test.pred files, no train or valid files >> skip them
         for pred_set in (['test', 'train', 'valid'] if on_train else ['test']):
             fold_mean = pd.DataFrame()
             mean_std = pd.DataFrame()
             if per_instance: fold_mean_per_instance = pd.DataFrame()
             
-            #there is not such files for random model!!
             predfiles = [f'{self.output}/{_}' for _ in os.listdir(self.output) if re.match('f\d+.pt', _)]
             if per_epoch: predfiles += [f'{self.output}/{_}' for _ in os.listdir(self.output) if re.match('f\d+.e\d+', _)]
 
@@ -49,19 +49,24 @@ class Ntf:
                 for foldidx in splits['folds'].keys():
                     if pred_set != 'test': Y = teamsvecs['member'][splits['folds'][foldidx][pred_set]]
                     else: Y = y_test
-                    Y_ = Ntf.torch.load(f'{self.output}/f{foldidx}.{pred_set}.{epoch}pred')['y_pred']
+                    filename = f'{self.output}/f{foldidx}.{pred_set}.{epoch}'
+                    Y_ = Ntf.torch.load(f'{filename}pred')['y_pred']
 
-                    # actual_skills = teamsvecs['skill_main'][splits['test']].todense().astype(int) # taking the skills from the test teams
-                    # skill_coverage = metric.skill_coverage(teamsvecs, actual_skills, Y_) # dict of skill_coverages for list of k's
-                    # df_skc = pd.DataFrame.from_dict(skill_coverage, orient='index', columns=['mean']) # skill_coverage (top_k) per fold
+                    df, df_mean, fpr_tpr = metric.calculate_metrics(Y, Y_, per_instance, metrics)
+                    if 'aucroc' in metrics.other:
+                        with open(f'{filename}pred.eval.roc.pkl', 'wb') as outfile: pickle.dump(fpr_tpr, outfile)
 
-                    df, df_mean, (fpr, tpr) = metric.calculate_metrics(Y, Y_, per_instance, metrics)
-                    if per_instance: df.to_csv(f'{self.output}/f{foldidx}.{pred_set}.{epoch}pred.eval.per_instance.csv', float_format='%.5f')
-                    log.info(f'Saving file per fold as : f{foldidx}.{pred_set}.{epoch}pred.eval.mean.csv')
-                    df_mean.to_csv(f'{self.output}/f{foldidx}.{pred_set}.{epoch}pred.eval.mean.csv')
-                    with open(f'{self.output}/f{foldidx}.{pred_set}.{epoch}pred.eval.roc.pkl', 'wb') as outfile: pickle.dump((fpr, tpr), outfile)
+                    for m in metrics.other:
+                        if 'skill_coverage' in m:
+                            X = teamsvecs['skill'][splits['test']] if scipy.sparse.issparse(teamsvecs['skill']) else teamsvecs['original_skill'] #to accomodate dense emb vecs of skills
+                            df_skc, df_mean_skc = metric.calculate_skill_coverage(X, Y_, teamsvecs['skillcoverage'], per_instance, topks=m.replace('skill_coverage_', '')) # skill_coverages for list of k's
+                            df_skc.columns = df.columns
+                            df = pd.concat([df, df_skc], axis=0)
+                            df_mean = pd.concat([df_mean, df_mean_skc], axis=0) # concat df_skc to the last row of df_mean
 
-                    #df_mean = pd.concat([df_mean, df_skc], axis=0) # concat df_skc to the last row of df_mean
+                    if per_instance: df.to_csv(f'{filename}pred.eval.per_instance.csv', float_format='%.5f')
+                    log.info(f'Saving file per fold as {filename}pred.eval.mean.csv')
+                    df_mean.to_csv(f'{filename}pred.eval.mean.csv')
                     fold_mean = pd.concat([fold_mean, df_mean], axis=1)
                     if per_instance: fold_mean_per_instance = fold_mean_per_instance.add(df, fill_value=0)
                 mean_std['mean'] = fold_mean.mean(axis=1)

@@ -301,7 +301,7 @@ class Team(object):
         except Exception as e: raise e
 
     @classmethod
-    def gen_skill_coverage(cls, teamsvecs, output):
+    def gen_skill_coverage(cls, teamsvecs, output, skipteams=None):
         '''
         a 1-hot vector containing skills that each member has in total by transposing 'member' and then doing dot product with 'skill'
         gives us the co-occurrence matrix of member vs skills. In this way we get the number of times member x co-occurs with skill y. Then,
@@ -325,7 +325,16 @@ class Team(object):
             return member_skill_co
         except FileNotFoundError as e:
             log.info(f'Member-skill co-occurrence matrix not found! Generating ...')
-            member_skill_co = scipy.sparse.lil_matrix(np.dot(teamsvecs['member'].transpose(), teamsvecs['skill']))
+
+            if skipteams is not None: # to avoid test/unseen teams leakage
+                import copy
+                member, skill = copy.deepcopy(teamsvecs['member']), copy.deepcopy(teamsvecs['skill'])
+                for i in skipteams:
+                    member.rows[i] = []; member.data[i] = []
+                    skill.rows[i] = []; skill.data[i] = []
+
+                member_skill_co = scipy.sparse.csr_matrix(np.dot(member.transpose(), skill))
+            else: member_skill_co = scipy.sparse.csr_matrix(np.dot(teamsvecs['member'].transpose(), teamsvecs['skill']))
             with open(filepath, 'wb') as f:
                 pickle.dump(member_skill_co, f)
                 log.info(f'Member-skill co-occurrence matrix {member_skill_co.shape} saved at {filepath}.')

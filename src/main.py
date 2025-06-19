@@ -79,10 +79,6 @@ def run(cfg):
         # this will call the Team.generate_sparse_vectors(), which itself may (lazy) call Team.read_data(), which itself may (lazy) call {Publication|Movie|Repo|Patent}.read_data()
         teamsvecs, indexes = domain_cls.gen_teamsvecs(cfg.data.source, cfg.data.output, cfg.data)
 
-        #TODO? move this call for evaluation part?
-        # skill coverage metric, all skills of each expert, all expert of each skills (supports of each skill, like in RarestFirst)
-        teamsvecs['skillcoverage'] = domain_cls.gen_skill_coverage(teamsvecs, cfg.data.output) # after we have a sparse vector, we create es_vecs from that
-
         year_idx = []
         for i in range(1, len(indexes['i2y'])): #e.g, [(0, 1900), (6, 1903), (14, 1906)] => the i shows the starting index for teams of the year
             if indexes['i2y'][i][0] - indexes['i2y'][i-1][0] > cfg.train.nfolds: year_idx.append(indexes['i2y'][i-1])
@@ -90,6 +86,10 @@ def run(cfg):
         indexes['i2y'] = year_idx
 
         splits = get_splits(teamsvecs['skill'].shape[0], cfg.train.nfolds, cfg.train.train_test_ratio, cfg.data.output, cfg.seed, indexes['i2y'] if cfg.train.step_ahead else None, step_ahead=cfg.train.step_ahead)
+
+        # move this call for evaluation part?
+        # skill coverage metric, all skills of each expert, all expert of each skills (supports of each skill, like in RarestFirst)
+        teamsvecs['skillcoverage'] = domain_cls.gen_skill_coverage(teamsvecs, cfg.data.output, skipteams=splits['test'])
 
         if 'embedding' in cfg.data and cfg.data.embedding.class_method:
             # Get command-line overrides for embedding. Kinda tricky as we dynamically override a subconfig.
@@ -138,6 +138,7 @@ def run(cfg):
             # t2v object knows the embedding method and ...
             skill_vecs = t2v.get_dense_vecs(vectype='skill')
             assert skill_vecs.shape[0] == teamsvecs['skill'].shape[0], f'{opentf.textcolor["red"]}Incorrect number of embeddings for teams subset of skills!{opentf.textcolor["reset"]}'
+            teamsvecs['original_skill'] = teamsvecs['skill'] #to accomodate skill_coverage metric and future use cases
             teamsvecs['skill'] = skill_vecs
 
         for m in cfg.models.instances:
@@ -159,8 +160,8 @@ def run(cfg):
 
             if 'eval'  in cfg.cmd:
                 log.info(f'{opentf.textcolor["magenta"]}Evaluating team recommender instance {m} ... {opentf.textcolor["reset"]}')
-                metrics = set(f'{m}_{",".join([str(i) for i in cfg.eval.topk])}' for m in cfg.eval.metrics) #{'ndcg_cut_2,5,10', 'P_2,5,10', ...}
-                models[m].evaluate(teamsvecs, splits, on_train=cfg.eval.on_train, per_epoch=cfg.eval.per_epoch, metrics=metrics)
+                for key in cfg.eval.metrics: cfg.eval.metrics[key] = [m.replace('topk', cfg.eval.topk) for m in cfg.eval.metrics[key]]
+                models[m].evaluate(teamsvecs, splits, cfg.eval.on_train, cfg.eval.per_epoch, cfg.eval.per_instance, cfg.eval.metrics)
 
             # if m_name.endswith('a1'): vecs_['skill'] = lil_matrix(scipy.sparse.hstack((vecs_['skill'], lil_matrix(np.ones((vecs_['skill'].shape[0], 1))))))
             # make_popular_and_nonpopular_matrix(vecs_, data_list[0])
