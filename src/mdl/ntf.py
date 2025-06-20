@@ -49,20 +49,26 @@ class Ntf:
                 for i, predfile in enumerate(predfiles):
                     epoch = f'e{i-1}.' if i > 0 else '' #the first file is non-epoch-based but the rest are
                     filename = f'{self.output}/f{foldidx}.{pred_set}.{epoch}'
+                    log.info(f'Evaluating predictions at {filename}pred ... for {metrics}')
                     Y_ = Ntf.torch.load(f'{filename}pred')['y_pred']
 
-                    df, df_mean, fpr_tpr = metric.calculate_metrics(Y, Y_, per_instance, metrics)
+                    log.info(f'{metrics.trec} ...')
+                    df, df_mean = metric.calculate_metrics(Y, Y_, per_instance, metrics)
+
                     if 'aucroc' in metrics.other:
+                        log.info("['aucroc'] and curve values (fpr, tpr) ...")
+                        aucroc, fpr_tpr = metric.calculate_auc_roc(Y, Y_)
+                        df_mean.loc['aucroc'] = aucroc
                         with open(f'{filename}pred.eval.roc.pkl', 'wb') as outfile: pickle.dump(fpr_tpr, outfile)
 
-                    for m in metrics.other:
-                        if 'skill_coverage' in m:
-                            X = teamsvecs['skill'] if scipy.sparse.issparse(teamsvecs['skill']) else teamsvecs['original_skill'] #to accomodate dense emb vecs of skills
-                            X = X[splits['folds'][foldidx][pred_set]] if pred_set != 'test' else X[splits['test']]
-                            df_skc, df_mean_skc = metric.calculate_skill_coverage(X, Y_, teamsvecs['skillcoverage'], per_instance, topks=m.replace('skill_coverage_', ''))
-                            df_skc.columns = df.columns
-                            df = pd.concat([df, df_skc], axis=0)
-                            df_mean = pd.concat([df_mean, df_mean_skc], axis=0)
+                    if (m:=[m for m in metrics.other if 'skill_coverage' in m]): #since this metric comes with topks str like 'skill_coverage_2,5,10'
+                        log.info(f'{m} ...')
+                        X = teamsvecs['skill'] if scipy.sparse.issparse(teamsvecs['skill']) else teamsvecs['original_skill'] #to accomodate dense emb vecs of skills
+                        X = X[splits['folds'][foldidx][pred_set]] if pred_set != 'test' else X[splits['test']]
+                        df_skc, df_mean_skc = metric.calculate_skill_coverage(X, Y_, teamsvecs['skillcoverage'], per_instance, topks=m[0].replace('skill_coverage_', ''))
+                        df_skc.columns = df.columns
+                        df = pd.concat([df, df_skc], axis=0)
+                        df_mean = pd.concat([df_mean, df_mean_skc], axis=0)
 
                     if per_instance: df.to_csv(f'{filename}pred.eval.per_instance.csv', float_format='%.5f')
                     log.info(f'Saving file per fold as {filename}pred.eval.mean.csv')
