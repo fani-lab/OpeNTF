@@ -11,13 +11,12 @@ class Rnd(Ntf):
         y_test = teamsvecs['member'][splits['test']]
         test_dl = Ntf.torch.utils.data.DataLoader(Ntf.dataset(X_test, y_test), batch_size=self.cfg.b, shuffle=False)
         for pred_set in (['test', 'train', 'valid'] if on_train else ['test']):
-            if pred_set != 'test':
-                X = teamsvecs['skill'][splits['folds'][foldidx][pred_set], :]
-                y = teamsvecs['member'][splits['folds'][foldidx][pred_set]]
-                dl = Ntf.torch.utils.data.DataLoader(Ntf.dataset(X, y), batch_size=self.cfg.b, shuffle=False)
-            else: dl = test_dl
-
             for foldidx in splits['folds'].keys():
+                if pred_set != 'test':
+                    X = teamsvecs['skill'][splits['folds'][foldidx][pred_set], :]
+                    y = teamsvecs['member'][splits['folds'][foldidx][pred_set]]
+                    dl = Ntf.torch.utils.data.DataLoader(Ntf.dataset(X, y), batch_size=self.cfg.b, shuffle=False)
+                else: dl = test_dl
                 y_pred = Ntf.torch.empty(0, teamsvecs['member'].shape[1])
                 for X, y in dl:
                     scores = Ntf.torch.clamp(Ntf.torch.rand(y.shape), min=1.e-6, max=1. - 1.e-6)

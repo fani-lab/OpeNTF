@@ -42,7 +42,7 @@ class Ntf:
             
             for foldidx in splits['folds'].keys(): #for e in range(epochs):
                 if pred_set != 'test': Y = teamsvecs['member'][splits['folds'][foldidx][pred_set]]
-                else:Y = y_test
+                else: Y = y_test
 
                 predfiles = [f'{self.output}/f{foldidx}.{pred_set}.pred'] #the first file as a hook
                 if per_epoch: predfiles += [f'{self.output}/{_}' for _ in os.listdir(self.output) if re.match(f'f{foldidx}.{pred_set}.e\d+.pred$', _)]
