@@ -40,15 +40,14 @@ class Ntf:
             mean_std = pd.DataFrame()
             if per_instance: fold_mean_per_instance = pd.DataFrame()
             
-            predfiles = [f'{self.output}/{_}' for _ in os.listdir(self.output) if re.match('f\d+.pt', _)]
-            if per_epoch: predfiles += [f'{self.output}/{_}' for _ in os.listdir(self.output) if re.match('f\d+.e\d+', _)]
+            for foldidx in splits['folds'].keys(): #for e in range(epochs):
+                if pred_set != 'test': Y = teamsvecs['member'][splits['folds'][foldidx][pred_set]]
+                else:Y = y_test
 
-            epochs = len(predfiles)//len(splits['folds'].keys())
-            for e in range(epochs):
-                epoch = f'e{e}.' if per_epoch and e < (epochs - 1) else ''
-                for foldidx in splits['folds'].keys():
-                    if pred_set != 'test': Y = teamsvecs['member'][splits['folds'][foldidx][pred_set]]
-                    else: Y = y_test
+                predfiles = [f'{self.output}/f{foldidx}.{pred_set}.pred'] #the first file as a hook
+                if per_epoch: predfiles += [f'{self.output}/{_}' for _ in os.listdir(self.output) if re.match(f'f{foldidx}.{pred_set}.e\d+.pred$', _)]
+                for i, predfile in enumerate(predfiles):
+                    epoch = f'e{i-1}.' if i > 0 else '' #the first file is non-epoch-based but the rest are
                     filename = f'{self.output}/f{foldidx}.{pred_set}.{epoch}'
                     Y_ = Ntf.torch.load(f'{filename}pred')['y_pred']
 
@@ -58,22 +57,24 @@ class Ntf:
 
                     for m in metrics.other:
                         if 'skill_coverage' in m:
-                            X = teamsvecs['skill'][splits['test']] if scipy.sparse.issparse(teamsvecs['skill']) else teamsvecs['original_skill'] #to accomodate dense emb vecs of skills
-                            df_skc, df_mean_skc = metric.calculate_skill_coverage(X, Y_, teamsvecs['skillcoverage'], per_instance, topks=m.replace('skill_coverage_', '')) # skill_coverages for list of k's
+                            X = teamsvecs['skill'] if scipy.sparse.issparse(teamsvecs['skill']) else teamsvecs['original_skill'] #to accomodate dense emb vecs of skills
+                            X = X[splits['folds'][foldidx][pred_set]] if pred_set != 'test' else X[splits['test']]
+                            df_skc, df_mean_skc = metric.calculate_skill_coverage(X, Y_, teamsvecs['skillcoverage'], per_instance, topks=m.replace('skill_coverage_', ''))
                             df_skc.columns = df.columns
                             df = pd.concat([df, df_skc], axis=0)
-                            df_mean = pd.concat([df_mean, df_mean_skc], axis=0) # concat df_skc to the last row of df_mean
+                            df_mean = pd.concat([df_mean, df_mean_skc], axis=0)
 
                     if per_instance: df.to_csv(f'{filename}pred.eval.per_instance.csv', float_format='%.5f')
                     log.info(f'Saving file per fold as {filename}pred.eval.mean.csv')
                     df_mean.to_csv(f'{filename}pred.eval.mean.csv')
-                    fold_mean = pd.concat([fold_mean, df_mean], axis=1)
-                    if per_instance: fold_mean_per_instance = fold_mean_per_instance.add(df, fill_value=0)
-                mean_std['mean'] = fold_mean.mean(axis=1)
-                mean_std['std'] = fold_mean.std(axis=1)
-                log.info(f'Saving mean evaluation file over nfolds as : {pred_set}.{epoch}pred.eval.mean.csv')
-                mean_std.to_csv(f'{self.output}/{pred_set}.{epoch}pred.eval.mean.csv')
-                if per_instance: fold_mean_per_instance.truediv(len(splits['folds'].keys())).to_csv(f'{self.output}/{pred_set}.{epoch}pred.eval.per_instance_mean.csv')
+                    if i == 0: # non-epoch-based only, as there is different number of epochs for each fold model due to earlystopping
+                        fold_mean = pd.concat([fold_mean, df_mean], axis=1)
+                        if per_instance: fold_mean_per_instance = fold_mean_per_instance.add(df, fill_value=0)
+            mean_std['mean'] = fold_mean.mean(axis=1)
+            mean_std['std'] = fold_mean.std(axis=1)
+            log.info(f'Saving mean evaluation file over {len(splits["folds"])} folds as {self.output}/{pred_set}.pred.eval.mean.csv')
+            mean_std.to_csv(f'{self.output}/{pred_set}.pred.eval.mean.csv')
+            if per_instance: fold_mean_per_instance.truediv(len(splits['folds'].keys())).to_csv(f'{self.output}/{pred_set}.pred.eval.per_instance_mean.csv')
     def plot_roc(self, splits, on_train=False):
         plt = opentf.install_import('')
         for pred_set in (['test', 'train', 'valid'] if on_train else ['test']):
