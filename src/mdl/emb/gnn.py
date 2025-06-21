@@ -355,27 +355,30 @@ class Gnn(T2v):
             if 'skill' in self.data.node_types: self.data['skill'].x = ordered_vecs[teamsvecs['member'].shape[1]:]; flag = True  # the remaining is s*
         assert flag, f'{opentf.textcolor["red"]}Nodes features initialization with d2v embeddings NOT applied! Check the consistency of d2v {self.cfg.graph.pre} and graph node types {self.cfg.graph.structure}{opentf.textcolor["reset"]}'
 
-    def get_dense_vecs(self, vectype='skill'): return self._get_node_emb(vectype=vectype)
+    def get_dense_vecs(self, vectype='skill'): return self._get_node_emb(node_type=vectype)
+
     def _get_node_emb(self, homo_data=None, node_type=None):
-        # in n2v, the weights are indeed the embeddings, like w2v or d2v
-        # in other models, self.model(self.data), that is the forward-pass produces the embedding
-        # this part is not needed, as having a model, we always can have the embedding
+        # having a model, we always can have the embedding
+        result = {}
         self.model.eval()
         if self.name == 'm2v':
             if node_type is not None:
                 try: return self.model(node_type)
                 except KeyError as e: raise KeyError(f'{opentf.textcolor["yellow"]}No vectors for {node_type}.{opentf.textcolor["reset"]} Check if it is part of metapath -> {self.cfg.model.metapath_name}') from e
             for node_type in self.data.node_types: # self.model.start or self.model.end could be used for MetaPath2Vec model but ...
-                try: log.info(f'Node type: {node_type}, Shape: {self.model(node_type).shape}')
+                try: result[node_type] = self.model(node_type)
                 except KeyError: log.warning(f'{opentf.textcolor["yellow"]}No vectors for {node_type}.{opentf.textcolor["reset"]} Check if it is part of metapath -> {self.cfg.model.metapath_name}' )
         else:
+            # in n2v, the weights are indeed the embeddings, like w2v or d2v
+            # in other models, self.model(self.data), that is the forward-pass produces the embedding
             if homo_data is None: homo_data = self.data.to_homogeneous()
             embeddings = self.model.embedding.weight.data.cpu() if self.name == 'n2v' else self.model(homo_data)
             node_type_tensor = homo_data.node_type # tensor of shape [num_nodes]
             if node_type is not None: return embeddings[node_type_tensor == (self.data.node_types.index(node_type))]
             for i, node_type in enumerate(self.data.node_types):
                 type_embeddings = embeddings[node_type_tensor == i]  # shape: [num_nodes_of_type, self.cfg.model.d]
-                log.info(f'Node type: {node_type}, Shape: {type_embeddings.shape}')
+                result[node_type] = type_embeddings
+        return result
 
     # def save_emb(self):
     #     with self.torch.no_grad():

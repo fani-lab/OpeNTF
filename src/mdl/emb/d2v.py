@@ -58,7 +58,6 @@ class D2v(T2v):
             self.__class__.gensim = opentf.install_import('gensim==4.3.3', 'gensim')
             self.model = self.gensim.models.Doc2Vec.load(self.modelfilepath)
             assert self.model.docvecs.vectors.shape[0] == teamsvecs['skill'].shape[0], f'{opentf.textcolor["red"]}Incorrect number of embeddings per team! {self.model.docvecs.vectors.shape[0]} != {teamsvecs["skill"].shape[0]}{opentf.textcolor["reset"]}'
-            log.info(f'Model of {self.model.docvecs.vectors.shape} embeddings loaded.')
             return self
         except FileNotFoundError:
             log.info(f'File not found! Training the embedding model from scratch ...')
