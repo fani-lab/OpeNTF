@@ -1,12 +1,11 @@
 multilayer neural classifiers
-    {fnn,bnn}_eval >> skill-coverage
-
     emb_{fnn,bnn}_{train,test,eval}
 
-    nmt
-    tNtf_{emb}_{fnn,bnn}_{train,test}
+    nmt (from nmt branch and sigir25 paper)
     rrn
     caser
+
+    tNtf_{emb}_{fnn,bnn}_{train,test}
 
     {emb}_{fnn,bnn}_cl_{train/test} >> future
 
