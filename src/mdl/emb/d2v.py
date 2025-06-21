@@ -102,12 +102,12 @@ class D2v(T2v):
         sorted_indices = np.array([d2v_model_wv.key_to_index[word] for word in sorted_words])
         return d2v_model_wv.vectors[sorted_indices]
 
-    def get_dense_vecs(self, vectype='skill'):
+    def get_dense_vecs(self, teamsvecs, vectype='skill'):
+        # note that a doc includes a subset of skills or members. So, the doc vec represents the subset.
+        # agg='': we can have vec for each individual words (skill or member) but then we have to sum/mean then for a subset. that's w2v, not d2v-based skills or members
         assert self.cfg.embtype == vectype, f'{opentf.textcolor["red"]}Incorrect d2v model ({self.cfg.embtype}) for the requested vector type {vectype}{opentf.textcolor["reset"]}'
         indices = [self.model.docvecs.key_to_index[str(i)] for i in range(len(self.model.docvecs))]
         assert np.allclose(self.model.docvecs.vectors, self.model.docvecs.vectors[indices]), f'{opentf.textcolor["red"]}Incorrect embedding for a team due to misorderings of embeddings!{opentf.textcolor["reset"]}'
-        # note that a doc includes a subset of skills or members. So, the doc vec represents the subset.
-        # we can have vec for each individual words (skill or member) but then we have to sum/mean then for a subset. that's w2v, not d2v-based skills or members
         return self.model.docvecs.vectors
 
 # # unit tests :D

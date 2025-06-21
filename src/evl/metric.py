@@ -28,14 +28,16 @@ def calculate_skill_coverage(X, Y_, expertskillvecs, per_instance=False, topks='
     B, E = Y_.shape #batches of output expert recommendations for each team
     assert not np.any(np.all(X.toarray() != 0, axis=1)), f'{opentf.textcolor["red"]}The skill vectors are not multi-hot to show the skill subset!{opentf.textcolor["reset"]}'
     skill_coverages = {int(k): np.zeros(B) for k in topks.split(',')}
-    # unit test: should make the result max to 1.0 because regardless of the selected expert, any of them, has ALL the skills
+
+    # unit test0: if k grows, this metric increases but for k=inf, it may not reach to exact 1.0 as skill-coverage misses skills in test teams (OOV)
+    # unit test1: should make the result max to 1.0 because regardless of the selected expert, any of them, has ALL the skills
     # for i in range(expertskillvecs.shape[0]):
     #     for j in range(expertskillvecs.shape[1]):
     #         expertskillvecs[i, j] = 1  # should make the result max to 1.0
 
     with tqdm(total=B) as pbar:
         for b in range(B):
-            # unit test: this should make the result nonzero because the required skills are become the entire set, and at least overlaps with an expert's skill
+            # unit test2: this should make the result nonzero because the required skills are become the entire set, and at least overlaps with an expert's skill
             # for i in range(X[b].shape[1]): X[b, i] = 1
 
             ranked_experts = np.argsort(Y_[b])[::-1]

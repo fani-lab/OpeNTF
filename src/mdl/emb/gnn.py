@@ -355,9 +355,12 @@ class Gnn(T2v):
             if 'skill' in self.data.node_types: self.data['skill'].x = ordered_vecs[teamsvecs['member'].shape[1]:]; flag = True  # the remaining is s*
         assert flag, f'{opentf.textcolor["red"]}Nodes features initialization with d2v embeddings NOT applied! Check the consistency of d2v {self.cfg.graph.pre} and graph node types {self.cfg.graph.structure}{opentf.textcolor["reset"]}'
 
-    def get_dense_vecs(self, vectype='skill'): return self._get_node_emb(node_type=vectype)
+    def get_dense_vecs(self, teamsvecs, vectype='skill'):
+        if vectype in teamsvecs.keys(): return (teamsvecs[vectype] @ self._get_node_emb(node_type=vectype).detach().numpy()) / teamsvecs[vectype].sum(axis=1) #average of selected embeddings, e.g., skillsubset of each teams
+        return self._get_node_emb(node_type=vectype) #individual embeddings
 
     def _get_node_emb(self, homo_data=None, node_type=None):
+        #NOTE: as the node indexes are exactly the skill, member, or team idx in teamsvecs, the embeddings are always aligned, i.e., s_i >> emb['skill'][i]
         # having a model, we always can have the embedding
         result = {}
         self.model.eval()
