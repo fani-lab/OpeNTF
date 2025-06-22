@@ -1,0 +1,76 @@
+save_data: ../output/nmt/run/{convs2s,rnn,transformer}
+save_model: ../output/nmt/run/{convs2s,rnn,transformer}.model
+src_vocab: ../output/nmt/run/{convs2s,rnn,transformer}.vocab.src
+tgt_vocab: ../output/nmt/run/{convs2s,rnn,transformer}.vocab.tgt
+overwrite: True
+data:
+  corpus_1:
+    path_src: ../output/nmt/src-train.txt
+    path_tgt: ../output/nmt/tgt-train.txt
+    weight: 1
+  valid:
+    path_src: ../output/nmt/src-val.txt
+    path_tgt: ../output/nmt/tgt-val.txt
+#src_embeddings: ../output/nmt/run/example.vocab.src.emb
+#tgt_embeddings: ../output/nmt/run/example.vocab.tgt.emb
+
+# # Where to save the checkpoints and common hyperparameters
+keep_checkpoint: -1
+seed: 0
+train_steps: 5009
+save_checkpoint_steps: 501
+valid_steps: 501
+report_every: 501
+dropout: 0.2
+word_vec_size: 128
+
+# Batching
+world_size: 1 # Train on a single GPU
+gpu_ranks: [0]
+#world_size: 2
+#gpu_ranks: [0, 1]
+num_workers: 8
+batch_size: 128
+bucket_size: 832
+valid_batch_size: 128
+
+# Optimization
+model_dtype: "fp16"
+optim: adam
+weight_decay: 0.0001
+learning_rate: 0.001
+adam_beta1: 0.9
+adam_beta2: 0.98
+
+#start_decay_steps: 50
+#decay_steps: 50
+
+# copy_attn: 'true'
+# global_attention: mlp
+# reuse_copy_attn: 'true'
+# bridge: 'true'
+
+encoder_type: {cnn,rnn,transformer}
+decoder_type: {cnn,rnn,transformer}
+
+## ConvS2S with Attention Configuration Template
+cnn_size: 128 # same as hidden size
+cnn_kernel_width: 3
+layers: 4
+
+## RNN with Attention Configuration Template
+rnn_type: LSTM
+rnn_size: 128
+input_feed: 1
+enc_layers: 4
+dec_layers: 4
+
+## Transformer with Attention Configuration Template
+warmup_steps: 501 # transformer
+position_encoding: true
+hidden_size: 128
+transformer_ff: 512
+attention_dropout: 0.2
+#enc_layers: 8
+#dec_layers: 8
+heads: 8
