@@ -1,7 +1,7 @@
 #python3.8
 #python -m venv opentf_venv
 #source opentf_venv/bin/activate  (non-windows), opentf_venv\Scripts\activate (windows)
-#pip install -r requirement.txt
+#pip install -r requirements.txt
 
 scipy==1.10.1
 numpy==1.24.4 #cannot go above for gensim
