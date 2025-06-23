@@ -70,18 +70,14 @@ def aggregate(output):
 @hydra.main(version_base=None, config_path='.', config_name='__config__')
 def run(cfg):
     t2v = None
-    if any(c in cfg.cmd for c in ['prep', 'train', 'test']):
+    domain_cls = get_class(cfg.data.domain)
+
+    if cfg.cmd and any(c in cfg.cmd for c in ['prep', 'train', 'test', 'eval']):
         cfg.data.output += f'.mt{cfg.data.filter.min_nteam}.ts{cfg.data.filter.min_team_size}' if 'filter' in cfg.data and cfg.data.filter else ''
         if not os.path.isdir(cfg.data.output): os.makedirs(cfg.data.output)
 
-        domain_cls = get_class(cfg.data.domain)
-
         # this will call the Team.generate_sparse_vectors(), which itself may (lazy) call Team.read_data(), which itself may (lazy) call {Publication|Movie|Repo|Patent}.read_data()
-        vecs, indexes = domain_cls.gen_teamsvecs(cfg.data.source, cfg.data.output, cfg.data)
-
-        #TODO? move this call for evaluation part?
-        # skill coverage metric, all skills of each expert, all expert of each skills (supports of each skill, like in RarestFirst)
-        vecs['skillcoverage'] = domain_cls.gen_skill_coverage(vecs, cfg.data.output) # after we have a sparse vector, we create es_vecs from that
+        teamsvecs, indexes = domain_cls.gen_teamsvecs(cfg.data.source, cfg.data.output, cfg.data)
 
         year_idx = []
         for i in range(1, len(indexes['i2y'])): #e.g, [(0, 1900), (6, 1903), (14, 1906)] => the i shows the starting index for teams of the year
@@ -89,7 +85,11 @@ def run(cfg):
         year_idx.append(indexes['i2y'][-1])
         indexes['i2y'] = year_idx
 
-        splits = get_splits(vecs['skill'].shape[0], cfg.train.nfolds, cfg.train.train_test_ratio, cfg.data.output, cfg.seed, indexes['i2y'] if cfg.train.step_ahead else None, step_ahead=cfg.train.step_ahead)
+        splits = get_splits(teamsvecs['skill'].shape[0], cfg.train.nfolds, cfg.train.train_test_ratio, cfg.data.output, cfg.seed, indexes['i2y'] if cfg.train.step_ahead else None, step_ahead=cfg.train.step_ahead)
+
+        # move this call for evaluation part?
+        # skill coverage metric, all skills of each expert, all expert of each skills (supports of each skill, like in RarestFirst)
+        teamsvecs['skillcoverage'] = domain_cls.gen_skill_coverage(teamsvecs, cfg.data.output, skipteams=splits['test'])
 
         if 'embedding' in cfg.data and cfg.data.embedding.class_method:
             # Get command-line overrides for embedding. Kinda tricky as we dynamically override a subconfig.
@@ -105,9 +105,9 @@ def run(cfg):
             cls = get_class(cls)
             t2v = cls(cfg.data.output, cfg.data.acceleration, cfg.data.embedding.config.model[cls.__name__.lower()])
             t2v.name = method
-            t2v.train(vecs, indexes, splits)
+            t2v.train(teamsvecs, indexes, splits)
 
-    if any(c in cfg.cmd for c in ['train', 'test']):
+    if cfg.cmd and any(c in cfg.cmd for c in ['train', 'test', 'eval']):
 
         # if a list, all see the exact splits of teams.
         # if individual, they see different teams in splits. But as we show the average results, no big deal, esp., as we do n-fold
@@ -115,18 +115,8 @@ def run(cfg):
         # model names t* will follow the streaming scenario
         # model names *_ts have timestamp (year) as a single added feature
         # model names *_ts2v learn temporal skill vectors via d2v when each doc is a stream of (skills: year of the team)
-
         # non-temporal (no streaming scenario, bag of teams)
-
         assert len(cfg.models.instances) > 0, f'{opentf.textcolor["red"]}No model instance for training! Check ./src/__config__.yaml and models.instances ... {opentf.textcolor["reset"]}'
-
-        if cfg.train.merge_teams_w_same_skills: domain_cls.merge_teams_by_skills(vecs, inplace=True)
-
-        if 'embedding' in cfg.data and cfg.data.embedding.class_method:
-            # t2v object knows the embedding method and ...
-            skill_vecs = t2v.get_dense_vecs(vectype='skill')
-            assert skill_vecs.shape[0] == vecs['skill'].shape[0], f'{opentf.textcolor["red"]}Incorrect number of embeddings for teams subset of skills!{opentf.textcolor["reset"]}'
-            vecs['skill'] = skill_vecs
 
         # Get command-line overrides for models. Kinda tricky as we dynamically override a subconfig.
         # Use '+models.{...}=value' to override
@@ -135,20 +125,46 @@ def run(cfg):
         mdlcfg = OmegaConf.merge(OmegaConf.load(cfg.models.config), OmegaConf.from_dotlist(mdl_overrides))
         mdlcfg.seed = cfg.seed
         mdlcfg.pytorch = cfg.pytorch
+        mdlcfg.save_per_epoch = cfg.train.save_per_epoch
+        mdlcfg.tntf.tfolds = cfg.train.nfolds
+        mdlcfg.tntf.step_ahead = cfg.train.step_ahead
+        mdlcfg.pytorch = cfg.pytorch
         OmegaConf.resolve(mdlcfg)
         cfg.models.config = mdlcfg
+
+        if cfg.train.merge_teams_w_same_skills: domain_cls.merge_teams_by_skills(teamsvecs, inplace=True)
+
+        if 'embedding' in cfg.data and cfg.data.embedding.class_method:
+            # t2v object knows the embedding method and ...
+            skill_vecs = t2v.get_dense_vecs(teamsvecs, vectype='skill')
+            assert skill_vecs.shape[0] == teamsvecs['skill'].shape[0], f'{opentf.textcolor["red"]}Incorrect number of embeddings for teams subset of skills!{opentf.textcolor["reset"]}'
+            teamsvecs['original_skill'] = teamsvecs['skill'] #to accomodate skill_coverage metric and future use cases
+            teamsvecs['skill'] = skill_vecs
+
         for m in cfg.models.instances:
-            import mdl # required for all models. Also, mdl/__init__.py should expose all submodules
-            models[m] = eval(m, {'mdl': mdl})
-            # if m_name.endswith('a1'): vecs_['skill'] = lil_matrix(scipy.sparse.hstack((vecs_['skill'], lil_matrix(np.ones((vecs_['skill'].shape[0], 1))))))
-            log.info(f'Training team recommender instance {m} ... ')
+            cls_method = m.split('_')
+            cls = get_class(cls_method[0])
+            output_ = (t2v.modelfilepath + '_' if t2v else cfg.data.output) + f'/{cls.__name__.lower()}' #cannot have file and folder with same name if t2v
+            models[m] = cls(output_, cfg.pytorch, cfg.acceleration, cfg.seed, cfg.models.config[cls.__name__.lower()])
+            if len(cls_method) > 1: #e.g., in mdl.tntf.tNtf that we need the core model
+                cls = get_class(cls_method[1])
+                models[m].model = cls(output_ + f'/{cls.__name__.lower()}', cfg.pytorch, cfg.acceleration, cfg.seed, cfg.models.config[cls.__name__.lower()])
             # find a way to show model-emb pair setting
+            if 'train' in cfg.cmd:
+                log.info(f'{opentf.textcolor["blue"]}Training team recommender instance {m} ... {opentf.textcolor["reset"]}')
+                models[m].learn(teamsvecs, splits, None)
+
+            if 'test'  in cfg.cmd:
+                log.info(f'{opentf.textcolor["green"]}Testing team recommender instance {m} ... {opentf.textcolor["reset"]}')
+                models[m].test(teamsvecs, splits, on_train=cfg.test.on_train, per_epoch=cfg.test.per_epoch)
+
+            if 'eval'  in cfg.cmd:
+                log.info(f'{opentf.textcolor["magenta"]}Evaluating team recommender instance {m} ... {opentf.textcolor["reset"]}')
+                for key in cfg.eval.metrics: cfg.eval.metrics[key] = [m.replace('topk', cfg.eval.topk) for m in cfg.eval.metrics[key]]
+                models[m].evaluate(teamsvecs, splits, cfg.eval.on_train, cfg.eval.per_epoch, cfg.eval.per_instance, cfg.eval.metrics)
+
+            # if m_name.endswith('a1'): vecs_['skill'] = lil_matrix(scipy.sparse.hstack((vecs_['skill'], lil_matrix(np.ones((vecs_['skill'].shape[0], 1))))))
             # make_popular_and_nonpopular_matrix(vecs_, data_list[0])
-
-            output_ = (t2v.modelfilepath if t2v else cfg.data.output) + f'_{models[m].name()}' #cannot have file and folder with same name if t2v
-            if not os.path.isdir(output_): os.makedirs(output_)
-
-            if 'train' in cfg.cmd: models[m].learn(vecs, indexes, splits, cfg.models.config[models[m].model.__class__.__name__.lower()] if isinstance(models[m], mdl.tntf.tNtf) else cfg.models.config[models[m].__class__.__name__.lower()], None, output_)
 
         # # streaming scenario (no vector for time)
         # if 'tfnn' in model_list: models['tfnn'] = tNtf(Fnn(), cfg.train.nfolds, cfg.train.step_ahead)
@@ -173,7 +189,6 @@ def run(cfg):
         # if 'caser' in model_list: models['caser'] = Caser(settings['model']['step_ahead'])
         # if 'rrn' in model_list: models['rrn'] = Rrn(settings['model']['baseline']['rrn']['with_zero'], settings['model']['step_ahead'])
 
-    # if 'test' in cmd: self.test(output, splits, indexes, vecs, settings, on_train_valid_set, per_epoch, merge_skills)
     # if 'eval' in cmd: self.evaluate(output, splits, vecs, on_train_valid_set, per_instance, per_epoch)
     # if 'plot' in cmd: self.plot_roc(output, splits, on_train_valid_set)
     # if 'fair' in cmd: self.fair(output, vecs, splits, fair_settings)
@@ -191,7 +206,7 @@ def run(cfg):
     #   if 'eval' in cmd: self.model.evaluate(output_, splits, vecs, on_train_valid_set, per_instance, per_epoch)
     #   if 'plot' in cmd: self.model.plot_roc(output_, splits, on_train_valid_set)
 
-    if 'agg' in cfg.cmd: aggregate(cfg.data.output)
+    # if 'agg' in cfg.cmd: aggregate(cfg.data.output)
 
 # sample runs for different configs, including different prep, embeddings, model training, ..., are available as unit-test in
 # ./github/workflows/*.yml

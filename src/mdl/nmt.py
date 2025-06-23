@@ -9,19 +9,16 @@ from eval.metric import *
 from mdl.ntf import Ntf
 
 class Nmt(Ntf):
-    def __init__(self):
-        super(Ntf, self).__init__()
+    def __init__(self, output, pytorch, device, seed, cgf): super(Ntf, self).__init__(output, pytorch, device, seed, cgf)
 
-    def prepare_data(self, vecs):
+    def _prep(self, teamsvecs, indexes, splits):
         input_data = []
         output_data = []
-        for i, id in enumerate(vecs['id']):
-            input_data.append([f's{str(skill_idx)}' for skill_idx in vecs['skill'][i].nonzero()[1]])
-            output_data.append([f'm{str(member_idx)}' for member_idx in vecs['member'][i].nonzero()[1]])
-        return input_data, output_data
+        for i in range(teamsvecs['skill'].shape[0]): #n_teams
+            input_data.append([f's{str(skill_idx)}' for skill_idx in teamsvecs['skill'][i].nonzero()[1]])
+            output_data.append([f'm{str(member_idx)}' for member_idx in teamsvecs['member'][i].nonzero()[1]])
 
-    def build_vocab(self, input_data, output_data, splits, settings, model_path):
-        endl = "\n"
+        endl = '\n'
         input_data = np.array(['{}{}'.format(_, endl) for _ in [' '.join(_) for _ in input_data]])
         output_data = np.array(['{}{}'.format(_, endl) for _ in [' '.join(_) for _ in output_data]])
 
@@ -29,10 +26,10 @@ class Nmt(Ntf):
             fold_path = f'{model_path}/fold{foldidx}'
             if not os.path.isdir(fold_path): os.makedirs(fold_path)
 
-            with open(f"{fold_path}/src-train.txt", "w") as src_train: src_train.writelines(input_data[splits['folds'][foldidx]['train']])
-            with open(f"{fold_path}/src-valid.txt", "w") as src_val: src_val.writelines(input_data[splits['folds'][foldidx]['valid']])
-            with open(f"{fold_path}/tgt-train.txt", "w") as tgt_train: tgt_train.writelines(output_data[splits['folds'][foldidx]['train']])
-            with open(f"{fold_path}/tgt-valid.txt", "w") as tgt_val: tgt_val.writelines(output_data[splits['folds'][foldidx]['valid']])
+            with open(f'{fold_path}/src-train.txt', 'w') as src_train: src_train.writelines(input_data[splits['folds'][foldidx]['train']])
+            with open(f'{fold_path}/src-valid.txt', 'w') as src_val: src_val.writelines(input_data[splits['folds'][foldidx]['valid']])
+            with open(f'{fold_path}/tgt-train.txt', 'w') as tgt_train: tgt_train.writelines(output_data[splits['folds'][foldidx]['train']])
+            with open(f'{fold_path}/tgt-valid.txt', 'w') as tgt_val: tgt_val.writelines(output_data[splits['folds'][foldidx]['valid']])
 
             settings['data']['corpus_1']['path_src'] = f'{fold_path}/src-train.txt'
             settings['data']['corpus_1']['path_tgt'] = f'{fold_path}/tgt-train.txt'
@@ -61,7 +58,9 @@ class Nmt(Ntf):
 
         return model_path
 
-    def learn(self, splits, path):
+    def learn(self, teamsvecs, indexes, splits):
+        self._prep(teamsvecs, indexes, splits)
+
         for foldidx in splits['folds'].keys():
             cli_cmd = 'onmt_train '
             cli_cmd += f'-config {path}/fold{foldidx}/config.yml '
@@ -129,30 +128,17 @@ class Nmt(Ntf):
     def run(self, splits, vecs, indexes, output, settings, cmd):
         with open(settings['base_config']) as infile: base_config = yaml.safe_load(infile)
 
-        encoder_type = base_config['encoder_type']
         learning_rate = base_config['learning_rate']
         word_vec_size = base_config['word_vec_size']
         batch_size = base_config['batch_size']
         epochs = base_config['train_steps']
-        team_count = vecs['skill'].shape[0]
-        skill_count = vecs['skill'].shape[1]
-        member_count = vecs['member'].shape[1]
 
-        if encoder_type == 'rnn':
-            encoder_type = base_config['rnn_type']
-            layer_size = base_config['rnn_size']
-        elif encoder_type == 'transformer':
-            layer_size = base_config['transformer_ff']
 
-        
-        model_path = f"{output}/t{team_count}.s{skill_count}.m{member_count}.et{encoder_type}.l{layer_size}.wv{word_vec_size}.lr{learning_rate}.b{batch_size}.e{epochs}"
-        if not os.path.isdir(output): os.makedirs(output)
         
         y_test = vecs['member'][splits['test']]
         
         if 'train' in cmd:
-            input_data, output_data = self.prepare_data(vecs)
-            model_path = self.build_vocab(input_data, output_data, splits, base_config, model_path)
+            model_path = self.build_vocab(splits, base_config, model_path)
             self.learn(splits, model_path)
         if 'test' in cmd: self.test(splits, model_path, per_epoch=True)
         if 'eval' in cmd: self.eval(splits, model_path, member_count, y_test, per_epoch=True)

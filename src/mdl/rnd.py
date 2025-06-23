@@ -1,28 +1,27 @@
-import numpy as np
+import numpy as np, logging
+log = logging.getLogger(__name__)
 
-from mdl.ntf import Ntf
+from .ntf import Ntf
 
 class Rnd(Ntf):
-    def __init__(self, pytorch): super(Rnd, self).__init__(pytorch)
+    def __init__(self, output, device, pytorch, seed, cgf): super(Rnd, self).__init__(output, device, pytorch, seed, cgf)
 
-    def test(self, model_path, splits, indexes, vecs, params, on_train_valid_set=False, per_epoch=False, merge_skills=False):
-        from mdl.cds import TFDataset
-
-        X_test = vecs['skill'][splits['test'], :]
-        y_test = vecs['member'][splits['test']]
-        test_matrix = TFDataset(X_test, y_test)
-        test_dl = Ntf.torch.utils.data.DataLoader(test_matrix, batch_size=params['b'], shuffle=True, num_workers=0)
-
-        for foldidx in splits['folds'].keys():
-            Ntf.torch.cuda.empty_cache()
-            with Ntf.torch.no_grad():
-                y_pred = Ntf.torch.empty(0, test_dl.dataset.output.shape[1])
-                for x, y in test_dl:
-                    x = x.to(device=self.device)
-                    scores = self.forward(None, y)#we need y to know the size of output
-                    scores = scores.squeeze(1).cpu().numpy()
-                    y_pred = np.vstack((y_pred, scores))
-            Ntf.torch.save(self, f'{model_path}/state_dict_model.f{foldidx}.pt', pickle_protocol=4)#dummy model save
-            Ntf.torch.save(y_pred, f'{model_path}/f{foldidx}.test.pred', pickle_protocol=4)
-
-    def forward(self, x, y): return Ntf.torch.clamp(Ntf.torch.rand(y.shape), min=1.e-6, max=1. - 1.e-6)
+    def test(self, teamsvecs, splits, on_train=False, per_epoch=False):
+        X_test = teamsvecs['skill'][splits['test'], :]
+        y_test = teamsvecs['member'][splits['test']]
+        test_dl = Ntf.torch.utils.data.DataLoader(Ntf.dataset(X_test, y_test), batch_size=self.cfg.b, shuffle=False)
+        for pred_set in (['test', 'train', 'valid'] if on_train else ['test']):
+            for foldidx in splits['folds'].keys():
+                if pred_set != 'test':
+                    X = teamsvecs['skill'][splits['folds'][foldidx][pred_set], :]
+                    y = teamsvecs['member'][splits['folds'][foldidx][pred_set]]
+                    dl = Ntf.torch.utils.data.DataLoader(Ntf.dataset(X, y), batch_size=self.cfg.b, shuffle=False)
+                else: dl = test_dl
+                y_pred = Ntf.torch.empty(0, teamsvecs['member'].shape[1])
+                for X, y in dl:
+                    scores = Ntf.torch.clamp(Ntf.torch.rand(y.shape), min=1.e-6, max=1. - 1.e-6)
+                    y_pred = np.vstack((y_pred, scores.squeeze(1)))
+                Ntf.torch.save({}, f'{self.output}/f{foldidx}.pt', pickle_protocol=4)#dummy model save
+                Ntf.torch.save({'y_pred': y_pred, 'uncertainty': None}, f'{self.output}/f{foldidx}.{pred_set}.pred', pickle_protocol=4)
+                epoch = '' #in a random model, there is no training nor per_epoch training
+                log.info(f'{self.name()} model predictions for fold{foldidx}.{pred_set}.{epoch} has saved at {self.output}/f{foldidx}.{pred_set}.{epoch}pred')

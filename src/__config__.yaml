@@ -10,14 +10,15 @@ seed: 0
 pytorch: torch==2.2.2 #--index-url https://download.pytorch.org/whl/cu124
 acceleration: 'cpu' #cpu for all cores, cpu:3 for 3 cores, 'cuda' or 'cuda:0' for the only available gpu, 'cuda:3' for gpu3 >> TODO: multiple gpus
 cmd:
-  - prep
-  - train
+  #- prep
+  #- train
   #- test
   #- eval
   #- plot
   #- agg
   #- fair
 data: #required for 'prep' step
+  hf: True
   domain:
     cmn.publication.Publication
     #cmn.movie.Movie
@@ -56,14 +57,15 @@ data: #required for 'prep' step
 
 models:
   instances:
-    - mdl.rnd.Rnd('${pytorch}')
-    #- mdl.fnn.Fnn() #input skills could be multihot (default), embeddings by d2v, n2v, m2v, ... see above data.embedding.class_method
-    #- mdl.bnn.Bnn()
-    #- mdl.nmt.Nmt()
-    #- mdl.tnmt.tNmt
-    - mdl.tntf.tNtf(mdl.rnd.Rnd('${pytorch}'), ${train.nfolds}, ${train.step_ahead})   #underlying base model could be fnn and bnn. future: tgnn?
+    - mdl.rnd.Rnd
+    - mdl.fnn.Fnn #input skills can be multihot (default), embeddings by d2v, n2v, m2v, ... see above data.embedding.class_method
+    - mdl.bnn.Bnn #thanks to bayesian-torch package at https://github.com/IntelLabs/bayesian-torch
+    #- mdl.nmt.Nmt
     #- mdl.caser.Caser #external baseline
     #- mdl.rrn.Rrn     #external baseline
+    ## NOTE: temporal baselines should not be mixed with non-temporal ones as the training/test splits are temporal based on train.step_ahead
+    #- mdl.tnmt.tNmt
+    #- mdl.tntf.tNtf_mdl.rnd.Rnd   #underlying base model could be fnn and bnn. future: tgnn?. train.step_ahead must be set.
 
   config: ./mdl/__config__.yaml
 
@@ -71,16 +73,21 @@ train:
   nfolds: 3 #ends with nfolds models each with nfolds-1 train splits and one fold valid split, nfolds results, averaged on a single test split
   train_test_ratio: 0.85 #the nfolds will be on the trainig part.
   merge_teams_w_same_skills: True # for explanation >> https://github.com/fani-lab/OpeNTF/issues/156
-  step_ahead: #if streaming/temporal training. for now, it means that whatever are in the last [step_ahead] time interval will be the test set!
-  save_per_epoch: False
+  step_ahead: #NOTE: setting this tag trigger temporal train/test splits for tNtf: streaming/temporal training. for now, it means that whatever are in the last [step_ahead] time interval will be the test set!
+  save_per_epoch: False # due to earlystopping, the number of files could be less than the max training epoch
 
 test:
   on_train: False # for over vs. under-fitting check. # random baseline (mdl.rnd.Rnd()) cannot join this.
   per_epoch: ${train.save_per_epoch} # the test results of each epoch on the test set >> for per-epoch performance. Similar to valid losses during training but here we can have eval metrics
 
 eval:
+  topk: '2,5,10'
+  metrics:
+    trec: [P_topk, recall_topk, ndcg_cut_topk, map_cut_topk, success_topk] # see trec_eval for a complete list or trec_* metrics https://github.com/terrierteam/pytrec_eval/blob/master/tests/pytrec_eval_tests.py
+    other: [skill_coverage_topk, aucroc] #aucroc may not be a good one as the number of classes are number of experts; very large
   on_train: ${test.on_train}
-  save_per_instance: True # needed for paired significance tests
+  per_epoch: ${test.per_epoch}
+  per_instance: True # needed for paired significance tests
 
 fair: #post-hoc reranks of the prediction list
   np_ratio: #desired ratio of non-popular experts after reranking; if None, based on distribution in dataset; default: None; Eg. 0.5

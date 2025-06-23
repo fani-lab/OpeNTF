@@ -58,7 +58,6 @@ class D2v(T2v):
             self.__class__.gensim = opentf.install_import('gensim==4.3.3', 'gensim')
             self.model = self.gensim.models.Doc2Vec.load(self.modelfilepath)
             assert self.model.docvecs.vectors.shape[0] == teamsvecs['skill'].shape[0], f'{opentf.textcolor["red"]}Incorrect number of embeddings per team! {self.model.docvecs.vectors.shape[0]} != {teamsvecs["skill"].shape[0]}{opentf.textcolor["reset"]}'
-            log.info(f'Model of {self.model.docvecs.vectors.shape} embeddings loaded.')
             return self
         except FileNotFoundError:
             log.info(f'File not found! Training the embedding model from scratch ...')
@@ -71,7 +70,7 @@ class D2v(T2v):
             if self.cfg.save_per_epoch:
                 import random
                 random.shuffle(self.data)
-                for epoch in range(1, self.cfg.e + 1):
+                for epoch in range(self.cfg.e):
                     self.model.train(self.data, total_examples=self.model.corpus_count, epochs=1)
                     delta = (self.model.alpha - self.model.min_alpha) / (self.cfg.e - 1)
                     self.model.alpha = max(self.model.alpha - delta, self.model.min_alpha)
@@ -103,12 +102,12 @@ class D2v(T2v):
         sorted_indices = np.array([d2v_model_wv.key_to_index[word] for word in sorted_words])
         return d2v_model_wv.vectors[sorted_indices]
 
-    def get_dense_vecs(self, vectype='skill'):
+    def get_dense_vecs(self, teamsvecs, vectype='skill'):
+        # note that a doc includes a subset of skills or members. So, the doc vec represents the subset.
+        # agg='': we can have vec for each individual words (skill or member) but then we have to sum/mean then for a subset. that's w2v, not d2v-based skills or members
         assert self.cfg.embtype == vectype, f'{opentf.textcolor["red"]}Incorrect d2v model ({self.cfg.embtype}) for the requested vector type {vectype}{opentf.textcolor["reset"]}'
         indices = [self.model.docvecs.key_to_index[str(i)] for i in range(len(self.model.docvecs))]
         assert np.allclose(self.model.docvecs.vectors, self.model.docvecs.vectors[indices]), f'{opentf.textcolor["red"]}Incorrect embedding for a team due to misorderings of embeddings!{opentf.textcolor["reset"]}'
-        # note that a doc includes a subset of skills or members. So, the doc vec represents the subset.
-        # we can have vec for each individual words (skill or member) but then we have to sum/mean then for a subset. that's w2v, not d2v-based skills or members
         return self.model.docvecs.vectors
 
 # # unit tests :D

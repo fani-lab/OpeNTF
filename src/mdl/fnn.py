@@ -1,335 +1,218 @@
-import os, time, json, re, random
-import numpy as np
-import matplotlib.pyplot as plt
+import os, re, numpy as np, logging, time
+log = logging.getLogger(__name__)
 
-import torch
-from torch import nn
-from torch.nn.functional import leaky_relu
-from torch import optim
-from torch.utils.data import DataLoader
-from torch.optim.lr_scheduler import StepLR, ReduceLROnPlateau
+import pkgmgr as opentf
 
-from mdl.ntf import Ntf
-from mdl.cds import TFDataset
+from .ntf import Ntf
+from .earlystopping import EarlyStopping
 
-from cmn.team import Team
-from cmn.tools import merge_teams_by_skills
-
-from mdl.earlystopping import EarlyStopping
-from cmn.tools import get_class_data_params_n_optimizer, adjust_learning_rate, apply_weight_decay_data_parameters
-from mdl.cds import SuperlossDataset
-from mdl.superloss import SuperLoss
-
+# these two only when curriculum learning
+# from .tools import get_class_data_params_n_optimizer, adjust_learning_rate, apply_weight_decay_data_parameters
+# from .superloss import SuperLoss
 
 class Fnn(Ntf):
-    def __init__(self): super(Fnn, self).__init__()
+    def __init__(self, output, pytorch, device, seed, cgf): super(Fnn, self).__init__(output, pytorch, device, seed, cgf)
 
-    def init(self, input_size, output_size, param):
-        self.fc1 = nn.Linear(input_size, param['l'][0])
-        hl = []
-        for i in range(1, len(param['l'])): hl.append(nn.Linear(param['l'][i - 1], param['l'][i]))
-        self.hidden_layer = nn.ModuleList(hl)
-        self.fc2 = nn.Linear(param['l'][-1], output_size)
-        for m in self.modules():
-            if isinstance(m, nn.Linear): nn.init.xavier_uniform_(m.weight)
-        return self
+    def init(self, input_size, output_size):
+        class Model(Ntf.torch.nn.Module):
+            def __init__(self, cfg, input_size, output_size):
+                super().__init__()
+                self.layers = Ntf.torch.nn.ModuleList()
+                self.layers.append(Ntf.torch.nn.Linear(input_size, cfg.h[0]))
+                for i in range(1, len(cfg.h)): self.layers.append(Ntf.torch.nn.Linear(cfg.h[i - 1], cfg.h[i]))
+                self.layers.append(Ntf.torch.nn.Linear(cfg.h[-1], output_size))
+                for m in self.layers: Ntf.torch.nn.init.xavier_uniform_(m.weight)
+            def forward(self, x):
+                for i, l in enumerate(self.layers): x = Ntf.torch.nn.functional.leaky_relu(l(x))
+                return x
+                #leave the sigmoid and clamping to be handled by the BCEWithLogitsLoss()
+                #return Ntf.torch.clamp(Ntf.torch.sigmoid(x), min=1.e-6, max=1. - 1.e-6)
+        self.model = Model(self.cfg, input_size, output_size)
+        return self.model
 
-    def forward(self, x):
-        x = leaky_relu(self.fc1(x))
-        for i, l in enumerate(self.hidden_layer): x = leaky_relu(l(x))
-        x = self.fc2(x)
-        x = torch.clamp(torch.sigmoid(x), min=1.e-6, max=1. - 1.e-6)
-        return x
+    def bxe(self, y_, y):
+        condition = (y == 1) # positive (correct) experts
+        if self.cfg.nsd == 'uniform': topk_indices = self.ns_uniform(y) #upscale selected neg experts
+        elif self.cfg.nsd == 'unigram': topk_indices = self.ns_unigram(y)
+        elif self.cfg.nsd == 'unigram_b': topk_indices = self.ns_unigram_batch(y)
+        # elif self.cfg.nsd == 'inverse_unigram': weight = self.ns_inverse_unigram(y_, y)
+        # elif self.cfg.nsd == 'inverse_unigram_b': weight = self.ns_inverse_unigram_mini_batch(y_, y)
+        if self.cfg.nsd:
+            selected_mask = Ntf.torch.zeros_like(y, dtype=Ntf.torch.bool)
+            batch_indices = Ntf.torch.arange(y.shape[0], device=y.device).unsqueeze(1).expand(-1, self.cfg.ns)  # shape [B, ns]
+            selected_mask[batch_indices, topk_indices] = True
+            condition = condition | selected_mask #those selected neg experts, same loss weight as pos expert
 
-    def cross_entropy(self, y_, y, ns, nns, unigram, weight):
-        if ns == "uniform": return self.ns_uniform(y_, y, nns)
-        if ns == "unigram" or ns.startswith("temporal_unigram"): return self.ns_unigram(y_, y, unigram, nns)
-        if ns == "unigram_b": return self.ns_unigram_mini_batch(y_, y, nns)
-        if ns == "inverse_unigram" or ns.startswith("temporal_inverse_unigram"): return self.ns_inverse_unigram(y_, y, unigram, nns)
-        if ns == "inverse_unigram_b": return self.ns_inverse_unigram_mini_batch(y_, y, nns)
-        # return self.weighted(y_, y)
-        if ns == "weighted": return self.weighted(y_, y, weight)
-        if ns == "pos-ce": return self.weighted2(y_, y) # positive cross-entropy
-        cri = nn.BCELoss()
-        return cri(y_.squeeze(1), y.squeeze(1))
+        weight = Ntf.torch.where(condition, self.cfg.tpw, self.cfg.tnw) # the rest neg experts. if this is 0, pure neg sampling
+        return Ntf.torch.nn.functional.binary_cross_entropy_with_logits(y_, y, weight, reduction='sum')
 
-    def weighted(self, logits, targets, pos_weight=2.5):
-        targets = targets.squeeze(1)
-        logits = logits.squeeze(1)
-        return (-targets * torch.log(logits) * pos_weight + (1 - targets) * - torch.log(1 - logits)).sum() # we both reward the TP and penalize the FP
+    def ns_uniform(self, y):
+        # fully batch-wise and gpu-friendly
+        mask_upweight_0s = (y == 0)
+        rand_scores = Ntf.torch.rand_like(y, dtype=Ntf.torch.float)
+        rand_scores = rand_scores.masked_fill(~mask_upweight_0s, -1.0)
+        # for each row, get top-n random scores among negatives
+        # if fewer than n negatives, topk will still return n, but may duplicate
+        _ , topk_indices = Ntf.torch.topk(rand_scores, k=self.cfg.ns, dim=1)
+        return topk_indices
 
-    # we only consider the loss on TP (the members which should be part of the final team)
-    def weighted2(self, logits, targets):
-        targets = targets.squeeze(1)
-        logits = logits.squeeze(1)
-        return (-targets * torch.log(logits)).sum()
+    def ns_unigram(self, y):
+        # fully batch-wise and gpu-friendly
+        mask_upweight_0s = (y == 0)
+        weight_matrix = self.unigram.expand(y.shape[0], -1)
+        sampling_weights = Ntf.torch.where(mask_upweight_0s, weight_matrix, Ntf.torch.zeros_like(weight_matrix))
 
-    def ns_uniform(self, logits, targets, neg_samples=5):
-        targets = targets.squeeze(1)
-        logits = logits.squeeze(1)
-        random_samples = torch.zeros_like(targets)
-        for b in range(targets.shape[0]):
-            k_neg_idx = torch.randint(0, targets.shape[1], (neg_samples,))
-            cor_idx = torch.nonzero(targets[b].cpu(), as_tuple=True)[0]
-            for idx in k_neg_idx:
-                if idx not in cor_idx: random_samples[b][idx] = 1
-        return (-targets * torch.log(logits) - random_samples * torch.log(1 - logits)).sum()
+        # RuntimeError: invalid multinomial distribution (sum of probabilities <= 0)
+        # happens very rarely (like in toy imdb) for unigram_b where the frequencies of ALL neg experts are 0
+        # so the final vector of prob weights are all zero
+        row_sums = sampling_weights.sum(dim=1)
+        uniform_weights = Ntf.torch.ones_like(sampling_weights) #fallback to uniform
+        sampling_weights[row_sums == 0] = uniform_weights[row_sums == 0]
 
-    def ns_unigram(self, logits, targets, unigram, neg_samples=5):
-        targets = targets.squeeze(1)
-        logits = logits.squeeze(1)
-        random_samples = torch.zeros_like(targets)
+        topk_indices = Ntf.torch.multinomial(sampling_weights, self.cfg.ns, replacement=False)  # [batch, ns]
+        return topk_indices
 
-        for b in range(targets.shape[0]):
-            k_neg_idx = list(set(random.choices(range(targets.shape[1]), weights=np.array(unigram)[0], k=neg_samples)))
-            cor_idx = torch.nonzero(targets[b], as_tuple=True)[0]
-            for idx in k_neg_idx:
-                if idx not in cor_idx: random_samples[b][idx] = 1
-        return (-targets * torch.log(logits) - random_samples * torch.log(1 - logits)).sum()
+    def ns_unigram_batch(self, y):
+        self.unigram = Ntf.torch.tensor(y.sum(axis=0) / y.shape[0]).to(self.device)  # frequency of each expert in a batch
+        return self.ns_unigram(y)
 
-    def ns_unigram_mini_batch(self, logits, targets, neg_samples=5):
-        targets = targets.squeeze(1)
-        logits = logits.squeeze(1)
-        random_samples = torch.zeros_like(targets)
-        n_paper_per_author = torch.sum(targets, dim=0) + 1
-        unigram = (n_paper_per_author / (targets.shape[0] + targets.shape[1])).cpu()
+    def learn(self, teamsvecs, splits, prev_model):
+        input_size = teamsvecs['skill'].shape[1]
+        output_size = teamsvecs['member'].shape[1]
 
-        for b in range(targets.shape[0]):
-            k_neg_idx = list(set(random.choices(range(targets.shape[1]), weights=unigram, k=neg_samples)))
-            cor_idx = torch.nonzero(targets[b], as_tuple=True)[0]
-            for idx in k_neg_idx:
-                if idx not in cor_idx:
-                    random_samples[b][idx] = 1
-        return (-targets * torch.log(logits) - random_samples * torch.log(1 - logits)).sum()
+        if self.cfg.nsd == 'unigram': self.unigram = Ntf.torch.tensor(teamsvecs['member'].sum(axis=0)/teamsvecs['member'].shape[0]).to(self.device) # frequency of each expert in all previous teams
+        #for 'unigram_b', we can calculate it based on y or y_ as it's size is the size of the batch
 
-    def ns_inverse_unigram(self, logits, targets, unigram, neg_samples=5):
-        targets = targets.squeeze(1)
-        logits = logits.squeeze(1)
-        random_samples = torch.zeros_like(targets)
-        for b in range(targets.shape[0]):
-            rand = np.random.rand(targets.shape[1])
-            neg_rands = (rand > unigram) * 1
-            neg_idx = torch.nonzero(torch.tensor(neg_rands), as_tuple=True)[1]
-            k_neg_idx = np.random.choice(neg_idx, neg_samples)
-            cor_idx = torch.nonzero(targets[b], as_tuple=True)[0]
-            for idx in k_neg_idx:
-                if idx not in cor_idx: random_samples[b][idx] = 1
-        return (-targets * torch.log(logits) - random_samples * torch.log(1 - logits)).sum()
-
-    def ns_inverse_unigram_mini_batch(self, logits, targets, neg_samples=5):
-        targets = targets.squeeze(1)
-        logits = logits.squeeze(1)
-        random_samples = torch.zeros_like(targets)
-        n_paper_per_author = torch.sum(targets, dim=0) + 1
-        unigram = (n_paper_per_author / (targets.shape[0] + targets.shape[1])).cpu()
-
-        for b in range(targets.shape[0]):
-            rand = torch.rand(targets.shape[1])
-            neg_rands = (rand > unigram) * 1
-            neg_idx = torch.nonzero(torch.tensor(neg_rands), as_tuple=True)[0]
-            k_neg_idx = np.random.choice(neg_idx, neg_samples)
-            cor_idx = torch.nonzero(targets[b], as_tuple=True)[0]
-            for idx in k_neg_idx:
-                if idx not in cor_idx: random_samples[b][idx] = 1
-        return (-targets * torch.log(logits) - random_samples * torch.log(1 - logits)).sum()
-
-    def learn(self, splits, indexes, vecs, params, prev_model, output):
-        print(f'\n.............. starting learn .................\n')
-        loss_type = params['loss']
-
-        learning_rate = params['lr']
-        batch_size = params['b']
-        num_epochs = params['e']
-        nns = params['nns']
-        ns = params['ns']
-        weight = params['weight'] # if the ns == weighted
-        input_size = vecs['skill'].shape[1]
-        output_size = len(indexes['i2c'])
-        # output_size = vecs['member'].shape[1]
-
-        unigram = Team.get_unigram(vecs['member'])
-        
-        if ns.startswith('temporal'):
-            cur_year = int(output.split('/')[-1])
-            index_cur_year = next((i for i, (idx, yr) in enumerate(indexes['i2y']) if yr == cur_year), None)
-            window_size = int(ns.split('_')[-1])
-            if index_cur_year - window_size >= 0:
-                start = indexes['i2y'][index_cur_year-window_size][0] if 'until' not in ns else 0
-                end = indexes['i2y'][index_cur_year][0] if 'until' in ns else indexes['i2y'][index_cur_year-window_size+1][0]
-                unigram = Team.get_unigram(vecs['member'][start:end])
-            else:
-                unigram = np.zeros(unigram.shape)
-
-        # Prime a dict for train and valid loss
-        train_valid_loss = dict()
-        for i in range(len(splits['folds'].keys())):
-            train_valid_loss[i] = {'train': [], 'valid': []}
-
-        start_time = time.time()
-        # Training K-fold
+        w = self.writer(log_dir=f'{self.output}/logs4tboard/run_{int(time.time())}')
         for foldidx in splits['folds'].keys():
-            # Retrieving the folds
-            X_train = vecs['skill'][splits['folds'][foldidx]['train'], :]
-            y_train = vecs['member'][splits['folds'][foldidx]['train']]
-            X_valid = vecs['skill'][splits['folds'][foldidx]['valid'], :]
-            y_valid = vecs['member'][splits['folds'][foldidx]['valid']]
 
-            training_matrix = SuperlossDataset(X_train, y_train)
-            validation_matrix = SuperlossDataset(X_valid, y_valid)
+            X_train = teamsvecs['skill'][splits['folds'][foldidx]['train'], :]
+            y_train = teamsvecs['member'][splits['folds'][foldidx]['train']]
+            X_valid = teamsvecs['skill'][splits['folds'][foldidx]['valid'], :]
+            y_valid = teamsvecs['member'][splits['folds'][foldidx]['valid']]
 
-            # Generating data loaders
-            training_dataloader = DataLoader(training_matrix, batch_size=batch_size, shuffle=True, num_workers=0)
-            validation_dataloader = DataLoader(validation_matrix, batch_size=batch_size, shuffle=True, num_workers=0)
-            data_loaders = {"train": training_dataloader, "valid": validation_dataloader}
+            train_dl = Ntf.torch.utils.data.DataLoader(Ntf.dataset(X_train, y_train), batch_size=self.cfg.b, shuffle=True)
+            valid_dl = Ntf.torch.utils.data.DataLoader(Ntf.dataset(X_valid, y_valid), batch_size=self.cfg.b, shuffle=True)
+            data_loaders = {'train': train_dl, 'valid': valid_dl}
 
             # Initialize network
-            self.init(input_size=input_size, output_size=output_size, param=params).to(self.device)
-            if prev_model: self.load_state_dict(torch.load(prev_model[foldidx]))
+            self.init(input_size=input_size, output_size=output_size)
+            if prev_model: self.model.load_state_dict(Ntf.torch.load(prev_model[foldidx]))
+            self.model.to(self.device)
 
-            optimizer = optim.Adam(self.parameters(), lr=learning_rate)
-            scheduler = ReduceLROnPlateau(optimizer, factor=0.5, patience=10, verbose=True)
-            # scheduler = StepLR(optimizer, step_size=3, gamma=0.9)
+            optimizer = Ntf.torch.optim.Adam(self.model.parameters(), lr=self.cfg.lr)
+            scheduler = Ntf.torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.1, patience=2, verbose=True)
+            # scheduler = Ntf.torch.optim.lr_scheduler.StepLR(optimizer, step_size=3, gamma=0.9)
 
-            train_loss_values = []
-            valid_loss_values = []
-            fold_time = time.time()
-            # Train Network
-            # Start data params
-            learning_rate_schedule = np.array([2, 4, 10])
-            if loss_type == 'DP': class_parameters, optimizer_class_param = get_class_data_params_n_optimizer(nr_classes=y_train.shape[1], lr=learning_rate, device=self.device)
-            # End data params
-            if loss_type == 'SL': criterion = SuperLoss(nsamples=X_train.shape[0], ncls=y_train.shape[1], wd_cls=0.9, loss_func=nn.BCELoss())
-            earlystopping = EarlyStopping(patience=5, verbose=False, delta=0.01, path=f"{output}/state_dict_model.f{foldidx}.pt", trace_func=print)
+            # if self.cfg.l == 'cdp': class_parameters, optimizer_class_param = get_class_data_params_n_optimizer(nr_classes=y_train.shape[1], lr=self.cfg.lr, device=self.device)
+            # if self.cfg.l == 'csl': csl_criterion = SuperLoss(nsamples=X_train.shape[0], ncls=y_train.shape[1], wd_cls=0.9, loss_func=Ntf.torch.nn.BCELoss())
+            earlystopping = EarlyStopping(Ntf.torch, patience=self.cfg.es, verbose=True, save_model=False, trace_func=log.info)
 
-            for epoch in range(num_epochs):
-                if loss_type == 'DP':
-                    if epoch in learning_rate_schedule:
-                        adjust_learning_rate(model_initial_lr=learning_rate, optimizer=optimizer, gamma=0.1, step=np.sum(epoch >= learning_rate_schedule))
+            for e in range(self.cfg.e):
+                # if self.cfg.l == 'cdp' and e in (learning_rate_schedule:=[2, 4, 10]): adjust_learning_rate(model_initial_lr=self.cfg.lr, optimizer=optimizer, gamma=0.1, step=np.sum(e >= learning_rate_schedule))
 
-                train_running_loss = valid_running_loss = 0.0
+                t_loss = v_loss = 0.0
                 # Each epoch has a training and validation phase
                 for phase in ['train', 'valid']:
-                    for batch_idx, (X, y, index) in enumerate(data_loaders[phase]):
-                        torch.cuda.empty_cache()
-                        X = X.float().to(device=self.device)  # Get data to cuda if possible
-                        y = y.float().to(device=self.device)
+                    for batch_idx, (X, y) in enumerate(data_loaders[phase]):
+                        Ntf.torch.cuda.empty_cache()
+                        X = X.squeeze(1).to(self.device)
+                        y = y.squeeze(1).to(self.device)
                         if phase == 'train':
-                            self.train(True)  # scheduler.step()
-                            # forward
-                            optimizer.zero_grad()
-                            if loss_type == 'DP': optimizer_class_param.zero_grad()
+                            self.model.train(True)  # scheduler.step()
+                            optimizer.zero_grad(); #self.cfg.l == 'cdp' and optimizer_class_param.zero_grad()
 
-                            y_ = self.forward(X)
+                            y_ = self.model.forward(X)
 
-                            if loss_type == 'normal': loss = self.cross_entropy(y_, y, ns, nns, unigram, weight)
-
-                            elif loss_type == 'SL': loss = criterion(y_.squeeze(1), y.squeeze(1), index)
-                            elif loss_type == 'DP':
-                                data_parameter_minibatch = torch.exp(class_parameters).view(1, -1)
-                                y_ = y_ / data_parameter_minibatch
-                                loss = self.cross_entropy(y_, y, ns, nns, unigram)
-                                loss = apply_weight_decay_data_parameters(loss, class_parameter_minibatch=class_parameters, weight_decay= 0.9)
-
-                            loss.backward()
+                            # if self.cfg.l == 'csl': loss = csl_criterion(y_.squeeze(1), y.squeeze(1), index)
+                            # elif self.cfg.l == 'cdp':
+                            #     data_parameter_minibatch = Ntf.torch.exp(class_parameters).view(1, -1)
+                            #     y_ = y_ / data_parameter_minibatch
+                            #     loss = self.cross_entropy(y_, y)
+                            #     cdp_loss = apply_weight_decay_data_parameters(loss, class_parameter_minibatch=class_parameters, weight_decay=0.9)
+                            # else:
+                            loss = self.bxe(y_, y) #reduction is 'sum' due to sparsity of multi-hot expert vector in last layer
+                            if self.is_bayesian: loss += Fnn.btorch.get_kl_loss(self.model) / y.shape[0]
+                            loss.backward(); #shouldn't we have this: if self.cfg.l == 'cdp': cdp_loss.backward()
                             # clip_grad_value_(model.parameters(), 1)
-                            optimizer.step()
-                            if loss_type == 'DP': optimizer_class_param.step()
-                            train_running_loss += loss.item()
+                            optimizer.step(); #self.cfg.l == 'cdp' and optimizer_class_param.step()
+                            t_loss += loss.item()
+
                         else:  # valid
-                            self.train(False)  # Set model to valid mode
-                            y_ = self.forward(X)
+                            self.model.eval()  # Set model to valid mode
+                            y_ = self.model.forward(X)
+                            # if self.cfg.l == 'csl': csl_criterion(y_.squeeze(), y.squeeze(), index)
+                            # else:
+                            loss = self.bxe(y_, y)
+                            if self.is_bayesian: loss += Fnn.btorch.get_kl_loss(self.model) / y.shape[0]
+                            #how about the loss of cdp for each class/expert? cdp_loss
 
-                            if loss_type == 'normal' or loss_type == 'DP': loss = self.cross_entropy(y_, y, ns, nns, unigram, weight)
+                            v_loss += loss.item()
 
-                            else: loss = criterion(y_.squeeze(), y.squeeze(), index)
-                            valid_running_loss += loss.item()
+                w.add_scalar(tag=f'{foldidx}_t_loss', scalar_value=t_loss / len(train_dl), global_step=e)
+                w.add_scalar(tag=f'{foldidx}_v_loss', scalar_value=v_loss / len(valid_dl), global_step=e)
+                log.info(f'Fold {foldidx}/{len(splits["folds"]) - 1}, Epoch {e}, {opentf.textcolor["blue"]}Train Loss: {t_loss / len(train_dl):.4f}{opentf.textcolor["reset"]}')
+                log.info(f'Fold {foldidx}/{len(splits["folds"]) - 1}, Epoch {e}, {opentf.textcolor["magenta"]}Valid Loss: {(v_loss / len(valid_dl)):.4f}{opentf.textcolor["reset"]}')
+                if self.cfg.spe:
+                    # self.model.eval()
+                    self.torch.save({'model_state_dict': self.model.state_dict(), 'cfg': self.cfg, 'f': foldidx, 'e': e, 't_loss': t_loss, 'v_loss': v_loss}, f'{self.output}/f{foldidx}.e{e}.pt')
+                    log.info(f'{self.name()} model with {opentf.cfg2str(self.cfg)} saved at {self.output}/f{foldidx}.e{e}.pt')
 
-                        print(
-                            f'Fold {foldidx}/{len(splits["folds"]) - 1}, Epoch {epoch}/{num_epochs - 1}, Minibatch {batch_idx}/{int(X_train.shape[0] / batch_size)}, Phase {phase}'
-                            f', Running Loss {phase} {loss.item()}'
-                            f", Time {time.time() - fold_time}, Overall {time.time() - start_time} "
-                        )
-                    # Appending the loss of each epoch to plot later
-                    if phase == 'train': train_loss_values.append(train_running_loss / X_train.shape[0])
-                    else: valid_loss_values.append(valid_running_loss / X_valid.shape[0])
-
-                    print(f'Fold {foldidx}/{len(splits["folds"]) - 1}, Epoch {epoch}/{num_epochs - 1}'
-                          f', Running Loss {phase} {train_loss_values[-1] if phase == "train" else valid_loss_values[-1]}'
-                          f", Time {time.time() - fold_time}, Overall {time.time() - start_time} "
-                          )
-                # torch.save(self.state_dict(), f"{output}/state_dict_model.f{foldidx}.e{epoch}.pt", pickle_protocol=4)
-                scheduler.step(valid_running_loss / X_valid.shape[0])
-                earlystopping(valid_loss_values[-1], self)
-                if earlystopping.early_stop:
-                    print(f"Early Stopping Triggered at epoch: {epoch}")
+                scheduler.step(v_loss / len(valid_dl))
+                if earlystopping(v_loss / len(valid_dl), self.model).early_stop:
+                    log.info(f'Early stopping triggered at epoch: {e}')
                     break
 
-            model_path = f"{output}/state_dict_model.f{foldidx}.pt"
+            self.torch.save({'model_state_dict': self.model.state_dict(), 'cfg': self.cfg, 'f': foldidx, 'e': e, 't_loss': t_loss, 'v_loss': v_loss}, f'{self.output}/f{foldidx}.pt')
+            log.info(f'{self.name()} model with {opentf.cfg2str(self.cfg)} saved at {self.output}/f{foldidx}.pt')
+        w.close()
 
-            torch.save(self.state_dict(), model_path, pickle_protocol=4)
+    def test(self, teamsvecs, splits, on_train=False, per_epoch=False):
+        assert os.path.isdir(self.output), f'{opentf.textcolor["red"]}No folder for {self.output} exist!{opentf.textcolor["reset"]}'
+        input_size = teamsvecs['skill'].shape[1]
+        output_size = teamsvecs['member'].shape[1]
 
-            train_valid_loss[foldidx]['train'] = train_loss_values
-            train_valid_loss[foldidx]['valid'] = valid_loss_values
-
-        print(f"It took {time.time() - start_time} to train the model.")
-        with open(f"{output}/train_valid_loss.json", 'w') as outfile:
-            json.dump(train_valid_loss, outfile)
-            for foldidx in train_valid_loss.keys():
-                plt.figure()
-                plt.plot(train_valid_loss[foldidx]['train'], label='Training Loss')
-                plt.plot(train_valid_loss[foldidx]['valid'], label='Validation Loss')
-                plt.legend(loc='upper right')
-                plt.title(f'Training and Validation Loss for fold #{foldidx}')
-                plt.savefig(f'{output}/f{foldidx}.train_valid_loss.png', dpi=100, bbox_inches='tight')
-                # plt.show() # temporarily turning this off, to better automate in bash environment
-        print(f'\n.............. ending learn .................\n')
-
-    def test(self, model_path, splits, indexes, vecs, params, on_train_valid_set=False, per_epoch=False, merge_skills=False):
-        print(f'\n.............. starting test .................\n')
-        if not os.path.isdir(model_path): raise Exception("The model does not exist!")
-        # input_size = len(indexes['i2s'])
-        input_size = vecs['skill'].shape[1]
-        output_size = vecs['member'].shape[1]
-        # output_size = len(indexes['i2c'])
-
-        if merge_skills:
-            vecs = merge_teams_by_skills(vecs)
-            print('running with merged teams by skill')
-
-        X_test = vecs['skill'][splits['test'], :]
-        y_test = vecs['member'][splits['test']]
-        test_matrix = TFDataset(X_test, y_test)
-        test_dl = DataLoader(test_matrix, batch_size=params['b'], shuffle=True, num_workers=0)
+        X_test = teamsvecs['skill'][splits['test'], :]
+        y_test = teamsvecs['member'][splits['test']]
+        test_dl = Ntf.torch.utils.data.DataLoader(Ntf.dataset(X_test, y_test), batch_size=self.cfg.b, shuffle=False)
 
         for foldidx in splits['folds'].keys():
-            modelfiles = [f'{model_path}/state_dict_model.f{foldidx}.pt']
-            if per_epoch: modelfiles += [f'{model_path}/{_}' for _ in os.listdir(model_path) if re.match(f'state_dict_model.f{foldidx}.e\d+.pt', _)]
+            modelfiles = [f'{self.output}/f{foldidx}.pt']
+            if per_epoch: modelfiles += [f'{self.output}/{_}' for _ in os.listdir(self.output) if re.match(f'f{foldidx}.e\d+.pt', _)]
 
             for modelfile in modelfiles:
-                self.init(input_size=input_size, output_size=output_size, param=params).to(self.device)
-                self.load_state_dict(torch.load(modelfile))
-                self.eval()
+                self.init(input_size=input_size, output_size=output_size).to(self.device)
+                self.model.load_state_dict(Ntf.torch.load(modelfile)['model_state_dict'])
+                self.model.eval()
 
-                for pred_set in (['test', 'train', 'valid'] if on_train_valid_set else ['test']):
+                for pred_set in (['test', 'train', 'valid'] if on_train else ['test']):
                     if pred_set != 'test':
-                        X = vecs['skill'][splits['folds'][foldidx][pred_set], :]
-                        y = vecs['member'][splits['folds'][foldidx][pred_set]]
-                        matrix = TFDataset(X, y)
-                        dl = DataLoader(matrix, batch_size=params['b'], shuffle=True, num_workers=0)
-                    else:
-                        X = X_test; y = y_test; matrix = test_matrix
-                        dl = test_dl
+                        X = teamsvecs['skill'][splits['folds'][foldidx][pred_set], :]
+                        y = teamsvecs['member'][splits['folds'][foldidx][pred_set]]
+                        dl = Ntf.torch.utils.data.DataLoader(Ntf.dataset(X, y), batch_size=self.cfg.b, shuffle=False)
+                    else: dl = test_dl
 
-                    torch.cuda.empty_cache()
-                    with torch.no_grad():
-                        y_pred = torch.empty(0, dl.dataset.output.shape[1])
-                        for x, y in dl:
-                            x = x.to(device=self.device)
-                            scores = self.forward(x)
-                            scores = scores.squeeze(1).cpu().numpy()
+                    Ntf.torch.cuda.empty_cache()
+                    with Ntf.torch.no_grad():
+                        y_pred = Ntf.torch.empty(0, dl.dataset.output.shape[1])
+                        for XX, yy in dl:
+                            XX = XX.squeeze(1).to(self.device)
+                            if self.is_bayesian:
+                                output_mc = []; pred_uncertainty = []; model_uncertainty = []
+                                for mc_run in range(self.cfg.nmc):
+                                    logits = self.model(XX)
+                                    probs = Ntf.torch.nn.functional.sigmoid(logits)
+                                    output_mc.append(probs)
+                                output = Ntf.torch.stack(output_mc)
+                                butil = opentf.install_import('', 'bayesian_torch.utils.util')
+                                pred_uncertainty.append(butil.predictive_entropy(output.data.cpu().numpy()))
+                                model_uncertainty.append(butil.mutual_information(output.data.cpu().numpy()))
+                                scores = output.mean(dim=0)
+
+                            else: scores = self.model.forward(XX).squeeze(1).cpu().numpy()
                             y_pred = np.vstack((y_pred, scores))
-                    epoch = modelfile.split('.')[-2] + '.' if per_epoch else ''
-                    epoch = epoch.replace(f'f{foldidx}.', '')
-                    torch.save(y_pred, f'{model_path}/f{foldidx}.{pred_set}.{epoch}pred', pickle_protocol=4)
 
-        print(f'\n.............. ending test .................\n')
+                    match = re.search(r'(e\d+)\.pt$', os.path.basename(modelfile))
+                    epoch = (match.group(1) + '.') if match else ''
+                    Ntf.torch.save({'y_pred': y_pred, 'uncertainty': {'pred': pred_uncertainty, 'model': model_uncertainty} if self.is_bayesian else None}, f'{self.output}/f{foldidx}.{pred_set}.{epoch}pred', pickle_protocol=4)
+                    log.info(f'{self.name()} model predictions for fold{foldidx}.{pred_set}.{epoch} has saved at {self.output}/f{foldidx}.{pred_set}.{epoch}pred')

@@ -1,9 +1,59 @@
 seed: # will be overriden dynamically in ./src/main.py from root ./__config__.yaml
 pytorch: #will be overriden dynamically in ./src/main.py from root ./__config__.yaml
-batch_size: 1000 # batch_size for loaders
-epochs: 100 # num max epochs
-ns: 5 # number of negative samples for each positive sample
-lr: 0.001 #learning rate
+batch_size: 128 # batch_size for loaders
+epochs: 10 # num max epochs
+nsd: unigram_b # negetative sampling distribution (heuristics): uniform, unigram, unigram_b
+ns: 5 # number of negative experts to upweight
+lr: 0.001 # learning rate
+es: 5 # earlystopping's patience. to bypass, set it to a higher value than epoch
+h: [128, 64, 128] #linear layers
+save_per_epoch: # will be overriden dynamically in ./src/main.py from root ./__config__.yaml
 
 rnd:
-  seed: ${seed}
+  b: ${batch_size}
+
+#Hamidi Rad, Fani, Kargar, Szlichta, Bagheri; Learning to Form Skill-based Teams of Experts. CIKM2020. https://dl.acm.org/doi/10.1145/3340531.3412140
+fnn:
+  b: ${batch_size}
+  e: ${epochs}
+  ns: ${ns}
+  lr: ${lr}
+  es: ${es}
+  h: ${h}
+  spe: ${save_per_epoch}
+  l: bce  # bce: binary x-entropy, csl: curriculum superloss, cdp: curriculum data parameters,
+  #E.g., 1M experts/labels but each team has 5 experts at max, so, p=5/1M. When 1/p, it becomes very large and creates training istability though!
+  tpw: 10 # 10–20 (start), tune carefully up to 1/p where p is the average ratio of TP labels (true experts), emphasizes rare positives.
+  tnw: 1 # usually leave as is, or reduce slightly
+  # Dashti, Samet, Fani; Effective Neural Team Formation via Negative Samples. CIKM2022. https://dl.acm.org/doi/10.1145/3511808.3557590
+  nsd: ${nsd} # negetative sampling distribution (heuristics): uniform, unigram, unigram_b
+
+#Hamidi Rad, Fani, Kargar, Szlichta, Bagheri; Learning to Form Skill-based Teams of Experts. CIKM2020. https://dl.acm.org/doi/10.1145/3340531.3412140
+bnn:
+  #thanks to bayesian-torch, all architectural things could be the same as fnn! See https://github.com/IntelLabs/bayesian-torch
+  b: ${batch_size}
+  e: ${epochs}
+  ns: ${ns}
+  lr: ${lr}
+  es: ${es}
+  h: ${h}
+  spe: ${save_per_epoch}
+  l: bce  # bce: binary x-entropy, csl: curriculum superloss, cdp: curriculum data parameters,
+  #E.g., 1M experts/labels but each team has 5 experts at max, so, p=5/1M. When 1/p, it becomes very large and creates training istability though!
+  tpw: 10 # 10–20 (start), tune carefully up to 1/p where p is the average ratio of TP labels (true experts), emphasizes rare positives.
+  tnw: 1 # usually leave as is, or reduce slightly
+  nsd: ${nsd} # negetative sampling distribution (heuristics): uniform, unigram, unigram_b
+  nmc: 10 # num_monte_carlo, the *.pred files include 'uncertainty' to log the 'pred' and 'model' uncertainties. Both lower, the better (pred has less std and model is confident) but it may be overconfident!
+
+# Thang, Hosseini, Fani; Translative Neural Team Recommendation: From Multilabel Classification to Sequence Prediction. SIGIR2025. https://doi.org/10.1145/3726302.3730259
+nmt: #see nmt.yaml for the rest of hyperparameters, esp., encoder specific settings
+  b: ${batch_size}
+  e: ${epochs}
+  lr: ${lr}
+  h: 128
+  enc: transformer # rnn, cnn, # cnn is for convs2s
+
+# Fani, Barzegar, Dashti, Saeedi; A Streaming Approach to Neural Team Formation Training. ECIR2024. https://doi.org/10.1007/978-3-031-56027-9_20
+tntf:
+  tfolds: # will be overriden dynamically in ./src/main.py from root ./__config__.yaml
+  step_ahead: # will be overriden dynamically in ./src/main.py from root ./__config__.yaml

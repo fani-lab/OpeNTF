@@ -4,6 +4,7 @@ from tqdm import tqdm
 log = logging.getLogger(__name__)
 
 import pkgmgr as opentf
+from mdl.earlystopping import EarlyStopping
 from .t2v import T2v
 
 class Gnn(T2v):
@@ -267,24 +268,27 @@ class Gnn(T2v):
         def _(e, loader, optimizer=None):
             if optimizer: self.model.train()
             else: self.model.eval()
-            loss = 0
+            e_loss = 0
             for batch in loader:
                 batch = batch.to(self.device)
                 if optimizer: optimizer.zero_grad()
                 x = self.model.forward(batch.edge_index)
                 pred = self.model.decode(x[batch.edge_label_index[0]], x[batch.edge_label_index[1]])
-                loss = self.torch.nn.functional.binary_cross_entropy_with_logits(pred, batch.edge_label.float())
+                loss = self.torch.nn.functional.binary_cross_entropy_with_logits(pred, batch.edge_label.float(), reduction='mean')
                 if optimizer: loss.backward(); optimizer.step();
-                loss += loss.item()
+                e_loss += loss.item()
+                #this is just the embeddings of the nodes in the current batch, not all the node embeddings
+                #better way is to render the all skill node embeddings
+                #self.writer.add_embedding(tag='node_emb' if optimizer else 'v_loss', mat=x, global_step=e)
 
-                self.writer.add_scalar(tag='t_loss' if optimizer else 'v_loss', scalar_value=loss, global_step=e)
-                self.writer.add_embedding(tag='t_loss' if optimizer else 'v_loss', mat=x, global_step=e)
+            self.writer.add_scalar(tag='t_loss' if optimizer else 'v_loss', scalar_value=e_loss, global_step=e)
 
-            return (loss / len(loader)) if len(loader) > 0 else float('inf')
+            return (e_loss / len(loader)) if len(loader) > 0 else float('inf')
 
         optimizer = self.torch.optim.Adam(self.model.parameters(), lr=self.cfg.model.lr)
+        earlystopping = EarlyStopping(Gnn.torch, patience=self.cfg.model.es, verbose=True, save_model=False, trace_func=log.info)
         self.torch.cuda.empty_cache()
-        for e in range(1, self.cfg.model.e + 1):
+        for e in range(self.cfg.model.e):
             log.info(f'Epoch {e}, {opentf.textcolor["blue"]}Train Loss: {(t_loss:=_(e, train_l, optimizer)):.4f}{opentf.textcolor["reset"]}')
             log.info(f'Epoch {e}, {opentf.textcolor["magenta"]}Valid Loss: {(v_loss:=_(e, valid_l)):.4f}{opentf.textcolor["reset"]}')
             if self.cfg.model.save_per_epoch:
@@ -292,7 +296,10 @@ class Gnn(T2v):
                 self.torch.save({'model_state_dict': self.model.state_dict(), 'cfg': self.cfg, 'e': e, 't_loss': t_loss, 'v_loss': v_loss}, f'{output}.e{e}')
                 log.info(f'{self.name} model with {opentf.cfg2str(self.cfg.model)} saved at {output}.e{e}')
 
-        log.info(f'{opentf.textcolor["yellow"]}Test Loss: {(tst_loss:=_(self.cfg.model.e + 1, test_l)):.4f}')
+            if earlystopping(v_loss, self.model).early_stop:
+                log.info(f'Early stopping triggered at epoch: {e}')
+                break
+        log.info(f'{opentf.textcolor["yellow"]}Test Loss: {(tst_loss:=_(self.cfg.model.e, test_l)):.4f}')
         #self.model.eval()
         self.torch.save({'model_state_dict': self.model.state_dict(), 'cfg': self.cfg, 'e': e, 't_loss': t_loss, 'v_loss': v_loss, 'tst_loss': tst_loss}, output)
         log.info(f'{self.name} model with {opentf.cfg2str(self.cfg.model)} saved at {output}.')
@@ -301,12 +308,14 @@ class Gnn(T2v):
     def _train_rw(self, output):
         optimizer = self.torch.optim.Adam(self.model.parameters(), lr=self.cfg.model.lr)
         loader = self.model.loader(batch_size=self.cfg.model.b, shuffle=True)  # num_workers=os.cpu_count() not working in windows! also, cuda won't engage for the loader if num_workers param is passed
+        earlystopping = EarlyStopping(Gnn.torch, patience=self.cfg.model.es, verbose=True, save_model=False, trace_func=log.info)
+
         self.torch.cuda.empty_cache()
-        for e in range(1, self.cfg.model.e + 1):
+        for e in range(self.cfg.model.e):
             e_loss = 0; self.model.train()
             for pos_rw, neg_rw in loader:
                 optimizer.zero_grad()
-                loss = self.model.loss(pos_rw.to(self.device), neg_rw.to(self.device))
+                loss = self.model.loss(pos_rw.to(self.device), neg_rw.to(self.device)) #reduction is always 'mean'
                 loss.backward(); optimizer.step(); e_loss += loss.item()
             e_loss /= len(loader)
             log.info(f'Epoch {e}, {opentf.textcolor["blue"]}Train Loss: {e_loss:.4f}{opentf.textcolor["reset"]}')
@@ -319,6 +328,10 @@ class Gnn(T2v):
                 self.torch.save({'model_state_dict': self.model.state_dict(), 'cfg': self.cfg, 'e': e, 't_loss': e_loss}, f'{output}.e{e}')
                 log.info(f'{self.name} model with {opentf.cfg2str(self.cfg.model)} saved at {output}.e{e}')
 
+            # TODO:it should be v_loss on validation set!
+            if earlystopping(e_loss, self.model).early_stop:
+                log.info(f'Early stopping triggered at epoch: {e}')
+                break
         self.model.eval()
         self.torch.save({'model_state_dict': self.model.state_dict(), 'cfg': self.cfg, 'e': e, 't_loss': e_loss}, output)
         log.info(f'{self.name} model with {opentf.cfg2str(self.cfg.model)} saved at {output}.')
@@ -353,41 +366,33 @@ class Gnn(T2v):
             if 'skill' in self.data.node_types: self.data['skill'].x = ordered_vecs[teamsvecs['member'].shape[1]:]; flag = True  # the remaining is s*
         assert flag, f'{opentf.textcolor["red"]}Nodes features initialization with d2v embeddings NOT applied! Check the consistency of d2v {self.cfg.graph.pre} and graph node types {self.cfg.graph.structure}{opentf.textcolor["reset"]}'
 
-    def get_dense_vecs(self, vectype='skill'): return self._get_node_emb(vectype=vectype)
+    def get_dense_vecs(self, teamsvecs, vectype='skill'):
+        if vectype in teamsvecs.keys(): return (teamsvecs[vectype] @ self._get_node_emb(node_type=vectype).detach().numpy()) / teamsvecs[vectype].sum(axis=1) #average of selected embeddings, e.g., skillsubset of each teams
+        return self._get_node_emb(node_type=vectype) #individual embeddings
+
     def _get_node_emb(self, homo_data=None, node_type=None):
-        # in n2v, the weights are indeed the embeddings, like w2v or d2v
-        # in other models, self.model(self.data), that is the forward-pass produces the embedding
-        # this part is not needed, as having a model, we always can have the embedding
+        #NOTE: as the node indexes are exactly the skill, member, or team idx in teamsvecs, the embeddings are always aligned, i.e., s_i >> emb['skill'][i]
+        # having a model, we always can have the embedding
+        result = {}
         self.model.eval()
         if self.name == 'm2v':
             if node_type is not None:
                 try: return self.model(node_type)
                 except KeyError as e: raise KeyError(f'{opentf.textcolor["yellow"]}No vectors for {node_type}.{opentf.textcolor["reset"]} Check if it is part of metapath -> {self.cfg.model.metapath_name}') from e
             for node_type in self.data.node_types: # self.model.start or self.model.end could be used for MetaPath2Vec model but ...
-                try: log.info(f'Node type: {node_type}, Shape: {self.model(node_type).shape}')
+                try: result[node_type] = self.model(node_type)
                 except KeyError: log.warning(f'{opentf.textcolor["yellow"]}No vectors for {node_type}.{opentf.textcolor["reset"]} Check if it is part of metapath -> {self.cfg.model.metapath_name}' )
         else:
+            # in n2v, the weights are indeed the embeddings, like w2v or d2v
+            # in other models, self.model(self.data), that is the forward-pass produces the embedding
             if homo_data is None: homo_data = self.data.to_homogeneous()
             embeddings = self.model.embedding.weight.data.cpu() if self.name == 'n2v' else self.model(homo_data)
             node_type_tensor = homo_data.node_type # tensor of shape [num_nodes]
             if node_type is not None: return embeddings[node_type_tensor == (self.data.node_types.index(node_type))]
             for i, node_type in enumerate(self.data.node_types):
                 type_embeddings = embeddings[node_type_tensor == i]  # shape: [num_nodes_of_type, self.cfg.model.d]
-                log.info(f'Node type: {node_type}, Shape: {type_embeddings.shape}')
-
-    # def save_emb(self):
-    #     with self.torch.no_grad():
-    #         for node_type in self.data.node_types: self.data[node_type].n_id = self.torch.arange(self.data[node_type].x.shape[0])
-    #         self.data.to(self.device)
-    #         # for simplicity, we just pass seed_edge_type = edge_types[0]. This does not impact any output
-    #         emb = self.model(self.data, self.edge_types[0], self.is_directed, emb=True)
-    #         embedding_output = f'{self.output}/{self.cfg.graph.structure[1]}.{self.cfg.graph.dup_edge if self.cfg.graph.dup_edge else "dup"}.{cfg2str(self.cfg)}.emb.{self.model}'
-    #         self.torch.save(emb, embedding_output, pickle_protocol=4)
-    #         log.info(f'Saved embedding as {embedding_output}')
-    #     # eval_batch(test_loader, is_directed)
-    #     self.torch.cuda.empty_cache()
-    #     # torch.save(self.model.state_dict(), f'{self.model_output}/gnn_model.pt', pickle_protocol=4)
-    #     #to load later by: self.model.load_state_dict(torch.load(f'{self.output}/gnn_model.pt'))
+                result[node_type] = type_embeddings
+        return result
 
     # def learn(self, loader, epochs):
     #     import torch.nn.functional as F

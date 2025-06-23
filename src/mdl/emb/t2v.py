@@ -15,4 +15,4 @@ class T2v:
 
     def train(self, teamsvecs, indexes, splits): pass
 
-    def get_dense_vecs(self, vectype='skill'): pass # this should access the self.model to reach out the embeddings explicitly
+    def get_dense_vecs(self, teamsvecs, vectype='skill'): pass # this should access the self.model to reach out the embeddings explicitly

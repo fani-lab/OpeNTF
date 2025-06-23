@@ -210,17 +210,31 @@ class Team(object):
                               f'Based on the underlying dataset/domain, it may be valid like in uspt, or invalid like dblp.\n{e}')
 
         return (True, '')
+
     @classmethod
     def gen_teamsvecs(cls, datapath, output, cfg):
+        def __load_teamsvecs_from_file(datapath, output, cfg, pkl):
+            with open(pkl, 'rb') as infile: vecs = pickle.load(infile)
+            indexes, _ = cls.read_data(datapath, output, cfg, indexes_only=True)
+            log.info(f"Teamsvecs matrices and indexes for skills {vecs['skill'].shape}, members {vecs['member'].shape}, and locations {vecs['loc'].shape if vecs['loc'] is not None else None} are loaded.")
+            assert vecs['skill'].shape[1] == len(indexes['i2s']) or \
+                   vecs['member'].shape[1] == len(indexes['i2c']) or \
+                  (vecs['loc'] is not None and vecs['loc'].shape[1] == len(indexes['i2l'])) , \
+                f'{opentf.textcolor["red"]}Incompatible teamsvecs and indexes!{opentf.textcolor["reset"]}'
+            return vecs, indexes
+
         pkl = f'{output}/teamsvecs.pkl'
         try:
             log.info(f"Loading teamsvecs matrices from {pkl} ...")
-            with open(pkl, 'rb') as infile: vecs = pickle.load(infile)
-            indexes, _ = cls.read_data(datapath, output, cfg, indexes_only=True)
-            log.info(f"Teamsvecs matrices for skills {vecs['skill'].shape}, members {vecs['member'].shape}, and locations {vecs['loc'].shape if vecs['loc'] is not None else None} are loaded.")
-            return vecs, indexes
+            return __load_teamsvecs_from_file(datapath, output, cfg, pkl)
         except FileNotFoundError as e:
-            log.info("Teamsvecs matrices not found! Generating ...")
+            # retry to download from hugging face. The pkl file is in the same path as output, except the '../' is removed
+            if( 'hf' in cfg and cfg.hf and
+                opentf.get_from_hf(repo_type='dataset', filename=pkl.replace('../', '')) and
+                opentf.get_from_hf(repo_type='dataset', filename=f'{output.replace("../","")}/indexes.pkl')):
+                return __load_teamsvecs_from_file(datapath, output, cfg, pkl)
+            
+            log.info("Teamsvecs matrices and/or indexes not found! Generating ...")
             indexes, teams = cls.read_data(datapath, output, cfg, indexes_only=False)
 
             # there should be no difference in content of teavsvecs when using different acceleration method
@@ -287,7 +301,7 @@ class Team(object):
         except Exception as e: raise e
 
     @classmethod
-    def gen_skill_coverage(cls, teamsvecs, output):
+    def gen_skill_coverage(cls, teamsvecs, output, skipteams=None):
         '''
         a 1-hot vector containing skills that each member has in total by transposing 'member' and then doing dot product with 'skill'
         gives us the co-occurrence matrix of member vs skills. In this way we get the number of times member x co-occurs with skill y. Then,
@@ -311,7 +325,16 @@ class Team(object):
             return member_skill_co
         except FileNotFoundError as e:
             log.info(f'Member-skill co-occurrence matrix not found! Generating ...')
-            member_skill_co = scipy.sparse.lil_matrix(np.dot(teamsvecs['member'].transpose(), teamsvecs['skill']))
+
+            if skipteams is not None: # to avoid test/unseen teams leakage
+                import copy
+                member, skill = copy.deepcopy(teamsvecs['member']), copy.deepcopy(teamsvecs['skill'])
+                for i in skipteams:
+                    member.rows[i] = []; member.data[i] = []
+                    skill.rows[i] = []; skill.data[i] = []
+
+                member_skill_co = scipy.sparse.csr_matrix(np.dot(member.transpose(), skill))
+            else: member_skill_co = scipy.sparse.csr_matrix(np.dot(teamsvecs['member'].transpose(), teamsvecs['skill']))
             with open(filepath, 'wb') as f:
                 pickle.dump(member_skill_co, f)
                 log.info(f'Member-skill co-occurrence matrix {member_skill_co.shape} saved at {filepath}.')
@@ -509,8 +532,6 @@ class Team(object):
             fig.savefig(f'{output}/{k}.pdf', dpi=100, bbox_inches='tight')
             plt.show()
 
-    @staticmethod
-    def get_unigram(membervecs): return membervecs.sum(axis=0)/membervecs.shape[0]
 
     # needs code review
     # def loc_heatmap_skills(dataset, output):
