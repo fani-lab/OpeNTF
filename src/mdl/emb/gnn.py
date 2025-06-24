@@ -375,10 +375,10 @@ class Gnn(T2v):
         self.model.eval()
         if self.name == 'm2v':
             if node_type is not None:
-                try: return self.model(node_type)
+                try: return self.model(node_type).detach().cpu()
                 except KeyError as e: raise KeyError(f'{opentf.textcolor["yellow"]}No vectors for {node_type}.{opentf.textcolor["reset"]} Check if it is part of metapath -> {self.cfg.model.metapath_name}') from e
             for node_type in self.data.node_types: # self.model.start or self.model.end could be used for MetaPath2Vec model but ...
-                try: result[node_type] = self.model(node_type)
+                try: result[node_type] = self.model(node_type).detach().cpu()
                 except KeyError: log.warning(f'{opentf.textcolor["yellow"]}No vectors for {node_type}.{opentf.textcolor["reset"]} Check if it is part of metapath -> {self.cfg.model.metapath_name}' )
         else:
             # in n2v, the weights are indeed the embeddings, like w2v or d2v
