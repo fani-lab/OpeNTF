@@ -251,26 +251,37 @@ class Team(object):
 
             elif 'acceleration' in cfg and 'cuda' in cfg.acceleration:
                 torch = opentf.install_import(cfg.pytorch, 'torch')
-                try: torch.tensor([1.0], device=(device := torch.device(cfg.acceleration if ':' in cfg.acceleration else 'cuda:0')))
+                try: device = torch.device(cfg.acceleration if ':' in cfg.acceleration else 'cuda:0')
                 except RuntimeError as e: raise RuntimeError(f'{opentf.textcolor["red"]}{cfg.acceleration}-->{device} is not available or invalid!{opentf.textcolor["reset"]}') from e
                 log.info(f'Using gpu {opentf.textcolor["blue"]}{cfg.acceleration}-->{device}{opentf.textcolor["reset"]} for teams vectors generation ...')
 
                 s2i, c2i, l2i = indexes['s2i'], indexes['c2i'], indexes['l2i']
                 total_dim = len(s2i) + len(c2i) + len(l2i)
                 
-                gpu_tensor_batches = []
-                for i in range(0, len(teams), cfg.bucket_size):
-                    batch = teams[i:min(i + cfg.bucket_size, len(teams))]
-                    if not batch: continue
-                    
-                    # Process batch and send to GPU
-                    one_hot_arrays = [team.get_one_hot(s2i, c2i, l2i, cfg.location) for team in batch]
-                    batch_array = np.vstack(one_hot_arrays) if one_hot_arrays else np.zeros((0, total_dim), dtype='u1')
-                    gpu_tensor_batches.append(torch.from_numpy(batch_array).to(device))
+                # GPU batch processing
+                gpu_batch_size = max(5000, min(int(torch.cuda.get_device_properties(device).total_memory * 0.6 / total_dim), 50000))
+                data = scipy.sparse.lil_matrix((len(teams), total_dim), dtype='u1')
+                skill_dim, member_dim = len(s2i), len(c2i)
                 
-                # Convert back to sparse matrix for validation
-                if gpu_tensor_batches: data = scipy.sparse.lil_matrix((torch.vstack(gpu_tensor_batches)).cpu().numpy())
-                else: data = scipy.sparse.lil_matrix((0, total_dim), dtype='u1')
+                for i in range(0, len(teams), gpu_batch_size):
+                    batch = teams[i:i + gpu_batch_size]
+                    gpu_result = torch.zeros((len(batch), total_dim), dtype=torch.uint8, device=device)
+                    
+                    for j, team in enumerate(batch):
+                        if team.skills:
+                            skill_indices = [s2i[skill] for skill in team.skills if skill in s2i]
+                            if skill_indices: gpu_result[j, skill_indices] = 1
+                        
+                        if team.members:
+                            member_indices = [skill_dim + c2i[f'{m.id}_{m.name}'] for m in team.members if f'{m.id}_{m.name}' in c2i]
+                            if member_indices: gpu_result[j, member_indices] = 1
+                        
+                        for loc in team.members_locations:
+                            loc_str = loc[0] + loc[1] + loc[2] if cfg.location == 'city' else loc[1] + loc[2] if cfg.location == 'state' else loc[2]
+                            if loc_str in l2i: gpu_result[j, skill_dim + member_dim + l2i[loc_str]] = 1
+                    
+                    data[i:i + len(batch)] = gpu_result.cpu().numpy()
+                    torch.cuda.empty_cache()
                 
             # serial
             else: data = Team.bucketing(cfg.bucket_size, indexes['s2i'], indexes['c2i'], indexes['l2i'], cfg.location, teams)
