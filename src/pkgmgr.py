@@ -33,7 +33,8 @@ def set_seed(seed, torch=None):
     numpy.random.seed(seed)
     if torch:
         torch.manual_seed(seed)
-        torch.use_deterministic_algorithms(True)
+        #torch.use_deterministic_algorithms(True) #RuntimeError: Deterministic behavior was enabled with either `torch.use_deterministic_algorithms(True)` or `at::Context::setDeterministicAlgorithms(true)`, but this operation .torch.nn.functional.leaky_relu is not deterministic because it uses CuBLAS and you have CUDA >= 10.2. To enable deterministic behavior in this case, you must set an environment variable before running your PyTorch application: CUBLAS_WORKSPACE_CONFIG=:4096:8 or CUBLAS_WORKSPACE_CONFIG=:16:8. For more information, go to https://docs.nvidia.com/cuda/cublas/index.html#cublasApi_reproducibility
+
         if torch.cuda.is_available():
             torch.cuda.manual_seed(seed)
             torch.cuda.manual_seed_all(seed)  # if multiple GPUs

@@ -1,6 +1,4 @@
 import os, itertools, pickle, logging, numpy as np
-from tqdm import tqdm
-
 log = logging.getLogger(__name__)
 
 import pkgmgr as opentf
@@ -12,7 +10,7 @@ class Gnn(T2v):
     def __init__(self, output, device, cgf):
         super().__init__(output, device, cgf)
         Gnn.torch = opentf.install_import(cgf.pytorch, 'torch')
-        Gnn.pyg = opentf.install_import(f'torch_geometric==2.6.1 torch_cluster==1.6.3 torch_sparse==0.6.18 torch_scatter==2.1.2 -f https://data.pyg.org/whl/torch-{Gnn.torch.__version__}.html', 'torch_geometric')
+        Gnn.pyg = opentf.install_import(f'torch_geometric==2.6.1 torch_cluster==1.6.3 torch_sparse==0.6.18 torch_scatter==2.1.2 pyg_lib==0.4.0 -f https://data.pyg.org/whl/torch-{Gnn.torch.__version__}.html', 'torch_geometric')
         opentf.install_import('tensorboard==2.14.0', 'tensorboard')
         opentf.set_seed(self.cfg.seed, Gnn.torch)
         self.writer = opentf.install_import('tensorboardX==2.6.2.2', 'tensorboardX', 'SummaryWriter')(log_dir=self.output + '/logs4tfboard')
@@ -28,7 +26,7 @@ class Gnn(T2v):
         # teamsvecs['skill']=lil_matrix(np.array([[1,1,0],[1,0,1],[1,1,1]]))
         # teamsvecs['member']=lil_matrix(np.array([[1,0,1,0],[1,1,0,0],[0,1,0,1]]))
         # teamsvecs['loc']=lil_matrix(np.array([[1,0],[0,1],[1,0]]))
-
+        tqdm = opentf.install_import('tqdm==4.65.0', 'tqdm', 'tqdm')
         file = self.output + f'/{self.cfg.graph.structure[1]}.{self.cfg.graph.dup_edge if self.cfg.graph.dup_edge else "dup"}.graph.pkl'
         try:
             log.info(f'Loading graph of {tuple(self.cfg.graph.structure)} from {file}  ...')
@@ -128,7 +126,7 @@ class Gnn(T2v):
 
         # message-passing-based >> default on homo, but can be wrapped into HeteroConv
         elif self.name in {'gcn', 'gs', 'gat', 'gatv2', 'gin'}:
-            output = f'd{self.cfg.model.d}.e{self.cfg.model.e}.b{self.cfg.model.b}.lr{self.cfg.model.lr}.ns{self.cfg.model.ns}.h{"-".join([str(i) for i in self.cfg.model.h])}.nn{"-".join([str(i) for i in self.cfg.model.nn])}'
+            output = f'.d{self.cfg.model.d}.e{self.cfg.model.e}.b{self.cfg.model.b}.lr{self.cfg.model.lr}.ns{self.cfg.model.ns}.h{"-".join([str(i) for i in self.cfg.model.h])}.nn{"-".join([str(i) for i in self.cfg.model.nn])}'
 
             # by default, gnn methods are for homo data.
             # we can wrap it by HeteroConv >> future
@@ -367,7 +365,7 @@ class Gnn(T2v):
         assert flag, f'{opentf.textcolor["red"]}Nodes features initialization with d2v embeddings NOT applied! Check the consistency of d2v {self.cfg.graph.pre} and graph node types {self.cfg.graph.structure}{opentf.textcolor["reset"]}'
 
     def get_dense_vecs(self, teamsvecs, vectype='skill'):
-        if vectype in teamsvecs.keys(): return (teamsvecs[vectype] @ self._get_node_emb(node_type=vectype).detach().numpy()) / teamsvecs[vectype].sum(axis=1) #average of selected embeddings, e.g., skillsubset of each teams
+        if vectype in teamsvecs.keys(): return (teamsvecs[vectype] @ self._get_node_emb(node_type=vectype)) / teamsvecs[vectype].sum(axis=1) #average of selected embeddings, e.g., skillsubset of each teams
         return self._get_node_emb(node_type=vectype) #individual embeddings
 
     def _get_node_emb(self, homo_data=None, node_type=None):
@@ -386,7 +384,7 @@ class Gnn(T2v):
             # in n2v, the weights are indeed the embeddings, like w2v or d2v
             # in other models, self.model(self.data), that is the forward-pass produces the embedding
             if homo_data is None: homo_data = self.data.to_homogeneous()
-            embeddings = self.model.embedding.weight.data.cpu() if self.name == 'n2v' else self.model(homo_data)
+            embeddings = self.model.embedding.weight.data.cpu() if self.name == 'n2v' else self.model(homo_data.edge_index.to(self.device)).detach().cpu()
             node_type_tensor = homo_data.node_type # tensor of shape [num_nodes]
             if node_type is not None: return embeddings[node_type_tensor == (self.data.node_types.index(node_type))]
             for i, node_type in enumerate(self.data.node_types):

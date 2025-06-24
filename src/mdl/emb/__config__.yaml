@@ -64,6 +64,7 @@ model:
       e:  ${model.epochs}
       b:  ${model.batch_size}
       lr: ${model.lr}
+      es: ${model.es}
       ns: ${model.ns}
       save_per_epoch: ${model.save_per_epoch}
       wl: 5  #walk_length

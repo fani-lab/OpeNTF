@@ -1,8 +1,7 @@
 import json, os, logging
-from tqdm import tqdm
-
 log = logging.getLogger(__name__)
 
+import pkgmgr as opentf
 from .author import Author
 from .team import Team
 
@@ -34,6 +33,7 @@ class Publication(Team):
 
     @staticmethod
     def read_data(datapath, output, cfg, indexes_only=False):
+        tqdm = opentf.install_import('tqdm==4.65.0', 'tqdm', 'tqdm')
         try: return super(Publication, Publication).load_data(output, indexes_only)
         except (FileNotFoundError, EOFError) as e:
             log.info(f'Pickles not found! Reading raw data from {datapath} (progress in bytes) ...')
