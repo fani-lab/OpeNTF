@@ -8,7 +8,7 @@ hydra:
     #dir: /dev/null # windows
 seed: 0
 pytorch: torch==2.4.1 #--index-url https://download.pytorch.org/whl/cu118
-acceleration: 'cuda' #cpu for all cores, cpu:3 for 3 cores, 'cuda' or 'cuda:0' for the only available gpu, 'cuda:3' for gpu3 >> TODO: multiple gpus
+acceleration: 'cpu' #cpu for all cores, cpu:3 for 3 cores, 'cuda' or 'cuda:0' for the only available gpu, 'cuda:3' for gpu3 >> TODO: multiple gpus
 cmd:
   #- prep
   #- train
