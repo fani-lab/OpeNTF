@@ -1,10 +1,15 @@
 multilayer neural classifiers
 
     nmt (from nmt branch and sigir25 paper)
-    rrn
-    caser
 
-    tNtf_{emb}_{fnn,bnn}_{train,test}
+    - rrn >> isn't it temporal?
+    - bundle recommenders
+
+    temporal/sequence
+        tNtf_{emb}_{fnn,bnn}_{train,test}
+        user-item recommender baselines:
+            - rrn?
+            - caser
 
     {emb}_{fnn,bnn}_cl_{train/test} >> future
 
