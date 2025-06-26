@@ -42,7 +42,7 @@ data: #required for 'prep' step
   location: 'venue' #should be one of 'city', 'state', 'country', represents the *location of team members*, or 'venue' represents the location of team members as replica of the location of team like in dblp
   bucket_size: 1000
   pytorch: ${pytorch}
-  acceleration: ${acceleration}
+  acceleration: 'cpu' # ${acceleration}
   embedding:
     class_method: #directs to the correct part of the embedding config file. If not set, skipped.
       mdl.emb.d2v.D2v_d2v   #Doc2Vec https://radimrehurek.com/gensim/auto_examples/tutorials/run_doc2vec_lee.html
