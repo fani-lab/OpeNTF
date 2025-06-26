@@ -1,15 +1,13 @@
 import os, scipy.sparse, pickle, numpy as np, logging
 from collections import Counter
 from functools import partial
-from dateutil import parser
-
 log = logging.getLogger(__name__)
 
 import pkgmgr as opentf
 class Team(object):
     def __init__(self, id, members, skills, datetime, location=None):
         self.id = int(id)
-        self.datetime = parser.parse(str(datetime)).year if datetime else None
+        self.datetime = opentf.install_import('python-dateutil==2.9', 'dateutil', 'parser').parse(str(datetime)).year if datetime else None
         self.members = members
         self.skills = skills
         self.location = location

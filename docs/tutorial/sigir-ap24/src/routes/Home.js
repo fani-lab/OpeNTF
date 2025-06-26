@@ -52,9 +52,15 @@ function Home() {
             <section id="section-location" class="active">
             <span id="section-title-location" className="section-title">Time and Location</span>
                 <div className="section-body" style={{textAlign: "center"}}>
-                    <b>9:00 AM - 12:15 PM (GMT+9), Monday, December 9, 2024<br/>
-                    Room 3, 2nd floor, Building 63, Nishiwaseda, Waseda University, Tokyo, Japan</b>{" "}
+                    9:00 AM - 12:15 PM (GMT+9), Monday, December 9, 2024<br/>
+                    Room 3, 2nd floor, Building 63, Nishiwaseda, Waseda University, Tokyo, Japan{" "}
                     <br/>
+                    <br/>
+                    <span style={{ fontSize: '14px', color: 'black' }}>
+                    Prev Tutorial: <a target="_blank" href="https://fani-lab.github.io/OpeNTF/tutorial/umap24/" >UMAP24</a> ◁ [<a target="_blank" href="">Full Outline</a>]
+                    [<a target="_blank" href="">Slides</a>]
+                    [<a target="_blank" style={{color: "gray"}}>Recording</a>] ▷ Next Tutorial: <a target="_blank" href="https://fani-lab.github.io/OpeNTF/tutorial/wsdm25/">WSDM25</a>
+                    </span>
                 </div>
             </section>
             <section id="section-abstract"><span id="section-title-abstract" className="section-title">Abstract</span>

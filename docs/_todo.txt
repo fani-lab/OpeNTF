@@ -1,5 +1,4 @@
 multilayer neural classifiers
-    emb_{fnn,bnn}_{train,test,eval}
 
     nmt (from nmt branch and sigir25 paper)
     rrn

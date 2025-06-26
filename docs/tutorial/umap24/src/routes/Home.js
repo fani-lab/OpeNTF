@@ -82,11 +82,17 @@ function Home() {
             11:00am-12:30pm (CEST) <br /> Thursday, July 4, 2024, Room 12
           </b>{" "}
           <br />
-          <b>
             <a href="https://meet.google.com/ikh-fnin-dns">
               https://meet.google.com/ikh-fnin-dns
-            </a>
-          </b>
+            </a><br />
+          [<a target="_blank" href="https://hosseinfani.github.io/res/papers/2024_UMAP_Collaborative_Team_Recommendation_for_Skilled_Users_Objectives_Techniques_and_New_Perspectives.pdf">Full Outline</a>]
+          [<a target="_blank" href="https://www.slideshare.net/slideshow/collaborative-team-recommendation-for-skilled-users-objectives-techniques-and-new-perspectives/270130704">Slides</a>]
+          [<a target="_blank" style={{color: "gray"}}>Recording</a>]
+          <br></br>
+          <br />
+          Next Tutorials:
+          [<a target="_blank" href="https://fani-lab.github.io/OpeNTF/tutorial/sigir-ap24/">SIGIR-AP24</a>]
+          [<a target="_blank" href="https://fani-lab.github.io/OpeNTF/tutorial/wsdm25/">WSDM25</a>]
         </div>
       </section>
       <section id="section-abstract">

@@ -7,7 +7,7 @@ hydra:
     dir: . #unix or macos
     #dir: /dev/null # windows
 seed: 0
-pytorch: torch==2.2.2 #--index-url https://download.pytorch.org/whl/cu124
+pytorch: torch==2.4.1 #--index-url https://download.pytorch.org/whl/cu118
 acceleration: 'cpu' #cpu for all cores, cpu:3 for 3 cores, 'cuda' or 'cuda:0' for the only available gpu, 'cuda:3' for gpu3 >> TODO: multiple gpus
 cmd:
   #- prep
@@ -70,7 +70,7 @@ models:
   config: ./mdl/__config__.yaml
 
 train:
-  nfolds: 3 #ends with nfolds models each with nfolds-1 train splits and one fold valid split, nfolds results, averaged on a single test split
+  nfolds: 3 #ends with {nfolds} models each with nfolds-1 train splits and one fold valid split, nfolds results, averaged on a single test split
   train_test_ratio: 0.85 #the nfolds will be on the trainig part.
   merge_teams_w_same_skills: True # for explanation >> https://github.com/fani-lab/OpeNTF/issues/156
   step_ahead: #NOTE: setting this tag trigger temporal train/test splits for tNtf: streaming/temporal training. for now, it means that whatever are in the last [step_ahead] time interval will be the test set!

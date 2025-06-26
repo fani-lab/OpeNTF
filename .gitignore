@@ -8,3 +8,14 @@
 docs/tutorial/*/node_modules/
 docs/tutorial/*/.idea/
 docs/tutorial/*/build/
+data/dblp/dblp.v12.json
+data/gith/links.csv
+data/imdb/name.basics.tsv
+data/imdb/title.basics.tsv
+data/imdb/title.principals.tsv
+data/uspt/cpc_current.tsv
+data/uspt/inventor.tsv
+data/uspt/location.tsv
+data/uspt/patent.tsv
+data/uspt/patent_inventor.tsv
+data/gith/repos.csv

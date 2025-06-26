@@ -207,7 +207,7 @@ class Fnn(Ntf):
                                 butil = opentf.install_import('', 'bayesian_torch.utils.util')
                                 pred_uncertainty.append(butil.predictive_entropy(output.data.cpu().numpy()))
                                 model_uncertainty.append(butil.mutual_information(output.data.cpu().numpy()))
-                                scores = output.mean(dim=0)
+                                scores = output.mean(dim=0).cpu().numpy()
 
                             else: scores = self.model.forward(XX).squeeze(1).cpu().numpy()
                             y_pred = np.vstack((y_pred, scores))
