@@ -103,7 +103,8 @@ def run(cfg):
             cfg.data.embedding.config = embcfg
             cls, method = cfg.data.embedding.class_method.split('_')
             cls = get_class(cls)
-            t2v = cls(cfg.data.output, cfg.data.acceleration, cfg.data.embedding.config.model[cls.__name__.lower()])
+            #t2v = cls(cfg.data.output, cfg.data.acceleration, cfg.data.embedding.config.model[cls.__name__.lower()])
+            t2v = cls(cfg.data.output, cfg.acceleration, cfg.data.embedding.config.model[cls.__name__.lower()])
             t2v.name = method
             t2v.train(teamsvecs, indexes, splits)
 
