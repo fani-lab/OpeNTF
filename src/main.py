@@ -145,11 +145,11 @@ def run(cfg):
         for m in cfg.models.instances:
             cls_method = m.split('_')
             cls = get_class(cls_method[0])
-            output_ = (t2v.modelfilepath + '_' if t2v else cfg.data.output) + f'/{cls.__name__.lower()}' #cannot have file and folder with same name if t2v
+            output_ = (t2v.modelfilepath + '_' if t2v else cfg.data.output) #cannot have file and folder with same name if t2v
             models[m] = cls(output_, cfg.pytorch, cfg.acceleration, cfg.seed, cfg.models.config[cls.__name__.lower()])
             if len(cls_method) > 1: #e.g., in mdl.tntf.tNtf that we need the core model
                 cls = get_class(cls_method[1])
-                models[m].model = cls(output_ + f'/{cls.__name__.lower()}', cfg.pytorch, cfg.acceleration, cfg.seed, cfg.models.config[cls.__name__.lower()])
+                models[m].model = cls(output_, cfg.pytorch, cfg.acceleration, cfg.seed, cfg.models.config[cls.__name__.lower()])
             # find a way to show model-emb pair setting
             if 'train' in cfg.cmd:
                 log.info(f'{opentf.textcolor["blue"]}Training team recommender instance {m} ... {opentf.textcolor["reset"]}')
