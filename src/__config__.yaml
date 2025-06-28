@@ -57,15 +57,15 @@ data: #required for 'prep' step
 
 models:
   instances:
-    - mdl.rnd.Rnd
-    - mdl.fnn.Fnn #input skills can be multihot (default), embeddings by d2v, n2v, m2v, ... see above data.embedding.class_method
-    - mdl.bnn.Bnn #thanks to bayesian-torch package at https://github.com/IntelLabs/bayesian-torch
-    #- mdl.nmt.Nmt
-    #- mdl.caser.Caser #external baseline
-    #- mdl.rrn.Rrn     #external baseline
+    #- mdl.rnd.Rnd
+    #- mdl.fnn.Fnn #input skills can be multihot (default), embeddings by d2v, n2v, m2v, ... see above data.embedding.class_method
+    #- mdl.bnn.Bnn #thanks to bayesian-torch package at https://github.com/IntelLabs/bayesian-torch
+    - mdl.nmt.Nmt
+    #- mdl.rrn.Rrn     #external baseline >> isn't it temporal?
     ## NOTE: temporal baselines should not be mixed with non-temporal ones as the training/test splits are temporal based on train.step_ahead
     #- mdl.tnmt.tNmt
     #- mdl.tntf.tNtf_mdl.rnd.Rnd   #underlying base model could be fnn and bnn. future: tgnn?. train.step_ahead must be set.
+    #- mdl.caser.Caser #external baseline
 
   config: ./mdl/__config__.yaml
 
