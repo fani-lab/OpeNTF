@@ -48,9 +48,8 @@ numpy==1.24.4 #cannot go above for gensim
 #pytrec-eval-terrier==0.5.2
 ## evl.metric.calculate_metrics()
 
-# yet to be reached and checked
-## opennmtpy requires 2.1 < torch < 2.3 and raises conflict with other versions when installed with pyg
-## OpenNMT-py>=3.3
-#reranking==0.3.6 # required by Adila submodule
-#fairsearchcore==1.0.4 # required by Adila submodule
-##schedule
+####### OpenNMT-py==3.3 # requires PyTorch >= 2.0 <2.2. It uninstalls an incompatible torch and installs torch 2.0.1, which conflicts with pyg
+
+######reranking==0.3.6 # required by Adila submodule
+######fairsearchcore==1.0.4 # required by Adila submodule
+######schedule

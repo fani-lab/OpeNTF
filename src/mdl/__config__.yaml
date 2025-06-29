@@ -50,7 +50,9 @@ nmt: #see nmt.yaml for the rest of hyperparameters, esp., encoder specific setti
   b: ${batch_size}
   e: ${epochs}
   lr: ${lr}
+  es: ${es}
   h: 128
+  spe: ${save_per_epoch}
   enc: transformer # rnn, cnn, # cnn is for convs2s
 
 # Fani, Barzegar, Dashti, Saeedi; A Streaming Approach to Neural Team Formation Training. ECIR2024. https://doi.org/10.1007/978-3-031-56027-9_20

@@ -1,6 +1,8 @@
 multilayer neural classifiers
 
     nmt (from nmt branch and sigir25 paper)
+        >> seperate _prep() from learn()
+        >> learn() does not save checkpoints
 
     - rrn >> isn't it temporal?
     - bundle recommenders
@@ -14,11 +16,10 @@ multilayer neural classifiers
     {emb}_{fnn,bnn}_cl_{train/test} >> future
 
 -- end2end
-make a connection between train/vali/test splits of teams and train/valid/test edge lists
+make a connection between train/vali/test splits of teams and train/valid/test edge lists >> this should be done per-fold!!
 
 Let's start the transfer part for now. I'll complete the tasks when I come to e2e
 
-- earlystoppings
 - strict splits, transductive, inductive
 - hetero version of gnns
 
@@ -53,12 +54,10 @@ luckily the nodes are already seen (skills, experts) (team nodes are always unse
 
 
 node2vec, metapath2vec
--- early stopping
 -- transductive vs. inductive >> train, valid, test
 -- yet to be run on entire datasets >> also check to engage cuda
 
 homo versions: gcn, gs, gat, gatv2, gin
--- early stopping
 -- transductive vs. inductive >> train, valid, test
 -- yet to be run on entire datasets >> also check to engage cuda
 

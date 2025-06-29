@@ -11,7 +11,7 @@ from .earlystopping import EarlyStopping
 # from .superloss import SuperLoss
 
 class Fnn(Ntf):
-    def __init__(self, output, pytorch, device, seed, cgf): super(Fnn, self).__init__(output, pytorch, device, seed, cgf)
+    def __init__(self, output, pytorch, device, seed, cgf): super().__init__(output, pytorch, device, seed, cgf)
 
     def init(self, input_size, output_size):
         class Model(Ntf.torch.nn.Module):
