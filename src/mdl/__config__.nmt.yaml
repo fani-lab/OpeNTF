@@ -2,29 +2,23 @@ save_data: _{}/nmt.{convs2s,rnn,transformer}
 save_model: _{}/nmt.{convs2s,rnn,transformer}.model
 src_vocab: _{}/nmt.{convs2s,rnn,transformer}.vocab.src
 tgt_vocab: _{}/nmt.{convs2s,rnn,transformer}.vocab.tgt
-overwrite: True
+overwrite: False #True raise warning, False >> raise exception
 data:
   corpus_1:
     path_src: _{}/src-train.txt
     path_tgt: _{}/tgt-train.txt
-    weight: 1
+    transforms: []
   valid:
     path_src: _{}/src-val.txt
     path_tgt: _{}/tgt-val.txt
+vocab_sample_limit: -1
 #src_embeddings: ../output/nmt/run/example.vocab.src.emb
 #tgt_embeddings: ../output/nmt/run/example.vocab.tgt.emb
 
-# # Where to save the checkpoints and common hyperparameters
-keep_checkpoint: -1
-seed: # will be overriden
-# train_steps: 5009 # default behaviour based on roughly train_steps = (total_training_examples) / batch_size) * num_epochs
-train_epochs: _{e} # change the default to n_epoch
-save_checkpoint_steps: 100
-valid_steps: 1
-report_every: 1
+seed: _{seed}
+
 early_stopping: _{es}
 early_stopping_criteria: accuracy
-
 dropout: 0.2
 word_vec_size: 128 # same as embedding dimension _{d}
 
@@ -35,8 +29,16 @@ gpu_ranks: _{acceleration}
 #gpu_ranks: [0, 1]
 num_workers: 8
 batch_size: _{b}
-bucket_size: 832
-valid_batch_size: ${batch_size}
+#bucket_size: 832
+#valid_batch_size: defaults to ${batch_size}
+
+# # Where to save the checkpoints and common hyperparameters
+keep_checkpoint: -1
+#train_steps: 100 # default behaviour based on roughly train_steps = (total_training_examples) / batch_size) * num_epochs
+#train_epochs: _{e} # change the default to n_epoch
+save_checkpoint_steps: 1 #_{spe} but here is per batch
+valid_steps: 1
+#report_every: 1
 
 # Optimization
 model_dtype: "fp16"
@@ -55,7 +57,7 @@ adam_beta2: 0.98
 # bridge: 'true'
 
 encoder_type: _{enc} #cnn,rnn,transformer
-decoder_type: ${encoder_type} #could be different
+decoder_type: _{dec} #could be different
 
 ## ConvS2S with Attention Configuration Template
 cnn_size: 128 # same as hidden size

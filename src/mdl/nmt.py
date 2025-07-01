@@ -1,15 +1,21 @@
-import pickle, subprocess, os, re, shlex, numpy as np, logging
+import pickle, subprocess, os, re, shlex, numpy as np, logging, sys
 from omegaconf import OmegaConf
 log = logging.getLogger(__name__)
 
+import pkgmgr as opentf
 from mdl.ntf import Ntf
 
 class Nmt(Ntf):
     def __init__(self, output, pytorch, device, seed, cgf):
         super().__init__(output, pytorch, device, seed, cgf)
         self.openmtcfg = OmegaConf.load('./mdl/__config__.nmt.yaml')
+        Nmt.onmt = opentf.install_import('OpenNMT-py==3.3', 'onmt')
 
     def _prep(self, teamsvecs, splits):
+        log.info(f'Loading src and tgt files and/or folding folders for OpenNMT in {self.output} ...')
+        if os.path.isfile(f'{self.output}/src-test.txt') and os.path.isfile(f'{self.output}/tgt-test.txt'): return
+        log.info(f'Files and/or folders not found! Generating ...')
+
         input_data = []
         output_data = []
         for i in range(teamsvecs['skill'].shape[0]): #n_teams
@@ -38,34 +44,53 @@ class Nmt(Ntf):
             self.openmtcfg.save_data = f'{fold_path}/'
             self.openmtcfg.save_model = f'{fold_path}/model'
 
-            self.openmtcfg.world_size = 1
-            self.openmtcfg.gpu_ranks = ([self.device.split(':')[1]] if 'cuda' in self.device else []) if '_{acceleration}' == self.openmtcfg.gpu_ranks else self.openmtcfg.gpu_ranks
-            self.openmtcfg.seed = self.seed
-            self.openmtcfg.train_epochs = self.cfg.e
-            # self.openmtcfg.save_checkpoint_steps = self.cfg.spe
-            self.openmtcfg.batch_size = self.cfg.b
-            self.openmtcfg.learning_rate = self.cfg.lr
-            self.openmtcfg.early_stopping = self.cfg.es
-            self.openmtcfg.encoder_type = self.cfg.enc
-
+            log.info(f'{opentf.textcolor["green"]}Overriding onmt.data config for fold{foldidx} in {fold_path}/config.yml ...{opentf.textcolor["reset"]}')
             OmegaConf.save(self.openmtcfg, f'{fold_path}/config.yml', resolve=True)
 
-            cli_cmd = 'onmt_build_vocab '
-            cli_cmd += f'-config {fold_path}/config.yml '
-            cli_cmd += f'-n_sample {len(input_data)}'
-            log.info(f'{cli_cmd}')
-            subprocess.Popen(shlex.split(cli_cmd)).wait()
+            # cli_cmd = f'onmt_build_vocab -config {fold_path}/config.yml -n_sample {len(input_data)}'
+            # log.info(cli_cmd)
+            # p = subprocess.Popen(shlex.split(cli_cmd), stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            # for l in p.stdout: log.info("[onmt_build_vocab stdout] %s", l.strip())
+            # for l in p.stderr: log.error("[onmt_build_vocab stderr] %s", l.strip())
+            # p.wait()
 
-        with open(f"{self.output}/src-test.txt", "w") as src_test: src_test.writelines(input_data[splits['test']])
-        with open(f"{self.output}/tgt-test.txt", "w") as tgt_test: tgt_test.writelines(output_data[splits['test']])
+            #NOTE: it overrides the main command
+            onmt_build = opentf.install_import('', 'onmt.bin.build_vocab', 'main')
+            sys.argv += ['onmt_build_vocab', '-config', f'{fold_path}/config.yml']
+            onmt_build()
+
+        with open(f'{self.output}/src-test.txt', 'w') as src_test: src_test.writelines(input_data[splits['test']])
+        with open(f'{self.output}/tgt-test.txt', 'w') as tgt_test: tgt_test.writelines(output_data[splits['test']])
 
     def learn(self, teamsvecs, splits, prev_model):
         self._prep(teamsvecs, splits)
+        # return
+        onmt_train = opentf.install_import('', 'onmt.bin.train', 'main')
         for foldidx in splits['folds'].keys():
-            cli_cmd = 'onmt_train '
-            cli_cmd += f'-config {self.output}/f{foldidx}/config.yml '
-            log.info(f'{cli_cmd}')
-            subprocess.Popen(shlex.split(cli_cmd)).wait()
+            fold_path = f'{self.output}/f{foldidx}'
+            self.openmtcfg = OmegaConf.load(f'{fold_path}/config.yml')
+            self.openmtcfg.world_size = 1
+            self.openmtcfg.gpu_ranks = ([self.device.split(':')[1]] if 'cuda' in self.device else []) if '_{acceleration}' == self.openmtcfg.gpu_ranks else self.openmtcfg.gpu_ranks
+            self.openmtcfg.seed = self.seed
+            # self.openmtcfg.train_epochs = self.cfg.e
+            self.openmtcfg.save_checkpoint_steps = int(self.cfg.spe)
+            self.openmtcfg.batch_size = self.cfg.b
+            self.openmtcfg.learning_rate = self.cfg.lr
+            self.openmtcfg.early_stopping = self.cfg.es
+            self.openmtcfg.encoder_type = self.openmtcfg.decoder_type = self.cfg.enc
+            log.info(f'{opentf.textcolor["blue"]}Overriding onmt config for train for fold{foldidx} in {fold_path}/config.yml ...{opentf.textcolor["reset"]}')
+            OmegaConf.save(self.openmtcfg, f'{fold_path}/config.yml', resolve=True)
+
+            # cli_cmd = f'onmt_train  -config {self.output}/f{foldidx}/config.yml '
+            # log.info(cli_cmd)
+            # p = subprocess.Popen(shlex.split(cli_cmd), stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            # for l in p.stdout: log.info("[onmt_train stdout] %s", l.strip())
+            # for l in p.stderr: log.error("[onmt_train stderr] %s", l.strip())
+            # p.wait()
+
+            #NOTE: it overrides the main command
+            sys.argv += ['onmt_train', '-config', f'{fold_path}/config.yml']
+            onmt_train()
 
     #todo: per_trainstep => per_epoch
     #todo: eval on prediction files
