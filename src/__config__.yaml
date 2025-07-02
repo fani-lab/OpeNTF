@@ -8,7 +8,7 @@ hydra:
     #dir: /dev/null # windows
 seed: 0
 pytorch: torch==2.4.1 #--index-url https://download.pytorch.org/whl/cu118
-acceleration: 'cpu' #cpu for all cores, cpu:3 for 3 cores, 'cuda' or 'cuda:0' for the only available gpu, 'cuda:3' for gpu3 >> TODO: multiple gpus
+acceleration: 'cpu' #cpu for all cores minus one, cpu:3 for 3 cores, 'cuda' or 'cuda:0' for the only available gpu, 'cuda:3' for gpu3 >> TODO: multiple gpus
 cmd:
   #- prep
   #- train
@@ -60,7 +60,7 @@ models:
     - mdl.rnd.Rnd
     - mdl.fnn.Fnn #input skills can be multihot (default), embeddings by d2v, n2v, m2v, ... see above data.embedding.class_method
     - mdl.bnn.Bnn #thanks to bayesian-torch package at https://github.com/IntelLabs/bayesian-torch
-    #- mdl.nmt.Nmt
+    - mdl.nmt.Nmt
     #- mdl.rrn.Rrn     #external baseline >> isn't it temporal?
     ## NOTE: temporal baselines should not be mixed with non-temporal ones as the training/test splits are temporal based on train.step_ahead
     #- mdl.tnmt.tNmt
@@ -74,7 +74,7 @@ train:
   train_test_ratio: 0.85 #the nfolds will be on the trainig part.
   merge_teams_w_same_skills: True # for explanation >> https://github.com/fani-lab/OpeNTF/issues/156
   step_ahead: #NOTE: setting this tag trigger temporal train/test splits for tNtf: streaming/temporal training. for now, it means that whatever are in the last [step_ahead] time interval will be the test set!
-  save_per_epoch: False # due to earlystopping, the number of files could be less than the max training epoch
+  save_per_epoch: True # due to earlystopping, the number of files could be less than the max training epoch
 
 test:
   on_train: False # for over vs. under-fitting check. # random baseline (mdl.rnd.Rnd()) cannot join this.

@@ -1,50 +1,48 @@
-save_data: _{}/nmt.{convs2s,rnn,transformer}
-save_model: _{}/nmt.{convs2s,rnn,transformer}.model
-src_vocab: _{}/nmt.{convs2s,rnn,transformer}.vocab.src
-tgt_vocab: _{}/nmt.{convs2s,rnn,transformer}.vocab.tgt
-overwrite: False #True raise warning, False >> raise exception
 data:
   corpus_1:
-    path_src: _{}/src-train.txt
-    path_tgt: _{}/tgt-train.txt
+    path_src: ${path_src} #../output/{domain}/{dataset}/nmt.{settings}/f{foldidx}/src-train.txt
+    path_tgt: ${path_tgt} #../output/{domain}/{dataset}/nmt.{settings}/f{foldidx}/tgt-train.txt
     transforms: []
   valid:
-    path_src: _{}/src-val.txt
-    path_tgt: _{}/tgt-val.txt
+    path_src: ${path_src} #../output/{domain}/{dataset}/nmt.{settings}/f{foldidx}/src-val.txt
+    path_tgt: ${path_tgt} #../output/{domain}/{dataset}/nmt.{settings}/f{foldidx}/tgt-val.txt
+src_vocab: ${src_vocab} #../output/{domain}/{dataset}/nmt.{settings}/f{foldidx}/vocab.src
+tgt_vocab: ${tgt_vocab} #../output/{domain}/{dataset}/nmt.{settings}/f{foldidx}/vocab.tgt
+overwrite: True #True raise warning, False >> raise exception
 vocab_sample_limit: -1
 #src_embeddings: ../output/nmt/run/example.vocab.src.emb
 #tgt_embeddings: ../output/nmt/run/example.vocab.tgt.emb
 
-seed: _{seed}
+save_data: ${save_data} #../output/{domain}/{dataset}/nmt.{settings}/f{foldidx}/
+save_model: ${save_model} #../output/{domain}/{dataset}/nmt.{settings}/f{foldidx}/model_step_*.pt
+seed: ${seed}
 
-early_stopping: _{es}
+early_stopping: ${es}
 early_stopping_criteria: accuracy
 dropout: 0.2
 word_vec_size: 128 # same as embedding dimension _{d}
 
 # Batching
-world_size: 1 # Train on a single GPU
-gpu_ranks: _{acceleration}
-#world_size: 2
-#gpu_ranks: [0, 1]
-num_workers: 8
-batch_size: _{b}
-#bucket_size: 832
+world_size: ${acceleration} # 1 train on cpu or a single GPU or 2 on two gpus [x, y]
+gpu_ranks: ${acceleration} # for cpu -> [], for gpus -> the indexes [0, 1]
+num_workers: 0 # keep 0 as for >0 UnboundLocalError: local variable 'item' referenced before assignment at ./onmt/inputters/dynamic_iterator.py", line 91, in __iter__
+batch_size: ${batch_size}
+batch_type: 'sents' #fixed number of sentence (team: (skill,member)) pairs per batch ('tokens' is not a good choice for here)
+bucket_size: ${train_size} # first buckets are to be filled, even if multiple reads if train is small, batches are coming from the buckets. So, it's better to make it equal to train_size
 #valid_batch_size: defaults to ${batch_size}
 
 # # Where to save the checkpoints and common hyperparameters
 keep_checkpoint: -1
-#train_steps: 100 # default behaviour based on roughly train_steps = (total_training_examples) / batch_size) * num_epochs
-#train_epochs: _{e} # change the default to n_epoch
-save_checkpoint_steps: 1 #_{spe} but here is per batch
+train_steps: ${e} # default behaviour based on roughly train_steps = (total_training_examples) / batch_size) * num_epochs
+save_checkpoint_steps: ${spe} but here is per batch
 valid_steps: 1
-#report_every: 1
+report_every: 1
 
 # Optimization
 model_dtype: "fp16"
 optim: adam
 weight_decay: 0.0001
-learning_rate: _{lr} #0.001
+learning_rate: ${lr} #0.001
 adam_beta1: 0.9
 adam_beta2: 0.98
 
@@ -56,8 +54,8 @@ adam_beta2: 0.98
 # reuse_copy_attn: 'true'
 # bridge: 'true'
 
-encoder_type: _{enc} #cnn,rnn,transformer
-decoder_type: _{dec} #could be different
+encoder_type: transformer #cnn,rnn,transformer
+decoder_type: transformer #could be same or different from encoder_type
 
 ## ConvS2S with Attention Configuration Template
 cnn_size: 128 # same as hidden size

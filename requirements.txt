@@ -1,6 +1,7 @@
 #python3.8
 #python -m venv opentf_venv
 #source opentf_venv/bin/activate  (non-windows), opentf_venv\Scripts\activate (windows)
+#pip install --upgrade pip
 #pip install -r requirements.txt
 
 hydra-core==1.3.2

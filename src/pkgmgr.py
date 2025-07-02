@@ -1,5 +1,4 @@
-import subprocess, sys, importlib, random, numpy
-import logging
+import subprocess, sys, importlib, random, numpy, logging
 log = logging.getLogger(__name__)
 from omegaconf import OmegaConf
 def install_import(install_name, import_path=None, from_module=None):
