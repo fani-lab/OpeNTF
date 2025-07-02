@@ -66,7 +66,6 @@ class Nmt(Ntf):
 
     def learn(self, teamsvecs, splits, prev_model):
         self._prep(teamsvecs, splits)
-        # return
         onmt_train = opentf.install_import('', 'onmt.bin.train', 'main')
         for foldidx in splits['folds'].keys():
             fold_path = f'{self.output}/f{foldidx}'
