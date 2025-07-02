@@ -1,4 +1,4 @@
-import pickle, subprocess, os, re, shlex, numpy as np, logging, sys
+import pickle, subprocess, os, re, shlex, numpy as np, logging, sys, scipy
 from omegaconf import OmegaConf
 log = logging.getLogger(__name__)
 
@@ -17,8 +17,9 @@ class Nmt(Ntf):
 
         input_data = []
         output_data = []
+        X = teamsvecs['skill'] if scipy.sparse.issparse(teamsvecs['skill']) else teamsvecs['original_skill']  # if skill dense vectors, fall back to multi-hot
         for i in range(teamsvecs['skill'].shape[0]): #n_teams
-            input_data.append([f's{str(skill_idx)}' for skill_idx in teamsvecs['skill'][i].nonzero()[1]])
+            input_data.append([f's{str(skill_idx)}' for skill_idx in X[i].nonzero()[1]])
             output_data.append([f'm{str(member_idx)}' for member_idx in teamsvecs['member'][i].nonzero()[1]])
 
         endl = '\n'
