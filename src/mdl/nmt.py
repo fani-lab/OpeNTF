@@ -9,7 +9,6 @@ class Nmt(Ntf):
     def __init__(self, output, pytorch, device, seed, cgf):
         Nmt.onmt = opentf.install_import('OpenNMT-py==3.3', 'onmt') #3.3 >> it installs its own version of pytorch==2.0.1
         super().__init__(output, None, device, seed, cgf)
-        self.openmtcfg = OmegaConf.load('./mdl/__config__.nmt.yaml')
 
     def _prep(self, teamsvecs, splits):
         log.info(f'Loading src and tgt files and/or folding folders for OpenNMT in {self.output} ...')
@@ -35,18 +34,19 @@ class Nmt(Ntf):
             with open(f'{fold_path}/tgt-train.txt', 'w') as tgt_train: tgt_train.writelines(output_data[splits['folds'][foldidx]['train']])
             with open(f'{fold_path}/tgt-valid.txt', 'w') as tgt_val: tgt_val.writelines(output_data[splits['folds'][foldidx]['valid']])
 
-            if OmegaConf.is_interpolation(self.openmtcfg, 'seed'): self.openmtcfg.seed = self.seed
-            if OmegaConf.is_interpolation(self.openmtcfg.data.corpus_1, 'path_src'): self.openmtcfg.data.corpus_1.path_src = f'{fold_path}/src-train.txt'
-            if OmegaConf.is_interpolation(self.openmtcfg.data.corpus_1, 'path_tgt'): self.openmtcfg.data.corpus_1.path_tgt = f'{fold_path}/tgt-train.txt'
-            if OmegaConf.is_interpolation(self.openmtcfg.data.valid, 'path_src'): self.openmtcfg.data.valid.path_src = f'{fold_path}/src-valid.txt'
-            if OmegaConf.is_interpolation(self.openmtcfg.data.valid, 'path_tgt'): self.openmtcfg.data.valid.path_tgt = f'{fold_path}/tgt-valid.txt'
-            if OmegaConf.is_interpolation(self.openmtcfg, 'src_vocab'): self.openmtcfg.src_vocab = f'{fold_path}/vocab.src'
-            if OmegaConf.is_interpolation(self.openmtcfg, 'tgt_vocab'): self.openmtcfg.tgt_vocab = f'{fold_path}/vocab.tgt'
-            if OmegaConf.is_interpolation(self.openmtcfg, 'save_data'): self.openmtcfg.save_data = f'{fold_path}/'
-            if OmegaConf.is_interpolation(self.openmtcfg, 'save_model'): self.openmtcfg.save_model = f'{fold_path}/model'
+            onmtcfg = OmegaConf.load('./mdl/__config__.nmt.yaml')
+            if OmegaConf.is_interpolation(onmtcfg, 'seed'): onmtcfg.seed = self.seed
+            if OmegaConf.is_interpolation(onmtcfg.data.corpus_1, 'path_src'): onmtcfg.data.corpus_1.path_src = f'{fold_path}/src-train.txt'
+            if OmegaConf.is_interpolation(onmtcfg.data.corpus_1, 'path_tgt'): onmtcfg.data.corpus_1.path_tgt = f'{fold_path}/tgt-train.txt'
+            if OmegaConf.is_interpolation(onmtcfg.data.valid, 'path_src'): onmtcfg.data.valid.path_src = f'{fold_path}/src-valid.txt'
+            if OmegaConf.is_interpolation(onmtcfg.data.valid, 'path_tgt'): onmtcfg.data.valid.path_tgt = f'{fold_path}/tgt-valid.txt'
+            if OmegaConf.is_interpolation(onmtcfg, 'src_vocab'): onmtcfg.src_vocab = f'{fold_path}/vocab.src'
+            if OmegaConf.is_interpolation(onmtcfg, 'tgt_vocab'): onmtcfg.tgt_vocab = f'{fold_path}/vocab.tgt'
+            if OmegaConf.is_interpolation(onmtcfg, 'save_data'): onmtcfg.save_data = f'{fold_path}/'
+            if OmegaConf.is_interpolation(onmtcfg, 'save_model'): onmtcfg.save_model = f'{fold_path}/model'
 
             log.info(f'{opentf.textcolor["green"]}Overriding onmt.data config for fold{foldidx} in {fold_path}/config.yml ...{opentf.textcolor["reset"]}')
-            OmegaConf.save(self.openmtcfg, f'{fold_path}/config.yml', resolve=False)
+            OmegaConf.save(onmtcfg, f'{fold_path}/config.yml', resolve=False)
 
             # cli_cmd = f'onmt_build_vocab -config {fold_path}/config.yml -n_sample {len(input_data)}'
             # log.info(cli_cmd)
@@ -70,25 +70,25 @@ class Nmt(Ntf):
         for foldidx in splits['folds'].keys():
             fold_path = f'{self.output}/f{foldidx}'
             train_size = len(splits['folds'][foldidx]['train'])
-            self.openmtcfg = OmegaConf.load(f'{fold_path}/config.yml')
+            onmtcfg = OmegaConf.load(f'{fold_path}/config.yml')
 
-            if OmegaConf.is_interpolation(self.openmtcfg, 'world_size'): self.openmtcfg.world_size = 1 if self.device in ['cpu', 'cuda'] else len(self.device.split(','))
-            if OmegaConf.is_interpolation(self.openmtcfg, 'gpu_ranks'):
-                if self.device == 'cpu': self.openmtcfg.gpu_ranks = []
-                elif self.device == 'cuda': self.openmtcfg.gpu_ranks = [0]
-                elif 'cuda:' in self.device: self.openmtcfg.gpu_ranks = [int(i) for i in self.device.split(':')[1].split(',')]
-            if OmegaConf.is_interpolation(self.openmtcfg, 'save_checkpoint_steps'): self.openmtcfg.save_checkpoint_steps = int(self.cfg.spe)
-            if OmegaConf.is_interpolation(self.openmtcfg, 'train_steps'): self.openmtcfg.train_steps = int(np.ceil(train_size / self.cfg.b) * self.cfg.e)
-            if OmegaConf.is_interpolation(self.openmtcfg, 'batch_size'): self.openmtcfg.batch_size = self.cfg.b
-            if OmegaConf.is_interpolation(self.openmtcfg, 'bucket_size'): self.openmtcfg.bucket_size = train_size
-            if OmegaConf.is_interpolation(self.openmtcfg, 'learning_rate'): self.openmtcfg.learning_rate = self.cfg.lr
-            if OmegaConf.is_interpolation(self.openmtcfg, 'early_stopping'): self.openmtcfg.early_stopping = self.cfg.es
-            if OmegaConf.is_interpolation(self.openmtcfg, 'encoder_type'): self.openmtcfg.encoder_type = self.cfg.enc
-            if OmegaConf.is_interpolation(self.openmtcfg, 'decoder_type'): self.openmtcfg.decoder_type = self.cfg.enc
-            self.openmtcfg.num_workers = os.cpu_count() - 1 if self.openmtcfg.num_workers == -1 else self.openmtcfg.num_workers
+            if OmegaConf.is_interpolation(onmtcfg, 'world_size'): onmtcfg.world_size = 1 if self.device in ['cpu', 'cuda'] else len(self.device.split(','))
+            if OmegaConf.is_interpolation(onmtcfg, 'gpu_ranks'):
+                if self.device == 'cpu': onmtcfg.gpu_ranks = []
+                elif self.device == 'cuda': onmtcfg.gpu_ranks = [0]
+                elif 'cuda:' in self.device: onmtcfg.gpu_ranks = [int(i) for i in self.device.split(':')[1].split(',')]
+            if OmegaConf.is_interpolation(onmtcfg, 'save_checkpoint_steps'): onmtcfg.save_checkpoint_steps = int(self.cfg.spe)
+            if OmegaConf.is_interpolation(onmtcfg, 'train_steps'): onmtcfg.train_steps = int(np.ceil(train_size / self.cfg.b) * self.cfg.e)
+            if OmegaConf.is_interpolation(onmtcfg, 'batch_size'): onmtcfg.batch_size = self.cfg.b
+            if OmegaConf.is_interpolation(onmtcfg, 'bucket_size'): onmtcfg.bucket_size = train_size
+            if OmegaConf.is_interpolation(onmtcfg, 'learning_rate'): onmtcfg.learning_rate = self.cfg.lr
+            if OmegaConf.is_interpolation(onmtcfg, 'early_stopping'): onmtcfg.early_stopping = self.cfg.es
+            if OmegaConf.is_interpolation(onmtcfg, 'encoder_type'): onmtcfg.encoder_type = self.cfg.enc
+            if OmegaConf.is_interpolation(onmtcfg, 'decoder_type'): onmtcfg.decoder_type = self.cfg.enc
+            onmtcfg.num_workers = os.cpu_count() - 1 if onmtcfg.num_workers == -1 else onmtcfg.num_workers
 
             log.info(f'{opentf.textcolor["blue"]}Overriding onmt config for train for fold{foldidx} in {fold_path}/config.yml ...{opentf.textcolor["reset"]}')
-            OmegaConf.save(self.openmtcfg, f'{fold_path}/config.yml', resolve=True)
+            OmegaConf.save(onmtcfg, f'{fold_path}/config.yml', resolve=True)
 
             # cli_cmd = f'onmt_train  -config {self.output}/f{foldidx}/config.yml '
             # log.info(cli_cmd)
@@ -107,8 +107,8 @@ class Nmt(Ntf):
         return
         for foldidx in splits['folds'].keys():
             fold_path = f'{self.output}/fold{foldidx}'
-            self.openmtcfg = OmegaConf.load(f'{fold_path}/config.yml')
-            modelfiles = [f"{fold_path}/model_step_{self.openmtcfg.train_epochs}.pt"]
+            onmtcfg = OmegaConf.load(f'{fold_path}/config.yml')
+            modelfiles = [f"{fold_path}/model_step_{onmtcfg.train_epochs}.pt"]
             if per_epoch: modelfiles += [f'{fold_path}/{_}' for _ in os.listdir(fold_path) if re.match(f'model_epoch_\d+.pt', _)]
             for model in modelfiles:
                 epoch = model.split('.')[-2].split('/')[-1].split('_')[-1]
@@ -122,15 +122,15 @@ class Nmt(Ntf):
                 print(f'{cli_cmd}')
                 subprocess.Popen(shlex.split(cli_cmd)).wait()
     
-    def eval(self, splits, path, member_count, y_test, per_epoch):
+    def evaluate(self, teamsvecs, splits, on_train=False, per_epoch=False, per_instance=False, metrics={}):
         return
         import evl.metric as metric
         fold_mean = pd.DataFrame()
         test_size = y_test.shape[0]
         for foldidx in splits['folds'].keys():
             fold_path = f'{path}/fold{foldidx}'
-            self.openmtcfg = OmegaConf.load(f'{fold_path}/config.yml')
-            modelfiles = [f"{fold_path}/model_step_{self.openmtcfg.train_epochs}.pt"]
+            onmtcfg = OmegaConf.load(f'{fold_path}/config.yml')
+            modelfiles = [f"{fold_path}/model_step_{onmtcfg.train_epochs}.pt"]
 
             #per_epoch depends on "save_checkpoint_steps" param in nmt_config.yaml since it simply collect the checkpoint files
             #so, per_epoch => per_checkpoints
