@@ -1,1 +1,9 @@
 
+We initially ran 3 models on cuda:1 and 3 models on cuda:3, resulting in a training time of ~3 hours per epoch.
+Running 6 models in parallel led to CPU usage exceeding 97% across all 224 cores.
+We terminated 3 runs on cuda:3, which reduced CPU usage to ~7% per core.
+We then launched a new run on cuda:3, increasing the batch size from 1,000 to 10,000, and started monitoring GPU and CPU utilization.
+As a result:
+    GPU memory usage increased 5×.
+    CPU usage again rose above 97% across all cores.
+
