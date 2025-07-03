@@ -12,6 +12,8 @@ multilayer neural classifiers
         user-item recommender baselines:
             - rrn?
             - caser
+            - sasrec
+            - bert4rec
 
     {emb}_{fnn,bnn}_cl_{train/test} >> future
 

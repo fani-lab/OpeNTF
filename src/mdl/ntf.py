@@ -49,8 +49,8 @@ class Ntf:
                 for i, predfile in enumerate(predfiles):
                     epoch = f'e{i-1}.' if i > 0 else '' #the first file is non-epoch-based but the rest are
                     filename = f'{self.output}/f{foldidx}.{pred_set}.{epoch}'
-                    log.info(f'Evaluating predictions at {filename}pred ... for {metrics}')
                     Y_ = Ntf.torch.load(f'{filename}pred')['y_pred']
+                    log.info(f'Evaluating predictions at {filename}pred ... for {metrics}')
 
                     log.info(f'{metrics.trec} ...')
                     df, df_mean = metric.calculate_metrics(Y, Y_, per_instance, metrics)

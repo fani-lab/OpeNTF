@@ -64,7 +64,7 @@ class D2v(T2v):
             self._prep(teamsvecs, indexes, splits)
             self.model = self.gensim.models.Doc2Vec(min_count=1, dbow_words=1, # keep it always one as it may be needed for gnn-based method for 'pre' config, i.e., initial node features
                                                     dm=self.cfg.dm, vector_size=self.cfg.d, window=self.cfg.w, min_alpha=self.cfg.lr,
-                                                    workers=self.device.split(':')[1] if 'cpu:' in self.device else os.cpu_count(), ** {'seed': self.cfg.seed} if self.cfg.seed is not None else {})
+                                                    workers=self.device.split(':')[1] if 'cpu:' in self.device else os.cpu_count() - 1, ** {'seed': self.cfg.seed} if self.cfg.seed is not None else {})
 
             self.model.build_vocab(self.data)
             if self.cfg.save_per_epoch:

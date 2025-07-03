@@ -1,9 +1,7 @@
-import os, re, numpy as np, logging, time
-
+import logging
 log = logging.getLogger(__name__)
 
 import pkgmgr as opentf
-
 from .fnn import Fnn
 # these two only when curriculum learning
 # from .tools import get_class_data_params_n_optimizer, adjust_learning_rate, apply_weight_decay_data_parameters

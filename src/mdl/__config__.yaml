@@ -46,12 +46,11 @@ bnn:
   nmc: 10 # num_monte_carlo, the *.pred files include 'uncertainty' to log the 'pred' and 'model' uncertainties. Both lower, the better (pred has less std and model is confident) but it may be overconfident!
 
 # Thang, Hosseini, Fani; Translative Neural Team Recommendation: From Multilabel Classification to Sequence Prediction. SIGIR2025. https://doi.org/10.1145/3726302.3730259
-nmt: #see nmt.yaml for the rest of hyperparameters, esp., encoder specific settings
+nmt: #see __config__.nmt.yaml for the rest of hyperparameters, esp., encoder specific settings
   b: ${batch_size}
   e: ${epochs}
   lr: ${lr}
   es: ${es}
-  h: 128
   spe: ${save_per_epoch}
   enc: transformer # rnn, cnn, # cnn is for convs2s
 

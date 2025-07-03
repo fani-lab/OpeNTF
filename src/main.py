@@ -139,7 +139,7 @@ def run(cfg):
             # t2v object knows the embedding method and ...
             skill_vecs = t2v.get_dense_vecs(teamsvecs, vectype='skill')
             assert skill_vecs.shape[0] == teamsvecs['skill'].shape[0], f'{opentf.textcolor["red"]}Incorrect number of embeddings for teams subset of skills!{opentf.textcolor["reset"]}'
-            teamsvecs['original_skill'] = teamsvecs['skill'] #to accomodate skill_coverage metric and future use cases
+            teamsvecs['original_skill'] = teamsvecs['skill'] #to accomodate skill_coverage metric and future use cases like in nmt
             teamsvecs['skill'] = skill_vecs
 
         for m in cfg.models.instances:

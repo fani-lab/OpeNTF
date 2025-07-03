@@ -440,7 +440,7 @@ class Team(object):
         return stats
 
     @classmethod
-    def merge_teams_by_skills(cls, teamsvecs, inplace=False, distinct=False):
+    def merge_teams_by_skills(cls, teamsvecs, inplace=False, distinct=False): #https://github.com/fani-lab/OpeNTF/issues/156
         # teamsvecs = {}
         # 1 110 0110
         # 2 110 1110
@@ -473,6 +473,8 @@ class Team(object):
         # 5 111 1110
 
         import copy
+        log.info(f'Merging teams whose subset of skills are the same ...')
+
         vecs = teamsvecs if inplace else copy.deepcopy(teamsvecs)
         merge_list = {}
 

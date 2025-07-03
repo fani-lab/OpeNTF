@@ -1,13 +1,14 @@
-#python3.8
-#python -m venv opentf_venv
-#source opentf_venv/bin/activate  (non-windows), opentf_venv\Scripts\activate (windows)
-#pip install -r requirements.txt
+########python3.8
+########python -m venv opentf_venv
+########source opentf_venv/bin/activate  (non-windows), opentf_venv\Scripts\activate (windows)
+########pip install --upgrade pip
+########pip install -r requirements.txt
 
 hydra-core==1.3.2
 scipy==1.10.1
 numpy==1.24.4 #cannot go above for gensim
 
-# on-demand package installations
+#########on-demand packages
 # tqdm==4.65.0
 ## cmn.movie.Movie.read_data()
 ## cmn.publication.Publication.read_data()
@@ -45,11 +46,12 @@ numpy==1.24.4 #cannot go above for gensim
 ## mdl.ntf.Ntf.__init__()
 #bayesian-torch==0.5.0
 ## mdl.bnn.Bnn.__init__()
-#pytrec-eval-terrier==0.5.2
+# pytrec-eval-terrier==0.5.2
 ## evl.metric.calculate_metrics()
+# OpenNMT-py==3.3 # uninstalls torch and reinstalls it for 2.0.1 -> conflicts with pyg. to make it gpu-ready: pip install torch==2.0.1+cu118 -f https://download.pytorch.org/whl/torch_stable.html
+## mdl.nmt.__init__()
 
-####### OpenNMT-py==3.3 # requires PyTorch >= 2.0 <2.2. It uninstalls an incompatible torch and installs torch 2.0.1, which conflicts with pyg
-
-######reranking==0.3.6 # required by Adila submodule
-######fairsearchcore==1.0.4 # required by Adila submodule
+######Adila submodule
+######reranking==0.3.6
+######fairsearchcore==1.0.4
 ######schedule
