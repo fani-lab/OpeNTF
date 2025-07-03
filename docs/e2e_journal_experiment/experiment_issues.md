@@ -2,8 +2,8 @@ Experiments on different [variations of fnn](https://docs.google.com/spreadsheet
 **training phase only**
 - We initially ran 3 models on cuda:1 and 3 models on cuda:3, resulting in a training time of ~3 hours per epoch.
 - Running 6 models in parallel led to CPU usage [exceeding 97%](https://github.com/mahdis-saeedi/OpeNTF/blob/main/docs/e2e_journal_experiment/cpu%26gpu_usage/cpu_6models_2gpus.txt) across all 224 cores.
-- We terminated 3 runs on cuda:3, which reduced CPU usage to [~6%](https://github.com/mahdis-saeedi/OpeNTF/blob/main/docs/e2e_journal_experiment/cpu%26gpu_usage/cpu_3models_1gpu_not_stable.txt) per core, but it was not stable and increased to more than 95% again.
-- We then launched a new run on cuda:3, increasing the batch size from 1,000 to 10,000, and started monitoring GPU and CPU utilization.
+- We stoped the 3 runs on cuda:3, which reduced CPU usage to [~6%](https://github.com/mahdis-saeedi/OpeNTF/blob/main/docs/e2e_journal_experiment/cpu%26gpu_usage/cpu_3models_1gpu_not_stable.txt) per core, but it was not stable and increased to more than 95% again.
+- We then started a new run on cuda:3, increasing the batch size from 1,000 to 10,000, and started monitoring GPU and CPU utilization.
 As a result:
 GPU memory usage increased [5×.](https://github.com/mahdis-saeedi/OpeNTF/blob/main/docs/e2e_journal_experiment/cpu%26gpu_usage/gpu_memory.txt)
 CPU usage again rose above 97% across all cores.
