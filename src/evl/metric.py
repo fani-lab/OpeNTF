@@ -41,7 +41,7 @@ def calculate_skill_coverage(X, Y_, expertskillvecs, per_instance=False, topks='
             # unit test2: this should make the result nonzero because the required skills are become the entire set, and at least overlaps with an expert's skill
             # for i in range(X[b].shape[1]): X[b, i] = 1
 
-            ranked_experts = np.argsort(Y_[b])[::-1]
+            ranked_experts = np.random.permutation(len(Y_[b])) if np.all(Y_[b] == Y_[b,0]) else np.argsort(Y_[b])[::-1]
             for k in skill_coverages.keys():
                 topk_indices = ranked_experts[:k]
                 topk_skill_rows = expertskillvecs[topk_indices]  # shape [k, S] sparse

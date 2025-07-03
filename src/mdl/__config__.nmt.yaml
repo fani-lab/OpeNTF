@@ -8,6 +8,7 @@ data:
     path_tgt: ${path_tgt} #../output/{domain}/{dataset}/nmt.{settings}/f{foldidx}/tgt-val.txt
 src_vocab: ${src_vocab} #../output/{domain}/{dataset}/nmt.{settings}/f{foldidx}/vocab.src
 tgt_vocab: ${tgt_vocab} #../output/{domain}/{dataset}/nmt.{settings}/f{foldidx}/vocab.tgt
+n_sample: -1
 overwrite: True #True raise warning, False >> raise exception
 vocab_sample_limit: -1
 #src_embeddings: ../output/nmt/run/example.vocab.src.emb
@@ -34,7 +35,7 @@ bucket_size: ${train_size} # first buckets are to be filled, even if multiple re
 # # Where to save the checkpoints and common hyperparameters
 keep_checkpoint: -1
 train_steps: ${e} # default behaviour based on roughly train_steps = (total_training_examples) / batch_size) * num_epochs
-save_checkpoint_steps: ${spe} but here is per batch
+save_checkpoint_steps: ${spe} #but here is per batch
 valid_steps: 1
 report_every: 1
 
@@ -78,3 +79,11 @@ attention_dropout: 0.2
 #enc_layers: 8
 #dec_layers: 8
 heads: 8
+
+
+
+# Inference-only params here (harmless during training)
+beam_size: 10
+n_best: 1
+min_length: 2
+max_length: 100

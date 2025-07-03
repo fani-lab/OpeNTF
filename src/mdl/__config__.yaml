@@ -51,7 +51,6 @@ nmt: #see __config__.nmt.yaml for the rest of hyperparameters, esp., encoder spe
   e: ${epochs}
   lr: ${lr}
   es: ${es}
-  h: 128
   spe: ${save_per_epoch}
   enc: transformer # rnn, cnn, # cnn is for convs2s
 
