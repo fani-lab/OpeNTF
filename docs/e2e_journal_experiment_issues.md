@@ -7,8 +7,7 @@ experiment on different [variations of fnn](https://docs.google.com/spreadsheets
 As a result:
     GPU memory usage increased 5×.
     CPU usage again rose above 97% across all cores.
-- We ran a test with 1 epoch and batch size = 50,000, while skipping the merging step of skills, which resulted in a memory error.
-- Reducing the batch size to 25,000 allowed the model to train successfully in approximately 4 minutes.
+- We ran a test with 1 epoch and batch size = 50,000, while skipping the merging step of skills, which resulted in a memory error. Then reducing the batch size to 25,000 allowed the model to train successfully in approximately 4 minutes.
 - When training two models in parallel on different GPUs, the average training time per epoch is about 10 minutes for both models(batch size 1000 and 25,000)
 - Training a single model with batch size = 1,000 resulted in an average epoch time of ~5 minutes.
 Note: We have not yet tested training a single model with batch size = 25,000!
