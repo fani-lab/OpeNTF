@@ -11,6 +11,6 @@ CPU usage again rose above 97% across all cores.
 - When training two models in parallel on different GPUs, the average training time per epoch is about 10 minutes for both models (batch size 1000 and 25,000)
 - Training a single model with batch size = 1,000 resulted in an average epoch time of ~5 minutes.
 Note: We have not yet tested training a single model with batch size = 25,000!
-- In a parallel run on two different GPUs, the GPU utilization for the model with a batch size of 25,000 reaches [100%](), but for the model with a batch size of 1,000, it remains below 6%.
+- In a parallel run on two different GPUs, the GPU utilization for the model with a batch size of 25,000 reaches [100%](https://github.com/mahdis-saeedi/OpeNTF/blob/main/docs/e2e_journal_experiment/cpu%26gpu_usage/gpu_utilization.txt), but for the model with a batch size of 1,000, it remains below 6%.
 
 
