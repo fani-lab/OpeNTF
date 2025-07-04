@@ -1,9 +1,7 @@
-import os, re, numpy as np, logging, time
-
+import logging
 log = logging.getLogger(__name__)
 
 import pkgmgr as opentf
-
 from .fnn import Fnn
 # these two only when curriculum learning
 # from .tools import get_class_data_params_n_optimizer, adjust_learning_rate, apply_weight_decay_data_parameters
@@ -13,7 +11,7 @@ from .fnn import Fnn
 
 class Bnn(Fnn):
     def __init__(self, output, pytorch, device, seed, cgf):
-        super(Fnn, self).__init__(output, pytorch, device, seed, cgf)
+        super().__init__(output, pytorch, device, seed, cgf)
         Fnn.btorch = opentf.install_import('bayesian-torch==0.5.0', 'bayesian_torch.models.dnn_to_bnn')
 
     def init(self, input_size, output_size):

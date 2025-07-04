@@ -1,6 +1,4 @@
 import logging, numpy as np
-from tqdm import tqdm
-
 log = logging.getLogger(__name__)
 
 import pkgmgr as opentf
@@ -47,6 +45,7 @@ class Repository(Team):
     @staticmethod
     def read_data(datapath, output, cfg, indexes_only=False):
         pd = opentf.install_import('pandas==2.0.0', 'pandas')# should be here as pickle uses references to existing modules when serialize the objects!
+        tqdm = opentf.install_import('tqdm==4.65.0', 'tqdm', 'tqdm')
         try: return super(Repository, Repository).load_data(output, indexes_only)
         except (FileNotFoundError, EOFError) as e:
             log.info(f'Pickles not found! Reading raw data from {datapath} ...')

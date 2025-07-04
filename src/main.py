@@ -103,7 +103,8 @@ def run(cfg):
             cfg.data.embedding.config = embcfg
             cls, method = cfg.data.embedding.class_method.split('_')
             cls = get_class(cls)
-            t2v = cls(cfg.data.output, cfg.data.acceleration, cfg.data.embedding.config.model[cls.__name__.lower()])
+            #t2v = cls(cfg.data.output, cfg.data.acceleration, cfg.data.embedding.config.model[cls.__name__.lower()])
+            t2v = cls(cfg.data.output, cfg.acceleration, cfg.data.embedding.config.model[cls.__name__.lower()])
             t2v.name = method
             t2v.train(teamsvecs, indexes, splits)
 
@@ -138,17 +139,17 @@ def run(cfg):
             # t2v object knows the embedding method and ...
             skill_vecs = t2v.get_dense_vecs(teamsvecs, vectype='skill')
             assert skill_vecs.shape[0] == teamsvecs['skill'].shape[0], f'{opentf.textcolor["red"]}Incorrect number of embeddings for teams subset of skills!{opentf.textcolor["reset"]}'
-            teamsvecs['original_skill'] = teamsvecs['skill'] #to accomodate skill_coverage metric and future use cases
+            teamsvecs['original_skill'] = teamsvecs['skill'] #to accomodate skill_coverage metric and future use cases like in nmt
             teamsvecs['skill'] = skill_vecs
 
         for m in cfg.models.instances:
             cls_method = m.split('_')
             cls = get_class(cls_method[0])
-            output_ = (t2v.modelfilepath + '_' if t2v else cfg.data.output) + f'/{cls.__name__.lower()}' #cannot have file and folder with same name if t2v
+            output_ = (t2v.modelfilepath + '_' if t2v else cfg.data.output) #cannot have file and folder with same name if t2v
             models[m] = cls(output_, cfg.pytorch, cfg.acceleration, cfg.seed, cfg.models.config[cls.__name__.lower()])
             if len(cls_method) > 1: #e.g., in mdl.tntf.tNtf that we need the core model
                 cls = get_class(cls_method[1])
-                models[m].model = cls(output_ + f'/{cls.__name__.lower()}', cfg.pytorch, cfg.acceleration, cfg.seed, cfg.models.config[cls.__name__.lower()])
+                models[m].model = cls(output_, cfg.pytorch, cfg.acceleration, cfg.seed, cfg.models.config[cls.__name__.lower()])
             # find a way to show model-emb pair setting
             if 'train' in cfg.cmd:
                 log.info(f'{opentf.textcolor["blue"]}Training team recommender instance {m} ... {opentf.textcolor["reset"]}')

@@ -12,7 +12,7 @@ class Ntf:
         Ntf.torch = opentf.install_import(pytorch, 'torch')
         opentf.set_seed(self.seed, Ntf.torch)
         opentf.install_import('tensorboard==2.14.0 protobuf==3.20', 'tensorboard')
-        self.output = output + '.' + opentf.cfg2str(self.cfg)
+        self.output = output + self.name()
         if not os.path.isdir(self.output): os.makedirs(self.output)
         self.writer = opentf.install_import('tensorboardX==2.6.2.2', 'tensorboardX', 'SummaryWriter')
         class NtfDataset(Ntf.torch.utils.data.Dataset):
@@ -25,7 +25,7 @@ class Ntf:
                 else: return Ntf.torch.as_tensor(self.input[index]).float(), Ntf.torch.as_tensor(self.output[index].toarray()).float()
         Ntf.dataset = NtfDataset
 
-    def name(self): return self.__class__.__name__.lower()
+    def name(self): return f'/{self.__class__.__name__.lower()}.{opentf.cfg2str(self.cfg)}'
 
     def learn(self, teamsvecs, splits, prev_model): pass
     def test(self, teamsvecs, splits, on_train=False, per_epoch=False): pass
@@ -49,8 +49,8 @@ class Ntf:
                 for i, predfile in enumerate(predfiles):
                     epoch = f'e{i-1}.' if i > 0 else '' #the first file is non-epoch-based but the rest are
                     filename = f'{self.output}/f{foldidx}.{pred_set}.{epoch}'
-                    log.info(f'Evaluating predictions at {filename}pred ... for {metrics}')
                     Y_ = Ntf.torch.load(f'{filename}pred')['y_pred']
+                    log.info(f'Evaluating predictions at {filename}pred ... for {metrics}')
 
                     log.info(f'{metrics.trec} ...')
                     df, df_mean = metric.calculate_metrics(Y, Y_, per_instance, metrics)
@@ -82,7 +82,7 @@ class Ntf:
             mean_std.to_csv(f'{self.output}/{pred_set}.pred.eval.mean.csv')
             if per_instance: fold_mean_per_instance.truediv(len(splits['folds'].keys())).to_csv(f'{self.output}/{pred_set}.pred.eval.per_instance_mean.csv')
     def plot_roc(self, splits, on_train=False):
-        plt = opentf.install_import('')
+        plt = opentf.install_import('matplotlib==3.7.5', 'matplotlib')
         for pred_set in (['test', 'train', 'valid'] if on_train else ['test']):
             plt.figure()
             for foldidx in splits['folds'].keys():

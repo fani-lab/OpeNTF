@@ -1,15 +1,13 @@
 import os, scipy.sparse, pickle, numpy as np, logging
 from collections import Counter
 from functools import partial
-from dateutil import parser
-
 log = logging.getLogger(__name__)
 
 import pkgmgr as opentf
 class Team(object):
     def __init__(self, id, members, skills, datetime, location=None):
         self.id = int(id)
-        self.datetime = parser.parse(str(datetime)).year if datetime else None
+        self.datetime = opentf.install_import('python-dateutil==2.9', 'dateutil', 'parser').parse(str(datetime)).year if datetime else None
         self.members = members
         self.skills = skills
         self.location = location
@@ -442,7 +440,7 @@ class Team(object):
         return stats
 
     @classmethod
-    def merge_teams_by_skills(cls, teamsvecs, inplace=False, distinct=False):
+    def merge_teams_by_skills(cls, teamsvecs, inplace=False, distinct=False): #https://github.com/fani-lab/OpeNTF/issues/156
         # teamsvecs = {}
         # 1 110 0110
         # 2 110 1110
@@ -475,6 +473,8 @@ class Team(object):
         # 5 111 1110
 
         import copy
+        log.info(f'Merging teams whose subset of skills are the same ...')
+
         vecs = teamsvecs if inplace else copy.deepcopy(teamsvecs)
         merge_list = {}
 

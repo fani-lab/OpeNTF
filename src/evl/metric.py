@@ -1,10 +1,10 @@
 import logging, numpy as np
-from tqdm import tqdm
 log = logging.getLogger(__name__)
 
 import pkgmgr as opentf
 def calculate_metrics(Y, Y_, per_instance=False, metrics={'trec': ['P_2,5', 'recall_2,5', 'ndcg_cut_2,5'], 'other': ['aucroc']}):
     pd = opentf.install_import('pandas==2.0.0', 'pandas')
+    tqdm = opentf.install_import('tqdm==4.65.0', 'tqdm', 'tqdm')
     pytrec_eval = opentf.install_import('pytrec-eval-terrier==0.5.7', 'pytrec_eval')
     qrel = dict(); run = dict()
     log.info(f'Building pytrec_eval input for {Y.shape[0]} instances ...')
@@ -25,6 +25,7 @@ def calculate_auc_roc(Y, Y_):
     return auc, (fpr, tpr)
 
 def calculate_skill_coverage(X, Y_, expertskillvecs, per_instance=False, topks='2,5,10'):#skillcoveragevecs: ExS, X: BatchxS, Y_: BatchxE
+    tqdm = opentf.install_import('tqdm==4.65.0', 'tqdm', 'tqdm')
     B, E = Y_.shape #batches of output expert recommendations for each team
     assert not np.any(np.all(X.toarray() != 0, axis=1)), f'{opentf.textcolor["red"]}The skill vectors are not multi-hot to show the skill subset!{opentf.textcolor["reset"]}'
     skill_coverages = {int(k): np.zeros(B) for k in topks.split(',')}
@@ -40,7 +41,7 @@ def calculate_skill_coverage(X, Y_, expertskillvecs, per_instance=False, topks='
             # unit test2: this should make the result nonzero because the required skills are become the entire set, and at least overlaps with an expert's skill
             # for i in range(X[b].shape[1]): X[b, i] = 1
 
-            ranked_experts = np.argsort(Y_[b])[::-1]
+            ranked_experts = np.random.permutation(len(Y_[b])) if np.all(Y_[b] == Y_[b,0]) else np.argsort(Y_[b])[::-1]
             for k in skill_coverages.keys():
                 topk_indices = ranked_experts[:k]
                 topk_skill_rows = expertskillvecs[topk_indices]  # shape [k, S] sparse

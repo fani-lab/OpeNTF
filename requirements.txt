@@ -1,15 +1,22 @@
-#python3.8
-#python -m venv opentf_venv
-#source opentf_venv/bin/activate  (non-windows), opentf_venv\Scripts\activate (windows)
-#pip install -r requirements.txt
+########python3.8
+########python -m venv opentf_venv
+########source opentf_venv/bin/activate  (non-windows), opentf_venv\Scripts\activate (windows)
+########pip install --upgrade pip
+########pip install -r requirements.txt
 
+hydra-core==1.3.2
 scipy==1.10.1
 numpy==1.24.4 #cannot go above for gensim
-tqdm==4.65.0
-hydra-core==1.3.2
-python-dateutil==2.9
 
-# on-demand package installations
+#########on-demand packages
+# tqdm==4.65.0
+## cmn.movie.Movie.read_data()
+## cmn.publication.Publication.read_data()
+## cmn.repo.Repository.read_data()
+## cmn.patent.Patent.read_data()
+## mdl.emb.gnn._prep()
+## evl.metric.calculate_metrics()
+## evl.metric.calculate_skill_coverage()
 # scikit-learn==1.2.2
 ## main.get_splits()
 ## mdl.emb.gnn.Gnn.eval()
@@ -39,12 +46,12 @@ python-dateutil==2.9
 ## mdl.ntf.Ntf.__init__()
 #bayesian-torch==0.5.0
 ## mdl.bnn.Bnn.__init__()
-#pytrec-eval-terrier==0.5.2
+# pytrec-eval-terrier==0.5.2
 ## evl.metric.calculate_metrics()
+# OpenNMT-py==3.3 # uninstalls torch and reinstalls it for 2.0.1 -> conflicts with pyg. to make it gpu-ready: pip install torch==2.0.1+cu118 -f https://download.pytorch.org/whl/torch_stable.html
+## mdl.nmt.__init__()
 
-# yet to be reached and checked
-## opennmtpy requires 2.1 < torch < 2.3 and raises conflict with other versions when installed with pyg
-## OpenNMT-py>=3.3
-#reranking==0.3.6 # required by Adila submodule
-#fairsearchcore==1.0.4 # required by Adila submodule
-##schedule
+######Adila submodule
+######reranking==0.3.6
+######fairsearchcore==1.0.4
+######schedule

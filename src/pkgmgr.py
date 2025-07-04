@@ -1,5 +1,4 @@
-import subprocess, sys, importlib, random, numpy
-import logging
+import subprocess, sys, importlib, random, numpy, logging
 log = logging.getLogger(__name__)
 from omegaconf import OmegaConf
 def install_import(install_name, import_path=None, from_module=None):
@@ -33,7 +32,8 @@ def set_seed(seed, torch=None):
     numpy.random.seed(seed)
     if torch:
         torch.manual_seed(seed)
-        torch.use_deterministic_algorithms(True)
+        #torch.use_deterministic_algorithms(True) #RuntimeError: Deterministic behavior was enabled with either `torch.use_deterministic_algorithms(True)` or `at::Context::setDeterministicAlgorithms(true)`, but this operation .torch.nn.functional.leaky_relu is not deterministic because it uses CuBLAS and you have CUDA >= 10.2. To enable deterministic behavior in this case, you must set an environment variable before running your PyTorch application: CUBLAS_WORKSPACE_CONFIG=:4096:8 or CUBLAS_WORKSPACE_CONFIG=:16:8. For more information, go to https://docs.nvidia.com/cuda/cublas/index.html#cublasApi_reproducibility
+
         if torch.cuda.is_available():
             torch.cuda.manual_seed(seed)
             torch.cuda.manual_seed_all(seed)  # if multiple GPUs
@@ -65,5 +65,5 @@ def get_from_hf(repo_type, filename) -> bool:
     repo_id = 'fani-lab/OpeNTF'
     log.info(f"Downloading {filename} from https://huggingface.co/{repo_type}/{repo_id} ...")
     # if the file is public, token=hf_token is ignored
-    try: return hf_api.hf_hub_download(repo_id='fani-lab/OpeNTF', repo_type=repo_type, filename=filename, local_dir='../', force_download=True, token=hf_token)
+    try: return hf_api.hf_hub_download(repo_id='fani-lab/OpeNTF', repo_type=repo_type, filename=filename, local_dir='../', force_download=True)
     except Exception as e: log.error(f'Error downloading {filename} from {repo_id}! {e}'); return None

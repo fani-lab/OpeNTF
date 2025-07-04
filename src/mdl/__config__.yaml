@@ -1,12 +1,12 @@
 seed: # will be overriden dynamically in ./src/main.py from root ./__config__.yaml
 pytorch: #will be overriden dynamically in ./src/main.py from root ./__config__.yaml
-batch_size: 128 # batch_size for loaders
-epochs: 10 # num max epochs
+batch_size: 1000 # batch_size for loaders
+epochs: 100 # num max epochs
 nsd: unigram_b # negetative sampling distribution (heuristics): uniform, unigram, unigram_b
 ns: 5 # number of negative experts to upweight
 lr: 0.001 # learning rate
 es: 5 # earlystopping's patience. to bypass, set it to a higher value than epoch
-h: [128, 64, 128] #linear layers
+h: [128] #linear layers
 save_per_epoch: # will be overriden dynamically in ./src/main.py from root ./__config__.yaml
 
 rnd:
@@ -46,11 +46,12 @@ bnn:
   nmc: 10 # num_monte_carlo, the *.pred files include 'uncertainty' to log the 'pred' and 'model' uncertainties. Both lower, the better (pred has less std and model is confident) but it may be overconfident!
 
 # Thang, Hosseini, Fani; Translative Neural Team Recommendation: From Multilabel Classification to Sequence Prediction. SIGIR2025. https://doi.org/10.1145/3726302.3730259
-nmt: #see nmt.yaml for the rest of hyperparameters, esp., encoder specific settings
+nmt: #see __config__.nmt.yaml for the rest of hyperparameters, esp., encoder specific settings
   b: ${batch_size}
   e: ${epochs}
   lr: ${lr}
-  h: 128
+  es: ${es}
+  spe: ${save_per_epoch}
   enc: transformer # rnn, cnn, # cnn is for convs2s
 
 # Fani, Barzegar, Dashti, Saeedi; A Streaming Approach to Neural Team Formation Training. ECIR2024. https://doi.org/10.1007/978-3-031-56027-9_20
