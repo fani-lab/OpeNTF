@@ -1,4 +1,4 @@
-Experiments on different [variations of fnn](https://docs.google.com/spreadsheets/d/1jt4Pvdz58qs0LyAnSjYr0MTpzy5ZfNonw5bBtfbIvKY/edit?gid=212563191#gid=212563191) with mhot vector as an input:
+Experiments on different [variations of fnn](https://docs.google.com/spreadsheets/d/1jt4Pvdz58qs0LyAnSjYr0MTpzy5ZfNonw5bBtfbIvKY/edit?gid=212563191#gid=212563191) with mhot vector as an input::
 **training phase only**
 - We initially ran 3 models on cuda:1 and 3 models on cuda:3, resulting in a training time of ~3 hours per epoch.
 - Running 6 models in parallel led to CPU usage [exceeding 97%](https://github.com/mahdis-saeedi/OpeNTF/blob/main/docs/e2e_journal_experiment/cpu%26gpu_usage/cpu_6models_2gpus.txt) across all 224 cores.
