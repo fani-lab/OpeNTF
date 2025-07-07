@@ -1,0 +1,183 @@
+import os
+import torch
+import copy
+import torch.nn.functional as F
+from torch.utils.data import DataLoader, TensorDataset
+from torch_geometric.loader import NeighborLoader, Node2VecLoader
+from torch_geometric.utils import negative_sampling
+from torch_geometric.nn import Node2Vec, MetaPath2Vec
+
+
+class FoldDataset:
+    def __init__(self, all_edges, fold_indices):
+        """
+        all_edges: torch.Tensor of shape [2, num_edges] (src, dst)
+        fold_indices: list of (train_idx, val_idx) tuples for each fold
+        """
+        self.all_edges = all_edges
+        self.fold_indices = fold_indices
+
+    def get_fold(self, i):
+        train_idx, val_idx = self.fold_indices[i]
+        return self.all_edges[:, train_idx], self.all_edges[:, val_idx]
+
+
+class LinkPredictionCVRunner:
+    def __init__(self, data, test_edges, fold_dataset, model_fn, decoder_fn,
+                 save_dir='cv_results', device='cpu', num_epochs=10, batch_size=1024,
+                 edge_types_supervision=None, embedding_model_type='gnn'):
+        """
+        edge_types_supervision: list of edge types to supervise on.
+        If empty or None, supervise on all edge types.
+        embedding_model_type: 'gnn', 'node2vec', or 'metapath2vec'
+        """
+        self.orig_data = data
+        self.test_edges = test_edges
+        self.fold_dataset = fold_dataset
+        self.model_fn = model_fn
+        self.decoder_fn = decoder_fn
+        self.device = device
+        self.num_epochs = num_epochs
+        self.batch_size = batch_size
+        self.save_dir = save_dir
+        self.edge_types_supervision = edge_types_supervision or []
+        self.embedding_model_type = embedding_model_type
+        os.makedirs(save_dir, exist_ok=True)
+
+    def _to_homo_cached(self, data):
+        if hasattr(data, '_homo_cache'):
+            return data._homo_cache
+        data._homo_cache = data.to_homogeneous()
+        return data._homo_cache
+
+    def run_fold(self, fold_idx):
+        train_edges, val_edges = self.fold_dataset.get_fold(fold_idx)
+
+        data_fold = copy.deepcopy(self.orig_data)
+        if self.edge_types_supervision:
+            for etype in self.edge_types_supervision:
+                data_fold[etype].edge_index = train_edges
+
+        homo = self._to_homo_cached(data_fold)
+
+        if self.edge_types_supervision:
+            etype_ids = [homo.edge_type_names.index(etype) for etype in self.edge_types_supervision]
+            edge_type_mask = torch.isin(homo.edge_type, torch.tensor(etype_ids, device=homo.edge_type.device))
+            pos_edge_index = homo.edge_index[:, edge_type_mask]
+        else:
+            pos_edge_index = train_edges
+
+        edge_dataset = TensorDataset(pos_edge_index[0], pos_edge_index[1])
+        edge_loader = DataLoader(edge_dataset, batch_size=self.batch_size, shuffle=True)
+
+        if self.embedding_model_type == 'node2vec':
+            model = Node2Vec(homo.edge_index, embedding_dim=128, walk_length=20, context_size=10, walks_per_node=10).to(self.device)
+            loader = model.loader(batch_size=self.batch_size, shuffle=True)
+        elif self.embedding_model_type == 'metapath2vec':
+            assert hasattr(self.orig_data, 'metapath2vec_model'), "Provide 'metapath2vec_model' attribute for MetaPath2Vec"
+            model = self.orig_data.metapath2vec_model.to(self.device)
+            loader = model.loader(batch_size=self.batch_size, shuffle=True)
+        else:
+            model = self.model_fn().to(self.device)
+            decoder = self.decoder_fn().to(self.device)
+            optimizer = torch.optim.Adam(list(model.parameters()) + list(decoder.parameters()), lr=1e-3)
+
+        if self.embedding_model_type in ['node2vec', 'metapath2vec']:
+            optimizer = torch.optim.SparseAdam(model.parameters(), lr=0.01)
+            model.train()
+            for epoch in range(self.num_epochs):
+                total_loss = 0
+                for pos_rw, neg_rw in loader:
+                    optimizer.zero_grad()
+                    loss = model.loss(pos_rw.to(self.device), neg_rw.to(self.device))
+                    loss.backward()
+                    optimizer.step()
+                    total_loss += loss.item()
+        else:
+            for epoch in range(self.num_epochs):
+                model.train()
+                decoder.train()
+                for src_pos, dst_pos in edge_loader:
+                    node_ids = torch.cat([src_pos, dst_pos]).unique()
+                    sub_loader = NeighborLoader(
+                        homo,
+                        input_nodes=node_ids,
+                        num_neighbors=[15, 10],
+                        batch_size=node_ids.size(0),
+                        shuffle=False
+                    )
+                    sub_data = next(iter(sub_loader)).to(self.device)
+
+                    x = model(sub_data.x, sub_data.edge_index)
+                    src_pos, dst_pos = src_pos.to(self.device), dst_pos.to(self.device)
+                    pos_out = decoder(x[src_pos], x[dst_pos])
+
+                    neg_dst = torch.randint(0, homo.num_nodes, (len(src_pos),), device=self.device)
+                    neg_out = decoder(x[src_pos], x[neg_dst])
+
+                    pos_loss = F.binary_cross_entropy_with_logits(pos_out, torch.ones_like(pos_out))
+                    neg_loss = F.binary_cross_entropy_with_logits(neg_out, torch.zeros_like(neg_out))
+                    loss = pos_loss + neg_loss
+
+                    loss.backward()
+                    optimizer.step()
+                    optimizer.zero_grad()
+
+        model_path = os.path.join(self.save_dir, f'model_fold{fold_idx}.pt')
+        torch.save({'model': model.state_dict()}, model_path)
+
+    def test_fold(self, fold_idx):
+        print(f"Testing fold {fold_idx}")
+        model_path = os.path.join(self.save_dir, f'model_fold{fold_idx}.pt')
+        data_fold = copy.deepcopy(self.orig_data)
+        homo = self._to_homo_cached(data_fold)
+
+        checkpoint = torch.load(model_path, map_location=self.device)
+
+        if self.embedding_model_type == 'node2vec':
+            model = Node2Vec(homo.edge_index, embedding_dim=128, walk_length=20, context_size=10, walks_per_node=10).to(self.device)
+        elif self.embedding_model_type == 'metapath2vec':
+            model = self.orig_data.metapath2vec_model.to(self.device)
+        else:
+            model = self.model_fn().to(self.device)
+            decoder = self.decoder_fn().to(self.device)
+            decoder.load_state_dict(checkpoint['decoder'])
+
+        model.load_state_dict(checkpoint['model'])
+        model.eval()
+
+        if self.embedding_model_type in ['node2vec', 'metapath2vec']:
+            x = model().to(self.device)
+            decoder = self.decoder_fn().to(self.device)
+        else:
+            x = model(homo.x.to(self.device), homo.edge_index.to(self.device))
+
+        src, dst = self.test_edges[0].to(self.device), self.test_edges[1].to(self.device)
+        pos_pred = decoder(x[src], x[dst]).sigmoid().cpu()
+        neg_dst = torch.randint(0, homo.num_nodes, (len(src),))
+        neg_pred = decoder(x[src], x[neg_dst]).sigmoid().cpu()
+
+        pred_path = os.path.join(self.save_dir, f'predictions_fold{fold_idx}.pt')
+        torch.save({'pos_pred': pos_pred, 'neg_pred': neg_pred}, pred_path)
+
+    def eval_fold(self, fold_idx):
+        print(f"Evaluating fold {fold_idx}")
+        pred_path = os.path.join(self.save_dir, f'predictions_fold{fold_idx}.pt')
+        preds = torch.load(pred_path)
+        pos_pred = preds['pos_pred']
+        neg_pred = preds['neg_pred']
+
+        y_true = torch.cat([torch.ones_like(pos_pred), torch.zeros_like(neg_pred)])
+        y_score = torch.cat([pos_pred, neg_pred])
+
+        from sklearn.metrics import roc_auc_score, average_precision_score
+        auc = roc_auc_score(y_true.numpy(), y_score.numpy())
+        ap = average_precision_score(y_true.numpy(), y_score.numpy())
+
+        result_path = os.path.join(self.save_dir, f'result_eval_fold{fold_idx}.pt')
+        torch.save({'auc': auc, 'ap': ap}, result_path)
+
+    def run_all_folds(self):
+        for i in range(len(self.fold_dataset.fold_indices)):
+            self.run_fold(i)
+        print("All folds completed.")

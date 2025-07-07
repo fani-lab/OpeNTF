@@ -101,8 +101,8 @@ model:
       h: # hidden dimension, if empty, means 1-hop: [${dim}, ${dim}], otherwise means len(hd)+1 hop: [${dim}, hd[0], hd[1], ..., ${dim}]
         - ${dim} # hydra cannot interpolate in a list like [${dim}]. So, each item per line
       nn: [30, 20] # number of neighbors in each hop ([20, 10] -> 20 neighbors in 1-hop, 10 neighbors in 2-hop). Should match hd
-      supervision_edge_types: # if not set, all edge_types as supervision edges.
-        #([('member', 'to', 'team')], 'stm')
+      supervision_edge_type:
+        - ['member', 'to', 'team'] # if not set, all edge_types as supervision edges.
 
     #Hamilton, Will, Zhitao Ying, and Jure Leskovec. "Inductive representation learning on large graphs." NIPS (2017).
     gs: ${model.gnn.gcn}
@@ -116,8 +116,8 @@ model:
       #h: # hidden dimension, if empty, means 1-hop: [${dim}, ${dim}], otherwise means len(hd)+1 hop: [${dim}, hd[0], hd[1], ..., ${dim}]
       #  - ${dim} # hydra cannot interpolate in a list like [${dim}]. So, each item per line
       #nn: [ 30, 20 ] # number of neighbors in each hop ([20, 10] -> 20 neighbors in 1-hop, 10 neighbors in 2-hop). Should match hd
-      #supervision_edge_types: # if not set, all edge_types as supervision edges.
-      ##([('member', 'to', 'team')], 'stm')
+      #supervision_edge_types:
+      # - ['member', 'to', 'team'] # if not set, all edge_types as supervision edges.
 
     gin: ${model.gnn.gcn}
 

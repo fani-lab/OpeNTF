@@ -175,24 +175,13 @@ class Gnn(T2v):
             def decode(self, x_i, x_j): return (x_i * x_j).sum(dim=-1) # we use binary_cross_entropy_with_logits for loss calc
         return Model(self.cfg, self.name, num_nodes)
     def _build_loader_mp(self, homo_data):
-        # (1)
-        # transductive (for opentf, only edges matter)
-        # - during the training, all graph structure is seen, but the loss is based on the edge prediction of edges in training set.
-        # So, the message passing for nodes connected to the edges of the val/test sets won't be affected.
-        # - during val/test, the loss is for edge prediction of edges in val/test set based on the final embeddings of incident nodes.
-        #
-        # in sum, the splits are based on edges, not nodes. Also, edges of all splits are available in training for message passing.
-        #
-        # inductive
-        # - during the training, the edges of val/test is not available at all, BOTH for message passing and loss calculation, i.e., strict splits
-        # this means the data's edge_index should be only based on the training teams
-
-        # for now, transductive
-
-        # (2)
-        # supervision edges
-        # if originally homo, ideally, all edges can be used
-        # if hetero, or to_homo(), we can further say what type of edges for supervision (loss calculation) during training
+        # (1) transductive (for opentf, only edges matter)
+        # -- all nodes 'skills', 'member', 'team' are seen
+        # -- edges (a) all can be seen for message passing but valid/test edges are not for loss/supervision (common practice)
+        #          (b) valid/test edges are literally removed, may lead to disconnected nodes (uncommon but very strict/pure, no leakage)
+        # for now, (1)(b)
+        # (2) inductive
+        # -- valid/test 'team' nodes are unseen >> future
 
         train_data, valid_data, test_data = self.pyg.transforms.RandomLinkSplit(is_undirected=True,
             num_val=0.1, num_test=0.0, # just for now. later, this should be based on the main splits of teams
@@ -391,6 +380,10 @@ class Gnn(T2v):
                 type_embeddings = embeddings[node_type_tensor == i]  # shape: [num_nodes_of_type, self.cfg.model.d]
                 result[node_type] = type_embeddings
         return result
+
+    def _train_mp_split(self): pass
+
+
 
     # def learn(self, loader, epochs):
     #     import torch.nn.functional as F
