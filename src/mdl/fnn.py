@@ -44,7 +44,7 @@ class Fnn(Ntf):
             condition = condition | selected_mask #those selected neg experts, same loss weight as pos expert
 
         weight = Ntf.torch.where(condition, self.cfg.tpw, self.cfg.tnw) # the rest neg experts. if this is 0, pure neg sampling
-        return Ntf.torch.nn.functional.binary_cross_entropy_with_logits(y_, y, weight, reduction='sum')
+        return Ntf.torch.nn.functional.binary_cross_entropy_with_logits(y_, y, weight, reduction='none')
 
     def ns_uniform(self, y):
         # fully batch-wise and gpu-friendly
@@ -131,7 +131,7 @@ class Fnn(Ntf):
                             #     loss = self.cross_entropy(y_, y)
                             #     cdp_loss = apply_weight_decay_data_parameters(loss, class_parameter_minibatch=class_parameters, weight_decay=0.9)
                             # else:
-                            loss = self.bxe(y_, y) #reduction is 'sum' due to sparsity of multi-hot expert vector in last layer
+                            loss = self.bxe(y_, y).sum(dim=1).mean() #reduction: 'sum' per instance, 'mean' over batch due to sparsity of multi-hot expert vector in last layer
                             if self.is_bayesian: loss += Fnn.btorch.get_kl_loss(self.model) / y.shape[0]
                             loss.backward(); #shouldn't we have this: if self.cfg.l == 'cdp': cdp_loss.backward()
                             # clip_grad_value_(model.parameters(), 1)
@@ -140,26 +140,27 @@ class Fnn(Ntf):
 
                         else:  # valid
                             self.model.eval()  # Set model to valid mode
-                            y_ = self.model.forward(X)
-                            # if self.cfg.l == 'csl': csl_criterion(y_.squeeze(), y.squeeze(), index)
-                            # else:
-                            loss = self.bxe(y_, y)
-                            if self.is_bayesian: loss += Fnn.btorch.get_kl_loss(self.model) / y.shape[0]
-                            #how about the loss of cdp for each class/expert? cdp_loss
+                            with Ntf.torch.no_grad():
+                                y_ = self.model.forward(X)
+                                # if self.cfg.l == 'csl': csl_criterion(y_.squeeze(), y.squeeze(), index)
+                                # else:
+                                loss = self.bxe(y_, y)
+                                if self.is_bayesian: loss += Fnn.btorch.get_kl_loss(self.model) / y.shape[0]
+                                #how about the loss of cdp for each class/expert? cdp_loss
+                                v_loss += loss.item()
 
-                            v_loss += loss.item()
-
-                w.add_scalar(tag=f'{foldidx}_t_loss', scalar_value=t_loss / len(train_dl), global_step=e)
-                w.add_scalar(tag=f'{foldidx}_v_loss', scalar_value=v_loss / len(valid_dl), global_step=e)
-                log.info(f'Fold {foldidx}/{len(splits["folds"]) - 1}, Epoch {e}, {opentf.textcolor["blue"]}Train Loss: {t_loss / len(train_dl):.4f}{opentf.textcolor["reset"]}')
-                log.info(f'Fold {foldidx}/{len(splits["folds"]) - 1}, Epoch {e}, {opentf.textcolor["magenta"]}Valid Loss: {(v_loss / len(valid_dl)):.4f}{opentf.textcolor["reset"]}')
+                t_loss /= len(train_dl); v_loss /= len(valid_dl)
+                w.add_scalar(tag=f'{foldidx}_t_loss', scalar_value=t_loss, global_step=e)
+                w.add_scalar(tag=f'{foldidx}_v_loss', scalar_value=v_loss, global_step=e)
+                log.info(f'Fold {foldidx}/{len(splits["folds"]) - 1}, Epoch {e}, {opentf.textcolor["blue"]}Train Loss: {t_loss:.4f}{opentf.textcolor["reset"]}')
+                log.info(f'Fold {foldidx}/{len(splits["folds"]) - 1}, Epoch {e}, {opentf.textcolor["magenta"]}Valid Loss: {v_loss:.4f}{opentf.textcolor["reset"]}')
                 if self.cfg.spe:
                     # self.model.eval()
                     self.torch.save({'model_state_dict': self.model.state_dict(), 'cfg': self.cfg, 'f': foldidx, 'e': e, 't_loss': t_loss, 'v_loss': v_loss}, f'{self.output}/f{foldidx}.e{e}.pt')
                     log.info(f'{self.name()} model with {opentf.cfg2str(self.cfg)} saved at {self.output}/f{foldidx}.e{e}.pt')
 
-                scheduler.step(v_loss / len(valid_dl))
-                if earlystopping(v_loss / len(valid_dl), self.model).early_stop:
+                scheduler.step(v_loss)
+                if earlystopping(v_loss, self.model).early_stop:
                     log.info(f'Early stopping triggered at epoch: {e}')
                     break
 
