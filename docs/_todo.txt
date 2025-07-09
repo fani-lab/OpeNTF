@@ -1,8 +1,19 @@
-multilayer neural classifiers
+graph neural network - e2e with transfer support (transductive splits per fold)
+node2vec,
+- test
+- eval
 
-    nmt (from nmt branch and sigir25 paper)
-        >> seperate _prep() from learn()
-        >> learn() does not save checkpoints
+metapath2vec
+- train
+- test
+- eval
+
+homo versions: gcn, gs, gat, gatv2, gin
+- train
+- test
+- eval
+
+multilayer neural classifiers
 
     - rrn >> isn't it temporal?
     - bundle recommenders
@@ -18,19 +29,11 @@ multilayer neural classifiers
     {emb}_{fnn,bnn}_cl_{train/test} >> future
 
 -- end2end
-make a connection between train/vali/test splits of teams and train/valid/test edge lists >> this should be done per-fold!!
-
-Let's start the transfer part for now. I'll complete the tasks when I come to e2e
-
-- strict splits, transductive, inductive
+- inductive
 - hetero version of gnns
-
-Notes:
-
 Our graph are mainly hetero, but gnn methods are mainly designed for homo graph. So, we create hetero, make it to_homo(), ...
 For strict hetero, we will use HeteroConv that wraps gnn methods per node type
 Indeed, it is worth study a mixture of gnn methods for node types :D
-
 
 update to readme for cmn layer and main readme
 
@@ -48,20 +51,6 @@ def evaluate_model(model, val_corpus):
         top_score = most_similar[0][1]
         sims.append(top_score)
     return sum(sims) / len(sims) >> a doc, when in test, should return the same doc if in train, or the most similar one (textoverlap?)
-
-
--- gnn-transferred >> for now, entire graph is seen. But
-Strict split way: create a training graph using training teams. The test teams should then added to infer the node embeddings.
-luckily the nodes are already seen (skills, experts) (team nodes are always unseen), but if not seen, either remove the node or infer based on surroundings.
-
-
-node2vec, metapath2vec
--- transductive vs. inductive >> train, valid, test
--- yet to be run on entire datasets >> also check to engage cuda
-
-homo versions: gcn, gs, gat, gatv2, gin
--- transductive vs. inductive >> train, valid, test
--- yet to be run on entire datasets >> also check to engage cuda
 
 =========
 hetero versions of gcn, gs, gat, gatv2, gin

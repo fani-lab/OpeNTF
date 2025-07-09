@@ -1,4 +1,4 @@
-import os, itertools, pickle, logging, numpy as np
+import os, itertools, pickle, logging, numpy as np, copy, time
 log = logging.getLogger(__name__)
 
 import pkgmgr as opentf
@@ -82,67 +82,110 @@ class Gnn(T2v):
 
         log.info(f'{opentf.textcolor["blue"]}Training {self.name} {opentf.textcolor["reset"]}... ')
 
-        # random-walk-based including n2v and m2v
-        # such methods are unsupervised and learn node embeddings from scratch, using random initialization internally.
-        # no need to manually create and initialize node embeddgins as in message-passing-based methods.
-        # such models do not consume node attributes or features like message-passing-based methods do
-        # they only use the graph structure.
-        # the learned embeddings are inside an nn.Embedding layer that is initialized randomly and optimized during training.
-        if self.name == 'n2v':
-            output = f'.w{self.cfg.model.w}.wl{self.cfg.model.wl}.wn{self.cfg.model.wn}'
-            # ImportError: 'Node2Vec' requires either the 'pyg-lib' or 'torch-cluster' package
-            # install_import(f'torch-cluster==1.6.3 -f https://data.pyg.org/whl/torch-{self.torch.__version__}.html', 'torch_cluster')
-            # import importlib; importlib.reload(self.pyg);importlib.reload(self.pyg.typing);importlib.reload(self.pyg.nn)
-            self.model = self.pyg.nn.Node2Vec((homo_data:=(self.data.to_homogeneous())).edge_index,
-                                 embedding_dim=self.cfg.model.d,
-                                 walk_length=self.cfg.model.wl,
-                                 context_size=self.cfg.model.w,
-                                 walks_per_node=self.cfg.model.wn,
-                                 num_negative_samples=self.cfg.model.ns).to(self.device)
-            self._train_rw(prefix + output + postfix) #TODO: valid and test sets
-            self._get_node_emb(homo_data=homo_data) #logging purposes
+        train_data = copy.deepcopy(self.data)
 
-        elif self.name == 'm2v':
-            # assert isinstance(self.data, self.pyg.data.HeteroData), f'{opentf.textcolor["red"]}Hetero graph is needed for m2v. {self.cfg.graph.structure} is NOT hetero!{opentf.textcolor["reset"]}'
-            assert len(self.data.node_types) > 1, f'{opentf.textcolor["red"]}Hetero graph is needed for m2v. {self.cfg.graph.structure} is NOT hetero!{opentf.textcolor["reset"]}'
-            output = f'.w{self.cfg.model.w}.wl{self.cfg.model.wl}.wn{self.cfg.model.wn}.{self.cfg.model.metapath_name[1]}' #should be fixed
-            self.model = self.pyg.nn.MetaPath2Vec(self.data.edge_index_dict,
-                                     metapath=[tuple(mp) for mp in self.cfg.model.metapath_name[0]],
+        # (1) transductive (for opentf, only edges matter)
+        # -- all nodes 'skills', 'member', 'team' are seen
+        # -- edges (a) all can be seen for message passing but valid/test edges are not for loss/supervision (common practice)
+        #          (b) valid/test team-member edges are literally removed, may 'rarely' lead to disconnected member nodes (uncommon but very strict/pure, no leakage)
+        #          (c) valid/test team-member and team-skill edges are literally removed, lead to disconnected team nodes, may be disconnected skills and members
+        # for now, (1)(b)
+        # (2) inductive
+        # -- valid/test 'team' nodes are unseen >> future
+
+        # remove (member to team) and (team to member) edges whose teams are in test set
+        test_teams_to_remove = Gnn.torch.tensor(splits['test'])
+        mask = ~Gnn.torch.isin(train_data['member', 'to', 'team'].edge_index[1], test_teams_to_remove)
+        train_data['member', 'to', 'team'].edge_index = train_data['member', 'to', 'team'].edge_index[:, mask]
+        mask = ~Gnn.torch.isin(train_data['team', 'rev_to', 'member'].edge_index[0], test_teams_to_remove)
+        train_data['team', 'rev_to', 'member'].edge_index = train_data['team', 'rev_to', 'member'].edge_index[:, mask]
+
+        for foldidx in splits['folds'].keys():
+
+            # remove (member to team) and (team to member) edges whose teams are in valid set too
+            valid_teams_to_remove = Gnn.torch.tensor(splits['folds'][foldidx]['valid'])
+
+            v_m2t_mask = Gnn.torch.isin(train_data['member', 'to', 'team'].edge_index[1], valid_teams_to_remove)
+            val_m2t_edges = train_data['member', 'to', 'team'].edge_index[:, v_m2t_mask]
+            train_data['member', 'to', 'team'].edge_index = train_data['member', 'to', 'team'].edge_index[:, ~v_m2t_mask]
+
+            v_t2m_mask = Gnn.torch.isin(train_data['team', 'rev_to', 'member'].edge_index[0], valid_teams_to_remove)
+            val_t2m_edges = train_data['team', 'rev_to', 'member'].edge_index[:, v_t2m_mask]
+            train_data['team', 'rev_to', 'member'].edge_index = train_data['team', 'rev_to', 'member'].edge_index[:, ~v_t2m_mask]
+
+            # random-walk-based (rw) including n2v and m2v, are unsupervised and learn node embeddings from scratch, using random initialization internally.
+            # no need to manually create and initialize node embeddgins like in message-passing-based (mp) methods.
+            # such models do not consume node attributes or features like mp methods do. they only use the graph structure.
+            # the learned embeddings are inside an nn.Embedding layer that is initialized randomly and optimized during training.
+            if self.name == 'n2v':
+                output = f'.w{self.cfg.model.w}.wl{self.cfg.model.wl}.wn{self.cfg.model.wn}'
+                # ImportError: 'Node2Vec' requires either the 'pyg-lib' or 'torch-cluster' package
+                # install_import(f'torch-cluster==1.6.3 -f https://data.pyg.org/whl/torch-{self.torch.__version__}.html', 'torch_cluster')
+                # import importlib; importlib.reload(self.pyg);importlib.reload(self.pyg.typing);importlib.reload(self.pyg.nn)
+                self.model = self.pyg.nn.Node2Vec((homo_data:=(train_data.to_homogeneous())).edge_index,
                                      embedding_dim=self.cfg.model.d,
                                      walk_length=self.cfg.model.wl,
                                      context_size=self.cfg.model.w,
                                      walks_per_node=self.cfg.model.wn,
                                      num_negative_samples=self.cfg.model.ns).to(self.device)
-            self._train_rw(prefix + output + postfix) #TODO: valid and test sets
-            self._get_node_emb() #logging purposes
+                offsets = {}; offset = 0
+                for node_type in train_data.node_types:
+                    offsets[node_type] = offset
+                    offset += train_data[node_type].num_nodes
 
-        elif self.name == 'han':
-            # assert isinstance(self.data, self.pyg.data.HeteroData), f'{opentf.textcolor["red"]}Hetero graph is needed for m2v. {self.cfg.graph.structure} is NOT hetero!{opentf.textcolor["reset"]}'
-            assert len(self.data.node_types) > 1, f'{opentf.textcolor["red"]}Hetero graph is needed for han. {self.cfg.graph.structure} is NOT hetero!{opentf.textcolor["reset"]}'
-            raise NotImplementedError(f'{self.name} not integrated!')
+                val_member_homo = val_m2t_edges[0] + offsets['member']
+                val_team_homo = val_m2t_edges[1] + offsets['team']
 
-        elif self.name == 'lant':
-            raise NotImplementedError(f'{self.name} not integrated!')
+                # # same effect/view as above two lines when to_homo(). So, no need for below lines
+                # val_team_homo = val_t2m_edges[0] + offsets['team']
+                # val_member_homo = val_t2m_edges[1] + offsets['member']
 
-        # message-passing-based >> default on homo, but can be wrapped into HeteroConv
-        elif self.name in {'gcn', 'gs', 'gat', 'gatv2', 'gin'}:
-            output = f'.d{self.cfg.model.d}.e{self.cfg.model.e}.b{self.cfg.model.b}.lr{self.cfg.model.lr}.ns{self.cfg.model.ns}.h{"-".join([str(i) for i in self.cfg.model.h])}.nn{"-".join([str(i) for i in self.cfg.model.nn])}'
+                val_edge_index_homo = Gnn.torch.stack([val_member_homo, val_team_homo], dim=0)
+                self.output = prefix + output + postfix
+                self._train_rw(splits, foldidx, val_edge_index_homo)
+                self._get_node_emb(homo_data=homo_data) #logging purposes
 
-            # by default, gnn methods are for homo data.
-            # we can wrap it by HeteroConv >> future
-            # or manually simulate it >> I think Jamil did this >> future
-            homo_data = self.data.to_homogeneous()
-            # building multilayer gnn-based model. Shouldn't depend on data.
-            # but as our graph has no features for node (for now), we need to assign a randomly initialized embeddings as node features.
-            # so, we need the num_nodes of the graph
-            self.model = self._built_model_mp(homo_data.num_nodes).to(self.device)
-            train_l, valid_l, test_l = self._build_loader_mp(homo_data=homo_data) # building train/valid/test splits and loaders. Should depend on data
-            self._train_mp(prefix + output + postfix, train_l, valid_l, test_l)
+            elif self.name == 'm2v':
+                # assert isinstance(self.data, self.pyg.data.HeteroData), f'{opentf.textcolor["red"]}Hetero graph is needed for m2v. {self.cfg.graph.structure} is NOT hetero!{opentf.textcolor["reset"]}'
+                assert len(self.data.node_types) > 1, f'{opentf.textcolor["red"]}Hetero graph is needed for m2v. {self.cfg.graph.structure} is NOT hetero!{opentf.textcolor["reset"]}'
+                output = f'.w{self.cfg.model.w}.wl{self.cfg.model.wl}.wn{self.cfg.model.wn}.{self.cfg.model.metapath_name[1]}' #should be fixed
+                self.model = self.pyg.nn.MetaPath2Vec(train_data.edge_index_dict,
+                                         metapath=[tuple(mp) for mp in self.cfg.model.metapath_name[0]],
+                                         embedding_dim=self.cfg.model.d,
+                                         walk_length=self.cfg.model.wl,
+                                         context_size=self.cfg.model.w,
+                                         walks_per_node=self.cfg.model.wn,
+                                         num_negative_samples=self.cfg.model.ns).to(self.device)
+                self._train_rw(prefix + output + postfix)
+                self._get_node_emb() #logging purposes
 
-        self.modelfilepath = prefix + output + postfix
-        # if self.name == 'lant': self.model.learn(self, self.cfg.model.e)  # built-in validation inside lant_encoder class
-        #
-        # self.plot_points()
+            elif self.name == 'han':
+                # assert isinstance(self.data, self.pyg.data.HeteroData), f'{opentf.textcolor["red"]}Hetero graph is needed for m2v. {self.cfg.graph.structure} is NOT hetero!{opentf.textcolor["reset"]}'
+                assert len(self.data.node_types) > 1, f'{opentf.textcolor["red"]}Hetero graph is needed for han. {self.cfg.graph.structure} is NOT hetero!{opentf.textcolor["reset"]}'
+                raise NotImplementedError(f'{self.name} not integrated!')
+
+            elif self.name == 'lant':
+                raise NotImplementedError(f'{self.name} not integrated!')
+
+            # message-passing-based >> default on homo, but can be wrapped into HeteroConv
+            elif self.name in {'gcn', 'gs', 'gat', 'gatv2', 'gin'}:
+                output = f'.d{self.cfg.model.d}.e{self.cfg.model.e}.b{self.cfg.model.b}.lr{self.cfg.model.lr}.ns{self.cfg.model.ns}.h{"-".join([str(i) for i in self.cfg.model.h])}.nn{"-".join([str(i) for i in self.cfg.model.nn])}'
+
+                # by default, gnn methods are for homo data.
+                # we can wrap it by HeteroConv >> future
+                # or manually simulate it >> I think Jamil did this >> future
+                homo_data = self.data.to_homogeneous()
+                # building multilayer gnn-based model. Shouldn't depend on data.
+                # but as our graph has no features for node (for now), we need to assign a randomly initialized embeddings as node features.
+                # so, we need the num_nodes of the graph
+                self.model = self._built_model_mp(homo_data.num_nodes).to(self.device)
+                train_l, valid_l, test_l = self._build_loader_mp(homo_data=homo_data) # building train/valid/test splits and loaders. Should depend on data
+                self._train_mp(prefix + output + postfix, train_l, valid_l, test_l)
+
+            self.modelfilepath = prefix + output + postfix
+            # if self.name == 'lant': self.model.learn(self, self.cfg.model.e)  # built-in validation inside lant_encoder class
+            #
+            # self.plot_points()
 
     def _built_model_mp(self, num_nodes):
         class Model(Gnn.torch.nn.Module):
@@ -175,24 +218,7 @@ class Gnn(T2v):
             def decode(self, x_i, x_j): return (x_i * x_j).sum(dim=-1) # we use binary_cross_entropy_with_logits for loss calc
         return Model(self.cfg, self.name, num_nodes)
     def _build_loader_mp(self, homo_data):
-        # (1)
-        # transductive (for opentf, only edges matter)
-        # - during the training, all graph structure is seen, but the loss is based on the edge prediction of edges in training set.
-        # So, the message passing for nodes connected to the edges of the val/test sets won't be affected.
-        # - during val/test, the loss is for edge prediction of edges in val/test set based on the final embeddings of incident nodes.
-        #
-        # in sum, the splits are based on edges, not nodes. Also, edges of all splits are available in training for message passing.
-        #
-        # inductive
-        # - during the training, the edges of val/test is not available at all, BOTH for message passing and loss calculation, i.e., strict splits
-        # this means the data's edge_index should be only based on the training teams
 
-        # for now, transductive
-
-        # (2)
-        # supervision edges
-        # if originally homo, ideally, all edges can be used
-        # if hetero, or to_homo(), we can further say what type of edges for supervision (loss calculation) during training
 
         train_data, valid_data, test_data = self.pyg.transforms.RandomLinkSplit(is_undirected=True,
             num_val=0.1, num_test=0.0, # just for now. later, this should be based on the main splits of teams
@@ -303,36 +329,50 @@ class Gnn(T2v):
         log.info(f'{self.name} model with {opentf.cfg2str(self.cfg.model)} saved at {output}.')
         self.writer.close()
 
-    def _train_rw(self, output):
+    def _train_rw(self, splits, foldidx, val_edge_index):
+        w = self.writer(log_dir=f'{self.output}/logs4tboard/run_{int(time.time())}')
         optimizer = self.torch.optim.Adam(self.model.parameters(), lr=self.cfg.model.lr)
+        scheduler = Gnn.torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.1, patience=2, verbose=True)
         loader = self.model.loader(batch_size=self.cfg.model.b, shuffle=True)  # num_workers=os.cpu_count() not working in windows! also, cuda won't engage for the loader if num_workers param is passed
         earlystopping = EarlyStopping(Gnn.torch, patience=self.cfg.model.es, verbose=True, save_model=False, trace_func=log.info)
-
         self.torch.cuda.empty_cache()
         for e in range(self.cfg.model.e):
-            e_loss = 0; self.model.train()
+            t_loss = 0; self.model.train()
             for pos_rw, neg_rw in loader:
                 optimizer.zero_grad()
-                loss = self.model.loss(pos_rw.to(self.device), neg_rw.to(self.device)) #reduction is always 'mean'
-                loss.backward(); optimizer.step(); e_loss += loss.item()
-            e_loss /= len(loader)
-            log.info(f'Epoch {e}, {opentf.textcolor["blue"]}Train Loss: {e_loss:.4f}{opentf.textcolor["reset"]}')
+                loss = self.model.loss(pos_rw.to(self.device), neg_rw.to(self.device)) #reduction is fixed to 'mean' internally
+                loss.backward(); optimizer.step(); t_loss += loss.item()
 
-            self.writer.add_scalar('Loss/train', e_loss, e)
-            # self.writer.add_embedding(node_embeddings, global_step=e)
+            self.model.eval()
+            with self.torch.no_grad():
+                z = self.model()
+                pos_scores = (z[val_edge_index[0]] * z[val_edge_index[1]]).sum(dim=-1)
+                neg_edge_index = Gnn.pyg.utils.negative_sampling(edge_index=self.model.edge_index, num_nodes=self.model.num_nodes, num_neg_samples=val_edge_index.size(1), method='sparse')
+                neg_scores = (z[neg_edge_index[0]] * z[neg_edge_index[1]]).sum(dim=-1)
+                scores = Gnn.torch.cat([pos_scores, neg_scores])
+                labels = Gnn.torch.cat([self.torch.ones_like(pos_scores), Gnn.torch.zeros_like(neg_scores)])
+                v_loss = Gnn.torch.F.binary_cross_entropy_with_logits(scores, labels, reduction='mean').item()
 
-            if self.cfg.model.save_per_epoch:
-                self.model.eval()
-                self.torch.save({'model_state_dict': self.model.state_dict(), 'cfg': self.cfg, 'e': e, 't_loss': e_loss}, f'{output}.e{e}')
-                log.info(f'{self.name} model with {opentf.cfg2str(self.cfg.model)} saved at {output}.e{e}')
+            t_loss /= len(loader); v_loss /= len(scores)
+            # self.writer.add_embedding(node_embeddings, global_step=e) >> would be nice to see the convergence of embeddings for node
+            w.add_scalar(tag=f'{foldidx}_t_loss', scalar_value=t_loss, global_step=e)
+            w.add_scalar(tag=f'{foldidx}_v_loss', scalar_value=v_loss, global_step=e)
+            log.info(f'Fold {foldidx}/{len(splits["folds"]) - 1}, Epoch {e}, {opentf.textcolor["blue"]}Train Loss: {t_loss:.4f}{opentf.textcolor["reset"]}')
+            log.info(f'Fold {foldidx}/{len(splits["folds"]) - 1}, Epoch {e}, {opentf.textcolor["magenta"]}Valid Loss: {v_loss:.4f}{opentf.textcolor["reset"]}')
 
-            # TODO:it should be v_loss on validation set!
-            if earlystopping(e_loss, self.model).early_stop:
+            if self.cfg.spe:
+                # self.model.eval()
+                self.torch.save({'model_state_dict': self.model.state_dict(), 'cfg': self.cfg, 'f': foldidx, 'e': e, 't_loss': t_loss, 'v_loss': v_loss}, f'{self.output}/f{foldidx}.e{e}.pt')
+                log.info(f'{self.name()} model with {opentf.cfg2str(self.cfg)} saved at {self.output}/f{foldidx}.e{e}.pt')
+
+            scheduler.step(v_loss)
+            if earlystopping(v_loss, self.model).early_stop:
                 log.info(f'Early stopping triggered at epoch: {e}')
                 break
-        self.model.eval()
-        self.torch.save({'model_state_dict': self.model.state_dict(), 'cfg': self.cfg, 'e': e, 't_loss': e_loss}, output)
-        log.info(f'{self.name} model with {opentf.cfg2str(self.cfg.model)} saved at {output}.')
+
+            self.torch.save({'model_state_dict': self.model.state_dict(), 'cfg': self.cfg, 'f': foldidx, 'e': e, 't_loss': t_loss, 'v_loss': v_loss}, f'{self.output}/f{foldidx}.pt')
+            log.info(f'{self.name()} model with {opentf.cfg2str(self.cfg)} saved at {self.output}/f{foldidx}.pt')
+        w.close()
 
     def _init_d2v_node_features(self, teamsvecs, indexes, splits):
         flag = False
@@ -391,6 +431,10 @@ class Gnn(T2v):
                 type_embeddings = embeddings[node_type_tensor == i]  # shape: [num_nodes_of_type, self.cfg.model.d]
                 result[node_type] = type_embeddings
         return result
+
+    def _train_mp_split(self): pass
+
+
 
     # def learn(self, loader, epochs):
     #     import torch.nn.functional as F

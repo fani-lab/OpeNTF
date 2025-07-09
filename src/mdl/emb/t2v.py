@@ -11,8 +11,8 @@ class T2v:
         self.modelfilepath = None
 
     # to prep the required dataset for embeddings like documents for d2v or graphs for gnn-based
-    def _prep(self, teamsvecs, indexes, splits): pass
+    def _prep(self, teamsvecs, indexes, splits=None): pass #split=None >> entire dataset, no valid/test splits
 
-    def train(self, teamsvecs, indexes, splits): pass
+    def train(self, teamsvecs, indexes, splits=None): pass #split=None >> entire dataset, no valid/test splits
 
     def get_dense_vecs(self, teamsvecs, vectype='skill'): pass # this should access the self.model to reach out the embeddings explicitly
