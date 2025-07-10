@@ -14,9 +14,7 @@ from .t2v import T2v
 
 class D2v(T2v):
     gensim = None
-    def __init__(self, output, device, cgf):
-        super().__init__(output, device, cgf)
-        self.name = 'd2v'
+    def __init__(self, output, device, cgf): super().__init__(output, device, 'd2v', cgf)
 
     def _prep(self, teamsvecs, indexes, splits):
         datafile = self.output + f'/{self.cfg.embtype}.docs.pkl'
@@ -52,7 +50,7 @@ class D2v(T2v):
 
     def train(self, teamsvecs, indexes, splits):
         # to select/create correct model file in the output directory
-        self.modelfilepath = self.output + f'/d{self.cfg.d}.e{self.cfg.e}.{self.name}.w{self.cfg.w}.dm{self.cfg.dm}.{self.cfg.embtype}'
+        self.modelfilepath = self.output + f'/{self.name}.d{self.cfg.d}.e{self.cfg.e}.w{self.cfg.w}.dm{self.cfg.dm}.{self.cfg.embtype}'
         try:
             log.info(f"Loading the model {self.modelfilepath} for {(teamsvecs['skill'].shape[0], self.cfg.d)}  embeddings ...")
             self.__class__.gensim = opentf.install_import('gensim==4.3.3', 'gensim')

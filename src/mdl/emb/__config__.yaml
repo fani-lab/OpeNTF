@@ -7,7 +7,7 @@ model:
   ns: 5 # number of negative samples for each positive sample
   lr: 0.001 #learning rate
   es: 5 # earlystopping's patience. to bypass, set it to a higher value than epoch
-  save_per_epoch: False
+  save_per_epoch: True
 
   # Quoc V. Le, Tomás Mikolov: Distributed Representations of Sentences and Documents. ICML 2014: 1188-1196
   d2v: # we use gensim
@@ -22,7 +22,7 @@ model:
     d: ${dim}
     e: ${model.epochs}
     lr: ${model.lr}
-    save_per_epoch: ${model.save_per_epoch}
+    spe: ${model.save_per_epoch}
 
   gnn:
     graph:
@@ -41,13 +41,13 @@ model:
         #max
         #mul
       pre: # if set, use pretrained D2v vectors as initial node features of graph data
-        #d8.e100.w10.d2v.dm1.skillmember  # skill, member, team
-        #d8.e100.w10.d2v.dm1.skill  # skill, team
-        #d9.e100.w10.d2v.dm1.skill  # if not exists, train from scratch!
+        #d2v.d8.e100.w10.dm1.skillmember  # skill, member, team
+        #d2v.d8.e100.w10.dm1.skill  # skill, team
+        #d2v.d9.e100.w10.dm1.skill  # if not exists, train from scratch!
 
     pytorch: #will be overriden dynamically in ./src/main.py from root ./__config__.yaml
     seed: ${model.seed}
-    model:   #dummy tag as placeholder. don't worry or touch it.
+    model: #dummy tag as placeholder. don't worry or touch it.
 
     #Grover, Aditya, and Jure Leskovec. "node2vec: Scalable feature learning for networks." Proceedings of the 22nd ACM SIGKDD international conference on Knowledge discovery and data mining. 2016.
     #p: Return parameter, controls likelihood of revisiting the previous node. high p → discourages going back, low p → encourages backtracking
@@ -75,18 +75,33 @@ model:
     #Dong, Chawla, Swami. "metapath2vec: Scalable representation learning for heterogeneous networks." SIGKDD 2017.
     m2v:
       metapath_name: # to have an embedding for a node type, it should be part of the metapath, e.g., for locations
-          #[[[member, rev_to, skill], [skill, to, member]], ms-sm] # for sm graph structure
-          [[[member, to, team], [team, rev_to, skill], [skill, to, team], [team, rev_to, member]], 'mts-stm'] #m->t->s, s->t->m for stm. Note: when we build the graph, m->t, s->t, l->t. So, make it undirected, t->m, t->s get 'rev_to' label
-          #[[[member, to, team],[team, rev_to, loc], [loc, to, team], [team, rev_to, member]], mtl-ltm] #stml
+        ##member → skill → member → skill, recommend skills to members, for sm graph structure
+        #[[[member, rev_to, skill], [skill, to, member], [member, rev_to, skill]], msm]
+
+        ##team → skill → team → member for stm. Given a team, rank likely members, recommend members to a team
+        [[[team, rev_to, skill], [skill, to, team ], [team, rev_to, member]], tstm]
+        ## member → team → skill → team for stm. Given a member, recommend likely teams
+        #[[[member, to, team], [team, rev_to, skill], [skill, to, team], mtst]
+
+        ##stml (member → team → location → team) Members worked on teams in the same location as the target team. Recommending teams to members or ranking likely team assignments for new members
+        #[[[member, to, team], [team, rev_to, loc], [loc, to, team]], mtlt]
+
+        ##Combines skill and location similarity (similar domain and location) to find members from teams that share skills and location with the target team. Location is important (e.g., for co-location constraints) and to reflect real-world assignment feasibility
+        #[[[team, rev_to, skill], [skill, to, team], [team, rev_to, loc], [loc, to, team], [team, rev_to, member]], tstlt]
+        ## (member → team → location → team), Member to similar teams in area, Teams near where member has worked
+        #[[member, to, team], [team, rev_to, loc], [loc, to, team], mtlt]
+        ## (team → location → team → member), Recommend local team members, Members in geographically close teams
+        #[[team, rev_to, loc], [loc, to, team], [team, rev_to, member]], tltm]
+
       d:  ${dim}
-      w:  ${model.d2v.w}
+      w:  4 #${model.d2v.w} ## assert walk_length + 1 >= context_size
       e:  ${model.epochs}
       b:  ${model.batch_size}
       lr: ${model.lr}
       es: ${model.es}
       ns: ${model.gnn.n2v.ns}
-      save_per_epoch: ${model.save_per_epoch}
-      wl: ${model.gnn.n2v.wl} #walk_length
+      spe: ${model.save_per_epoch}
+      wl: 3 #${model.gnn.n2v.wl} #walk_length AttributeError: The 'walk_length' is longer than the given 'metapath', but the 'metapath' does not denote a cycle
       wn: ${model.gnn.n2v.wn} #walks_per_node
 
     #Thomas N. Kipf, Max Welling: Semi-Supervised Classification with Graph Convolutional Networks. ICLR (Poster) 2017
