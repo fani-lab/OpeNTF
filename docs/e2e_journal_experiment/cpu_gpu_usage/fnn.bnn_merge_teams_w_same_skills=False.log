@@ -1,0 +1,19 @@
+[2025-07-21 11:30:16,735][cmn.team][INFO] - Loading teamsvecs matrices from /home/msaeedi/OpeNTF/output/imdb/title.basics.tsv.mt10.ts2/teamsvecs.pkl ...
+[2025-07-21 11:30:17,221][cmn.team][INFO] - Loading indexes pickle from /home/msaeedi/OpeNTF/output/imdb/title.basics.tsv.mt10.ts2/indexes.pkl ...
+[2025-07-21 11:30:17,282][cmn.team][INFO] - Indexes pickle is loaded.
+[2025-07-21 11:30:17,282][cmn.team][INFO] - Teamsvecs matrices and indexes for skills (186385, 27), members (186385, 44774), and locations None are loaded.
+[2025-07-21 11:30:17,284][__main__][INFO] - Loading splits from /home/msaeedi/OpeNTF/output/imdb/title.basics.tsv.mt10.ts2/splits.pkl ...
+[2025-07-21 11:30:17,286][cmn.team][INFO] - Loading member-skill co-occurrence matrix (44774, 27) from /home/msaeedi/OpeNTF/output/imdb/title.basics.tsv.mt10.ts2/skillcoverage.pkl ...
+[2025-07-21 11:30:23,347][__main__][INFO] - [94mTraining team recommender instance mdl.fnn.Fnn ... [0m
+[2025-07-21 11:31:08,712][mdl.fnn][INFO] - Fold 0/4, Epoch 0, [94mTrain Loss: 7302.3172[0m
+[2025-07-21 11:31:08,713][mdl.fnn][INFO] - Fold 0/4, Epoch 0, [95mValid Loss: 7083.7872[0m
+[2025-07-21 11:31:08,743][mdl.fnn][INFO] - /fnn.b1000.e100.ns5.lr0.001.es5.h[128].speTrue.lbce.tpw1.tnw0.nsdunigram_b model with b1000.e100.ns5.lr0.001.es5.h[128].speTrue.lbce.tpw1.tnw0.nsdunigram_b saved at /home/msaeedi/OpeNTF/output/imdb/title.basics.tsv.mt10.ts2/fnn.b1000.e100.ns5.lr0.001.es5.h[128].speTrue.lbce.tpw1.tnw0.nsdunigram_b/f0.e0.pt
+[2025-07-21 11:31:08,743][mdl.fnn][INFO] - Validation loss decreased (inf --> 7083.787247)
+[2025-07-21 11:31:52,925][mdl.fnn][INFO] - Fold 0/4, Epoch 1, [94mTrain Loss: 6965.6673[0m
+[2025-07-21 11:31:52,926][mdl.fnn][INFO] - Fold 0/4, Epoch 1, [95mValid Loss: 6867.9771[0m
+[2025-07-21 11:31:52,957][mdl.fnn][INFO] - /fnn.b1000.e100.ns5.lr0.001.es5.h[128].speTrue.lbce.tpw1.tnw0.nsdunigram_b model with b1000.e100.ns5.lr0.001.es5.h[128].speTrue.lbce.tpw1.tnw0.nsdunigram_b saved at /home/msaeedi/OpeNTF/output/imdb/title.basics.tsv.mt10.ts2/fnn.b1000.e100.ns5.lr0.001.es5.h[128].speTrue.lbce.tpw1.tnw0.nsdunigram_b/f0.e1.pt
+[2025-07-21 11:31:52,957][mdl.fnn][INFO] - Validation loss decreased (7083.787247 --> 6867.977097)
+[2025-07-21 11:32:34,934][mdl.fnn][INFO] - Fold 0/4, Epoch 2, [94mTrain Loss: 6760.0003[0m
+[2025-07-21 11:32:34,934][mdl.fnn][INFO] - Fold 0/4, Epoch 2, [95mValid Loss: 6763.6588[0m
+[2025-07-21 11:32:34,964][mdl.fnn][INFO] - /fnn.b1000.e100.ns5.lr0.001.es5.h[128].speTrue.lbce.tpw1.tnw0.nsdunigram_b model with b1000.e100.ns5.lr0.001.es5.h[128].speTrue.lbce.tpw1.tnw0.nsdunigram_b saved at /home/msaeedi/OpeNTF/output/imdb/title.basics.tsv.mt10.ts2/fnn.b1000.e100.ns5.lr0.001.es5.h[128].speTrue.lbce.tpw1.tnw0.nsdunigram_b/f0.e2.pt
+[2025-07-21 11:32:34,964][mdl.fnn][INFO] - Validation loss decreased (6867.977097 --> 6763.658798)
