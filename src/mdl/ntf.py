@@ -46,7 +46,7 @@ class Ntf:
 
                 predfiles = [f'{self.output}/f{foldidx}.{pred_set}.pred'] #the first file as a hook
                 if per_epoch: predfiles += [f'{self.output}/{_}' for _ in os.listdir(self.output) if re.match(f'f{foldidx}.{pred_set}.e\d+.pred$', _)]
-                for i, predfile in enumerate(predfiles):
+                for i, predfile in enumerate(sorted(sorted(predfiles), key=len)):
                     epoch = f'e{i-1}.' if i > 0 else '' #the first file is non-epoch-based but the rest are
                     filename = f'{self.output}/f{foldidx}.{pred_set}.{epoch}'
                     Y_ = Ntf.torch.load(f'{filename}pred')['y_pred']

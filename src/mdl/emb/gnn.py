@@ -7,16 +7,15 @@ from .t2v import T2v
 
 class Gnn(T2v):
 
-    def __init__(self, output, device, cgf):
-        super().__init__(output, device, cgf)
+    def __init__(self, output, device, name, cgf):
+        super().__init__(output, device, name, cgf)
         Gnn.torch = opentf.install_import(cgf.pytorch, 'torch')
         Gnn.pyg = opentf.install_import(f'torch_geometric==2.6.1 torch_cluster==1.6.3 torch_sparse==0.6.18 torch_scatter==2.1.2 pyg_lib==0.4.0 -f https://data.pyg.org/whl/torch-{Gnn.torch.__version__}.html', 'torch_geometric')
         opentf.install_import('tensorboard==2.14.0', 'tensorboard')
         opentf.set_seed(self.cfg.seed, Gnn.torch)
-        self.writer = opentf.install_import('tensorboardX==2.6.2.2', 'tensorboardX', 'SummaryWriter')(log_dir=self.output + '/logs4tfboard')
-        self.name = None
+        self.writer = opentf.install_import('tensorboardX==2.6.2.2', 'tensorboardX', 'SummaryWriter')
+        self.w = None
         self.decoder = None
-        self.modelfilepath = None
 
     def _prep(self, teamsvecs, indexes, splits):
         #NOTE: for any change, unit test using https://github.com/fani-lab/OpeNTF/issues/280
@@ -75,15 +74,13 @@ class Gnn(T2v):
     def train(self, teamsvecs, indexes, splits):
         self._prep(teamsvecs, None, splits)
         self.cfg.model = self.cfg[self.name] #gnn.n2v or gnn.gs --> gnn.model
-        prefix = self.output + f'/d{self.cfg.model.d}.e{self.cfg.model.e}.ns{self.cfg.model.ns}.{self.name}'
-        postfix = f'{".pre" if self.cfg.graph.pre else ""}.{self.cfg.graph.dup_edge}.{self.cfg.graph.structure[1]}'
+        self.output += f'/{self.name}.d{self.cfg.model.d}.e{self.cfg.model.e}.ns{self.cfg.model.ns}.{self.cfg.graph.dup_edge}.{self.cfg.graph.structure[1]}'
+        self.output += f'{".pre" if self.cfg.graph.pre else ""}'
         # replace the 1 dimensional node features with pretrained d2v skill vectors of required dimension
         if self.cfg.graph.pre: self._init_d2v_node_features(teamsvecs, indexes, splits)
 
         log.info(f'{opentf.textcolor["blue"]}Training {self.name} {opentf.textcolor["reset"]}... ')
-
         train_data = copy.deepcopy(self.data)
-
         # (1) transductive (for opentf, only edges matter)
         # -- all nodes 'skills', 'member', 'team' are seen
         # -- edges (a) all can be seen for message passing but valid/test edges are not for loss/supervision (common practice)
@@ -113,12 +110,26 @@ class Gnn(T2v):
             val_t2m_edges = train_data['team', 'rev_to', 'member'].edge_index[:, v_t2m_mask]
             train_data['team', 'rev_to', 'member'].edge_index = train_data['team', 'rev_to', 'member'].edge_index[:, ~v_t2m_mask]
 
+            ## homo valid construction for n2v and homo versions of gnns
+            offsets = {}; offset = 0
+            for node_type in train_data.node_types:
+                offsets[node_type] = offset
+                offset += train_data[node_type].num_nodes
+
+            val_member_homo = val_m2t_edges[0] + offsets['member']
+            val_team_homo = val_m2t_edges[1] + offsets['team']
+            # # same effect/view as above two lines when to_homo(). So, no need for below lines
+            # val_team_homo = val_t2m_edges[0] + offsets['team']
+            # val_member_homo = val_t2m_edges[1] + offsets['member']
+
+            val_m_t_edge_index_homo = Gnn.torch.stack([val_member_homo, val_team_homo], dim=0)
+
             # random-walk-based (rw) including n2v and m2v, are unsupervised and learn node embeddings from scratch, using random initialization internally.
             # no need to manually create and initialize node embeddgins like in message-passing-based (mp) methods.
             # such models do not consume node attributes or features like mp methods do. they only use the graph structure.
             # the learned embeddings are inside an nn.Embedding layer that is initialized randomly and optimized during training.
             if self.name == 'n2v':
-                output = f'.w{self.cfg.model.w}.wl{self.cfg.model.wl}.wn{self.cfg.model.wn}'
+                if foldidx == 0: self.output += f'.w{self.cfg.model.w}.wl{self.cfg.model.wl}.wn{self.cfg.model.wn}'
                 # ImportError: 'Node2Vec' requires either the 'pyg-lib' or 'torch-cluster' package
                 # install_import(f'torch-cluster==1.6.3 -f https://data.pyg.org/whl/torch-{self.torch.__version__}.html', 'torch_cluster')
                 # import importlib; importlib.reload(self.pyg);importlib.reload(self.pyg.typing);importlib.reload(self.pyg.nn)
@@ -128,35 +139,26 @@ class Gnn(T2v):
                                      context_size=self.cfg.model.w,
                                      walks_per_node=self.cfg.model.wn,
                                      num_negative_samples=self.cfg.model.ns).to(self.device)
-                offsets = {}; offset = 0
-                for node_type in train_data.node_types:
-                    offsets[node_type] = offset
-                    offset += train_data[node_type].num_nodes
 
-                val_member_homo = val_m2t_edges[0] + offsets['member']
-                val_team_homo = val_m2t_edges[1] + offsets['team']
-
-                # # same effect/view as above two lines when to_homo(). So, no need for below lines
-                # val_team_homo = val_t2m_edges[0] + offsets['team']
-                # val_member_homo = val_t2m_edges[1] + offsets['member']
-
-                val_edge_index_homo = Gnn.torch.stack([val_member_homo, val_team_homo], dim=0)
-                self.output = prefix + output + postfix
-                self._train_rw(splits, foldidx, val_edge_index_homo)
+                self._train_rw(splits, foldidx, val_m_t_edge_index_homo)
                 self._get_node_emb(homo_data=homo_data) #logging purposes
 
             elif self.name == 'm2v':
                 # assert isinstance(self.data, self.pyg.data.HeteroData), f'{opentf.textcolor["red"]}Hetero graph is needed for m2v. {self.cfg.graph.structure} is NOT hetero!{opentf.textcolor["reset"]}'
                 assert len(self.data.node_types) > 1, f'{opentf.textcolor["red"]}Hetero graph is needed for m2v. {self.cfg.graph.structure} is NOT hetero!{opentf.textcolor["reset"]}'
-                output = f'.w{self.cfg.model.w}.wl{self.cfg.model.wl}.wn{self.cfg.model.wn}.{self.cfg.model.metapath_name[1]}' #should be fixed
-                self.model = self.pyg.nn.MetaPath2Vec(train_data.edge_index_dict,
-                                         metapath=[tuple(mp) for mp in self.cfg.model.metapath_name[0]],
-                                         embedding_dim=self.cfg.model.d,
-                                         walk_length=self.cfg.model.wl,
-                                         context_size=self.cfg.model.w,
-                                         walks_per_node=self.cfg.model.wn,
-                                         num_negative_samples=self.cfg.model.ns).to(self.device)
-                self._train_rw(prefix + output + postfix)
+                if foldidx == 0: self.output += f'.w{self.cfg.model.w}.wl{self.cfg.model.wl}.wn{self.cfg.model.wn}.{self.cfg.model.metapath_name[1]}' #should be fixed
+
+                num_nodes_dict =
+
+                self.model = self.pyg.nn.MetaPath2Vec(edge_index_dict=train_data.edge_index_dict,
+                                                      num_nodes_dict = {ntype: train_data[ntype].num_nodes for ntype in train_data.node_types}, #NOTE: if not explicitly set, it does num_nodes = int(edge_index[0].max()) + 1 !!
+                                                      metapath=[tuple(mp) for mp in self.cfg.model.metapath_name[0]],
+                                                      embedding_dim=self.cfg.model.d,
+                                                      walk_length=self.cfg.model.wl,
+                                                      context_size=self.cfg.model.w,
+                                                      walks_per_node=self.cfg.model.wn,
+                                                      num_negative_samples=self.cfg.model.ns).to(self.device)
+                self._train_rw(splits, foldidx, val_m_t_edge_index_homo)
                 self._get_node_emb() #logging purposes
 
             elif self.name == 'han':
@@ -171,21 +173,18 @@ class Gnn(T2v):
             elif self.name in {'gcn', 'gs', 'gat', 'gatv2', 'gin'}:
                 output = f'.d{self.cfg.model.d}.e{self.cfg.model.e}.b{self.cfg.model.b}.lr{self.cfg.model.lr}.ns{self.cfg.model.ns}.h{"-".join([str(i) for i in self.cfg.model.h])}.nn{"-".join([str(i) for i in self.cfg.model.nn])}'
 
-                # by default, gnn methods are for homo data.
-                # we can wrap it by HeteroConv >> future
-                # or manually simulate it >> I think Jamil did this >> future
+                # by default, gnn methods are for homo data. We can wrap it by HeteroConv or manually simulate it >> I think Jamil did this >> future
                 homo_data = self.data.to_homogeneous()
-                # building multilayer gnn-based model. Shouldn't depend on data.
-                # but as our graph has no features for node (for now), we need to assign a randomly initialized embeddings as node features.
+                # building multilayer gnn-based model. Shouldn't depend on data. but as our graph has no features for node (for now), we need to assign a randomly initialized embeddings as node features.
                 # so, we need the num_nodes of the graph
                 self.model = self._built_model_mp(homo_data.num_nodes).to(self.device)
                 train_l, valid_l, test_l = self._build_loader_mp(homo_data=homo_data) # building train/valid/test splits and loaders. Should depend on data
-                self._train_mp(prefix + output + postfix, train_l, valid_l, test_l)
+                self._train_mp(train_l, valid_l, test_l)
 
-            self.modelfilepath = prefix + output + postfix
             # if self.name == 'lant': self.model.learn(self, self.cfg.model.e)  # built-in validation inside lant_encoder class
             #
             # self.plot_points()
+        if self.w: self.w.close()
 
     def _built_model_mp(self, num_nodes):
         class Model(Gnn.torch.nn.Module):
@@ -288,7 +287,7 @@ class Gnn(T2v):
         #     #     from lant_encoder import Encoder
         #     #     model = Encoder(hidden_channels=self.d, data=train_data)
         #     self.optimizer = self.torch.optim.Adam(self.model.parameters(), lr=self.cfg.model.lr)
-    def _train_mp(self, output, train_l, valid_l, test_l):
+    def _train_mp(self, train_l, valid_l, test_l):
         def _(e, loader, optimizer=None):
             if optimizer: self.model.train()
             else: self.model.eval()
@@ -317,20 +316,20 @@ class Gnn(T2v):
             log.info(f'Epoch {e}, {opentf.textcolor["magenta"]}Valid Loss: {(v_loss:=_(e, valid_l)):.4f}{opentf.textcolor["reset"]}')
             if self.cfg.model.save_per_epoch:
                 #self.model.eval()
-                self.torch.save({'model_state_dict': self.model.state_dict(), 'cfg': self.cfg, 'e': e, 't_loss': t_loss, 'v_loss': v_loss}, f'{output}.e{e}')
-                log.info(f'{self.name} model with {opentf.cfg2str(self.cfg.model)} saved at {output}.e{e}')
+                self.torch.save({'model_state_dict': self.model.state_dict(), 'cfg': self.cfg, 'e': e, 't_loss': t_loss, 'v_loss': v_loss}, f'{self.output}.e{e}')
+                log.info(f'{self.name} model with {opentf.cfg2str(self.cfg.model)} saved at {self.output}.e{e}')
 
             if earlystopping(v_loss, self.model).early_stop:
                 log.info(f'Early stopping triggered at epoch: {e}')
                 break
         log.info(f'{opentf.textcolor["yellow"]}Test Loss: {(tst_loss:=_(self.cfg.model.e, test_l)):.4f}')
         #self.model.eval()
-        self.torch.save({'model_state_dict': self.model.state_dict(), 'cfg': self.cfg, 'e': e, 't_loss': t_loss, 'v_loss': v_loss, 'tst_loss': tst_loss}, output)
-        log.info(f'{self.name} model with {opentf.cfg2str(self.cfg.model)} saved at {output}.')
+        self.torch.save({'model_state_dict': self.model.state_dict(), 'cfg': self.cfg, 'e': e, 't_loss': t_loss, 'v_loss': v_loss, 'tst_loss': tst_loss}, self.output)
+        log.info(f'{self.name} model with {opentf.cfg2str(self.cfg.model)} saved at {self.output}.')
         self.writer.close()
 
-    def _train_rw(self, splits, foldidx, val_edge_index):
-        w = self.writer(log_dir=f'{self.output}/logs4tboard/run_{int(time.time())}')
+    def _train_rw(self, splits, foldidx, val_m_t_edge_index_homo):
+        if self.w is None: self.w = self.writer(log_dir=f'{self.output}/logs4tboard/run_{int(time.time())}')
         optimizer = self.torch.optim.Adam(self.model.parameters(), lr=self.cfg.model.lr)
         scheduler = Gnn.torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.1, patience=2, verbose=True)
         loader = self.model.loader(batch_size=self.cfg.model.b, shuffle=True)  # num_workers=os.cpu_count() not working in windows! also, cuda won't engage for the loader if num_workers param is passed
@@ -344,36 +343,37 @@ class Gnn(T2v):
                 loss.backward(); optimizer.step(); t_loss += loss.item()
 
             self.model.eval()
-            with self.torch.no_grad():
-                z = self.model()
-                pos_scores = (z[val_edge_index[0]] * z[val_edge_index[1]]).sum(dim=-1)
-                neg_edge_index = Gnn.pyg.utils.negative_sampling(edge_index=self.model.edge_index, num_nodes=self.model.num_nodes, num_neg_samples=val_edge_index.size(1), method='sparse')
-                neg_scores = (z[neg_edge_index[0]] * z[neg_edge_index[1]]).sum(dim=-1)
-                scores = Gnn.torch.cat([pos_scores, neg_scores])
-                labels = Gnn.torch.cat([self.torch.ones_like(pos_scores), Gnn.torch.zeros_like(neg_scores)])
-                v_loss = Gnn.torch.F.binary_cross_entropy_with_logits(scores, labels, reduction='mean').item()
+            scores = (self.model.embedding.weight[val_m_t_edge_index_homo[0]] * self.model.embedding.weight[val_m_t_edge_index_homo[1]]).sum(dim=-1)
+
+            # w/ pos and neg samples for validation
+            # pos_scores = (z[val_edge_index[0]] * z[val_edge_index[1]]).sum(dim=-1)
+            # neg_edge_index = Gnn.pyg.utils.negative_sampling(edge_index=self.model.edge_index, num_nodes=self.model.num_nodes, num_neg_samples=val_edge_index.size(1), method='sparse')
+            # neg_scores = (z[neg_edge_index[0]] * z[neg_edge_index[1]]).sum(dim=-1)
+            # scores = Gnn.torch.cat([pos_scores, neg_scores])
+            # labels = Gnn.torch.cat([self.torch.ones_like(pos_scores), Gnn.torch.zeros_like(neg_scores)])
+            # v_loss = Gnn.torch.F.binary_cross_entropy_with_logits(scores, labels, reduction='mean').item()
+
+            v_loss = Gnn.torch.nn.functional.binary_cross_entropy_with_logits(scores, self.torch.ones_like(scores), reduction='mean').item()
 
             t_loss /= len(loader); v_loss /= len(scores)
             # self.writer.add_embedding(node_embeddings, global_step=e) >> would be nice to see the convergence of embeddings for node
-            w.add_scalar(tag=f'{foldidx}_t_loss', scalar_value=t_loss, global_step=e)
-            w.add_scalar(tag=f'{foldidx}_v_loss', scalar_value=v_loss, global_step=e)
+            self.w.add_scalar(tag=f'{foldidx}_t_loss', scalar_value=t_loss, global_step=e)
+            self.w.add_scalar(tag=f'{foldidx}_v_loss', scalar_value=v_loss, global_step=e)
             log.info(f'Fold {foldidx}/{len(splits["folds"]) - 1}, Epoch {e}, {opentf.textcolor["blue"]}Train Loss: {t_loss:.4f}{opentf.textcolor["reset"]}')
             log.info(f'Fold {foldidx}/{len(splits["folds"]) - 1}, Epoch {e}, {opentf.textcolor["magenta"]}Valid Loss: {v_loss:.4f}{opentf.textcolor["reset"]}')
 
-            if self.cfg.spe:
+            if self.cfg.model.spe:
                 # self.model.eval()
                 self.torch.save({'model_state_dict': self.model.state_dict(), 'cfg': self.cfg, 'f': foldidx, 'e': e, 't_loss': t_loss, 'v_loss': v_loss}, f'{self.output}/f{foldidx}.e{e}.pt')
-                log.info(f'{self.name()} model with {opentf.cfg2str(self.cfg)} saved at {self.output}/f{foldidx}.e{e}.pt')
+                log.info(f'{self.name} model with {opentf.cfg2str(self.cfg.model)} saved at {self.output}/f{foldidx}.e{e}.pt')
 
             scheduler.step(v_loss)
             if earlystopping(v_loss, self.model).early_stop:
                 log.info(f'Early stopping triggered at epoch: {e}')
                 break
 
-            self.torch.save({'model_state_dict': self.model.state_dict(), 'cfg': self.cfg, 'f': foldidx, 'e': e, 't_loss': t_loss, 'v_loss': v_loss}, f'{self.output}/f{foldidx}.pt')
-            log.info(f'{self.name()} model with {opentf.cfg2str(self.cfg)} saved at {self.output}/f{foldidx}.pt')
-        w.close()
-
+        self.torch.save({'model_state_dict': self.model.state_dict(), 'cfg': self.cfg, 'f': foldidx, 'e': e, 't_loss': t_loss, 'v_loss': v_loss}, f'{self.output}/f{foldidx}.pt')
+        log.info(f'{self.name} model with {opentf.cfg2str(self.cfg.model)} saved at {self.output}/f{foldidx}.pt')
     def _init_d2v_node_features(self, teamsvecs, indexes, splits):
         flag = False
         log.info(f'Loading pretrained d2v embeddings {self.cfg.graph.pre} in {self.output} to initialize node features, or if not exist, train d2v embeddings from scratch ...')

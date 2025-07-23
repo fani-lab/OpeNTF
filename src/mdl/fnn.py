@@ -92,7 +92,7 @@ class Fnn(Ntf):
             y_valid = teamsvecs['member'][splits['folds'][foldidx]['valid']]
 
             train_dl = Ntf.torch.utils.data.DataLoader(Ntf.dataset(X_train, y_train), batch_size=self.cfg.b, shuffle=True)
-            valid_dl = Ntf.torch.utils.data.DataLoader(Ntf.dataset(X_valid, y_valid), batch_size=self.cfg.b, shuffle=True)
+            valid_dl = Ntf.torch.utils.data.DataLoader(Ntf.dataset(X_valid, y_valid), batch_size=self.cfg.b, shuffle=False)
             data_loaders = {'train': train_dl, 'valid': valid_dl}
 
             # Initialize network
@@ -181,7 +181,7 @@ class Fnn(Ntf):
             modelfiles = [f'{self.output}/f{foldidx}.pt']
             if per_epoch: modelfiles += [f'{self.output}/{_}' for _ in os.listdir(self.output) if re.match(f'f{foldidx}.e\d+.pt', _)]
 
-            for modelfile in modelfiles:
+            for modelfile in sorted(sorted(modelfiles), key=len):
                 self.init(input_size=input_size, output_size=output_size).to(self.device)
                 self.model.load_state_dict(Ntf.torch.load(modelfile)['model_state_dict'])
                 self.model.eval()
