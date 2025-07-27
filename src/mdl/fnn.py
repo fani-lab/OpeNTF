@@ -144,7 +144,7 @@ class Fnn(Ntf):
                                 y_ = self.model.forward(X)
                                 # if self.cfg.l == 'csl': csl_criterion(y_.squeeze(), y.squeeze(), index)
                                 # else:
-                                loss = self.bxe(y_, y)
+                                loss = self.bxe(y_, y).sum(dim=1).mean() #look at train loss for the reason
                                 if self.is_bayesian: loss += Fnn.btorch.get_kl_loss(self.model) / y.shape[0]
                                 #how about the loss of cdp for each class/expert? cdp_loss
                                 v_loss += loss.item()

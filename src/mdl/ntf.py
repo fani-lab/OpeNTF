@@ -46,11 +46,9 @@ class Ntf:
 
                 predfiles = [f'{self.output}/f{foldidx}.{pred_set}.pred'] #the first file as a hook
                 if per_epoch: predfiles += [f'{self.output}/{_}' for _ in os.listdir(self.output) if re.match(f'f{foldidx}.{pred_set}.e\d+.pred$', _)]
-                for i, predfile in enumerate(sorted(sorted(predfiles), key=len)):
-                    epoch = f'e{i-1}.' if i > 0 else '' #the first file is non-epoch-based but the rest are
-                    filename = f'{self.output}/f{foldidx}.{pred_set}.{epoch}'
-                    Y_ = Ntf.torch.load(f'{filename}pred')['y_pred']
-                    log.info(f'Evaluating predictions at {filename}pred ... for {metrics}')
+                for i, predfile in enumerate(sorted(sorted(predfiles), key=len)): #the first file is/should be non-epoch-based
+                    Y_ = Ntf.torch.load(predfile)['y_pred']
+                    log.info(f'Evaluating predictions at {predfile} ... for {metrics}')
 
                     log.info(f'{metrics.trec} ...')
                     df, df_mean = metric.calculate_metrics(Y, Y_, per_instance, metrics)
@@ -59,7 +57,7 @@ class Ntf:
                         log.info("['aucroc'] and curve values (fpr, tpr) ...")
                         aucroc, fpr_tpr = metric.calculate_auc_roc(Y, Y_)
                         df_mean.loc['aucroc'] = aucroc
-                        with open(f'{filename}pred.eval.roc.pkl', 'wb') as outfile: pickle.dump(fpr_tpr, outfile)
+                        with open(f'{predfile}.eval.roc.pkl', 'wb') as outfile: pickle.dump(fpr_tpr, outfile)
 
                     if (m:=[m for m in metrics.other if 'skill_coverage' in m]): #since this metric comes with topks str like 'skill_coverage_2,5,10'
                         log.info(f'{m} ...')
@@ -70,9 +68,9 @@ class Ntf:
                         df = pd.concat([df, df_skc], axis=0)
                         df_mean = pd.concat([df_mean, df_mean_skc], axis=0)
 
-                    if per_instance: df.to_csv(f'{filename}pred.eval.per_instance.csv', float_format='%.5f')
-                    log.info(f'Saving file per fold as {filename}pred.eval.mean.csv')
-                    df_mean.to_csv(f'{filename}pred.eval.mean.csv')
+                    if per_instance: df.to_csv(f'{predfile}.eval.per_instance.csv', float_format='%.5f')
+                    log.info(f'Saving file per fold as {predfile}.eval.mean.csv')
+                    df_mean.to_csv(f'{predfile}.eval.mean.csv')
                     if i == 0: # non-epoch-based only, as there is different number of epochs for each fold model due to earlystopping
                         fold_mean = pd.concat([fold_mean, df_mean], axis=1)
                         if per_instance: fold_mean_per_instance = fold_mean_per_instance.add(df, fill_value=0)
