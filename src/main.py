@@ -17,7 +17,8 @@ def get_splits(n_sample, n_folds, train_ratio, output, seed, year_idx=None, step
         with open(splitf, 'rb') as f: splits = pickle.load(f)
         return splits
     except FileNotFoundError as e:
-        scikit = opentf.install_import('scikit-learn==1.2.2', 'sklearn.model_selection')
+        # scikit = opentf.install_import('scikit-learn==1.2.2', 'sklearn.model_selection')
+        scikit = opentf.install_import_2('scikit-learn', 'sklearn.model_selection')
         log.info(f'Splits file not found! Generating ...')
         if year_idx:
             train = np.arange(year_idx[0][0], year_idx[-step_ahead][0])  # for temporal folding, we do on each time interval ==> look at tntf.py
@@ -69,6 +70,7 @@ def aggregate(output):
 
 @hydra.main(version_base=None, config_path='.', config_name='__config__')
 def run(cfg):
+    opentf.generate_req_dict("../requirements.txt") 
     t2v = None
     domain_cls = get_class(cfg.data.domain)
 
