@@ -2,19 +2,20 @@ import logging, numpy as np
 log = logging.getLogger(__name__)
 
 import pkgmgr as opentf
-def calculate_metrics(Y, Y_, per_instance=False, metrics={'trec': ['P_2,5', 'recall_2,5', 'ndcg_cut_2,5'], 'other': ['aucroc']}):
+def calculate_metrics(Y, Y_, per_instance=False, metrics=['P_2,5', 'recall_2,5', 'ndcg_cut_2,5']):
     pd = opentf.install_import('pandas==2.0.0', 'pandas')
     tqdm = opentf.install_import('tqdm==4.65.0', 'tqdm', 'tqdm')
     pytrec_eval = opentf.install_import('pytrec-eval-terrier==0.5.7', 'pytrec_eval')
     qrel = dict(); run = dict()
     log.info(f'Building pytrec_eval input for {Y.shape[0]} instances ...')
+    k = min(1000, Y_.shape[1])
     with tqdm(total=Y.shape[0]) as pbar:
-        for i, (y, y_) in enumerate(zip(Y, Y_)):
-            qrel['q' + str(i)] = {'d' + str(idx): 1 for idx in y.nonzero()[1]}
-            run['q' + str(i)] = {'d' + str(j): int(np.round(v * 100)) for j, v in enumerate(y_)}
+        topk_idxes = np.argpartition(-Y_, kth=k - 1, axis=1)[:, :k]
+        for i in range(Y.shape[0]):
+            qrel['q' + str(i)] = {'d' + str(idx): 1 for idx in Y[i].nonzero()[1]}
+            run['q' + str(i)] = {'d' + str(idx): k-rank for rank, idx in enumerate(topk_idxes[i])}
             pbar.update(1)
-            # run['q' + str(i)] = {'d' + str(idx): int(np.round(y_[idx] * 10)) for idx in np.where(y_ > 0.5)[0]}
-    df = pd.DataFrame.from_dict(pytrec_eval.RelevanceEvaluator(qrel, set(metrics.trec)).evaluate(run))
+    df = pd.DataFrame.from_dict(pytrec_eval.RelevanceEvaluator(qrel, set(metrics)).evaluate(run))
     df_mean = df.mean(axis=1).to_frame('mean')
     return df if per_instance else None, df_mean
 

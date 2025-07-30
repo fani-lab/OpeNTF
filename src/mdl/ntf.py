@@ -51,7 +51,7 @@ class Ntf:
                     log.info(f'Evaluating predictions at {predfile} ... for {metrics}')
 
                     log.info(f'{metrics.trec} ...')
-                    df, df_mean = metric.calculate_metrics(Y, Y_, per_instance, metrics)
+                    df, df_mean = metric.calculate_metrics(Y, Y_, per_instance, metrics.trec)
 
                     if 'aucroc' in metrics.other:
                         log.info("['aucroc'] and curve values (fpr, tpr) ...")
