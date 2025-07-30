@@ -13,7 +13,7 @@ def calculate_metrics(Y, Y_, per_instance=False, metrics=['P_2,5', 'recall_2,5',
         topk_idxes = np.argpartition(-Y_, kth=k - 1, axis=1)[:, :k]
         for i in range(Y.shape[0]):
             qrel['q' + str(i)] = {'d' + str(idx): 1 for idx in Y[i].nonzero()[1]}
-            run['q' + str(i)] = {'d' + str(idx): k-rank for rank, idx in enumerate(topk_idxes[i])}
+            run['q' + str(i)] = {'d' + str(idx): float(Y_[i][topk_idxes[i][j]]) for j, idx in enumerate(topk_idxes[i])}
             pbar.update(1)
     df = pd.DataFrame.from_dict(pytrec_eval.RelevanceEvaluator(qrel, set(metrics)).evaluate(run))
     df_mean = df.mean(axis=1).to_frame('mean')

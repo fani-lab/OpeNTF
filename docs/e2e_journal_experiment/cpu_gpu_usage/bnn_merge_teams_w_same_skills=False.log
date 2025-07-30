@@ -1,0 +1,39 @@
+[2025-07-21 11:20:10,240][cmn.team][INFO] - Loading teamsvecs matrices from /home/msaeedi/OpeNTF/output/imdb/title.basics.tsv.mt10.ts2/teamsvecs.pkl ...
+[2025-07-21 11:20:10,728][cmn.team][INFO] - Loading indexes pickle from /home/msaeedi/OpeNTF/output/imdb/title.basics.tsv.mt10.ts2/indexes.pkl ...
+[2025-07-21 11:20:10,790][cmn.team][INFO] - Indexes pickle is loaded.
+[2025-07-21 11:20:10,790][cmn.team][INFO] - Teamsvecs matrices and indexes for skills (186385, 27), members (186385, 44774), and locations None are loaded.
+[2025-07-21 11:20:10,792][__main__][INFO] - Loading splits from /home/msaeedi/OpeNTF/output/imdb/title.basics.tsv.mt10.ts2/splits.pkl ...
+[2025-07-21 11:20:10,795][cmn.team][INFO] - Loading member-skill co-occurrence matrix (44774, 27) from /home/msaeedi/OpeNTF/output/imdb/title.basics.tsv.mt10.ts2/skillcoverage.pkl ...
+[2025-07-21 11:20:17,314][__main__][INFO] - [94mTraining team recommender instance mdl.bnn.Bnn ... [0m
+[2025-07-21 11:21:00,479][mdl.fnn][INFO] - Fold 0/4, Epoch 0, [94mTrain Loss: 188144.8602[0m
+[2025-07-21 11:21:00,480][mdl.fnn][INFO] - Fold 0/4, Epoch 0, [95mValid Loss: 117498.1362[0m
+[2025-07-21 11:21:00,529][mdl.fnn][INFO] - /bnn.b30000.e100.ns5.lr0.001.es5.h[128].speTrue.lbce.tpw1.tnw0.nsdunigram_b.nmc10 model with b30000.e100.ns5.lr0.001.es5.h[128].speTrue.lbce.tpw1.tnw0.nsdunigram_b.nmc10 saved at /home/msaeedi/OpeNTF/output/imdb/title.basics.tsv.mt10.ts2/bnn.b30000.e100.ns5.lr0.001.es5.h[128].speTrue.lbce.tpw1.tnw0.nsdunigram_b.nmc10/f0.e0.pt
+[2025-07-21 11:21:00,530][mdl.fnn][INFO] - Validation loss decreased (inf --> 117498.136230)
+[2025-07-21 11:21:33,113][mdl.fnn][INFO] - Fold 0/4, Epoch 1, [94mTrain Loss: 187871.2000[0m
+[2025-07-21 11:21:33,114][mdl.fnn][INFO] - Fold 0/4, Epoch 1, [95mValid Loss: 117371.7754[0m
+[2025-07-21 11:21:33,157][mdl.fnn][INFO] - /bnn.b30000.e100.ns5.lr0.001.es5.h[128].speTrue.lbce.tpw1.tnw0.nsdunigram_b.nmc10 model with b30000.e100.ns5.lr0.001.es5.h[128].speTrue.lbce.tpw1.tnw0.nsdunigram_b.nmc10 saved at /home/msaeedi/OpeNTF/output/imdb/title.basics.tsv.mt10.ts2/bnn.b30000.e100.ns5.lr0.001.es5.h[128].speTrue.lbce.tpw1.tnw0.nsdunigram_b.nmc10/f0.e1.pt
+[2025-07-21 11:21:33,157][mdl.fnn][INFO] - Validation loss decreased (117498.136230 --> 117371.775391)
+[2025-07-21 11:22:07,351][mdl.fnn][INFO] - Fold 0/4, Epoch 2, [94mTrain Loss: 187638.4172[0m
+[2025-07-21 11:22:07,352][mdl.fnn][INFO] - Fold 0/4, Epoch 2, [95mValid Loss: 117269.4438[0m
+[2025-07-21 11:22:07,405][mdl.fnn][INFO] - /bnn.b30000.e100.ns5.lr0.001.es5.h[128].speTrue.lbce.tpw1.tnw0.nsdunigram_b.nmc10 model with b30000.e100.ns5.lr0.001.es5.h[128].speTrue.lbce.tpw1.tnw0.nsdunigram_b.nmc10 saved at /home/msaeedi/OpeNTF/output/imdb/title.basics.tsv.mt10.ts2/bnn.b30000.e100.ns5.lr0.001.es5.h[128].speTrue.lbce.tpw1.tnw0.nsdunigram_b.nmc10/f0.e2.pt
+[2025-07-21 11:22:07,405][mdl.fnn][INFO] - Validation loss decreased (117371.775391 --> 117269.443848)
+[2025-07-21 11:22:39,949][mdl.fnn][INFO] - Fold 0/4, Epoch 3, [94mTrain Loss: 187403.3891[0m
+[2025-07-21 11:22:39,949][mdl.fnn][INFO] - Fold 0/4, Epoch 3, [95mValid Loss: 117160.7539[0m
+[2025-07-21 11:22:40,003][mdl.fnn][INFO] - /bnn.b30000.e100.ns5.lr0.001.es5.h[128].speTrue.lbce.tpw1.tnw0.nsdunigram_b.nmc10 model with b30000.e100.ns5.lr0.001.es5.h[128].speTrue.lbce.tpw1.tnw0.nsdunigram_b.nmc10 saved at /home/msaeedi/OpeNTF/output/imdb/title.basics.tsv.mt10.ts2/bnn.b30000.e100.ns5.lr0.001.es5.h[128].speTrue.lbce.tpw1.tnw0.nsdunigram_b.nmc10/f0.e3.pt
+[2025-07-21 11:22:40,003][mdl.fnn][INFO] - Validation loss decreased (117269.443848 --> 117160.753906)
+[2025-07-21 11:23:12,542][mdl.fnn][INFO] - Fold 0/4, Epoch 4, [94mTrain Loss: 187117.2883[0m
+[2025-07-21 11:23:12,543][mdl.fnn][INFO] - Fold 0/4, Epoch 4, [95mValid Loss: 116995.8057[0m
+[2025-07-21 11:23:12,595][mdl.fnn][INFO] - /bnn.b30000.e100.ns5.lr0.001.es5.h[128].speTrue.lbce.tpw1.tnw0.nsdunigram_b.nmc10 model with b30000.e100.ns5.lr0.001.es5.h[128].speTrue.lbce.tpw1.tnw0.nsdunigram_b.nmc10 saved at /home/msaeedi/OpeNTF/output/imdb/title.basics.tsv.mt10.ts2/bnn.b30000.e100.ns5.lr0.001.es5.h[128].speTrue.lbce.tpw1.tnw0.nsdunigram_b.nmc10/f0.e4.pt
+[2025-07-21 11:23:12,596][mdl.fnn][INFO] - Validation loss decreased (117160.753906 --> 116995.805664)
+[2025-07-21 11:23:46,929][mdl.fnn][INFO] - Fold 0/4, Epoch 5, [94mTrain Loss: 186815.2039[0m
+[2025-07-21 11:23:46,930][mdl.fnn][INFO] - Fold 0/4, Epoch 5, [95mValid Loss: 116833.2056[0m
+[2025-07-21 11:23:47,008][mdl.fnn][INFO] - /bnn.b30000.e100.ns5.lr0.001.es5.h[128].speTrue.lbce.tpw1.tnw0.nsdunigram_b.nmc10 model with b30000.e100.ns5.lr0.001.es5.h[128].speTrue.lbce.tpw1.tnw0.nsdunigram_b.nmc10 saved at /home/msaeedi/OpeNTF/output/imdb/title.basics.tsv.mt10.ts2/bnn.b30000.e100.ns5.lr0.001.es5.h[128].speTrue.lbce.tpw1.tnw0.nsdunigram_b.nmc10/f0.e5.pt
+[2025-07-21 11:23:47,008][mdl.fnn][INFO] - Validation loss decreased (116995.805664 --> 116833.205566)
+[2025-07-21 11:24:19,941][mdl.fnn][INFO] - Fold 0/4, Epoch 6, [94mTrain Loss: 186479.9781[0m
+[2025-07-21 11:24:19,941][mdl.fnn][INFO] - Fold 0/4, Epoch 6, [95mValid Loss: 116651.4023[0m
+[2025-07-21 11:24:19,983][mdl.fnn][INFO] - /bnn.b30000.e100.ns5.lr0.001.es5.h[128].speTrue.lbce.tpw1.tnw0.nsdunigram_b.nmc10 model with b30000.e100.ns5.lr0.001.es5.h[128].speTrue.lbce.tpw1.tnw0.nsdunigram_b.nmc10 saved at /home/msaeedi/OpeNTF/output/imdb/title.basics.tsv.mt10.ts2/bnn.b30000.e100.ns5.lr0.001.es5.h[128].speTrue.lbce.tpw1.tnw0.nsdunigram_b.nmc10/f0.e6.pt
+[2025-07-21 11:24:19,983][mdl.fnn][INFO] - Validation loss decreased (116833.205566 --> 116651.402344)
+[2025-07-21 11:24:54,059][mdl.fnn][INFO] - Fold 0/4, Epoch 7, [94mTrain Loss: 186089.3039[0m
+[2025-07-21 11:24:54,060][mdl.fnn][INFO] - Fold 0/4, Epoch 7, [95mValid Loss: 116426.6377[0m
+[2025-07-21 11:24:54,103][mdl.fnn][INFO] - /bnn.b30000.e100.ns5.lr0.001.es5.h[128].speTrue.lbce.tpw1.tnw0.nsdunigram_b.nmc10 model with b30000.e100.ns5.lr0.001.es5.h[128].speTrue.lbce.tpw1.tnw0.nsdunigram_b.nmc10 saved at /home/msaeedi/OpeNTF/output/imdb/title.basics.tsv.mt10.ts2/bnn.b30000.e100.ns5.lr0.001.es5.h[128].speTrue.lbce.tpw1.tnw0.nsdunigram_b.nmc10/f0.e7.pt
+[2025-07-21 11:24:54,103][mdl.fnn][INFO] - Validation loss decreased (116651.402344 --> 116426.637695)
