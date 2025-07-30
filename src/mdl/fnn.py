@@ -200,17 +200,14 @@ class Fnn(Ntf):
                             XX = XX.squeeze(1).to(self.device)
                             if self.is_bayesian:
                                 output_mc = []; pred_uncertainty = []; model_uncertainty = []
-                                for mc_run in range(self.cfg.nmc):
-                                    logits = self.model(XX)
-                                    probs = Ntf.torch.nn.functional.sigmoid(logits)
-                                    output_mc.append(probs)
+                                for mc_run in range(self.cfg.nmc): output_mc.append(Ntf.torch.nn.functional.sigmoid(self.model.forward(XX))) #model returns logits
                                 output = Ntf.torch.stack(output_mc)
                                 butil = opentf.install_import('', 'bayesian_torch.utils.util')
                                 pred_uncertainty.append(butil.predictive_entropy(output.data.cpu().numpy()))
                                 model_uncertainty.append(butil.mutual_information(output.data.cpu().numpy()))
                                 scores = output.mean(dim=0).cpu().numpy()
 
-                            else: scores = self.model.forward(XX).squeeze(1).cpu().numpy()
+                            else: scores = Ntf.torch.nn.functional.sigmoid(self.model.forward(XX)).squeeze(1).cpu().numpy()
                             y_pred = np.vstack((y_pred, scores))
 
                     match = re.search(r'(e\d+)\.pt$', os.path.basename(modelfile))
