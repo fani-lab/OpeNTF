@@ -150,7 +150,7 @@ class Nmt(Ntf):
                 log.info(f'Evaluating predictions at {self.output}/{predfile} ... for {evalcfg.metrics}')
 
                 log.info(f'{evalcfg.metrics.trec} ...')
-                df, df_mean = metric.calculate_metrics(Y, Y_, evalcfg.topK, evalcfg.per_instance, evalcfg.metrics)
+                df, df_mean = metric.calculate_metrics(Y, Y_, evalcfg.topK, evalcfg.per_instance, evalcfg.metrics.trec)
 
                 if 'aucroc' in evalcfg.metrics.other:
                     log.info("['aucroc'] and curve values (fpr, tpr) ...")
