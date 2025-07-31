@@ -79,8 +79,10 @@ train:
 test:
   on_train: False # for over vs. under-fitting check. # random baseline (mdl.rnd.Rnd()) cannot join this.
   per_epoch: ${train.save_per_epoch} # the test results of each epoch on the test set >> for per-epoch performance. Similar to valid losses during training but here we can have eval metrics
+  topK: 1000 #as the *.pred files becomes huge for test set (|test| by |experts|), or when on_tain=True, we can only keep the topk probs per test instance, zero the rest, and save sparse matrix
 
 eval:
+  topK: ${test.topK}
   topk: '2,5,10'
   metrics:
     trec: [P_topk, recall_topk, ndcg_cut_topk, map_cut_topk, success_topk] # see trec_eval for a complete list or trec_* metrics https://github.com/terrierteam/pytrec_eval/blob/master/tests/pytrec_eval_tests.py

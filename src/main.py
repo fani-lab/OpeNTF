@@ -156,12 +156,12 @@ def run(cfg):
 
             if 'test'  in cfg.cmd:
                 log.info(f'{opentf.textcolor["green"]}Testing team recommender instance {m} ... {opentf.textcolor["reset"]}')
-                models[m].test(teamsvecs, splits, on_train=cfg.test.on_train, per_epoch=cfg.test.per_epoch)
+                models[m].test(teamsvecs, splits, cfg.test)
 
             if 'eval'  in cfg.cmd:
                 log.info(f'{opentf.textcolor["magenta"]}Evaluating team recommender instance {m} ... {opentf.textcolor["reset"]}')
                 for key in cfg.eval.metrics: cfg.eval.metrics[key] = [m.replace('topk', cfg.eval.topk) for m in cfg.eval.metrics[key]]
-                models[m].evaluate(teamsvecs, splits, cfg.eval.on_train, cfg.eval.per_epoch, cfg.eval.per_instance, cfg.eval.metrics)
+                models[m].evaluate(teamsvecs, splits, cfg.eval)
 
             # if m_name.endswith('a1'): vecs_['skill'] = lil_matrix(scipy.sparse.hstack((vecs_['skill'], lil_matrix(np.ones((vecs_['skill'].shape[0], 1))))))
             # make_popular_and_nonpopular_matrix(vecs_, data_list[0])

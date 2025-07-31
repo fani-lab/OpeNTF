@@ -2,13 +2,13 @@ import logging, numpy as np
 log = logging.getLogger(__name__)
 
 import pkgmgr as opentf
-def calculate_metrics(Y, Y_, per_instance=False, metrics=['P_2,5', 'recall_2,5', 'ndcg_cut_2,5']):
+def calculate_metrics(Y, Y_, topK=None, per_instance=False, metrics=['P_2,5', 'recall_2,5', 'ndcg_cut_2,5']):
     pd = opentf.install_import('pandas==2.0.0', 'pandas')
     tqdm = opentf.install_import('tqdm==4.65.0', 'tqdm', 'tqdm')
     pytrec_eval = opentf.install_import('pytrec-eval-terrier==0.5.7', 'pytrec_eval')
     qrel = dict(); run = dict()
     log.info(f'Building pytrec_eval input for {Y.shape[0]} instances ...')
-    k = min(1000, Y_.shape[1])
+    k = min(topK, Y_.shape[1]) if topK else Y_.shape[1] #first stage topK for efficiency in space and speed
     with tqdm(total=Y.shape[0]) as pbar:
         topk_idxes = np.argpartition(-Y_, kth=k - 1, axis=1)[:, :k]
         for i in range(Y.shape[0]):
