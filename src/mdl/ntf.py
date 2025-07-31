@@ -27,58 +27,72 @@ class Ntf:
 
     def name(self): return f'/{self.__class__.__name__.lower()}.{opentf.cfg2str(self.cfg)}'
 
+    @staticmethod
+    def to_topk_sparse(probs, k, type='coo'):
+        topk_values, topk_indices = Ntf.torch.topk(probs, k, dim=1)
+        row_idx = Ntf.torch.arange(probs.shape[0], device=probs.device).unsqueeze(1).expand(-1, k)
+        indices = Ntf.torch.stack([row_idx, topk_indices], dim=0).reshape(2, -1)
+        values = topk_values.reshape(-1)
+        sparse = Ntf.torch.sparse_coo_tensor(indices, values, size=probs.shape).coalesce()
+
+        if type == 'csr': return sparse.to_sparse_csr()
+        if type == 'csc': return sparse.to_sparse_csc()  # cse is on cpu in torch?
+        else: return sparse
     def learn(self, teamsvecs, splits, prev_model): pass
-    def test(self, teamsvecs, splits, on_train=False, per_epoch=False): pass
-    def evaluate(self, teamsvecs, splits, on_train=False, per_epoch=False, per_instance=False, metrics={}):
+    def test(self, teamsvecs, splits, testcfg): pass
+    def evaluate(self, teamsvecs, splits, evalcfg):
         assert os.path.isdir(self.output), f'{opentf.textcolor["red"]}No folder for {self.output} exist!{opentf.textcolor["reset"]}'
         pd = opentf.install_import('pandas==2.0.0', 'pandas')
         import evl.metric as metric
         y_test = teamsvecs['member'][splits['test']]
         # Rnd model does only have f*.test.pred files, no train or valid files >> skip them
-        for pred_set in (['test', 'train', 'valid'] if on_train else ['test']):
+        for pred_set in (['test', 'train', 'valid'] if evalcfg.on_train else ['test']):
             fold_mean = pd.DataFrame()
             mean_std = pd.DataFrame()
-            if per_instance: fold_mean_per_instance = pd.DataFrame()
+            if evalcfg.per_instance: fold_mean_per_instance = pd.DataFrame()
             
             for foldidx in splits['folds'].keys(): #for e in range(epochs):
                 if pred_set != 'test': Y = teamsvecs['member'][splits['folds'][foldidx][pred_set]]
                 else: Y = y_test
 
                 predfiles = [f'{self.output}/f{foldidx}.{pred_set}.pred'] #the first file as a hook
-                if per_epoch: predfiles += [f'{self.output}/{_}' for _ in os.listdir(self.output) if re.match(f'f{foldidx}.{pred_set}.e\d+.pred$', _)]
+                if evalcfg.per_epoch: predfiles += [f'{self.output}/{_}' for _ in os.listdir(self.output) if re.match(f'f{foldidx}.{pred_set}.e\d+.pred$', _)]
                 for i, predfile in enumerate(sorted(sorted(predfiles), key=len)): #the first file is/should be non-epoch-based
                     Y_ = Ntf.torch.load(predfile)['y_pred']
-                    log.info(f'Evaluating predictions at {predfile} ... for {metrics}')
+                    log.info(f'Evaluating predictions at {predfile} ... for {evalcfg.metrics}')
 
-                    log.info(f'{metrics.trec} ...')
-                    df, df_mean = metric.calculate_metrics(Y, Y_, per_instance, metrics.trec)
+                    #evl.metric works on numpy or scipy.sparse. so, we need to convert Y_ which is torch.tensor, either sparse or not
+                    Y_ = Y_.to_dense().cpu().numpy()
 
-                    if 'aucroc' in metrics.other:
+                    log.info(f'{evalcfg.metrics.trec} ...')
+                    df, df_mean = metric.calculate_metrics(Y, Y_, evalcfg.topK, evalcfg.per_instance, evalcfg.metrics.trec)
+
+                    if 'aucroc' in evalcfg.metrics.other:
                         log.info("['aucroc'] and curve values (fpr, tpr) ...")
                         aucroc, fpr_tpr = metric.calculate_auc_roc(Y, Y_)
                         df_mean.loc['aucroc'] = aucroc
                         with open(f'{predfile}.eval.roc.pkl', 'wb') as outfile: pickle.dump(fpr_tpr, outfile)
 
-                    if (m:=[m for m in metrics.other if 'skill_coverage' in m]): #since this metric comes with topks str like 'skill_coverage_2,5,10'
+                    if (m:=[m for m in evalcfg.metrics.other if 'skill_coverage' in m]): #since this metric comes with topks str like 'skill_coverage_2,5,10'
                         log.info(f'{m} ...')
                         X = teamsvecs['skill'] if scipy.sparse.issparse(teamsvecs['skill']) else teamsvecs['original_skill'] #to accomodate dense emb vecs of skills
                         X = X[splits['folds'][foldidx][pred_set]] if pred_set != 'test' else X[splits['test']]
-                        df_skc, df_mean_skc = metric.calculate_skill_coverage(X, Y_, teamsvecs['skillcoverage'], per_instance, topks=m[0].replace('skill_coverage_', ''))
+                        df_skc, df_mean_skc = metric.calculate_skill_coverage(X, Y_, teamsvecs['skillcoverage'], evalcfg.per_instance, topks=m[0].replace('skill_coverage_', ''))
                         df_skc.columns = df.columns
                         df = pd.concat([df, df_skc], axis=0)
                         df_mean = pd.concat([df_mean, df_mean_skc], axis=0)
 
-                    if per_instance: df.to_csv(f'{predfile}.eval.per_instance.csv', float_format='%.5f')
+                    if evalcfg.per_instance: df.to_csv(f'{predfile}.eval.per_instance.csv', float_format='%.5f')
                     log.info(f'Saving file per fold as {predfile}.eval.mean.csv')
                     df_mean.to_csv(f'{predfile}.eval.mean.csv')
                     if i == 0: # non-epoch-based only, as there is different number of epochs for each fold model due to earlystopping
                         fold_mean = pd.concat([fold_mean, df_mean], axis=1)
-                        if per_instance: fold_mean_per_instance = fold_mean_per_instance.add(df, fill_value=0)
+                        if evalcfg.per_instance: fold_mean_per_instance = fold_mean_per_instance.add(df, fill_value=0)
             mean_std['mean'] = fold_mean.mean(axis=1)
             mean_std['std'] = fold_mean.std(axis=1)
             log.info(f'Saving mean evaluation file over {len(splits["folds"])} folds as {self.output}/{pred_set}.pred.eval.mean.csv')
             mean_std.to_csv(f'{self.output}/{pred_set}.pred.eval.mean.csv')
-            if per_instance: fold_mean_per_instance.truediv(len(splits['folds'].keys())).to_csv(f'{self.output}/{pred_set}.pred.eval.per_instance_mean.csv')
+            if evalcfg.per_instance: fold_mean_per_instance.truediv(len(splits['folds'].keys())).to_csv(f'{self.output}/{pred_set}.pred.eval.per_instance_mean.csv')
     def plot_roc(self, splits, on_train=False):
         plt = opentf.install_import('matplotlib==3.7.5', 'matplotlib')
         for pred_set in (['test', 'train', 'valid'] if on_train else ['test']):

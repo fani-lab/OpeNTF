@@ -168,7 +168,7 @@ class Fnn(Ntf):
             log.info(f'{self.name()} model with {opentf.cfg2str(self.cfg)} saved at {self.output}/f{foldidx}.pt')
         w.close()
 
-    def test(self, teamsvecs, splits, on_train=False, per_epoch=False):
+    def test(self, teamsvecs, splits, testcfg):
         assert os.path.isdir(self.output), f'{opentf.textcolor["red"]}No folder for {self.output} exist!{opentf.textcolor["reset"]}'
         input_size = teamsvecs['skill'].shape[1]
         output_size = teamsvecs['member'].shape[1]
@@ -179,14 +179,14 @@ class Fnn(Ntf):
 
         for foldidx in splits['folds'].keys():
             modelfiles = [f'{self.output}/f{foldidx}.pt']
-            if per_epoch: modelfiles += [f'{self.output}/{_}' for _ in os.listdir(self.output) if re.match(f'f{foldidx}.e\d+.pt', _)]
+            if testcfg.per_epoch: modelfiles += [f'{self.output}/{_}' for _ in os.listdir(self.output) if re.match(f'f{foldidx}.e\d+.pt', _)]
 
             for modelfile in sorted(sorted(modelfiles), key=len):
                 self.init(input_size=input_size, output_size=output_size).to(self.device)
                 self.model.load_state_dict(Ntf.torch.load(modelfile)['model_state_dict'])
                 self.model.eval()
 
-                for pred_set in (['test', 'train', 'valid'] if on_train else ['test']):
+                for pred_set in (['test', 'train', 'valid'] if testcfg.on_train else ['test']):
                     if pred_set != 'test':
                         X = teamsvecs['skill'][splits['folds'][foldidx][pred_set], :]
                         y = teamsvecs['member'][splits['folds'][foldidx][pred_set]]
@@ -195,7 +195,7 @@ class Fnn(Ntf):
 
                     Ntf.torch.cuda.empty_cache()
                     with Ntf.torch.no_grad():
-                        y_pred = Ntf.torch.empty(0, dl.dataset.output.shape[1])
+                        y_pred = []
                         for XX, yy in dl:
                             XX = XX.squeeze(1).to(self.device)
                             if self.is_bayesian:
@@ -205,12 +205,13 @@ class Fnn(Ntf):
                                 butil = opentf.install_import('', 'bayesian_torch.utils.util')
                                 pred_uncertainty.append(butil.predictive_entropy(output.data.cpu().numpy()))
                                 model_uncertainty.append(butil.mutual_information(output.data.cpu().numpy()))
-                                scores = output.mean(dim=0).cpu().numpy()
+                                y_pred.append(output.mean(dim=0))
 
-                            else: scores = Ntf.torch.nn.functional.sigmoid(self.model.forward(XX)).squeeze(1).cpu().numpy()
-                            y_pred = np.vstack((y_pred, scores))
+                            else: y_pred.append(Ntf.torch.nn.functional.sigmoid(self.model.forward(XX)).squeeze(1))
+                        y_pred = Ntf.torch.vstack(y_pred)
 
                     match = re.search(r'(e\d+)\.pt$', os.path.basename(modelfile))
                     epoch = (match.group(1) + '.') if match else ''
-                    Ntf.torch.save({'y_pred': y_pred, 'uncertainty': {'pred': pred_uncertainty, 'model': model_uncertainty} if self.is_bayesian else None}, f'{self.output}/f{foldidx}.{pred_set}.{epoch}pred', pickle_protocol=4)
+
+                    Ntf.torch.save({'y_pred': Ntf.to_topk_sparse(y_pred, testcfg.topK) if (testcfg.topK and testcfg.topK < y_pred.shape[1]) else y_pred, 'uncertainty': {'pred': pred_uncertainty, 'model': model_uncertainty} if self.is_bayesian else None}, f'{self.output}/f{foldidx}.{pred_set}.{epoch}pred', pickle_protocol=4)
                     log.info(f'{self.name()} model predictions for fold{foldidx}.{pred_set}.{epoch} has saved at {self.output}/f{foldidx}.{pred_set}.{epoch}pred')

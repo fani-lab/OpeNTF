@@ -97,12 +97,12 @@ class Nmt(Ntf):
             sys.argv += ['onmt_train', '-config', f'{self.output}/f{foldidx}.config.yml']
             onmt_train()
 
-    def test(self, teamsvecs, splits, on_train, per_epoch):
+    def test(self, teamsvecs, splits, testcfg):
         for foldidx in splits['folds'].keys():
             onmtcfg = OmegaConf.load(f'{self.output}/f{foldidx}.config.yml')
             modelfiles = [f'{self.output}/{_}' for _ in os.listdir(self.output) if re.match(f'f{foldidx}._step_\d+.pt', _)]
             modelfiles = sorted(modelfiles, key=lambda f: int(f.split('_')[-1].split('.')[0]), reverse=True)
-            if not per_epoch: modelfiles = modelfiles[0] #only the last step as the final model if no per_epoch
+            if not testcfg.per_epoch: modelfiles = modelfiles[0] #only the last step as the final model if no per_epoch
             for modelfile in modelfiles:
                 step = modelfile.split('_')[-1].split('.')[0]
                 cli_cmd = 'onmt_translate '
@@ -123,19 +123,20 @@ class Nmt(Ntf):
                 # translator = build_translator(opt_path_or_dict="config.yaml",  report_score=True)
                 # results = translator.translate(src=["Hello world!", "How are you?"],batch_size=2)
     
-    def evaluate(self, teamsvecs, splits, on_train=False, per_epoch=False, per_instance=False, metrics={}):
+    #TODO: many code overlaps with ntf.evaluate ...
+    def evaluate(self, teamsvecs, splits, evalcfg):
         pd = opentf.install_import('pandas==2.0.0', 'pandas')
         import evl.metric as metric
         fold_mean = pd.DataFrame()
         mean_std = pd.DataFrame()
-        if per_instance: fold_mean_per_instance = pd.DataFrame()
+        if evalcfg.per_instance: fold_mean_per_instance = pd.DataFrame()
         Y = teamsvecs['member'][splits['test']]
         for foldidx in splits['folds'].keys():
             predfiles = [_ for _ in os.listdir(self.output) if re.match(f'f{foldidx}.test.e\d+.pred$', _)]
             predfiles = sorted(predfiles, key=lambda f: int(re.search(r'\.e(\d+)\.', f).group(1)), reverse=True)
             #per_epoch depends on "save_checkpoint_steps" param in nmt_config.yaml since it simply collect the checkpoint files
             #so, per_epoch => per_checkpoints/steps
-            if not per_epoch: predfiles = predfiles[0]  # only the last step as the final model if no per_epoch
+            if not evalcfg.per_epoch: predfiles = predfiles[0]  # only the last step as the final model if no per_epoch
             for i, predfile in enumerate(predfiles):
                 df_pred = pd.read_csv(f'{self.output}/{predfile}', header=None)
                 #df_pred = pd.read_csv(f'{self.output}/tgt-test.txt', header=None) # for unit-test, y_ = y
@@ -146,37 +147,37 @@ class Nmt(Ntf):
                     predlist = re.sub(r'\baveryunlikelytoken\w*\b', '', predlist).strip().replace('m', '').replace('<unk>', '').split()
                     for pred in predlist: Y_[_, int(pred)] = 1/len(predlist)
 
-                log.info(f'Evaluating predictions at {self.output}/{predfile} ... for {metrics}')
+                log.info(f'Evaluating predictions at {self.output}/{predfile} ... for {evalcfg.metrics}')
 
-                log.info(f'{metrics.trec} ...')
-                df, df_mean = metric.calculate_metrics(Y, Y_, per_instance, metrics)
+                log.info(f'{evalcfg.metrics.trec} ...')
+                df, df_mean = metric.calculate_metrics(Y, Y_, evalcfg.topK, evalcfg.per_instance, evalcfg.metrics)
 
-                if 'aucroc' in metrics.other:
+                if 'aucroc' in evalcfg.metrics.other:
                     log.info("['aucroc'] and curve values (fpr, tpr) ...")
                     aucroc, fpr_tpr = metric.calculate_auc_roc(Y, Y_)
                     df_mean.loc['aucroc'] = aucroc
                     with open(f'{self.output}/{predfile}.eval.roc.pkl', 'wb') as outfile: pickle.dump(fpr_tpr, outfile)
 
-                if (m := [m for m in metrics.other if 'skill_coverage' in m]):  # since this metric comes with topks str like 'skill_coverage_2,5,10'
+                if (m := [m for m in evalcfg.metrics.other if 'skill_coverage' in m]):  # since this metric comes with topks str like 'skill_coverage_2,5,10'
                     log.info(f'{m} ...')
                     X = teamsvecs['skill'] if scipy.sparse.issparse(teamsvecs['skill']) else teamsvecs['original_skill']  # to accomodate dense emb vecs of skills
                     X = X[splits['test']]
                     #TODO: for absolute 0 all, it should be 0?
-                    df_skc, df_mean_skc = metric.calculate_skill_coverage(X, Y_, teamsvecs['skillcoverage'], per_instance, topks=m[0].replace('skill_coverage_', ''))
+                    df_skc, df_mean_skc = metric.calculate_skill_coverage(X, Y_, teamsvecs['skillcoverage'], evalcfg.per_instance, topks=m[0].replace('skill_coverage_', ''))
                     df_skc.columns = df.columns
                     df = pd.concat([df, df_skc], axis=0)
                     df_mean = pd.concat([df_mean, df_mean_skc], axis=0)
 
-                if per_instance: df.to_csv(f'{self.output}/{predfile}.eval.per_instance.csv', float_format='%.5f')
+                if evalcfg.per_instance: df.to_csv(f'{self.output}/{predfile}.eval.per_instance.csv', float_format='%.5f')
                 log.info(f'Saving file per fold as {self.output}/{predfile}.eval.mean.csv')
                 df_mean.to_csv(f'{self.output}/{predfile}.eval.mean.csv')
                 if i == 0:  # non-epoch-based only, as there is different number of epochs for each fold model due to earlystopping
                     fold_mean = pd.concat([fold_mean, df_mean], axis=1)
-                    if per_instance: fold_mean_per_instance = fold_mean_per_instance.add(df, fill_value=0)
+                    if evalcfg.per_instance: fold_mean_per_instance = fold_mean_per_instance.add(df, fill_value=0)
         mean_std['mean'] = fold_mean.mean(axis=1)
         mean_std['std'] = fold_mean.std(axis=1)
         log.info(f'Saving mean evaluation file over {len(splits["folds"])} folds as {self.output}/test.pred.eval.mean.csv')
         mean_std.to_csv(f'{self.output}/test.pred.eval.mean.csv')
-        if per_instance: fold_mean_per_instance.truediv(len(splits['folds'].keys())).to_csv(f'{self.output}/test.pred.eval.per_instance_mean.csv')
+        if evalcfg.per_instance: fold_mean_per_instance.truediv(len(splits['folds'].keys())).to_csv(f'{self.output}/test.pred.eval.per_instance_mean.csv')
 
 
