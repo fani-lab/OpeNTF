@@ -21,8 +21,8 @@ class Ntf:
                 self.input, self.output = input_matrix, output_matrix
             def __len__(self): return self.input.shape[0]
             def __getitem__(self, index):
-                if scipy.sparse.issparse(self.input): return Ntf.torch.as_tensor(self.input[index].toarray()).float(), Ntf.torch.as_tensor(self.output[index].toarray()).float()
-                else: return Ntf.torch.as_tensor(self.input[index]).float(), Ntf.torch.as_tensor(self.output[index].toarray()).float()
+                if scipy.sparse.issparse(self.input): return Ntf.torch.as_tensor(self.input[index].tocsr().toarray()).float(), Ntf.torch.as_tensor(self.output[index].tocsr().toarray()).float()
+                else: return Ntf.torch.as_tensor(self.input[index]).float(), Ntf.torch.as_tensor(self.output[index].tocsr().toarray()).float()
         Ntf.dataset = NtfDataset
 
     def name(self): return f'/{self.__class__.__name__.lower()}.{opentf.cfg2str(self.cfg)}'
