@@ -205,9 +205,10 @@ class Fnn(Ntf):
                                 butil = opentf.install_import('', 'bayesian_torch.utils.util')
                                 pred_uncertainty.append(butil.predictive_entropy(output.data.cpu().numpy()))
                                 model_uncertainty.append(butil.mutual_information(output.data.cpu().numpy()))
-                                y_pred.append(output.mean(dim=0))
+                                y_pred.append(output.mean(dim=0).cpu())
 
-                            else: y_pred.append(Ntf.torch.nn.functional.sigmoid(self.model.forward(XX)).squeeze(1))
+                            else: y_pred.append((Ntf.torch.nn.functional.sigmoid(self.model.forward(XX)).squeeze(1)).cpu())
+                            # move each batch to main memory before appending; gpu may not have enough memory for the entire test set, like in the dblp dataset
                         y_pred = Ntf.torch.vstack(y_pred)
 
                     match = re.search(r'(e\d+)\.pt$', os.path.basename(modelfile))
