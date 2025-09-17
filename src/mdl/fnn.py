@@ -106,7 +106,7 @@ class Fnn(Ntf):
 
             # if self.cfg.l == 'cdp': class_parameters, optimizer_class_param = get_class_data_params_n_optimizer(nr_classes=y_train.shape[1], lr=self.cfg.lr, device=self.device)
             # if self.cfg.l == 'csl': csl_criterion = SuperLoss(nsamples=X_train.shape[0], ncls=y_train.shape[1], wd_cls=0.9, loss_func=Ntf.torch.nn.BCELoss())
-            earlystopping = EarlyStopping(Ntf.torch, patience=self.cfg.es, verbose=True, save_model=False, trace_func=log.info)
+            earlystopping = EarlyStopping(Ntf.torch, patience=self.cfg.es, verbose=True, delta=self.cfg.lr, save_model=False, trace_func=log.info)
 
             for e in range(self.cfg.e):
                 # if self.cfg.l == 'cdp' and e in (learning_rate_schedule:=[2, 4, 10]): adjust_learning_rate(model_initial_lr=self.cfg.lr, optimizer=optimizer, gamma=0.1, step=np.sum(e >= learning_rate_schedule))
