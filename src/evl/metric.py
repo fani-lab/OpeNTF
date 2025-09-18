@@ -19,11 +19,11 @@ def calculate_metrics(Y, Y_, topK=None, per_instance=False, metrics=['P_2,5', 'r
     df_mean = df.mean(axis=1).to_frame('mean')
     return df if per_instance else None, df_mean
 
-def calculate_auc_roc(Y, Y_):
+def calculate_auc_roc(Y, Y_, curve=False):
     scikit = opentf.install_import('scikit-learn==1.2.2', 'sklearn.metrics')
     auc = scikit.roc_auc_score(Y.toarray(), Y_, average='micro', multi_class="ovr")
-    fpr, tpr, _ = scikit.roc_curve(Y.toarray().ravel(), Y_.ravel())
-    return auc, (fpr, tpr)
+    if curve: fpr, tpr, _ = scikit.roc_curve(Y.toarray().ravel(), Y_.ravel())
+    return auc, (fpr, tpr) if curve else None
 
 def calculate_skill_coverage(X, Y_, expertskillvecs, per_instance=False, topks='2,5,10'):#skillcoveragevecs: ExS, X: BatchxS, Y_: BatchxE
     tqdm = opentf.install_import('tqdm==4.65.0', 'tqdm', 'tqdm')

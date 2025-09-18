@@ -67,11 +67,12 @@ class Ntf:
                     log.info(f'{evalcfg.metrics.trec} ...')
                     df, df_mean = metric.calculate_metrics(Y, Y_, evalcfg.topK, evalcfg.per_instance, evalcfg.metrics.trec)
 
-                    if 'aucroc' in evalcfg.metrics.other:
-                        log.info("['aucroc'] and curve values (fpr, tpr) ...")
-                        aucroc, fpr_tpr = metric.calculate_auc_roc(Y, Y_)
+                    if (m:=[m for m in evalcfg.metrics.other if 'aucroc' in m]):
+                        log.info(f'{m} ...')
+                        aucroc, fpr_tpr = metric.calculate_auc_roc(Y, Y_, curve=True) if m[0] == 'aucroc+' else metric.calculate_auc_roc(Y, Y_)
                         df_mean.loc['aucroc'] = aucroc
-                        with open(f'{predfile}.eval.roc.pkl', 'wb') as outfile: pickle.dump(fpr_tpr, outfile)
+                        if fpr_tpr:
+                            with open(f'{predfile}.eval.roc.pkl', 'wb') as outfile: pickle.dump(fpr_tpr, outfile)
 
                     if (m:=[m for m in evalcfg.metrics.other if 'skill_coverage' in m]): #since this metric comes with topks str like 'skill_coverage_2,5,10'
                         log.info(f'{m} ...')
