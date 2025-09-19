@@ -62,7 +62,7 @@ class Ntf:
                     log.info(f'Evaluating predictions at {predfile} ... for {evalcfg.metrics}')
 
                     #evl.metric works on numpy or scipy.sparse. so, we need to convert Y_ which is torch.tensor, either sparse or not
-                    Y_ = Y_.to_dense().cpu().numpy()
+                    Y_ = Y_.cpu().to_dense().numpy()
 
                     log.info(f'{evalcfg.metrics.trec} ...')
                     df, df_mean = metric.calculate_metrics(Y, Y_, evalcfg.topK, evalcfg.per_instance, evalcfg.metrics.trec)
