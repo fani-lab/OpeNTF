@@ -7,7 +7,7 @@ model:
   ns: 5 # number of negative samples for each positive sample
   lr: 0.001 #learning rate
   es: 5 # earlystopping's patience. to bypass, set it to a higher value than epoch
-  save_per_epoch: True
+  spe: True
 
   # Quoc V. Le, Tomás Mikolov: Distributed Representations of Sentences and Documents. ICML 2014: 1188-1196
   d2v: # we use gensim
@@ -22,7 +22,7 @@ model:
     d: ${dim}
     e: ${model.epochs}
     lr: ${model.lr}
-    spe: ${model.save_per_epoch}
+    spe: ${model.spe}
 
   gnn:
     graph:
@@ -66,7 +66,7 @@ model:
       lr: ${model.lr}
       es: ${model.es}
       ns: ${model.ns}
-      spe: ${model.save_per_epoch}
+      spe: ${model.spe}
       wl: 5  #walk_length
       wn: 10 #walks_per_node
       p:  1.0
@@ -100,7 +100,7 @@ model:
       lr: ${model.lr}
       es: ${model.es}
       ns: ${model.gnn.n2v.ns}
-      spe: ${model.save_per_epoch}
+      spe: ${model.spe}
       wl: 3 #${model.gnn.n2v.wl} #walk_length AttributeError: The 'walk_length' is longer than the given 'metapath', but the 'metapath' does not denote a cycle
       wn: ${model.gnn.n2v.wn} #walks_per_node
 
@@ -112,7 +112,7 @@ model:
       lr: ${model.lr}
       es: ${model.es}
       ns: ${model.ns}
-      save_per_epoch: ${model.save_per_epoch}
+      spe: ${model.spe}
       h: # hidden dimension, if empty, means 1-hop: [${dim}, ${dim}], otherwise means len(hd)+1 hop: [${dim}, hd[0], hd[1], ..., ${dim}]
         - ${dim} # hydra cannot interpolate in a list like [${dim}]. So, each item per line
       nn: [30, 20] # number of neighbors in each hop ([20, 10] -> 20 neighbors in 1-hop, 10 neighbors in 2-hop). Should match hd
@@ -127,7 +127,7 @@ model:
       #lr: ${model.lr}
       #es: ${model.es}
       #ns: ${model.ns}
-      #save_per_epoch: ${model.save_per_epoch}
+      #spe: ${model.spe}
       #h: # hidden dimension, if empty, means 1-hop: [${dim}, ${dim}], otherwise means len(hd)+1 hop: [${dim}, hd[0], hd[1], ..., ${dim}]
       #  - ${dim} # hydra cannot interpolate in a list like [${dim}]. So, each item per line
       #nn: [ 30, 20 ] # number of neighbors in each hop ([20, 10] -> 20 neighbors in 1-hop, 10 neighbors in 2-hop). Should match hd
@@ -143,7 +143,7 @@ model:
       lr: ${model.lr}
       es: ${model.es}
       ns: ${model.ns}
-      save_per_epoch: ${model.save_per_epoch}
+      spe: ${model.spe}
       h: # hidden dimension, if empty, means 1-hop: [${dim}, ${dim}], otherwise means len(hd)+1 hop: [${dim}, hd[0], hd[1], ..., ${dim}]
         - ${dim} # hydra cannot interpolate in a list like [${dim}]. So, each item per line
       nn: [30, 20] # number of neighbors in each hop ([20, 10] -> 20 neighbors in 1-hop, 10 neighbors in 2-hop). Should match hd

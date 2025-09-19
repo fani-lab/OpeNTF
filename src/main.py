@@ -125,7 +125,7 @@ def run(cfg):
         mdlcfg = OmegaConf.merge(OmegaConf.load(cfg.models.config), OmegaConf.from_dotlist(mdl_overrides))
         mdlcfg.seed = cfg.seed
         mdlcfg.pytorch = cfg.pytorch
-        mdlcfg.save_per_epoch = cfg.train.save_per_epoch
+        mdlcfg.spe = cfg.train.save_per_epoch
         mdlcfg.tntf.tfolds = cfg.train.nfolds
         mdlcfg.tntf.step_ahead = cfg.train.step_ahead
         mdlcfg.pytorch = cfg.pytorch
@@ -144,7 +144,7 @@ def run(cfg):
         for m in cfg.models.instances:
             cls_method = m.split('_')
             cls = get_class(cls_method[0])
-            output_ = (t2v.modelfilepath + '_' if t2v else cfg.data.output) #cannot have file and folder with same name if t2v
+            output_ = (t2v.output + '_' if t2v else cfg.data.output) #cannot have file and folder with same name if t2v
             models[m] = cls(output_, cfg.pytorch, cfg.acceleration, cfg.seed, cfg.models.config[cls.__name__.lower()])
             if len(cls_method) > 1: #e.g., in mdl.tntf.tNtf that we need the core model
                 cls = get_class(cls_method[1])

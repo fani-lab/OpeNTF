@@ -177,7 +177,7 @@ class Gnn(T2v):
                 # so, we need the num_nodes of the graph
                 self.model = self._built_model_mp(homo_data.num_nodes).to(self.device)
                 train_l, valid_l, test_l = self._build_loader_mp(homo_data=homo_data) # building train/valid/test splits and loaders. Should depend on data
-                self._train_mp(train_l, valid_l, test_l)
+                self._train_mp(train_l, valid_l)
 
         if self.w: self.w.close()
 
@@ -282,7 +282,8 @@ class Gnn(T2v):
         #     #     from lant_encoder import Encoder
         #     #     model = Encoder(hidden_channels=self.d, data=train_data)
         #     self.optimizer = self.torch.optim.Adam(self.model.parameters(), lr=self.cfg.model.lr)
-    def _train_mp(self, train_l, valid_l, test_l):
+    def _train_mp(self, train_l, valid_l):
+        if self.w is None: self.w = self.writer(log_dir=f'{self.output}/logs4tboard/run_{int(time.time())}')
         def _(e, loader, optimizer=None):
             if optimizer: self.model.train()
             else: self.model.eval()
@@ -299,8 +300,7 @@ class Gnn(T2v):
                 #better way is to render the all skill node embeddings
                 #self.writer.add_embedding(tag='node_emb' if optimizer else 'v_loss', mat=x, global_step=e)
 
-            self.writer.add_scalar(tag='t_loss' if optimizer else 'v_loss', scalar_value=e_loss, global_step=e)
-
+            self.w.add_scalar(tag='t_loss' if optimizer else 'v_loss', scalar_value=e_loss, global_step=e)
             return (e_loss / len(loader)) if len(loader) > 0 else float('inf')
 
         optimizer = self.torch.optim.Adam(self.model.parameters(), lr=self.cfg.model.lr)
@@ -309,7 +309,7 @@ class Gnn(T2v):
         for e in range(self.cfg.model.e):
             log.info(f'Epoch {e}, {opentf.textcolor["blue"]}Train Loss: {(t_loss:=_(e, train_l, optimizer)):.4f}{opentf.textcolor["reset"]}')
             log.info(f'Epoch {e}, {opentf.textcolor["magenta"]}Valid Loss: {(v_loss:=_(e, valid_l)):.4f}{opentf.textcolor["reset"]}')
-            if self.cfg.model.save_per_epoch:
+            if self.cfg.model.spe:
                 #self.model.eval()
                 self.torch.save({'model_state_dict': self.model.state_dict(), 'cfg': self.cfg, 'e': e, 't_loss': t_loss, 'v_loss': v_loss}, f'{self.output}.e{e}')
                 log.info(f'{self.name} model with {opentf.cfg2str(self.cfg.model)} saved at {self.output}.e{e}')
@@ -317,11 +317,10 @@ class Gnn(T2v):
             if earlystopping(v_loss, self.model).early_stop:
                 log.info(f'Early stopping triggered at epoch: {e}')
                 break
-        log.info(f'{opentf.textcolor["yellow"]}Test Loss: {(tst_loss:=_(self.cfg.model.e, test_l)):.4f}')
         #self.model.eval()
         self.torch.save({'model_state_dict': self.model.state_dict(), 'cfg': self.cfg, 'e': e, 't_loss': t_loss, 'v_loss': v_loss, 'tst_loss': tst_loss}, self.output)
         log.info(f'{self.name} model with {opentf.cfg2str(self.cfg.model)} saved at {self.output}.')
-        self.writer.close()
+        self.w.close()
 
     def _train_rw(self, splits, foldidx, val_m_t_edge_index_homo):
         if self.w is None: self.w = self.writer(log_dir=f'{self.output}/logs4tboard/run_{int(time.time())}')
@@ -377,7 +376,7 @@ class Gnn(T2v):
         d2v_cfg.seed = self.cfg.seed
         d2v_cfg.embtype = self.cfg.graph.pre.split('.')[-1] # Check emb.d2v.D2v.train() for filename pattern
         d2v_cfg.lr = self.cfg.model.lr
-        d2v_cfg.save_per_epoch = self.cfg.model.save_per_epoch
+        d2v_cfg.spe = self.cfg.model.spe
         # simple lazy load, or train from scratch if the file not found!
         d2v_obj = D2v(self.output, self.device, d2v_cfg).train(teamsvecs, indexes, splits)
         # the order is NOT correct in d2v, i.e., vecs[0] may be for vecs['s20']. Call D2v.natsortvecs(d2v_obj.model.wv)

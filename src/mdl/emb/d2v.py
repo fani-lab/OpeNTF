@@ -49,11 +49,11 @@ class D2v(T2v):
 
     def train(self, teamsvecs, indexes, splits):
         # to select/create correct model file in the output directory
-        self.modelfilepath = self.output + f'/{self.name}.d{self.cfg.d}.e{self.cfg.e}.w{self.cfg.w}.dm{self.cfg.dm}.{self.cfg.embtype}'
+        self.output = self.output + f'/{self.name}.d{self.cfg.d}.e{self.cfg.e}.w{self.cfg.w}.dm{self.cfg.dm}.{self.cfg.embtype}'
         try:
-            log.info(f"Loading the model {self.modelfilepath} for {(teamsvecs['skill'].shape[0], self.cfg.d)}  embeddings ...")
+            log.info(f"Loading the model {self.output} for {(teamsvecs['skill'].shape[0], self.cfg.d)} embeddings ...")
             self.__class__.gensim = opentf.install_import('gensim==4.3.3', 'gensim')
-            self.model = self.gensim.models.Doc2Vec.load(self.modelfilepath)
+            self.model = self.gensim.models.Doc2Vec.load(self.output)
             assert self.model.docvecs.vectors.shape[0] == teamsvecs['skill'].shape[0], f'{opentf.textcolor["red"]}Incorrect number of embeddings per team! {self.model.docvecs.vectors.shape[0]} != {teamsvecs["skill"].shape[0]}{opentf.textcolor["reset"]}'
             return self
         except FileNotFoundError:
@@ -71,12 +71,12 @@ class D2v(T2v):
                     self.model.train(self.data, total_examples=self.model.corpus_count, epochs=1)
                     delta = (self.model.alpha - self.model.min_alpha) / (self.cfg.e - 1)
                     self.model.alpha = max(self.model.alpha - delta, self.model.min_alpha)
-                    log.info(f'Saving model at {self.modelfilepath}.{opentf.textcolor["blue"]}e{epoch} at lr {self.model.alpha}{opentf.textcolor["reset"]}...')
-                    self.model.save(f'{self.modelfilepath}.e{epoch}')
+                    log.info(f'Saving model at {self.output}.{opentf.textcolor["blue"]}e{epoch} at lr {self.model.alpha}{opentf.textcolor["reset"]}...')
+                    self.model.save(f'{self.output}.e{epoch}')
             else: self.model.train(self.data, total_examples=self.model.corpus_count, epochs=self.cfg.e)
 
-            log.info(f'Saving model at {self.modelfilepath} ...')
-            self.model.save(self.modelfilepath)
+            log.info(f'Saving model at {self.output} ...')
+            self.model.save(self.output)
             # self.model.save_word2vec_format(f'{output}.w2v')
             # self.model.docvecs.save_word2vec_format(f'{output}.d2v')
             return self

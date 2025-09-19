@@ -7,7 +7,7 @@ ns: 5 # number of negative experts to upweight
 lr: 0.001 # learning rate
 es: 5 # earlystopping's patience. to bypass, set it to a higher value than epoch
 h: [128] #linear layers
-save_per_epoch: # will be overriden dynamically in ./src/main.py from root ./__config__.yaml
+spe: # will be overriden dynamically in ./src/main.py from root ./__config__.yaml
 
 rnd:
   b: ${batch_size}
@@ -20,7 +20,7 @@ fnn:
   lr: ${lr}
   es: ${es}
   h: ${h}
-  spe: ${save_per_epoch}
+  spe: ${spe}
   l: bce  # bce: binary x-entropy, csl: curriculum superloss, cdp: curriculum data parameters,
   #E.g., 1M experts/labels but each team has 5 experts at max, so, p=5/1M. When 1/p, it becomes very large and creates training istability though!
   tpw: 10 # 10–20 (start), tune carefully up to 1/p where p is the average ratio of TP labels (true experts), emphasizes rare positives.
@@ -37,7 +37,7 @@ bnn:
   lr: ${lr}
   es: ${es}
   h: ${h}
-  spe: ${save_per_epoch}
+  spe: ${spe}
   l: bce  # bce: binary x-entropy, csl: curriculum superloss, cdp: curriculum data parameters,
   #E.g., 1M experts/labels but each team has 5 experts at max, so, p=5/1M. When 1/p, it becomes very large and creates training istability though!
   tpw: 10 # 10–20 (start), tune carefully up to 1/p where p is the average ratio of TP labels (true experts), emphasizes rare positives.
@@ -51,7 +51,7 @@ nmt: #see __config__.nmt.yaml for the rest of hyperparameters, esp., encoder spe
   e: ${epochs}
   lr: ${lr}
   es: ${es}
-  spe: ${save_per_epoch}
+  spe: ${spe}
   enc: transformer # rnn, cnn, # cnn is for convs2s
 
 # Fani, Barzegar, Dashti, Saeedi; A Streaming Approach to Neural Team Formation Training. ECIR2024. https://doi.org/10.1007/978-3-031-56027-9_20
