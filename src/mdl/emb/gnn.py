@@ -147,9 +147,6 @@ class Gnn(T2v):
                 # assert isinstance(self.data, self.pyg.data.HeteroData), f'{opentf.textcolor["red"]}Hetero graph is needed for m2v. {self.cfg.graph.structure} is NOT hetero!{opentf.textcolor["reset"]}'
                 assert len(self.data.node_types) > 1, f'{opentf.textcolor["red"]}Hetero graph is needed for m2v. {self.cfg.graph.structure} is NOT hetero!{opentf.textcolor["reset"]}'
                 if foldidx == 0: self.output += f'.w{self.cfg.model.w}.wl{self.cfg.model.wl}.wn{self.cfg.model.wn}.{self.cfg.model.metapath_name[1]}' #should be fixed
-
-                num_nodes_dict =
-
                 self.model = self.pyg.nn.MetaPath2Vec(edge_index_dict=train_data.edge_index_dict,
                                                       num_nodes_dict = {ntype: train_data[ntype].num_nodes for ntype in train_data.node_types}, #NOTE: if not explicitly set, it does num_nodes = int(edge_index[0].max()) + 1 !!
                                                       metapath=[tuple(mp) for mp in self.cfg.model.metapath_name[0]],
@@ -167,6 +164,7 @@ class Gnn(T2v):
                 raise NotImplementedError(f'{self.name} not integrated!')
 
             elif self.name == 'lant':
+                # if self.name == 'lant': self.model.learn(self, self.cfg.model.e)  # built-in validation inside lant_encoder class
                 raise NotImplementedError(f'{self.name} not integrated!')
 
             # message-passing-based >> default on homo, but can be wrapped into HeteroConv
@@ -181,9 +179,6 @@ class Gnn(T2v):
                 train_l, valid_l, test_l = self._build_loader_mp(homo_data=homo_data) # building train/valid/test splits and loaders. Should depend on data
                 self._train_mp(train_l, valid_l, test_l)
 
-            # if self.name == 'lant': self.model.learn(self, self.cfg.model.e)  # built-in validation inside lant_encoder class
-            #
-            # self.plot_points()
         if self.w: self.w.close()
 
     def _built_model_mp(self, num_nodes):

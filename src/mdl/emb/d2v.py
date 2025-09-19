@@ -14,7 +14,6 @@ from .t2v import T2v
 
 class D2v(T2v):
     gensim = None
-    def __init__(self, output, device, cgf): super().__init__(output, device, 'd2v', cgf)
 
     def _prep(self, teamsvecs, indexes, splits):
         datafile = self.output + f'/{self.cfg.embtype}.docs.pkl'
@@ -65,7 +64,7 @@ class D2v(T2v):
                                                     workers=self.device.split(':')[1] if 'cpu:' in self.device else os.cpu_count() - 1, ** {'seed': self.cfg.seed} if self.cfg.seed is not None else {})
 
             self.model.build_vocab(self.data)
-            if self.cfg.save_per_epoch:
+            if self.cfg.spe:
                 import random
                 random.shuffle(self.data)
                 for epoch in range(self.cfg.e):
