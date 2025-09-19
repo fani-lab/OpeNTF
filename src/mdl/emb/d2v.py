@@ -49,16 +49,17 @@ class D2v(T2v):
 
     def train(self, teamsvecs, indexes, splits):
         # to select/create correct model file in the output directory
-        self.output = self.output + f'/{self.name}.d{self.cfg.d}.e{self.cfg.e}.w{self.cfg.w}.dm{self.cfg.dm}.{self.cfg.embtype}'
+        output = self.output + f'/{self.name}.d{self.cfg.d}.e{self.cfg.e}.w{self.cfg.w}.dm{self.cfg.dm}.{self.cfg.embtype}'
         try:
-            log.info(f"Loading the model {self.output} for {(teamsvecs['skill'].shape[0], self.cfg.d)} embeddings ...")
+            log.info(f"Loading the model {output} for {(teamsvecs['skill'].shape[0], self.cfg.d)} embeddings ...")
             self.__class__.gensim = opentf.install_import('gensim==4.3.3', 'gensim')
-            self.model = self.gensim.models.Doc2Vec.load(self.output)
+            self.model = self.gensim.models.Doc2Vec.load(output)
             assert self.model.docvecs.vectors.shape[0] == teamsvecs['skill'].shape[0], f'{opentf.textcolor["red"]}Incorrect number of embeddings per team! {self.model.docvecs.vectors.shape[0]} != {teamsvecs["skill"].shape[0]}{opentf.textcolor["reset"]}'
             return self
         except FileNotFoundError:
             log.info(f'File not found! Training the embedding model from scratch ...')
             self._prep(teamsvecs, indexes, splits)
+            self.output = output
             self.model = self.gensim.models.Doc2Vec(min_count=1, dbow_words=1, # keep it always one as it may be needed for gnn-based method for 'pre' config, i.e., initial node features
                                                     dm=self.cfg.dm, vector_size=self.cfg.d, window=self.cfg.w, min_alpha=self.cfg.lr,
                                                     workers=self.device.split(':')[1] if 'cpu:' in self.device else os.cpu_count() - 1, ** {'seed': self.cfg.seed} if self.cfg.seed is not None else {})
