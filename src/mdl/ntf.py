@@ -58,7 +58,7 @@ class Ntf:
                 predfiles = [f'{self.output}/f{foldidx}.{pred_set}.pred'] #the first file as a hook
                 if evalcfg.per_epoch: predfiles += [f'{self.output}/{_}' for _ in os.listdir(self.output) if re.match(f'f{foldidx}.{pred_set}.e\d+.pred$', _)]
                 for i, predfile in enumerate(sorted(sorted(predfiles), key=len)): #the first file is/should be non-epoch-based
-                    Y_ = Ntf.torch.load(predfile)['y_pred']
+                    Y_ = Ntf.torch.load(predfile, map_location=self.device)['y_pred']
                     log.info(f'Evaluating predictions at {predfile} ... for {evalcfg.metrics}')
 
                     #evl.metric works on numpy or scipy.sparse. so, we need to convert Y_ which is torch.tensor, either sparse or not

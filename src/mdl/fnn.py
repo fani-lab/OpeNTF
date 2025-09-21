@@ -97,7 +97,7 @@ class Fnn(Ntf):
 
             # Initialize network
             self.init(input_size=input_size, output_size=output_size)
-            if prev_model: self.model.load_state_dict(Ntf.torch.load(prev_model[foldidx]))
+            if prev_model: self.model.load_state_dict(Ntf.torch.load(prev_model[foldidx], map_location=self.device))
             self.model.to(self.device)
 
             optimizer = Ntf.torch.optim.Adam(self.model.parameters(), lr=self.cfg.lr)
@@ -183,7 +183,7 @@ class Fnn(Ntf):
 
             for modelfile in sorted(sorted(modelfiles), key=len):
                 self.init(input_size=input_size, output_size=output_size).to(self.device)
-                self.model.load_state_dict(Ntf.torch.load(modelfile)['model_state_dict'])
+                self.model.load_state_dict(Ntf.torch.load(modelfile, map_location=self.device)['model_state_dict'])
                 self.model.eval()
 
                 for pred_set in (['test', 'train', 'valid'] if testcfg.on_train else ['test']):
