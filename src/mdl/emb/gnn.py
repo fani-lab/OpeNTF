@@ -80,7 +80,7 @@ class Gnn(T2v):
         if self.cfg.graph.pre: self._init_d2v_node_features(teamsvecs, indexes, splits)
 
         log.info(f'{opentf.textcolor["blue"]}Training {self.name} {opentf.textcolor["reset"]}... ')
-        train_data = copy.deepcopy(self.data)
+
         # (1) transductive (for opentf, only edges matter)
         # -- all nodes 'skills', 'member', 'team' are seen
         # -- edges (a) all can be seen for message passing but valid/test edges are not for loss/supervision (common practice)
@@ -90,6 +90,7 @@ class Gnn(T2v):
         # (2) inductive
         # -- valid/test 'team' nodes are unseen >> future
 
+        train_data = copy.deepcopy(self.data)
         # remove (member to team) and (team to member) edges whose teams are in test set
         test_teams_to_remove = Gnn.torch.tensor(splits['test'])
         mask = ~Gnn.torch.isin(train_data['member', 'to', 'team'].edge_index[1], test_teams_to_remove)
@@ -98,23 +99,23 @@ class Gnn(T2v):
         train_data['team', 'rev_to', 'member'].edge_index = train_data['team', 'rev_to', 'member'].edge_index[:, mask]
 
         for foldidx in splits['folds'].keys():
-
+            fold_data = copy.deepcopy(train_data)
             # remove (member to team) and (team to member) edges whose teams are in valid set too
             valid_teams_to_remove = Gnn.torch.tensor(splits['folds'][foldidx]['valid'])
 
-            v_m2t_mask = Gnn.torch.isin(train_data['member', 'to', 'team'].edge_index[1], valid_teams_to_remove)
-            val_m2t_edges = train_data['member', 'to', 'team'].edge_index[:, v_m2t_mask]
-            train_data['member', 'to', 'team'].edge_index = train_data['member', 'to', 'team'].edge_index[:, ~v_m2t_mask]
+            v_m2t_mask = Gnn.torch.isin(fold_data['member', 'to', 'team'].edge_index[1], valid_teams_to_remove)
+            val_m2t_edges = fold_data['member', 'to', 'team'].edge_index[:, v_m2t_mask]
+            fold_data['member', 'to', 'team'].edge_index = fold_data['member', 'to', 'team'].edge_index[:, ~v_m2t_mask]
 
-            v_t2m_mask = Gnn.torch.isin(train_data['team', 'rev_to', 'member'].edge_index[0], valid_teams_to_remove)
-            val_t2m_edges = train_data['team', 'rev_to', 'member'].edge_index[:, v_t2m_mask]
-            train_data['team', 'rev_to', 'member'].edge_index = train_data['team', 'rev_to', 'member'].edge_index[:, ~v_t2m_mask]
+            v_t2m_mask = Gnn.torch.isin(fold_data['team', 'rev_to', 'member'].edge_index[0], valid_teams_to_remove)
+            val_t2m_edges = fold_data['team', 'rev_to', 'member'].edge_index[:, v_t2m_mask]
+            fold_data['team', 'rev_to', 'member'].edge_index = fold_data['team', 'rev_to', 'member'].edge_index[:, ~v_t2m_mask]
 
             ## homo valid construction for n2v and homo versions of gnns
             offsets = {}; offset = 0
-            for node_type in train_data.node_types:
+            for node_type in fold_data.node_types:
                 offsets[node_type] = offset
-                offset += train_data[node_type].num_nodes
+                offset += fold_data[node_type].num_nodes
 
             val_member_homo = val_m2t_edges[0] + offsets['member']
             val_team_homo = val_m2t_edges[1] + offsets['team']
@@ -133,7 +134,8 @@ class Gnn(T2v):
                 # ImportError: 'Node2Vec' requires either the 'pyg-lib' or 'torch-cluster' package
                 # install_import(f'torch-cluster==1.6.3 -f https://data.pyg.org/whl/torch-{self.torch.__version__}.html', 'torch_cluster')
                 # import importlib; importlib.reload(self.pyg);importlib.reload(self.pyg.typing);importlib.reload(self.pyg.nn)
-                self.model = self.pyg.nn.Node2Vec((homo_data:=(train_data.to_homogeneous())).edge_index,
+                self.model = self.pyg.nn.Node2Vec((homo_data:=(fold_data.to_homogeneous())).edge_index,
+                                     num_nodes=homo_data.num_nodes, #should be explicitly passed to accomodate possible isolated nodes
                                      embedding_dim=self.cfg.model.d,
                                      walk_length=self.cfg.model.wl,
                                      context_size=self.cfg.model.w,
@@ -147,8 +149,8 @@ class Gnn(T2v):
                 # assert isinstance(self.data, self.pyg.data.HeteroData), f'{opentf.textcolor["red"]}Hetero graph is needed for m2v. {self.cfg.graph.structure} is NOT hetero!{opentf.textcolor["reset"]}'
                 assert len(self.data.node_types) > 1, f'{opentf.textcolor["red"]}Hetero graph is needed for m2v. {self.cfg.graph.structure} is NOT hetero!{opentf.textcolor["reset"]}'
                 if foldidx == 0: self.output += f'.w{self.cfg.model.w}.wl{self.cfg.model.wl}.wn{self.cfg.model.wn}.{self.cfg.model.metapath_name[1]}' #should be fixed
-                self.model = self.pyg.nn.MetaPath2Vec(edge_index_dict=train_data.edge_index_dict,
-                                                      num_nodes_dict = {ntype: train_data[ntype].num_nodes for ntype in train_data.node_types}, #NOTE: if not explicitly set, it does num_nodes = int(edge_index[0].max()) + 1 !!
+                self.model = self.pyg.nn.MetaPath2Vec(edge_index_dict=fold_data.edge_index_dict,
+                                                      num_nodes_dict = {ntype: fold_data[ntype].num_nodes for ntype in fold_data.node_types}, #NOTE: if not explicitly set, it does num_nodes = int(edge_index[0].max()) + 1 !!
                                                       metapath=[tuple(mp) for mp in self.cfg.model.metapath_name[0]],
                                                       embedding_dim=self.cfg.model.d,
                                                       walk_length=self.cfg.model.wl,
@@ -169,7 +171,7 @@ class Gnn(T2v):
 
             # message-passing-based >> default on homo, but can be wrapped into HeteroConv
             elif self.name in {'gcn', 'gs', 'gat', 'gatv2', 'gin'}:
-                output = f'.d{self.cfg.model.d}.e{self.cfg.model.e}.b{self.cfg.model.b}.lr{self.cfg.model.lr}.ns{self.cfg.model.ns}.h{"-".join([str(i) for i in self.cfg.model.h])}.nn{"-".join([str(i) for i in self.cfg.model.nn])}'
+                if foldidx == 0: self.output += f'.d{self.cfg.model.d}.e{self.cfg.model.e}.b{self.cfg.model.b}.lr{self.cfg.model.lr}.ns{self.cfg.model.ns}.h{"-".join([str(i) for i in self.cfg.model.h])}.nn{"-".join([str(i) for i in self.cfg.model.nn])}'
 
                 # by default, gnn methods are for homo data. We can wrap it by HeteroConv or manually simulate it >> I think Jamil did this >> future
                 homo_data = self.data.to_homogeneous()
@@ -304,22 +306,22 @@ class Gnn(T2v):
             return (e_loss / len(loader)) if len(loader) > 0 else float('inf')
 
         optimizer = self.torch.optim.Adam(self.model.parameters(), lr=self.cfg.model.lr)
-        earlystopping = EarlyStopping(Gnn.torch, patience=self.cfg.model.es, verbose=True, save_model=False, trace_func=log.info)
+        earlystopping = EarlyStopping(Gnn.torch, patience=self.cfg.model.es, verbose=True, delta=self.cfg.model.lr, save_model=False, trace_func=log.info)
         self.torch.cuda.empty_cache()
         for e in range(self.cfg.model.e):
             log.info(f'Epoch {e}, {opentf.textcolor["blue"]}Train Loss: {(t_loss:=_(e, train_l, optimizer)):.4f}{opentf.textcolor["reset"]}')
             log.info(f'Epoch {e}, {opentf.textcolor["magenta"]}Valid Loss: {(v_loss:=_(e, valid_l)):.4f}{opentf.textcolor["reset"]}')
             if self.cfg.model.spe:
                 #self.model.eval()
-                self.torch.save({'model_state_dict': self.model.state_dict(), 'cfg': self.cfg, 'e': e, 't_loss': t_loss, 'v_loss': v_loss}, f'{self.output}.e{e}')
-                log.info(f'{self.name} model with {opentf.cfg2str(self.cfg.model)} saved at {self.output}.e{e}')
+                self.torch.save({'model_state_dict': self.model.state_dict(), 'cfg': self.cfg, 'e': e, 't_loss': t_loss, 'v_loss': v_loss}, f'{self.output}/f0.e{e}.pt')
+                log.info(f'{self.name} model with {opentf.cfg2str(self.cfg.model)} saved at {self.output}.e{e}.pt')
 
             if earlystopping(v_loss, self.model).early_stop:
                 log.info(f'Early stopping triggered at epoch: {e}')
                 break
         #self.model.eval()
-        self.torch.save({'model_state_dict': self.model.state_dict(), 'cfg': self.cfg, 'e': e, 't_loss': t_loss, 'v_loss': v_loss}, self.output)
-        log.info(f'{self.name} model with {opentf.cfg2str(self.cfg.model)} saved at {self.output}.')
+        self.torch.save({'model_state_dict': self.model.state_dict(), 'cfg': self.cfg, 'e': e, 't_loss': t_loss, 'v_loss': v_loss}, f'{self.output}/f0.pt') #will be fixed after fold-base
+        log.info(f'{self.name} model with {opentf.cfg2str(self.cfg.model)} saved at {self.output}.pt.')
         self.w.close()
 
     def _train_rw(self, splits, foldidx, val_m_t_edge_index_homo):

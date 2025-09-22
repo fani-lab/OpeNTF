@@ -144,7 +144,7 @@ def run(cfg):
         for m in cfg.models.instances:
             cls_method = m.split('_')
             cls = get_class(cls_method[0])
-            output_ = (t2v.output + '_' if t2v else cfg.data.output) #cannot have file and folder with same name if t2v
+            output_ = (t2v.output if t2v else cfg.data.output)
             models[m] = cls(output_, cfg.pytorch, cfg.acceleration, cfg.seed, cfg.models.config[cls.__name__.lower()])
             if len(cls_method) > 1: #e.g., in mdl.tntf.tNtf that we need the core model
                 cls = get_class(cls_method[1])

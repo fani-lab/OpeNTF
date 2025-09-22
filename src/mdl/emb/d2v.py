@@ -49,17 +49,20 @@ class D2v(T2v):
 
     def train(self, teamsvecs, indexes, splits):
         # to select/create correct model file in the output directory
-        output = self.output + f'/{self.name}.d{self.cfg.d}.e{self.cfg.e}.w{self.cfg.w}.dm{self.cfg.dm}.{self.cfg.embtype}'
+        modelstr = f'{self.name}.d{self.cfg.d}.e{self.cfg.e}.w{self.cfg.w}.dm{self.cfg.dm}.{self.cfg.embtype}'
+        modelpath = f'{self.output}/{modelstr}/'
+        modelfile = f'{self.output}/{modelstr}/{modelstr}.pt'
         try:
-            log.info(f"Loading the model {output} for {(teamsvecs['skill'].shape[0], self.cfg.d)} embeddings ...")
+            log.info(f"Loading the model {modelfile} for {(teamsvecs['skill'].shape[0], self.cfg.d)} embeddings ...")
             self.__class__.gensim = opentf.install_import('gensim==4.3.3', 'gensim')
-            self.model = self.gensim.models.Doc2Vec.load(output)
+            self.model = self.gensim.models.Doc2Vec.load(modelfile)
             assert self.model.docvecs.vectors.shape[0] == teamsvecs['skill'].shape[0], f'{opentf.textcolor["red"]}Incorrect number of embeddings per team! {self.model.docvecs.vectors.shape[0]} != {teamsvecs["skill"].shape[0]}{opentf.textcolor["reset"]}'
             return self
         except FileNotFoundError:
             log.info(f'File not found! Training the embedding model from scratch ...')
             self._prep(teamsvecs, indexes, splits)
-            self.output = output
+            self.output = modelpath
+            if not os.path.isdir(self.output): os.makedirs(self.output)
             self.model = self.gensim.models.Doc2Vec(min_count=1, dbow_words=1, # keep it always one as it may be needed for gnn-based method for 'pre' config, i.e., initial node features
                                                     dm=self.cfg.dm, vector_size=self.cfg.d, window=self.cfg.w, min_alpha=self.cfg.lr,
                                                     workers=self.device.split(':')[1] if 'cpu:' in self.device else os.cpu_count() - 1, ** {'seed': self.cfg.seed} if self.cfg.seed is not None else {})
@@ -72,12 +75,12 @@ class D2v(T2v):
                     self.model.train(self.data, total_examples=self.model.corpus_count, epochs=1)
                     delta = (self.model.alpha - self.model.min_alpha) / (self.cfg.e - 1)
                     self.model.alpha = max(self.model.alpha - delta, self.model.min_alpha)
-                    log.info(f'Saving model at {self.output}.{opentf.textcolor["blue"]}e{epoch} at lr {self.model.alpha}{opentf.textcolor["reset"]}...')
-                    self.model.save(f'{self.output}.e{epoch}')
+                    log.info(f'Saving model at {modelfile}.{opentf.textcolor["blue"]}e{epoch} at lr {self.model.alpha}{opentf.textcolor["reset"]}...')
+                    self.model.save(modelfile.replace('.pt', f'.e{epoch}.pt'))
             else: self.model.train(self.data, total_examples=self.model.corpus_count, epochs=self.cfg.e)
 
-            log.info(f'Saving model at {self.output} ...')
-            self.model.save(self.output)
+            log.info(f'Saving model at {modelfile} ...')
+            self.model.save(modelfile)
             # self.model.save_word2vec_format(f'{output}.w2v')
             # self.model.docvecs.save_word2vec_format(f'{output}.d2v')
             return self
