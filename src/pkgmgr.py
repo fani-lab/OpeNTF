@@ -110,7 +110,7 @@ textcolor = {
 
 hf_token = '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' # this is a read-only token
 def get_from_hf(repo_type, filename) -> bool:
-    hf_api = install_import('huggingface_hub', from_module='HfApi')()
+    hf_api = install_import('huggingface-hub', 'huggingface_hub', from_module='HfApi')()
     repo_id = 'fani-lab/OpeNTF'
     log.info(f"Downloading {filename} from https://huggingface.co/{repo_type}/{repo_id} ...")
     # if the file is public, token=hf_token is ignored

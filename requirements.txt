@@ -12,6 +12,9 @@ numpy==1.24.4 #cannot go above for gensim
 #$ python-dateutil==2.9
 ## cmn.team.__init__()
 
+#$ huggingface-hub==0.33.0
+## pkgmgr.get_from_hf()
+
 #$ tqdm==4.65.0
 ## cmn.movie.Movie.read_data()
 ## cmn.publication.Publication.read_data()
