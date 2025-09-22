@@ -154,7 +154,7 @@ class Fnn(Ntf):
                 w.add_scalar(tag=f'{foldidx}_v_loss', scalar_value=v_loss, global_step=e)
                 log.info(f'Fold {foldidx}/{len(splits["folds"]) - 1}, Epoch {e}, {opentf.textcolor["blue"]}Train Loss: {t_loss:.4f}{opentf.textcolor["reset"]}')
                 log.info(f'Fold {foldidx}/{len(splits["folds"]) - 1}, Epoch {e}, {opentf.textcolor["magenta"]}Valid Loss: {v_loss:.4f}{opentf.textcolor["reset"]}')
-                if self.cfg.spe:
+                if self.cfg.spe and (e == 0 or ((e + 1) % self.cfg.spe) == 0):
                     # self.model.eval()
                     self.torch.save({'model_state_dict': self.model.state_dict(), 'cfg': self.cfg, 'f': foldidx, 'e': e, 't_loss': t_loss, 'v_loss': v_loss}, f'{self.output}/f{foldidx}.e{e}.pt')
                     log.info(f'{self.name()} model with {opentf.cfg2str(self.cfg)} saved at {self.output}/f{foldidx}.e{e}.pt')

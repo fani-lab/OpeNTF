@@ -98,6 +98,7 @@ def run(cfg):
             emb_overrides = [o.replace('+data.embedding.', '') for o in HydraConfig.get().overrides.task if '+data.embedding.' in o]
             embcfg = OmegaConf.merge(OmegaConf.load(cfg.data.embedding.config), OmegaConf.from_dotlist(emb_overrides))
             embcfg.model.seed = cfg.seed
+            embcfg.model.spe = cfg.train.save_per_epoch
             OmegaConf.resolve(embcfg)
             cfg.data.embedding.config = embcfg
             cls, method = cfg.data.embedding.class_method.split('_') if cfg.data.embedding.class_method.find('_') else (cfg.data.embedding.class_method, None)

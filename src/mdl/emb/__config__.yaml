@@ -7,7 +7,7 @@ model:
   ns: 5 # number of negative samples for each positive sample
   lr: 0.001 #learning rate
   es: 5 # earlystopping's patience. to bypass, set it to a higher value than epoch
-  spe: True
+  spe: # will be overriden dynamically in ./src/main.py from root ./config.yml
 
   # Quoc V. Le, Tomás Mikolov: Distributed Representations of Sentences and Documents. ICML 2014: 1188-1196
   d2v: # we use gensim

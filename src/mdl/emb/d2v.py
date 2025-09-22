@@ -75,8 +75,9 @@ class D2v(T2v):
                     self.model.train(self.data, total_examples=self.model.corpus_count, epochs=1)
                     delta = (self.model.alpha - self.model.min_alpha) / (self.cfg.e - 1)
                     self.model.alpha = max(self.model.alpha - delta, self.model.min_alpha)
-                    log.info(f'Saving model at {modelfile}.{opentf.textcolor["blue"]}e{epoch} at lr {self.model.alpha}{opentf.textcolor["reset"]}...')
-                    self.model.save(modelfile.replace('.pt', f'.e{epoch}.pt'))
+                    if epoch == 0 or ((epoch + 1) % self.cfg.spe) == 0:
+                        log.info(f'Saving model at {modelfile}.{opentf.textcolor["blue"]}e{epoch} at lr {self.model.alpha}{opentf.textcolor["reset"]}...')
+                        self.model.save(modelfile.replace('.pt', f'.e{epoch}.pt'))
             else: self.model.train(self.data, total_examples=self.model.corpus_count, epochs=self.cfg.e)
 
             log.info(f'Saving model at {modelfile} ...')

@@ -6,9 +6,9 @@ import pkgmgr as opentf
 from mdl.ntf import Ntf
 
 class Nmt(Ntf):
-    def __init__(self, output, pytorch, device, seed, cgf):
-        Nmt.onmt = opentf.install_import('OpenNMT-py', 'onmt') #3.3 >> it installs its own version of pytorch==2.0.1
-        super().__init__(output, None, device, seed, cgf)
+    def __init__(self, output, device, seed, cgf):
+        super().__init__(output, device, seed, cgf)
+        Nmt.onmt = opentf.install_import('OpenNMT-py', 'onmt')  # 3.3 >> it installs its own version of pytorch==2.0.1
 
     def _prep(self, teamsvecs, splits):
         log.info(f'Loading src and tgt files and/or folding folders for OpenNMT in {self.output} ...')
