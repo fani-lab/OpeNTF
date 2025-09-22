@@ -144,7 +144,7 @@ class Nmt(Ntf):
                 Y_ = np.zeros((Y.shape[0], Y.shape[1]))
                 for _ in range(Y.shape[0]):
                     predlist = (df_pred.iloc[_])[0]
-                    predlist = re.sub(r'\baveryunlikelytoken\w*\b', '', predlist).strip().replace('m', '').replace('<unk>', '').split()
+                    predlist = re.sub(r'\baveryunlikelytoken\w*\b', '', predlist).strip().replace('<unk>', '').replace('<s>', '').replace('m', '').split()
                     for pred in predlist: Y_[_, int(pred)] = 1/len(predlist)
 
                 log.info(f'Evaluating predictions at {self.output}/{predfile} ... for {evalcfg.metrics}')
