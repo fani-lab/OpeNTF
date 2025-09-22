@@ -12,7 +12,7 @@ Obtain hf token:
 4.In src/.env, add the token to the line with HF_API_TOKEN
 '''
 
-HfApi = opentf.install_import('huggingface-hub==0.33.0', 'huggingface_hub', 'HfApi')
+HfApi = opentf.install_import('huggingface_hub', from_module='HfApi')
 hf_api = HfApi(token=opentf.hf_token)
 
 

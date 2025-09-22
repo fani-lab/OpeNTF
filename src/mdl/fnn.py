@@ -11,7 +11,7 @@ from .earlystopping import EarlyStopping
 # from .superloss import SuperLoss
 
 class Fnn(Ntf):
-    def __init__(self, output, pytorch, device, seed, cgf): super().__init__(output, pytorch, device, seed, cgf)
+    def __init__(self, output, device, seed, cgf): super().__init__(output, device, seed, cgf)
 
     def init(self, input_size, output_size):
         class Model(Ntf.torch.nn.Module):
@@ -202,7 +202,7 @@ class Fnn(Ntf):
                                 output_mc = []; pred_uncertainty = []; model_uncertainty = []
                                 for mc_run in range(self.cfg.nmc): output_mc.append(Ntf.torch.nn.functional.sigmoid(self.model.forward(XX))) #model returns logits
                                 output = Ntf.torch.stack(output_mc)
-                                butil = opentf.install_import('', 'bayesian_torch.utils.util')
+                                butil = opentf.install_import('bayesian-torch', 'bayesian_torch.utils.util')
                                 pred_uncertainty.append(butil.predictive_entropy(output.data.cpu().numpy()))
                                 model_uncertainty.append(butil.mutual_information(output.data.cpu().numpy()))
                                 y_pred.append(output.mean(dim=0).cpu())

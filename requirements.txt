@@ -17,37 +17,48 @@ numpy==1.24.4 #cannot go above for gensim
 ## mdl.emb.gnn._prep()
 ## evl.metric.calculate_metrics()
 ## evl.metric.calculate_skill_coverage()
+
 #$ scikit-learn==1.2.2
 ## main.get_splits()
 ## mdl.emb.gnn.Gnn.eval()
 ## mdl.tntf.learn()
 ## evl.metric.calculate_auc_roc()
+
 #$ pandas==2.0.0
 ## cmn.repository.Repository.read_data()
 ## cmn.movie.Movie.read_data()
 ## cmn.patent.Patent.read_data()
 ## mdl.ntf.Ntf.evaluate()
 ## evl.metric.calculate_metrics()
+
 #$ matplotlib==3.7.5
 ## cmn.team.Team.plot_stats()
 ## mdl.ntf.Ntf.plot_roc()
+
 #$ natsort==8.4.0
 ## mdl.emb.d2v.D2v.order()
+
 #$ gensim==4.3.3 #needs numpy 1.24.4
 ## mdl.emb.d2v.D2v.train()
-#$ torch==2.2.2 --index-url https://download.pytorch.org/whl/cu124
+
+#$ torch==2.4.1 #--index-url https://download.pytorch.org/whl/cu118
 ## mdl.emb.gnn.Gnn.__init__() ./mdl/emb/__config__.yaml.pytorch
 ## mdl.ntf.Ntf.__init__() ./mdl/__config__.yaml.pytorch
-#$ torch_geometric==2.6.1 torch_cluster==1.6.3 torch_sparse==0.6.18 torch_scatter==2.1.2 -f https://data.pyg.org/whl/torch-{Gnn.torch.__version__}.html
+
+#$ torch_geometric==2.6.1 torch_cluster==1.6.3 torch_sparse==0.6.18 torch_scatter==2.1.2 -f https://data.pyg.org/whl/torch-2.4.1+cpu.html #torch-2.4.1+cu118.html should match the torch version
 ## mdl.emb.gnn.Gnn.__init__()
 ## mdl.ntf.Ntf.__init__()
-#$ tensorboard==2.14.0 tensorboardX==2.6.2.2 protobuf==3.20
+
+#$ tensorboardX==2.6.2.2 tensorboard==2.14.0 protobuf==3.20
 ## mdl.emb.gnn.Gnn.__init__()
 ## mdl.ntf.Ntf.__init__()
+
 #$ bayesian-torch==0.5.0
 ## mdl.bnn.Bnn.__init__()
+
 #$ pytrec-eval-terrier==0.5.2
 ## evl.metric.calculate_metrics()
+
 #$ OpenNMT-py==3.3 # uninstalls torch and reinstalls it for 2.0.1 -> conflicts with pyg. to make it gpu-ready: pip install torch==2.0.1+cu118 -f https://download.pytorch.org/whl/torch_stable.html
 ## mdl.nmt.__init__()
 

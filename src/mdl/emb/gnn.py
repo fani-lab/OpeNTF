@@ -9,11 +9,10 @@ class Gnn(T2v):
 
     def __init__(self, output, device, name, cgf):
         super().__init__(output, device, name, cgf)
-        Gnn.torch = opentf.install_import(cgf.pytorch, 'torch')
-        Gnn.pyg = opentf.install_import(f'torch_geometric==2.6.1 torch_cluster==1.6.3 torch_sparse==0.6.18 torch_scatter==2.1.2 pyg_lib==0.4.0 -f https://data.pyg.org/whl/torch-{Gnn.torch.__version__}.html', 'torch_geometric')
-        opentf.install_import('tensorboard==2.14.0', 'tensorboard')
+        Gnn.torch = opentf.install_import('torch')
+        Gnn.pyg = opentf.install_import('torch_geometric')
         opentf.set_seed(self.cfg.seed, Gnn.torch)
-        self.writer = opentf.install_import('tensorboardX==2.6.2.2', 'tensorboardX', 'SummaryWriter')
+        self.writer = opentf.install_import('tensorboardX', from_module='SummaryWriter')
         self.w = None
         self.decoder = None
 
@@ -25,7 +24,7 @@ class Gnn(T2v):
         # teamsvecs['skill']=lil_matrix(np.array([[1,1,0],[1,0,1],[1,1,1]]))
         # teamsvecs['member']=lil_matrix(np.array([[1,0,1,0],[1,1,0,0],[0,1,0,1]]))
         # teamsvecs['loc']=lil_matrix(np.array([[1,0],[0,1],[1,0]]))
-        tqdm = opentf.install_import('tqdm==4.65.0', 'tqdm', 'tqdm')
+        tqdm = opentf.install_import('tqdm', from_module='tqdm')
         file = self.output + f'/{self.cfg.graph.structure[1]}.{self.cfg.graph.dup_edge if self.cfg.graph.dup_edge else "dup"}.graph.pkl'
         try:
             log.info(f'Loading graph of {tuple(self.cfg.graph.structure)} from {file}  ...')
@@ -552,7 +551,7 @@ class Gnn(T2v):
     #     ground_truth = self.torch.cat(ground_truths, dim=0).cpu().numpy()
     #     loss = total_loss / total_examples
     #     #from sklearn.metrics import roc_auc_score
-    #     roc_auc_score = install_import('scikit-learn==1.2.2', 'sklearn.metrics', 'roc_auc_score')
+    #     roc_auc_score = install_import('scikit-learn', 'sklearn.metrics', 'roc_auc_score')
     #     auc = roc_auc_score(ground_truth, pred)
     #     print()
     #     print(f'Val loss : {loss:.6f}')

@@ -54,7 +54,7 @@ class D2v(T2v):
         modelfile = f'{self.output}/{modelstr}/{modelstr}.pt'
         try:
             log.info(f"Loading the model {modelfile} for {(teamsvecs['skill'].shape[0], self.cfg.d)} embeddings ...")
-            self.__class__.gensim = opentf.install_import('gensim==4.3.3', 'gensim')
+            self.__class__.gensim = opentf.install_import('gensim')
             self.model = self.gensim.models.Doc2Vec.load(modelfile)
             assert self.model.docvecs.vectors.shape[0] == teamsvecs['skill'].shape[0], f'{opentf.textcolor["red"]}Incorrect number of embeddings per team! {self.model.docvecs.vectors.shape[0]} != {teamsvecs["skill"].shape[0]}{opentf.textcolor["reset"]}'
             return self
@@ -98,7 +98,7 @@ class D2v(T2v):
     @staticmethod
     def natsortvecs(d2v_model_wv):
         import numpy as np
-        natsorted = opentf.install_import('natsort==8.4.0', 'natsort', 'natsorted')
+        natsorted = opentf.install_import('natsort', from_module='natsorted')
         sorted_words = natsorted(d2v_model_wv.index_to_key)  # ['m3', 's10', 's2', 's1'] --> ['m3', 's1', 's2', 's10']
         sorted_indices = np.array([d2v_model_wv.key_to_index[word] for word in sorted_words])
         return d2v_model_wv.vectors[sorted_indices]

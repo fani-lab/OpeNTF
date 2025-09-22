@@ -3,18 +3,17 @@ log = logging.getLogger(__name__)
 
 import pkgmgr as opentf
 class Ntf:
-    def __init__(self, output, pytorch, device, seed, cgf):
+    def __init__(self, output, device, seed, cgf):
         self.cfg = cgf
         self.seed = seed
         self.device = device
         self.model = None
         self.is_bayesian = False
-        Ntf.torch = opentf.install_import(pytorch, 'torch')
+        Ntf.torch = opentf.install_import('torch')
+        self.writer = opentf.install_import(pkg_name='tensorboardX', from_module='SummaryWriter')
         opentf.set_seed(self.seed, Ntf.torch)
-        opentf.install_import('tensorboard==2.14.0 protobuf==3.20', 'tensorboard')
         self.output = output + self.name()
         if not os.path.isdir(self.output): os.makedirs(self.output)
-        self.writer = opentf.install_import('tensorboardX==2.6.2.2', 'tensorboardX', 'SummaryWriter')
         class NtfDataset(Ntf.torch.utils.data.Dataset):
             def __init__(self, input_matrix, output_matrix):
                 super().__init__()
@@ -42,7 +41,7 @@ class Ntf:
     def test(self, teamsvecs, splits, testcfg): pass
     def evaluate(self, teamsvecs, splits, evalcfg):
         assert os.path.isdir(self.output), f'{opentf.textcolor["red"]}No folder for {self.output} exist!{opentf.textcolor["reset"]}'
-        pd = opentf.install_import('pandas==2.0.0', 'pandas')
+        pd = opentf.install_import('pandas')
         import evl.metric as metric
         y_test = teamsvecs['member'][splits['test']]
         # Rnd model does only have f*.test.pred files, no train or valid files >> skip them
@@ -95,7 +94,7 @@ class Ntf:
             mean_std.to_csv(f'{self.output}/{pred_set}.pred.eval.mean.csv')
             if evalcfg.per_instance: fold_mean_per_instance.truediv(len(splits['folds'].keys())).to_csv(f'{self.output}/{pred_set}.pred.eval.per_instance_mean.csv')
     def plot_roc(self, splits, on_train=False):
-        plt = opentf.install_import('matplotlib==3.7.5', 'matplotlib')
+        plt = opentf.install_import('matplotlib')
         for pred_set in (['test', 'train', 'valid'] if on_train else ['test']):
             plt.figure()
             for foldidx in splits['folds'].keys():

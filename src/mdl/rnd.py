@@ -4,7 +4,7 @@ log = logging.getLogger(__name__)
 from .ntf import Ntf
 
 class Rnd(Ntf):
-    def __init__(self, output, device, pytorch, seed, cgf): super(Rnd, self).__init__(output, device, pytorch, seed, cgf)
+    def __init__(self, output, device, seed, cgf): super(Rnd, self).__init__(output, device, seed, cgf)
 
     def test(self, teamsvecs, splits, testcfg):
         X_test = teamsvecs['skill'][splits['test'], :]

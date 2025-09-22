@@ -7,7 +7,7 @@ import pkgmgr as opentf
 class Team(object):
     def __init__(self, id, members, skills, datetime, location=None):
         self.id = int(id)
-        self.datetime = opentf.install_import('python-dateutil==2.9', 'dateutil', 'parser').parse(str(datetime)).year if datetime else None
+        self.datetime = opentf.install_import('python-dateutil', 'dateutil', 'parser').parse(str(datetime)).year if datetime else None
         self.members = members
         self.skills = skills
         self.location = location
@@ -250,7 +250,7 @@ class Team(object):
                 data = scipy.sparse.vstack(data, 'lil')#{'bsr', 'coo', 'csc', 'csr', 'dia', 'dok', 'lil'}, By default an appropriate sparse matrix format is returned!!
 
             elif 'acceleration' in cfg and 'cuda' in cfg.acceleration:
-                torch = opentf.install_import(cfg.pytorch, 'torch')
+                torch = opentf.install_import('torch')
                 try: torch.tensor([1.0], device=(device := torch.device(cfg.acceleration if ':' in cfg.acceleration else 'cuda:0')))
                 except RuntimeError as e: raise RuntimeError(f'{opentf.textcolor["red"]}{cfg.acceleration}-->{device} is not available or invalid!{opentf.textcolor["reset"]}') from e
                 log.info(f'Using gpu {opentf.textcolor["blue"]}{cfg.acceleration}-->{device}{opentf.textcolor["reset"]} for teams vectors generation ...')
@@ -497,7 +497,7 @@ class Team(object):
 
     @staticmethod
     def plot_stats(stats, output, plot_title):
-        plt = opentf.install_import('matplotlib==3.7.5', 'matplotlib.pyplot')
+        plt = opentf.install_import('matplotlib', 'matplotlib.pyplot')
         plt.rcParams.update({'font.family': 'Consolas'})
         for k, v in stats.items():
             if '*' in k: print(f'{k} : {v}'); continue

@@ -1,5 +1,4 @@
 seed: # will be overriden dynamically in ./src/main.py from root ./__config__.yaml
-pytorch: #will be overriden dynamically in ./src/main.py from root ./__config__.yaml
 batch_size: 1000 # batch_size for loaders
 epochs: 100 # num max epochs
 nsd: unigram_b # negetative sampling distribution (heuristics): uniform, unigram, unigram_b

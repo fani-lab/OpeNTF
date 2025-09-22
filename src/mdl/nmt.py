@@ -7,7 +7,7 @@ from mdl.ntf import Ntf
 
 class Nmt(Ntf):
     def __init__(self, output, pytorch, device, seed, cgf):
-        Nmt.onmt = opentf.install_import('OpenNMT-py==3.3', 'onmt') #3.3 >> it installs its own version of pytorch==2.0.1
+        Nmt.onmt = opentf.install_import('OpenNMT-py', 'onmt') #3.3 >> it installs its own version of pytorch==2.0.1
         super().__init__(output, None, device, seed, cgf)
 
     def _prep(self, teamsvecs, splits):
@@ -53,7 +53,7 @@ class Nmt(Ntf):
             # p.wait()
 
             #NOTE: it overrides the main command
-            onmt_build = opentf.install_import('', 'onmt.bin.build_vocab', 'main')
+            onmt_build = opentf.install_import('OpenNMT-py', 'onmt.bin.build_vocab', 'main')
             sys.argv += ['onmt_build_vocab', '-config', f'{self.output}/f{foldidx}.config.yml']
             onmt_build()
 
@@ -62,7 +62,7 @@ class Nmt(Ntf):
 
     def learn(self, teamsvecs, splits, prev_model):
         self._prep(teamsvecs, splits)
-        onmt_train = opentf.install_import('', 'onmt.bin.train', 'main')
+        onmt_train = opentf.install_import('OpenNMT-py', 'onmt.bin.train', 'main')
         for foldidx in splits['folds'].keys():
             train_size = len(splits['folds'][foldidx]['train'])
             onmtcfg = OmegaConf.load(f'{self.output}/f{foldidx}.config.yml')
@@ -125,7 +125,7 @@ class Nmt(Ntf):
     
     #TODO: many code overlaps with ntf.evaluate ...
     def evaluate(self, teamsvecs, splits, evalcfg):
-        pd = opentf.install_import('pandas==2.0.0', 'pandas')
+        pd = opentf.install_import('pandas')
         import evl.metric as metric
         fold_mean = pd.DataFrame()
         mean_std = pd.DataFrame()

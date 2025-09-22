@@ -33,7 +33,7 @@ class Publication(Team):
 
     @staticmethod
     def read_data(datapath, output, cfg, indexes_only=False):
-        tqdm = opentf.install_import('tqdm==4.65.0', 'tqdm', 'tqdm')
+        tqdm = opentf.install_import('tqdm', from_module='tqdm')
         try: return super(Publication, Publication).load_data(output, indexes_only)
         except (FileNotFoundError, EOFError) as e:
             log.info(f'Pickles not found! Reading raw data from {datapath} (progress in bytes) ...')

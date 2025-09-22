@@ -3,9 +3,9 @@ log = logging.getLogger(__name__)
 
 import pkgmgr as opentf
 def calculate_metrics(Y, Y_, topK=None, per_instance=False, metrics=['P_2,5', 'recall_2,5', 'ndcg_cut_2,5']):
-    pd = opentf.install_import('pandas==2.0.0', 'pandas')
-    tqdm = opentf.install_import('tqdm==4.65.0', 'tqdm', 'tqdm')
-    pytrec_eval = opentf.install_import('pytrec-eval-terrier==0.5.7', 'pytrec_eval')
+    pd = opentf.install_import('pandas')
+    tqdm = opentf.install_import('tqdm', from_module='tqdm')
+    pytrec_eval = opentf.install_import('pytrec-eval-terrier', 'pytrec_eval')
     qrel = dict(); run = dict()
     log.info(f'Building pytrec_eval input for {Y.shape[0]} instances ...')
     k = min(topK, Y_.shape[1]) if topK else Y_.shape[1] #first stage topK for efficiency in space and speed
@@ -20,13 +20,13 @@ def calculate_metrics(Y, Y_, topK=None, per_instance=False, metrics=['P_2,5', 'r
     return df if per_instance else None, df_mean
 
 def calculate_auc_roc(Y, Y_, curve=False):
-    scikit = opentf.install_import('scikit-learn==1.2.2', 'sklearn.metrics')
+    scikit = opentf.install_import('scikit-learn', 'sklearn.metrics')
     auc = scikit.roc_auc_score(Y.toarray(), Y_, average='micro', multi_class="ovr")
     if curve: fpr, tpr, _ = scikit.roc_curve(Y.toarray().ravel(), Y_.ravel())
     return auc, (fpr, tpr) if curve else None
 
 def calculate_skill_coverage(X, Y_, expertskillvecs, per_instance=False, topks='2,5,10'):#skillcoveragevecs: ExS, X: BatchxS, Y_: BatchxE
-    tqdm = opentf.install_import('tqdm==4.65.0', 'tqdm', 'tqdm')
+    tqdm = opentf.install_import('tqdm', from_module='tqdm')
     B, E = Y_.shape #batches of output expert recommendations for each team
     assert not np.any(np.all(X.toarray() != 0, axis=1)), f'{opentf.textcolor["red"]}The skill vectors are not multi-hot to show the skill subset!{opentf.textcolor["reset"]}'
     skill_coverages = {int(k): np.zeros(B) for k in topks.split(',')}
@@ -51,7 +51,7 @@ def calculate_skill_coverage(X, Y_, expertskillvecs, per_instance=False, topks='
                 skill_coverages[k][b] = np.dot(X_, X[b].transpose()).sum() / X[b].sum() # let it raise exception if divide by 0 (must not happen as it shows empty required skills)
             pbar.update(1)
 
-    pd = opentf.install_import('pandas==2.0.0', 'pandas')
+    pd = opentf.install_import('pandas')
     df_skc = pd.DataFrame(data=[v for v in skill_coverages.values()], index=[f'skill_coverage_{k}' for k in skill_coverages.keys()])
     return df_skc, df_skc.mean(axis=1).to_frame('mean')
 

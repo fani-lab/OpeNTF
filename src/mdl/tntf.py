@@ -5,8 +5,8 @@ import pkgmgr as opentf
 from mdl.ntf import Ntf
 
 class tNtf(Ntf):
-    def __init__(self, output, device, pytorch, seed, cgf, model=None):
-        super(tNtf, self).__init__(output, device, pytorch, seed, cgf)
+    def __init__(self, output, device, seed, cgf, model=None):
+        super(tNtf, self).__init__(output, device, seed, cgf)
         self.model = model
 
     def name(self): return self.__class__.__name__.lower() + '.' + self.model.__class__.__name__.lower() # e.g., tNtf.Rnd
@@ -15,7 +15,7 @@ class tNtf(Ntf):
         year_idx = indexes['i2y']
         items_in_directory = [int(item) for item in os.listdir(self.model.output) if item.isdigit()]
 
-        scikit = opentf.install_import('scikit-learn==1.2.2', 'sklearn.model_selection')
+        scikit = opentf.install_import('scikit-learn', 'sklearn.model_selection')
 
         for i, v in enumerate(year_idx[:-self.cfg.step_ahead]):#the last years are for test.
             n_years_trained = len(items_in_directory)
