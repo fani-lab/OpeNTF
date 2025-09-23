@@ -57,11 +57,13 @@ class Ntf:
                 predfiles = [f'{self.output}/f{foldidx}.{pred_set}.pred'] #the first file as a hook
                 if evalcfg.per_epoch: predfiles += [f'{self.output}/{_}' for _ in os.listdir(self.output) if re.match(f'f{foldidx}.{pred_set}.e\d+.pred$', _)]
                 for i, predfile in enumerate(sorted(sorted(predfiles), key=len)): #the first file is/should be non-epoch-based
-                    Y_ = Ntf.torch.load(predfile, map_location=self.device)['y_pred']
+                    # in test, we accumulate preds in main memory when ntf.test() due to issue #320: https://github.com/fani-lab/OpeNTF/issues/320
+                    # so all preds tensors are already in cpu, but just in case map_location='cpu'
+                    Y_ = Ntf.torch.load(predfile, map_location='cpu')['y_pred']
                     log.info(f'Evaluating predictions at {predfile} ... for {evalcfg.metrics}')
 
                     #evl.metric works on numpy or scipy.sparse. so, we need to convert Y_ which is torch.tensor, either sparse or not
-                    Y_ = Y_.cpu().to_dense().numpy()
+                    Y_ = Y_.to_dense().numpy()
 
                     log.info(f'{evalcfg.metrics.trec} ...')
                     df, df_mean = metric.calculate_metrics(Y, Y_, evalcfg.topK, evalcfg.per_instance, evalcfg.metrics.trec)
