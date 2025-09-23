@@ -156,6 +156,11 @@ class Gnn(T2v):
                                                       context_size=self.cfg.model.w,
                                                       walks_per_node=self.cfg.model.wn,
                                                       num_negative_samples=self.cfg.model.ns).to(self.device)
+                # m2v only creates embeddings for node types in metapaths, it skips for others, so
+                # the global ids of valid nodes (member -> team) should be back to local ids relative to original graph
+                # then back ids relative to m2v indexing
+                val_m_t_edge_index_homo[0] = val_m_t_edge_index_homo[0] - offsets['member'] + self.model.start['member']
+                val_m_t_edge_index_homo[1] = val_m_t_edge_index_homo[1] - offsets['team'] + self.model.start['team']
                 self._train_rw(splits, foldidx, val_m_t_edge_index_homo)
                 self._get_node_emb() #logging purposes
 

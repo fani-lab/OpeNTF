@@ -72,7 +72,7 @@ train:
   train_test_ratio: 0.85 #the nfolds will be on the trainig part.
   merge_teams_w_same_skills: False # for explanation >> https://github.com/fani-lab/OpeNTF/issues/156
   step_ahead: #NOTE: setting this tag trigger temporal train/test splits for tNtf: streaming/temporal training. for now, it means that whatever are in the last [step_ahead] time interval will be the test set!
-  save_per_epoch: 5 # if 0, no per epoch save, if nonzero x, every x epoch. Also, due to early stopping the number of files could be less than the max training epoch
+  save_per_epoch: 10 # if 0, no per epoch save, if nonzero x, every x epoch. Also, due to early stopping the number of files could be less than the max training epoch
 
 test:
   on_train: False # for over vs. under-fitting check. # random baseline (mdl.rnd.Rnd()) cannot join this.

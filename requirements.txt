@@ -9,7 +9,7 @@ scipy==1.10.1
 numpy==1.24.4 #cannot go above for gensim
 
 #########on-demand packages
-#$ python-dateutil==2.9
+#$ python-dateutil==2.9.0
 ## cmn.team.__init__()
 
 #$ huggingface-hub==0.33.0
