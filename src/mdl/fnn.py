@@ -86,6 +86,8 @@ class Fnn(Ntf):
         w = self.writer(log_dir=f'{self.output}/logs4tboard/run_{int(time.time())}')
         for foldidx in splits['folds'].keys():
 
+            # TODO: to inject fold-based pretrained t2v embeddings for skills
+
             X_train = teamsvecs['skill'][splits['folds'][foldidx]['train'], :]
             y_train = teamsvecs['member'][splits['folds'][foldidx]['train']]
             X_valid = teamsvecs['skill'][splits['folds'][foldidx]['valid'], :]

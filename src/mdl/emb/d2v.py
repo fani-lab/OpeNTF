@@ -15,7 +15,7 @@ from .t2v import T2v
 class D2v(T2v):
     gensim = None
 
-    def _prep(self, teamsvecs, indexes, splits):
+    def _prep(self, teamsvecs, indexes, splits=None):
         datafile = self.output + f'/{self.cfg.embtype}.docs.pkl'
         try:
             log.info(f'Loading teams as docs {datafile}  ...')
@@ -47,7 +47,7 @@ class D2v(T2v):
             with open(datafile, 'wb') as f: pickle.dump(self.data, f)
             return self
 
-    def train(self, teamsvecs, indexes, splits):
+    def learn(self, teamsvecs, indexes, splits=None):
         # to select/create correct model file in the output directory
         modelstr = f'{self.name}.d{self.cfg.d}.e{self.cfg.e}.w{self.cfg.w}.dm{self.cfg.dm}.{self.cfg.embtype}'
         modelpath = f'{self.output}/{modelstr}/'
@@ -60,7 +60,7 @@ class D2v(T2v):
             return self
         except FileNotFoundError:
             log.info(f'File not found! Training the embedding model from scratch ...')
-            self._prep(teamsvecs, indexes, splits)
+            self._prep(teamsvecs, indexes)
             self.output = modelpath
             if not os.path.isdir(self.output): os.makedirs(self.output)
             self.model = self.gensim.models.Doc2Vec(min_count=1, dbow_words=1, # keep it always one as it may be needed for gnn-based method for 'pre' config, i.e., initial node features

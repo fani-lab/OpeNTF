@@ -16,7 +16,7 @@ class Gnn(T2v):
         self.w = None
         self.decoder = None
 
-    def _prep(self, teamsvecs, indexes, splits):
+    def _prep(self, teamsvecs, indexes, splits=None):
         #NOTE: for any change, unit test using https://github.com/fani-lab/OpeNTF/issues/280
         # import numpy as np
         # from scipy.sparse import lil_matrix
@@ -70,8 +70,8 @@ class Gnn(T2v):
             with open(file, 'wb') as f: pickle.dump(self.data, f)
             return self.data
 
-    def train(self, teamsvecs, indexes, splits):
-        self._prep(teamsvecs, None, splits)
+    def learn(self, teamsvecs, indexes, splits=None):
+        self._prep(teamsvecs, indexes=None)
         self.cfg.model = self.cfg[self.name] #gnn.n2v or gnn.gs --> gnn.model
         self.output += f'/{self.name}.d{self.cfg.model.d}.e{self.cfg.model.e}.ns{self.cfg.model.ns}.{self.cfg.graph.dup_edge}.{self.cfg.graph.structure[1]}'
         self.output += f'{".pre" if self.cfg.graph.pre else ""}'
@@ -173,6 +173,7 @@ class Gnn(T2v):
                 # if self.name == 'lant': self.model.learn(self, self.cfg.model.e)  # built-in validation inside lant_encoder class
                 raise NotImplementedError(f'{self.name} not integrated!')
 
+            # TODO: make the mp-based gnn for folds
             # message-passing-based >> default on homo, but can be wrapped into HeteroConv
             elif self.name in {'gcn', 'gs', 'gat', 'gatv2', 'gin'}:
                 if foldidx == 0: self.output += f'.d{self.cfg.model.d}.e{self.cfg.model.e}.b{self.cfg.model.b}.lr{self.cfg.model.lr}.ns{self.cfg.model.ns}.h{"-".join([str(i) for i in self.cfg.model.h])}.nn{"-".join([str(i) for i in self.cfg.model.nn])}'

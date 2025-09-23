@@ -105,7 +105,7 @@ def run(cfg):
             cls = get_class(cls)
             #t2v = cls(cfg.data.output, cfg.data.acceleration, method, cfg.data.embedding.config.model[cls.__name__.lower()])
             t2v = cls(cfg.data.output, cfg.acceleration, method, cfg.data.embedding.config.model[cls.__name__.lower()])
-            t2v.train(teamsvecs, indexes, splits)
+            t2v.learn(teamsvecs, indexes, splits)
 
     if cfg.cmd and any(c in cfg.cmd for c in ['train', 'test', 'eval']):
 
@@ -132,6 +132,9 @@ def run(cfg):
 
         if cfg.train.merge_teams_w_same_skills: domain_cls.merge_teams_by_skills(teamsvecs, inplace=True)
 
+        # TODO: this way of injecting skill embeddings are not fold-based
+        # TODO: the ntf models know the fold inside ntf.learn()
+        # TODO: the gnn models need to inherit ntf to act like them
         if 'embedding' in cfg.data and cfg.data.embedding.class_method:
             # t2v object knows the embedding method and ...
             skill_vecs = t2v.get_dense_vecs(teamsvecs, vectype='skill')
