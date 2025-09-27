@@ -1,7 +1,3 @@
-# TODO: this way of injecting skill embeddings are not fold-based
-# TODO: the ntf models know the fold inside ntf.learn()
-# TODO: to inject fold-based pretrained t2v embeddings for skills
-
 # TODO: the gnn models need to inherit ntf to act like them
 graph neural network - e2e with transfer support (transductive splits per fold)
 node2vec, metapath2vec, homo versions (gcn, gs, gat, gatv2, gin)

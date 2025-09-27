@@ -133,9 +133,11 @@ def run(cfg):
 
         if cfg.train.merge_teams_w_same_skills: domain_cls.merge_teams_by_skills(teamsvecs, inplace=True)
 
-        # TODO: this way of injecting skill embeddings are not fold-based
-        # TODO: the ntf models know the fold inside ntf.learn()
-        # TODO: the gnn models need to inherit ntf to act like them
+        #  this way of injecting skill embeddings are not fold-based >> https://github.com/fani-lab/OpeNTF/issues/324
+        #  the ntf models know the fold inside ntf.learn()
+        #  but since the folding remove the team-member links, and embeddings are mainly used for skills (transfer-based)
+        #  t2v.get_dense_vecs returns the vecs from t2v.model in the last fold (after going through the earlier folds)
+        #  I think no big deal for the underlying fnn/bnn, all their folds use the skill embeddings based on graph based on last fold
         if 'embedding' in cfg.data and cfg.data.embedding.class_method:
             # t2v object knows the embedding method and ...
             skill_vecs = t2v.get_dense_vecs(teamsvecs, vectype='skill')
