@@ -11,10 +11,9 @@ import pkgmgr as opentf
 # from cmn.tools import popular_nonpopular_ratio, generate_popular_and_nonpopular
 
 def get_splits(n_sample, n_folds, train_ratio, output, seed, year_idx=None, step_ahead=1):
-    splitf = f'{output}/splits.pkl'
     try:
-        log.info(f'Loading splits from {splitf} ...')
-        with open(splitf, 'rb') as f: splits = pickle.load(f)
+        log.info(f'Loading splits from {output} ...')
+        with open(output, 'rb') as f: splits = pickle.load(f)
         return splits
     except FileNotFoundError as e:
         scikit = opentf.install_import('scikit-learn', 'sklearn.model_selection')
@@ -33,7 +32,7 @@ def get_splits(n_sample, n_folds, train_ratio, output, seed, year_idx=None, step
             splits['folds'][k]['train'] = train[trainIdx]
             splits['folds'][k]['valid'] = train[validIdx]
 
-        with open(splitf, 'wb') as f: pickle.dump(splits, f)
+        with open(output, 'wb') as f: pickle.dump(splits, f)
         return splits
 
 def aggregate(output):
@@ -85,11 +84,13 @@ def run(cfg):
         year_idx.append(indexes['i2y'][-1])
         indexes['i2y'] = year_idx
 
-        splits = get_splits(teamsvecs['skill'].shape[0], cfg.train.nfolds, cfg.train.train_test_ratio, cfg.data.output, cfg.seed, indexes['i2y'] if cfg.train.step_ahead else None, step_ahead=cfg.train.step_ahead)
+        splitstr = f'/splits.f{cfg.train.nfolds}.r{cfg.train.train_test_ratio}'
+        splits = get_splits(teamsvecs['skill'].shape[0], cfg.train.nfolds, cfg.train.train_test_ratio, f'{cfg.data.output}{splitstr}.pkl', cfg.seed, indexes['i2y'] if cfg.train.step_ahead else None, step_ahead=cfg.train.step_ahead)
 
         # move this call for evaluation part?
         # skill coverage metric, all skills of each expert, all expert of each skills (supports of each skill, like in RarestFirst)
         teamsvecs['skillcoverage'] = domain_cls.gen_skill_coverage(teamsvecs, cfg.data.output, skipteams=splits['test'])
+        cfg.data.output += splitstr #all models of anytype should be under a split strategy
 
         if 'embedding' in cfg.data and cfg.data.embedding.class_method:
             # Get command-line overrides for embedding. Kinda tricky as we dynamically override a subconfig.

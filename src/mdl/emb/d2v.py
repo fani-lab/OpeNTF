@@ -16,7 +16,7 @@ class D2v(T2v):
     gensim = None
 
     def _prep(self, teamsvecs, indexes, splits=None):
-        datafile = self.output + f'/{self.cfg.embtype}.docs.pkl'
+        datafile = self.output + f'/../{self.cfg.embtype}.docs.pkl'
         try:
             log.info(f'Loading teams as docs {datafile}  ...')
             with open(datafile, 'rb') as infile: self.data = pickle.load(infile)
