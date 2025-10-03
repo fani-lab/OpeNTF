@@ -59,10 +59,18 @@ models:
     - mdl.fnn.Fnn #input skills can be multihot (default), embeddings by d2v, n2v, m2v, ... see above data.embedding.class_method
     - mdl.bnn.Bnn #thanks to bayesian-torch package at https://github.com/IntelLabs/bayesian-torch
     - mdl.nmt.Nmt
-    #- mdl.rrn.Rrn     #external baseline >> isn't it temporal?
+    #- mdl.gtf.Gtf_mdl.emb.gnn.Gnn_n2v   #Node2Vec https://pytorch-geometric.readthedocs.io/en/latest/generated/torch_geometric.nn.models.Node2Vec.html
+    #- mdl.gtf.Gtf_mdl.emb.gnn.Gnn_m2v   #Metapath2Vec https://pytorch-geometric.readthedocs.io/en/latest/generated/torch_geometric.nn.models.MetaPath2Vec.html
+    #- mdl.gtf.Gtf_mdl.emb.gnn.Gnn_gcn   #GraphConvolutionNetwork https://pytorch-geometric.readthedocs.io/en/latest/generated/torch_geometric.nn.conv.GCNConv.html
+    #- mdl.gtf.Gtf_mdl.emb.gnn.Gnn_gs    #GraphSAGE https://pytorch-geometric.readthedocs.io/en/latest/generated/torch_geometric.nn.conv.SAGEConv.html
+    #- mdl.gtf.Gtf_mdl.emb.gnn.Gnn_gat   #GraphAttentionNetwork https://pytorch-geometric.readthedocs.io/en/latest/generated/torch_geometric.nn.conv.GATConv.html
+    #- mdl.gtf.Gtf_mdl.emb.gnn.Gnn_gatv2 #GraphAttentionNetwork https://pytorch-geometric.readthedocs.io/en/latest/generated/torch_geometric.nn.conv.GATv2Conv.html
+    #- mdl.gtf.Gtf_mdl.emb.gnn.Gnn_gin   #GraphIsomorphicNetwork
+
     ## NOTE: temporal baselines should not be mixed with non-temporal ones as the training/test splits are temporal based on train.step_ahead
-    #- mdl.tnmt.tNmt
     #- mdl.tntf.tNtf_mdl.rnd.Rnd   #underlying base model could be fnn and bnn. future: tgnn?. train.step_ahead must be set.
+    #- mdl.tnmt.tNmt
+    #- mdl.rrn.Rrn     #external baseline >> isn't it temporal?
     #- mdl.caser.Caser #external baseline
 
   config: ./mdl/__config__.yaml

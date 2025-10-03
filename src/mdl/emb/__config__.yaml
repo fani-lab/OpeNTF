@@ -1,7 +1,6 @@
 dim: 128 # embedding dim. it matters for skill vectors if the skill set is small (e.g., in imdb or gith) or large (e.g., in dblp or uspt)
 
 model:
-  seed: # will be overriden dynamically in ./src/main.py from root ./config.yml
   batch_size: 1000 # batch_size for loaders
   epochs: 100 # num max epochs
   ns: 5 # number of negative samples for each positive sample
@@ -11,7 +10,6 @@ model:
 
   # Quoc V. Le, Tomás Mikolov: Distributed Representations of Sentences and Documents. ICML 2014: 1188-1196
   d2v: # we use gensim
-    seed: ${model.seed}
     embtype: skill # skill, member, skillmember, skilltime
     dm: 1 # training algorithm. 1: distributed memory (PV-DM), 0: distributed bag of words (PV-DBOW)
     # NOTE: As the input is a skill subset, so either the sum/avg of skill vectors individually >> embtype = 'skill' or 'joint' and  dbow_words = True
@@ -46,7 +44,6 @@ model:
         #d2v.d9.e100.w10.dm1.skill  # if not exists, train from scratch!
 
     pytorch: #will be overriden dynamically in ./src/main.py from root ./__config__.yaml
-    seed: ${model.seed}
     model: #dummy tag as placeholder. don't worry or touch it.
 
     #Grover, Aditya, and Jure Leskovec. "node2vec: Scalable feature learning for networks." Proceedings of the 22nd ACM SIGKDD international conference on Knowledge discovery and data mining. 2016.

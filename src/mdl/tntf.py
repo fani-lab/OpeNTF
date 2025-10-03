@@ -6,7 +6,7 @@ from mdl.ntf import Ntf
 
 class tNtf(Ntf):
     def __init__(self, output, device, seed, cgf, model=None):
-        super(tNtf, self).__init__(output, device, seed, cgf)
+        super().__init__(output, device, seed, cgf)
         self.model = model
 
     def name(self): return self.__class__.__name__.lower() + '.' + self.model.__class__.__name__.lower() # e.g., tNtf.Rnd

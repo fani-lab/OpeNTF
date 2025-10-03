@@ -1,12 +1,6 @@
-# TODO: the gnn models need to inherit ntf to act like them
 graph neural network - e2e with transfer support (transductive splits per fold)
 node2vec, metapath2vec, homo versions (gcn, gs, gat, gatv2, gin)
-- test
 - eval
-
-- test
-- eval
-
 
 multilayer neural classifiers
 
@@ -61,7 +55,6 @@ why not d2v when we have team, skill, and member vectors?
 update/check cmn.team.Team.get_stats()
 update/check cmn.patent.Patent.get_stats()
 make cmn.team.Team.get_stats() gpu-friendly
-make cmn.team.Team.get_teamsvecs() gpu-friendly (Kap's pr)
 
 =======================================================
 

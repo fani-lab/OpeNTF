@@ -98,14 +98,13 @@ def run(cfg):
             # Use '+data.embedding.{...}=null' to drop. The '~data.embedding.{...}' cannot be used here.
             emb_overrides = [o.replace('+data.embedding.', '') for o in HydraConfig.get().overrides.task if '+data.embedding.' in o]
             embcfg = OmegaConf.merge(OmegaConf.load(cfg.data.embedding.config), OmegaConf.from_dotlist(emb_overrides))
-            embcfg.model.seed = cfg.seed
             embcfg.model.spe = cfg.train.save_per_epoch
             OmegaConf.resolve(embcfg)
             cfg.data.embedding.config = embcfg
             cls, method = cfg.data.embedding.class_method.split('_') if cfg.data.embedding.class_method.find('_') else (cfg.data.embedding.class_method, None)
             cls = get_class(cls)
             #t2v = cls(cfg.data.output, cfg.data.acceleration, method, cfg.data.embedding.config.model[cls.__name__.lower()])
-            t2v = cls(cfg.data.output, cfg.acceleration, method, cfg.data.embedding.config.model[cls.__name__.lower()])
+            t2v = cls(cfg.data.output, cfg.acceleration, cfg.seed, cfg=cfg.data.embedding.config.model[cls.__name__.lower()], name=method)
             t2v.learn(teamsvecs, indexes, splits)
 
     if cfg.cmd and any(c in cfg.cmd for c in ['train', 'test', 'eval']):
@@ -150,10 +149,12 @@ def run(cfg):
             cls = get_class(cls_method[0])
             output_ = (t2v.output if t2v else cfg.data.output)
             models[m] = cls(output_, cfg.acceleration, cfg.seed, cfg.models.config[cls.__name__.lower()])
-            if len(cls_method) > 1: #e.g., in mdl.tntf.tNtf that we need the core model
+
+            if len(cls_method) > 1: #for those wrappers that need internal model like tNtf or Gtf
                 cls = get_class(cls_method[1])
-                models[m].model = cls(output_, cfg.acceleration, cfg.seed, cfg.models.config[cls.__name__.lower()])
-            # find a way to show model-emb pair setting
+                models[m].model = cls(output_, cfg.acceleration, cfg.seed, cfg.models.config[cls.__name__.lower()], ** {'model': cls_method[2]} if len(cls_method) > 2 else {})
+                #TODO: the gnn config in mdl/__config__.yaml >> borrow the idea from data.embedding above
+
             if 'train' in cfg.cmd:
                 log.info(f'{opentf.textcolor["blue"]}Training team recommender instance {m} ... {opentf.textcolor["reset"]}')
                 models[m].learn(teamsvecs, splits, None)

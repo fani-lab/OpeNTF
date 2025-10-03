@@ -7,16 +7,16 @@ from .t2v import T2v
 
 class Gnn(T2v):
 
-    def __init__(self, output, device, name, cgf):
-        super().__init__(output, device, name, cgf)
+    def __init__(self, output, device, seed, cfg, model):
+        super().__init__(output, device, seed, cfg, model)
         Gnn.torch = opentf.install_import('torch')
         Gnn.pyg = opentf.install_import('torch_geometric')
-        opentf.set_seed(self.cfg.seed, Gnn.torch)
+        opentf.set_seed(self.seed, Gnn.torch)
         self.writer = opentf.install_import('tensorboardX', from_module='SummaryWriter')
         self.w = None
         self.decoder = None
 
-    def _prep(self, teamsvecs, indexes, splits=None):
+    def _prep(self, teamsvecs, splits=None, time_indexes=None):
         #NOTE: for any change, unit test using https://github.com/fani-lab/OpeNTF/issues/280
         # import numpy as np
         # from scipy.sparse import lil_matrix
@@ -70,13 +70,13 @@ class Gnn(T2v):
             with open(file, 'wb') as f: pickle.dump(self.data, f)
             return self.data
 
-    def learn(self, teamsvecs, indexes, splits=None):
-        self._prep(teamsvecs, indexes=None)
+    def learn(self, teamsvecs, splits=None, time_indexes=None):
+        self._prep(teamsvecs)
         self.cfg.model = self.cfg[self.name] #gnn.n2v or gnn.gs --> gnn.model
         self.output += f'/{self.name}.d{self.cfg.model.d}.e{self.cfg.model.e}.ns{self.cfg.model.ns}.{self.cfg.graph.dup_edge}.{self.cfg.graph.structure[1]}'
         self.output += f'{".pre" if self.cfg.graph.pre else ""}'
         # replace the 1 dimensional node features with pretrained d2v skill vectors of required dimension
-        if self.cfg.graph.pre: self._init_d2v_node_features(teamsvecs, indexes, splits)
+        if self.cfg.graph.pre: self._init_d2v_node_features(teamsvecs)
 
         log.info(f'{opentf.textcolor["blue"]}Training {self.name} {opentf.textcolor["reset"]}... ')
 
@@ -327,17 +327,17 @@ class Gnn(T2v):
 
         self.torch.save({'model_state_dict': self.model.state_dict(), 'cfg': self.cfg, 'f': foldidx, 'e': e, 't_loss': t_loss, 'v_loss': v_loss}, f'{self.output}/f{foldidx}.pt')
         log.info(f'{self.name} model with {opentf.cfg2str(self.cfg.model)} saved at {self.output}/f{foldidx}.pt')
-    def _init_d2v_node_features(self, teamsvecs, indexes, splits):
+
+    def _init_d2v_node_features(self, teamsvecs):
         flag = False
         log.info(f'Loading pretrained d2v embeddings {self.cfg.graph.pre} in {self.output} to initialize node features, or if not exist, train d2v embeddings from scratch ...')
         from .d2v import D2v
         d2v_cfg = opentf.str2cfg(self.cfg.graph.pre)
-        d2v_cfg.seed = self.cfg.seed
         d2v_cfg.embtype = self.cfg.graph.pre.split('.')[-1] # Check emb.d2v.D2v.train() for filename pattern
         d2v_cfg.lr = self.cfg.model.lr
         d2v_cfg.spe = self.cfg.model.spe
         # simple lazy load, or train from scratch if the file not found!
-        d2v_obj = D2v(self.output, self.device, 'd2v', d2v_cfg).learn(teamsvecs, indexes, splits)
+        d2v_obj = D2v(self.output, self.device, 'd2v', d2v_cfg).learn(teamsvecs, time_indexes=None, splits=None)
         # the order is NOT correct in d2v, i.e., vecs[0] may be for vecs['s20']. Call D2v.natsortvecs(d2v_obj.model.wv)
         # d2v = Doc2Vec.load(self.cfg.graph.pre)
         for node_type in self.data.node_types:
@@ -384,173 +384,3 @@ class Gnn(T2v):
                 type_embeddings = embeddings[node_type_tensor == i]  # shape: [num_nodes_of_type, self.cfg.model.d]
                 result[node_type] = type_embeddings
         return result
-
-    def _train_mp_split(self): pass
-
-
-
-    # def learn(self, loader, epochs):
-    #     import torch.nn.functional as F
-    #     #from mdl.earlystopping import EarlyStopping
-    #     es = install_import('', 'mdl.earlystopping', 'EarlyStopping')
-    #     epochs_taken = 0
-    #     loss_array = []; val_auc_array = []; val_loss_array = []
-    #     earlystopping = es(verbose=True, delta=0.001, path=f"{self.model_output}/state_dict_model.e{epochs}.pt", trace_func=log.info, save_model=False)
-    #     for epoch in range(1, epochs + 1):
-    #         self.optimizer.zero_grad()
-    #         total_loss = 0; total_examples = 0
-    #         self.torch.cuda.empty_cache()
-    #         # train for loaders of all edge_types, e.g : train_loader['skill','to','team'], train_loader['member','to','team']
-    #         for seed_edge_type in self.cfg.graph.supervision_edge_types:
-    #             print(f'epoch {epoch:03d} : batching for train_loader for seed_edge_type : {seed_edge_type}')
-    #             for sampled_data in loader[seed_edge_type]:
-    #                 self.optimizer.zero_grad()
-    #                 sampled_data.to(self.device)
-    #                 pred = self.model(sampled_data, seed_edge_type, self.is_directed)
-    #                 # The ground_truth and the pred shapes should be 1-dimensional
-    #                 # we squeeze them after generation
-    #                 if (type(sampled_data) == self.pyg.data.HeteroData): ground_truth = sampled_data[seed_edge_type].edge_label
-    #                 else: ground_truth = sampled_data.edge_label
-    #                 loss = F.binary_cross_entropy_with_logits(pred, ground_truth)
-    #                 loss.backward()
-    #                 self.optimizer.step()
-    #
-    #                 total_loss += float(loss) * pred.numel()  # each batch might not contain same number of predictions, so we normalize it using the individual number of preds each turn
-    #                 total_examples += pred.numel()
-    #         avg_loss = (total_loss / total_examples)
-    #         if (epoch % 10 == 0): log.info(f"\n.............Epoch: {epoch:03d}, Loss: {avg_loss:.6f}.............\n")
-    #         loss_array.append(avg_loss)
-    #
-    #         self.optimizer.zero_grad()
-    #         ls, auc = self.eval(self.val_loader)
-    #         val_loss_array.append(ls)
-    #         val_auc_array.append(auc)
-    #
-    #         epochs_taken += 1
-    #         earlystopping(val_loss_array[-1], self.model)
-    #         if earlystopping.early_stop:
-    #             print(f"Early Stopping Triggered at epoch: {epoch}")
-    #             break
-    #
-    #     # plot the figure and save
-    #     fig_output = f'{self.model_output}/{self.model_name}.{self.graph_type}.undir.{self.agg}.e{epochs}.ns{int(self.ns)}.b{self.b}.d{self.d}.png'
-    #     self.plot_graph(self.torch.arange(1, epochs_taken + 1, 1), loss_array, val_loss_array, fig_output=fig_output)
-    #     fig_output = f'{self.model_output}/{self.model_name}.{self.graph_type}.undir.{self.agg}.e{epochs}.ns{int(self.ns)}.b{self.b}.d{self.d}.val_auc_per_epoch.png'
-    #     self.plot_graph(self.torch.arange(1, epochs_taken + 1, 1), val_auc_array, xlabel='Epochs', ylabel='Val AUC', title=f'Validation AUC vs Epochs for Embedding Generation', fig_output=fig_output)
-    #
-    # def split(self, data, manual_neg_samples):
-    #     edge_types = None; rev_edge_types = None
-    #     if (type(data) == self.pyg.data.HeteroData):#from torch_geometric.data import HeteroData
-    #         num_edge_types = len(data.edge_types)
-    #         edge_types = data.edge_types[:num_edge_types // 2]
-    #         rev_edge_types = data.edge_types[num_edge_types // 2:]
-    #
-    #     transform = T.RandomLinkSplit(num_val=0.1, num_test=0.0, disjoint_train_ratio=0.3,
-    #         neg_sampling_ratio=0.0,             # we leave negative sampling to the mini_batch_loaders
-    #         add_negative_train_samples=False, edge_types=edge_types, rev_edge_types=rev_edge_types,
-    #     )
-    #
-    #     train_data, val_data, test_data = transform(data)
-    #     if manual_neg_samples:
-    #         for data_type in [train_data, val_data]: self.manual_negative_sampler(data_type, edge_types, self.ns)
-    #     train_data.validate(raise_on_error=True); val_data.validate(raise_on_error=True); test_data.validate(raise_on_error=True)
-    #
-    #     # if han, add metapaths to the metadata
-    #     if self.model_name == 'han':
-    #         from torch_geometric.transforms import AddMetaPaths
-    #         train_data = AddMetaPaths(metapaths=self.metapaths, drop_orig_edge_types=False, drop_unconnected_node_types=False)(train_data)
-    #         val_data = AddMetaPaths(metapaths=self.metapaths, drop_orig_edge_types=False, drop_unconnected_node_types=False)(val_data)
-    #
-    #     return train_data, val_data, test_data, edge_types, rev_edge_types
-    #
-    # def manual_negative_sampler(self, data_type, edge_types, num_samples_ratio):
-    #     from torch_geometric.utils import negative_sampling
-    #     for edge_type in edge_types:
-    #         pos_edge_index = data_type[edge_type].edge_label_index
-    #         num_pos_samples = pos_edge_index.shape[1]
-    #         num_neg_samples = int(num_samples_ratio * num_pos_samples)
-    #
-    #         neg_edge_index = negative_sampling( edge_index=data_type[edge_type].edge_index,
-    #             num_nodes=(data_type[edge_type[0]].num_nodes,data_type[edge_type[2]].num_nodes),  # Specify number of nodes if necessary
-    #             num_neg_samples=num_neg_samples, method='sparse'
-    #         )
-    #         # Concatenate positive and negative edges
-    #         new_edge_label_index = self.torch.cat([pos_edge_index, neg_edge_index], dim=1)
-    #         new_edge_label = self.torch.cat([self.torch.ones(num_pos_samples), self.torch.zeros(num_neg_samples)], dim=0)
-    #
-    #         data_type[edge_type].edge_label_index = new_edge_label_index
-    #         data_type[edge_type].edge_label = new_edge_label
-    #
-    #     return data_type
-    #
-    # def eval(self, loader):
-    #     import torch.nn.functional as F
-    #     preds = []; ground_truths = []
-    #     total_loss = 0; total_examples = 0
-    #     self.model.eval()
-    #     with self.torch.no_grad():
-    #         for seed_edge_type in self.cfg.graph.supervision_edge_types:
-    #             for sampled_data in loader[seed_edge_type]:
-    #                 sampled_data.to(self.device)
-    #                 tmp_pred = self.model(sampled_data, seed_edge_type, self.is_directed)
-    #                 if (type(sampled_data) == self.pyg.data.HeteroData): # we have ground_truths per edge_label_index
-    #                     tmp_ground_truth = sampled_data[seed_edge_type].edge_label
-    #                 else: tmp_ground_truth = sampled_data.edge_label
-    #
-    #                 assert tmp_pred.shape == tmp_ground_truth.shape
-    #                 loss = F.binary_cross_entropy_with_logits(tmp_pred, tmp_ground_truth)
-    #                 total_loss += float(loss) * tmp_pred.numel()
-    #                 total_examples += tmp_pred.numel()
-    #
-    #                 preds.append(tmp_pred)
-    #                 ground_truths.append(tmp_ground_truth)
-    #
-    #     pred = self.torch.cat(preds, dim=0).cpu().numpy()
-    #     ground_truth = self.torch.cat(ground_truths, dim=0).cpu().numpy()
-    #     loss = total_loss / total_examples
-    #     #from sklearn.metrics import roc_auc_score
-    #     roc_auc_score = install_import('scikit-learn', 'sklearn.metrics', 'roc_auc_score')
-    #     auc = roc_auc_score(ground_truth, pred)
-    #     print()
-    #     print(f'Val loss : {loss:.6f}')
-    #     print(f"Val AUC: {auc:.6f}\n")
-    #     # print(f'................... ending eval...................\n')
-    #     return loss, auc
-    #
-    # # made specifically for the gnn training
-    # def plot_graph(self, x, y, *args, xlabel='Epochs', ylabel='Loss', title='Loss vs Epochs', fig_output='plot.png'):
-    #     from matplotlib import pyplot as plt
-    #     plt.plot(x, y, label='Train')  # Plot the first set of data
-    #
-    #     if len(args) > 0:
-    #         plt.plot(x, args[0], label='Valid')  # Plot the second set of data
-    #         plt.legend()  # Add legend if there are two sets of data
-    #
-    #     plt.xlabel(xlabel)
-    #     plt.ylabel(ylabel)
-    #     plt.title(title)
-    #     print(f'\nsaving figure as : {fig_output}\n')
-    #     plt.savefig(fig_output)
-    #     plt.clf()
-    #     # plot.show()
-
-
-# @torch.no_grad()
-# def plot_points(colors):
-#     model.eval()
-#     z = model().cpu().numpy()
-#     z = TSNE(n_components=2).fit_transform(z)
-#     y = data.y.cpu().numpy()
-#
-#     plt.figure(figsize=(8, 8))
-#     for i in range(dataset.num_classes):
-#         plt.scatter(z[y == i, 0], z[y == i, 1], s=20, color=colors[i])
-#     # plt.scatter(z[:, 0], z[:, 1], s=20)
-#     plt.axis('off')
-#     plt.show()
-#
-#
-# colors = [
-#     '#ffc0cb', '#bada55', '#008080', '#420420', '#7fe5f0', '#065535', '#ffd700'
-# ]
-# plot_points(colors)

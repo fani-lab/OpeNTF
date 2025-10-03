@@ -2,7 +2,7 @@ import pickle, numpy as np, scipy.sparse
 import pandas as pd
 import torch
 from scipy.sparse import lil_matrix
-from .sparse_sgd import SparseSGD
+from src._msc.sparse_sgd import SparseSGD
 
 def get_class_data_params_n_optimizer(nr_classes, lr, device):
     class_parameters = torch.tensor(np.ones(nr_classes) * np.log(1.0), dtype=torch.float32, requires_grad=True, device=device)

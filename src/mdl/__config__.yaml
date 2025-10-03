@@ -53,6 +53,10 @@ nmt: #see __config__.nmt.yaml for the rest of hyperparameters, esp., encoder spe
   spe: ${spe}
   enc: transformer # rnn, cnn, # cnn is for convs2s
 
+gtf:
+
+gnn: ./mdl/emb/__config__.yaml
+
 # Fani, Barzegar, Dashti, Saeedi; A Streaming Approach to Neural Team Formation Training. ECIR2024. https://doi.org/10.1007/978-3-031-56027-9_20
 tntf:
   tfolds: # will be overriden dynamically in ./src/main.py from root ./__config__.yaml

@@ -15,8 +15,10 @@ from .t2v import T2v
 class D2v(T2v):
     gensim = None
 
-    def _prep(self, teamsvecs, indexes, splits=None):
+    def _prep(self, teamsvecs, splits=None, time_indexes=None):
         datafile = self.output + f'/../{self.cfg.embtype}.docs.pkl'
+        assert self.cfg.embtype == 'skilltime' and time_indexes, f'{opentf.textcolor["red"]}Temporal skill embedding needs time indexes!{opentf.textcolor["reset"]}'
+
         try:
             log.info(f'Loading teams as docs {datafile}  ...')
             with open(datafile, 'rb') as infile: self.data = pickle.load(infile)
@@ -25,14 +27,14 @@ class D2v(T2v):
             log.info(f'File not found! Creating the documents out of teams ...')
             self.data = []
             j = 0
-            year = indexes['i2y'][0][1]
+            year = time_indexes['i2y'][0][1] if self.cfg.embtype == 'skilltime' else None
             for i in range(teamsvecs['skill'].shape[0]): #or ['member'], as we are enumerating rows that shows teams
                 skill_doc = [f's{str(skill_idx)}' for skill_idx in teamsvecs['skill'][i, :].nonzero()[1]]
                 member_doc = [f'm{str(member_idx)}' for member_idx in teamsvecs['member'][i, :].nonzero()[1]]
 
                 # level up by a trigger
-                if j < len(indexes['i2y']) and indexes['i2y'][j][0] == i:
-                    year = indexes['i2y'][j][1]
+                if year and j < len(time_indexes['i2y']) and time_indexes['i2y'][j][0] == i:
+                    year = time_indexes['i2y'][j][1]
                     year_idx = j  # zero-based
                     j += 1
                 datetime_doc = [f'dt{str(year)}']
@@ -47,7 +49,7 @@ class D2v(T2v):
             with open(datafile, 'wb') as f: pickle.dump(self.data, f)
             return self
 
-    def learn(self, teamsvecs, indexes, splits=None):
+    def learn(self, teamsvecs, splits=None, time_indexes=None):
         # to select/create correct model file in the output directory
         modelstr = f'{self.name}.d{self.cfg.d}.e{self.cfg.e}.w{self.cfg.w}.dm{self.cfg.dm}.{self.cfg.embtype}'
         modelpath = f'{self.output}/{modelstr}/'
@@ -60,12 +62,12 @@ class D2v(T2v):
             return self
         except FileNotFoundError:
             log.info(f'File not found! Training the embedding model from scratch ...')
-            self._prep(teamsvecs, indexes)
+            self._prep(teamsvecs, splits, time_indexes)
             self.output = modelpath
             if not os.path.isdir(self.output): os.makedirs(self.output)
             self.model = self.gensim.models.Doc2Vec(min_count=1, dbow_words=1, # keep it always one as it may be needed for gnn-based method for 'pre' config, i.e., initial node features
                                                     dm=self.cfg.dm, vector_size=self.cfg.d, window=self.cfg.w, min_alpha=self.cfg.lr,
-                                                    workers=self.device.split(':')[1] if 'cpu:' in self.device else os.cpu_count() - 1, ** {'seed': self.cfg.seed} if self.cfg.seed is not None else {})
+                                                    workers=self.device.split(':')[1] if 'cpu:' in self.device else os.cpu_count() - 1, ** {'seed': self.seed} if self.seed is not None else {})
 
             self.model.build_vocab(self.data)
             if self.cfg.spe:

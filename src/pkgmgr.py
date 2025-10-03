@@ -88,10 +88,10 @@ def set_seed(seed, torch=None):
             torch.backends.cudnn.deterministic = True # in cuDNN
             torch.backends.cudnn.benchmark = False
 
-def cfg2str(cfg): return '.'.join([f'{k}{v}' for k, v in OmegaConf.to_container(cfg, resolve=True).items()])
+def cfg2str(cfg): return '.'.join([f'{k}{v}' for k, v in OmegaConf.to_container(cfg, resolve=True).items()]) if cfg else ''
 
 def str2cfg(s): #dot seperated kv, e.g., x1.y2.z3 --> x:1 y:2 z:3
-    items = s.split(".")
+    items = s.split('.')
     config = {}
     for item in items:
         key = ''.join(filter(str.isalpha, item))
