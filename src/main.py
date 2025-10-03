@@ -104,7 +104,7 @@ def run(cfg):
             cls, method = cfg.data.embedding.class_method.split('_') if cfg.data.embedding.class_method.find('_') else (cfg.data.embedding.class_method, None)
             cls = get_class(cls)
             #t2v = cls(cfg.data.output, cfg.data.acceleration, method, cfg.data.embedding.config.model[cls.__name__.lower()])
-            t2v = cls(cfg.data.output, cfg.acceleration, cfg.seed, cfg=cfg.data.embedding.config.model[cls.__name__.lower()], name=method)
+            t2v = cls(cfg.data.output, cfg.acceleration, cfg.seed, cfg.data.embedding.config.model[cls.__name__.lower()], method)
             t2v.learn(teamsvecs, indexes, splits)
 
     if cfg.cmd and any(c in cfg.cmd for c in ['train', 'test', 'eval']):
