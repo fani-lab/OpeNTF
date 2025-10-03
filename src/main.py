@@ -105,7 +105,7 @@ def run(cfg):
             cls = get_class(cls)
             #t2v = cls(cfg.data.output, cfg.data.acceleration, method, cfg.data.embedding.config.model[cls.__name__.lower()])
             t2v = cls(cfg.data.output, cfg.acceleration, cfg.seed, cfg.data.embedding.config.model[cls.__name__.lower()], method)
-            t2v.learn(teamsvecs, indexes, splits)
+            t2v.learn(teamsvecs, splits)
 
     if cfg.cmd and any(c in cfg.cmd for c in ['train', 'test', 'eval']):
 
@@ -123,7 +123,6 @@ def run(cfg):
         # Use '+models.{...}=null' to drop
         mdl_overrides = [o.replace('+models.', '') for o in HydraConfig.get().overrides.task if '+models.' in o]
         mdlcfg = OmegaConf.merge(OmegaConf.load(cfg.models.config), OmegaConf.from_dotlist(mdl_overrides))
-        mdlcfg.seed = cfg.seed
         mdlcfg.spe = cfg.train.save_per_epoch
         mdlcfg.tntf.tfolds = cfg.train.nfolds
         mdlcfg.tntf.step_ahead = cfg.train.step_ahead

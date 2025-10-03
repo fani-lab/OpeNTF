@@ -337,7 +337,7 @@ class Gnn(T2v):
         d2v_cfg.lr = self.cfg.model.lr
         d2v_cfg.spe = self.cfg.model.spe
         # simple lazy load, or train from scratch if the file not found!
-        d2v_obj = D2v(self.output, self.device, 'd2v', d2v_cfg).learn(teamsvecs, time_indexes=None, splits=None)
+        d2v_obj = D2v(self.output, self.device, self.seed, d2v_cfg, 'd2v').learn(teamsvecs, time_indexes=None, splits=None)
         # the order is NOT correct in d2v, i.e., vecs[0] may be for vecs['s20']. Call D2v.natsortvecs(d2v_obj.model.wv)
         # d2v = Doc2Vec.load(self.cfg.graph.pre)
         for node_type in self.data.node_types:

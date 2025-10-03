@@ -17,7 +17,7 @@ class D2v(T2v):
 
     def _prep(self, teamsvecs, splits=None, time_indexes=None):
         datafile = self.output + f'/../{self.cfg.embtype}.docs.pkl'
-        assert self.cfg.embtype == 'skilltime' and time_indexes, f'{opentf.textcolor["red"]}Temporal skill embedding needs time indexes!{opentf.textcolor["reset"]}'
+        if self.cfg.embtype == 'skilltime': assert time_indexes, f'{opentf.textcolor["red"]}Temporal skill embedding needs time indexes!{opentf.textcolor["reset"]}'
 
         try:
             log.info(f'Loading teams as docs {datafile}  ...')
