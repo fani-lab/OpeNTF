@@ -116,3 +116,14 @@ def get_from_hf(repo_type, filename) -> bool:
     # if the file is public, token=hf_token is ignored
     try: return hf_api.hf_hub_download(repo_id='fani-lab/OpeNTF', repo_type=repo_type, filename=filename, local_dir='../', force_download=True)
     except Exception as e: log.error(f'Error downloading {filename} from {repo_id}! {e}'); return None
+
+def topk_sparse(torch, probs, k, type='coo'):
+    topk_values, topk_indices = torch.topk(probs, k, dim=1)
+    row_idx = torch.arange(probs.shape[0], device=probs.device).unsqueeze(1).expand(-1, k)
+    indices = torch.stack([row_idx, topk_indices], dim=0).reshape(2, -1)
+    values = topk_values.reshape(-1)
+    sparse = torch.sparse_coo_tensor(indices, values, size=probs.shape).coalesce()
+
+    if type == 'csr': return sparse.to_sparse_csr()
+    if type == 'csc': return sparse.to_sparse_csc()  # cse is on cpu in torch?
+    else: return sparse

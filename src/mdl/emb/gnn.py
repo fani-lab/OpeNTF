@@ -1,4 +1,4 @@
-import os, itertools, pickle, logging, numpy as np, copy, time
+import os, itertools, pickle, logging, numpy as np, copy, time, re
 log = logging.getLogger(__name__)
 
 import pkgmgr as opentf
@@ -68,13 +68,19 @@ class Gnn(T2v):
             self.data.validate(raise_on_error=True)
             log.info(f'Saving graph at {file} ...')
             with open(file, 'wb') as f: pickle.dump(self.data, f)
+
             return self.data
 
     def learn(self, teamsvecs, splits=None, time_indexes=None):
         self._prep(teamsvecs)
         self.cfg.model = self.cfg[self.name] #gnn.n2v or gnn.gs --> gnn.model
-        self.output += f'/{self.name}.d{self.cfg.model.d}.e{self.cfg.model.e}.ns{self.cfg.model.ns}.{self.cfg.graph.dup_edge}.{self.cfg.graph.structure[1]}'
+
+        self.output += f'/{self.name}.b{self.cfg.model.b}.e{self.cfg.model.e}.ns{self.cfg.model.ns}.lr{self.cfg.model.lr}.es{self.cfg.model.es}.spe{self.cfg.model.spe}.d{self.cfg.model.d}.{self.cfg.graph.dup_edge}.{self.cfg.graph.structure[1]}'
         self.output += f'{".pre" if self.cfg.graph.pre else ""}'
+        if self.name == 'n2v': self.output += f'.w{self.cfg.model.w}.wl{self.cfg.model.wl}.wn{self.cfg.model.wn}'
+        elif self.name == 'm2v': self.output += f'.w{self.cfg.model.w}.wl{self.cfg.model.wl}.wn{self.cfg.model.wn}.{self.cfg.model.metapath_name[1]}'  # should be fixed
+        elif self.name in {'gcn', 'gs', 'gat', 'gatv2', 'gin'}: self.output += f'.h{"-".join([str(i) for i in self.cfg.model.h])}.nn{"-".join([str(i) for i in self.cfg.model.nn])}'
+
         # replace the 1 dimensional node features with pretrained d2v skill vectors of required dimension
         if self.cfg.graph.pre: self._init_d2v_node_features(teamsvecs)
 
@@ -131,7 +137,6 @@ class Gnn(T2v):
             # such models do not consume node attributes or features like mp methods do. they only use the graph structure.
             # the learned embeddings are inside an nn.Embedding layer that is initialized randomly and optimized during training.
             if self.name == 'n2v':
-                if foldidx == 0: self.output += f'.w{self.cfg.model.w}.wl{self.cfg.model.wl}.wn{self.cfg.model.wn}'
                 # ImportError: 'Node2Vec' requires either the 'pyg-lib' or 'torch-cluster' package
                 # install_import(f'torch-cluster==1.6.3 -f https://data.pyg.org/whl/torch-{self.torch.__version__}.html', 'torch_cluster')
                 # import importlib; importlib.reload(self.pyg);importlib.reload(self.pyg.typing);importlib.reload(self.pyg.nn)
@@ -149,7 +154,6 @@ class Gnn(T2v):
             elif self.name == 'm2v':
                 # assert isinstance(self.data, self.pyg.data.HeteroData), f'{opentf.textcolor["red"]}Hetero graph is needed for m2v. {self.cfg.graph.structure} is NOT hetero!{opentf.textcolor["reset"]}'
                 assert len(self.data.node_types) > 1, f'{opentf.textcolor["red"]}Hetero graph is needed for m2v. {self.cfg.graph.structure} is NOT hetero!{opentf.textcolor["reset"]}'
-                if foldidx == 0: self.output += f'.w{self.cfg.model.w}.wl{self.cfg.model.wl}.wn{self.cfg.model.wn}.{self.cfg.model.metapath_name[1]}' #should be fixed
                 self.model = self.pyg.nn.MetaPath2Vec(edge_index_dict=fold_data.edge_index_dict,
                                                       num_nodes_dict = {ntype: fold_data[ntype].num_nodes for ntype in fold_data.node_types}, #NOTE: if not explicitly set, it does num_nodes = int(edge_index[0].max()) + 1 !!
                                                       metapath=[tuple(mp) for mp in self.cfg.model.metapath_name[0]],
@@ -177,14 +181,12 @@ class Gnn(T2v):
 
             # message-passing-based >> default on homo, but can be wrapped into HeteroConv
             elif self.name in {'gcn', 'gs', 'gat', 'gatv2', 'gin'}:
-                if foldidx == 0: self.output += f'.d{self.cfg.model.d}.e{self.cfg.model.e}.b{self.cfg.model.b}.lr{self.cfg.model.lr}.ns{self.cfg.model.ns}.h{"-".join([str(i) for i in self.cfg.model.h])}.nn{"-".join([str(i) for i in self.cfg.model.nn])}'
-
                 # by default, gnn methods are for homo data. We can wrap it by HeteroConv or manually simulate it >> I think Jamil did this >> future
                 train_data_homo = train_data.to_homogeneous()
                 # building multilayer gnn-based model. Shouldn't depend on data. but as our graph has no features for node (for now), we need to assign a randomly initialized embeddings as node features.
                 # so, we need the num_nodes of the graph
                 self.model = self._built_model_mp(train_data_homo.num_nodes).to(self.device)
-                self._train_mp(train_data_homo, val_m_t_edge_index_homo)
+                self._train_mp(splits, foldidx, val_m_t_edge_index_homo, train_data_homo)
 
         if self.w: self.w.close()
 
@@ -219,7 +221,7 @@ class Gnn(T2v):
             def decode(self, x_i, x_j): return (x_i * x_j).sum(dim=-1) # we use binary_cross_entropy_with_logits for loss calc
         return Model(self.cfg, self.name, num_nodes)
 
-    def _train_mp(self, homo_data, val_m_t_edge_index_homo):
+    def _train_mp(self, splits, foldidx, val_m_t_edge_index_homo, homo_data):
         train_edge_index_homo = homo_data.edge_index
         if 'supervision_edge_types' in self.cfg.model and self.cfg.model.supervision_edge_types is not None:
             etype_to_id = {etype: i for i, etype in enumerate(self.data.edge_types)}
@@ -266,18 +268,18 @@ class Gnn(T2v):
         earlystopping = EarlyStopping(Gnn.torch, patience=self.cfg.model.es, verbose=True, delta=self.cfg.model.lr, save_model=False, trace_func=log.info)
         self.torch.cuda.empty_cache()
         for e in range(self.cfg.model.e):
-            log.info(f'Epoch {e}, {opentf.textcolor["blue"]}Train Loss: {(t_loss:=_(e, train_loader, optimizer)):.4f}{opentf.textcolor["reset"]}')
-            log.info(f'Epoch {e}, {opentf.textcolor["magenta"]}Valid Loss: {(v_loss:=_(e, valid_loader)):.4f}{opentf.textcolor["reset"]}')
+            log.info(f'Fold {foldidx}/{len(splits["folds"]) - 1}, Epoch {e}, {opentf.textcolor["blue"]}Train Loss: {(t_loss:=_(e, train_loader, optimizer)):.4f}{opentf.textcolor["reset"]}')
+            log.info(f'Fold {foldidx}/{len(splits["folds"]) - 1}, Epoch {e}, {opentf.textcolor["magenta"]}Valid Loss: {(v_loss:=_(e, valid_loader)):.4f}{opentf.textcolor["reset"]}')
             if self.cfg.model.spe and (e == 0 or ((e + 1) % self.cfg.model.spe) == 0):
                 #self.model.eval()
-                self.torch.save({'model_state_dict': self.model.state_dict(), 'cfg': self.cfg, 'e': e, 't_loss': t_loss, 'v_loss': v_loss}, f'{self.output}/f0.e{e}.pt')
+                self.torch.save({'model_state_dict': self.model.state_dict(), 'cfg': self.cfg, 'e': e, 't_loss': t_loss, 'v_loss': v_loss}, f'{self.output}/f{foldidx}.e{e}.pt')
                 log.info(f'{self.name} model with {opentf.cfg2str(self.cfg.model)} saved at {self.output}.e{e}.pt')
 
             if earlystopping(v_loss, self.model).early_stop:
                 log.info(f'Early stopping triggered at epoch: {e}')
                 break
         #self.model.eval()
-        self.torch.save({'model_state_dict': self.model.state_dict(), 'cfg': self.cfg, 'e': e, 't_loss': t_loss, 'v_loss': v_loss}, f'{self.output}/f0.pt') #will be fixed after fold-base
+        self.torch.save({'model_state_dict': self.model.state_dict(), 'cfg': self.cfg, 'e': e, 't_loss': t_loss, 'v_loss': v_loss}, f'{self.output}/f{foldidx}.pt') #will be fixed after fold-base
         log.info(f'{self.name} model with {opentf.cfg2str(self.cfg.model)} saved at {self.output}.pt.')
         self.w.close()
 
@@ -384,3 +386,45 @@ class Gnn(T2v):
                 type_embeddings = embeddings[node_type_tensor == i]  # shape: [num_nodes_of_type, self.cfg.model.d]
                 result[node_type] = type_embeddings
         return result
+
+    def test(self, teamsvecs, splits, testcfg):
+        # output should be consumable by the ntf.evaluate(), otherwise needs overriding
+        assert os.path.isdir(self.output), f'{opentf.textcolor["red"]}No folder for {self.output} exist!{opentf.textcolor["reset"]}'
+        log.info(f'{opentf.textcolor["blue"]}Testing {self.name} {opentf.textcolor["reset"]}... ')
+        # our evaluation methodology is to prediction the connection of all experts/candidates to the node of a test team, so we only need the team indices
+        tst_teams = Gnn.torch.as_tensor(splits['test'], device=self.device)
+        experts = Gnn.torch.arange(self.data['member'].num_nodes, device=self.device)
+
+        for foldidx in splits['folds'].keys():
+            modelfiles = [f'{self.output}/f{foldidx}.pt']
+            if testcfg.per_epoch: modelfiles += [f'{self.output}/{_}' for _ in os.listdir(self.output) if re.match(f'f{foldidx}.e\d+.pt', _)]
+            for modelfile in sorted(sorted(modelfiles), key=len):
+                self.model.load_state_dict(Gnn.torch.load(modelfile, map_location=self.device)['model_state_dict'])
+                self.model.eval()
+
+                for pred_set in (['test', 'train', 'valid'] if testcfg.on_train else ['test']):
+                    if pred_set != 'test': raise NotImplementedError(f'Prediction on {pred_set} not integrated!')
+
+                    z_experts, z_teams = self._get_node_emb(node_type='member'), self._get_node_emb(node_type='team')
+
+                    Gnn.torch.cuda.empty_cache()
+                    preds = []
+                    with Gnn.torch.no_grad():
+                        for t in tst_teams:
+                            z_t = z_teams[t].unsqueeze(0).expand(len(experts), -1)
+                            pred = Gnn.torch.sigmoid((z_t * z_experts).sum(dim=-1))
+                            preds.append(pred.cpu())  # keep on CPU to save memory
+
+                    match = re.search(r'(e\d+)\.pt$', os.path.basename(modelfile))
+                    epoch = (match.group(1) + '.') if match else ''
+
+                    preds = Gnn.torch.vstack(preds)
+                    Gnn.torch.save({'y_pred': opentf.topk_sparse(Gnn.torch, preds, testcfg.topK) if (testcfg.topK and testcfg.topK < preds.shape[1]) else preds, 'uncertainty': None}, f'{self.output}/f{foldidx}.{pred_set}.{epoch}pred', pickle_protocol=4)
+                    log.info(f'{self.name} model predictions for fold{foldidx}.{pred_set}.{epoch} has saved at {self.output}/f{foldidx}.{pred_set}.{epoch}pred')
+
+    def evaluate(self, teamsvecs, splits, evalcfg):
+        from mdl.ntf import Ntf
+        ntfobj = Ntf(self.output, self.device, self.seed, None)
+        ntfobj.output = self.output # to override the trailing class name ntf
+        ntfobj.evaluate(teamsvecs, splits, evalcfg)
+

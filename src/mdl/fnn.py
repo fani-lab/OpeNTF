@@ -215,5 +215,5 @@ class Fnn(Ntf):
                     match = re.search(r'(e\d+)\.pt$', os.path.basename(modelfile))
                     epoch = (match.group(1) + '.') if match else ''
 
-                    Ntf.torch.save({'y_pred': Ntf.to_topk_sparse(y_pred, testcfg.topK) if (testcfg.topK and testcfg.topK < y_pred.shape[1]) else y_pred, 'uncertainty': {'pred': pred_uncertainty, 'model': model_uncertainty} if self.is_bayesian else None}, f'{self.output}/f{foldidx}.{pred_set}.{epoch}pred', pickle_protocol=4)
+                    Ntf.torch.save({'y_pred': opentf.topk_sparse(Ntf.torch, y_pred, testcfg.topK) if (testcfg.topK and testcfg.topK < y_pred.shape[1]) else y_pred, 'uncertainty': {'pred': pred_uncertainty, 'model': model_uncertainty} if self.is_bayesian else None}, f'{self.output}/f{foldidx}.{pred_set}.{epoch}pred', pickle_protocol=4)
                     log.info(f'{self.name()} model predictions for fold{foldidx}.{pred_set}.{epoch} has saved at {self.output}/f{foldidx}.{pred_set}.{epoch}pred')

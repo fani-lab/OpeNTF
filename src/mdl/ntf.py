@@ -3,8 +3,8 @@ log = logging.getLogger(__name__)
 
 import pkgmgr as opentf
 class Ntf:
-    def __init__(self, output, device, seed, cgf):
-        self.cfg = cgf
+    def __init__(self, output, device, seed, cfg):
+        self.cfg = cfg
         self.seed = seed
         self.device = device
         self.model = None
@@ -26,17 +26,6 @@ class Ntf:
 
     def name(self): return f'/{self.__class__.__name__.lower()}.{opentf.cfg2str(self.cfg)}'
 
-    @staticmethod
-    def to_topk_sparse(probs, k, type='coo'):
-        topk_values, topk_indices = Ntf.torch.topk(probs, k, dim=1)
-        row_idx = Ntf.torch.arange(probs.shape[0], device=probs.device).unsqueeze(1).expand(-1, k)
-        indices = Ntf.torch.stack([row_idx, topk_indices], dim=0).reshape(2, -1)
-        values = topk_values.reshape(-1)
-        sparse = Ntf.torch.sparse_coo_tensor(indices, values, size=probs.shape).coalesce()
-
-        if type == 'csr': return sparse.to_sparse_csr()
-        if type == 'csc': return sparse.to_sparse_csc()  # cse is on cpu in torch?
-        else: return sparse
     def learn(self, teamsvecs, splits, prev_model): pass
     def test(self, teamsvecs, splits, testcfg): pass
     def evaluate(self, teamsvecs, splits, evalcfg):

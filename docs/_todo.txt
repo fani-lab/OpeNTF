@@ -1,6 +1,4 @@
-graph neural network - e2e with transfer support (transductive splits per fold)
-node2vec, metapath2vec, homo versions (gcn, gs, gat, gatv2, gin)
-- eval
+#TODO: the e2e needs data.embedding.class_method but should not re-train >> When gtf runs for test, no t2v.learn()
 
 multilayer neural classifiers
 
