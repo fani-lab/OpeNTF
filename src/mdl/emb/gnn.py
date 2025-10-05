@@ -140,8 +140,8 @@ class Gnn(T2v):
                 # ImportError: 'Node2Vec' requires either the 'pyg-lib' or 'torch-cluster' package
                 # install_import(f'torch-cluster==1.6.3 -f https://data.pyg.org/whl/torch-{self.torch.__version__}.html', 'torch_cluster')
                 # import importlib; importlib.reload(self.pyg);importlib.reload(self.pyg.typing);importlib.reload(self.pyg.nn)
-                self.model = self.pyg.nn.Node2Vec((homo_data:=(fold_data.to_homogeneous())).edge_index,
-                                     num_nodes=homo_data.num_nodes, #should be explicitly passed to accomodate possible isolated nodes
+                self.model = self.pyg.nn.Node2Vec((fold_homo_data:=(fold_data.to_homogeneous())).edge_index,
+                                     num_nodes=fold_homo_data.num_nodes, #should be explicitly passed to accomodate possible isolated nodes
                                      embedding_dim=self.cfg.model.d,
                                      walk_length=self.cfg.model.wl,
                                      context_size=self.cfg.model.w,
@@ -149,7 +149,7 @@ class Gnn(T2v):
                                      num_negative_samples=self.cfg.model.ns).to(self.device)
 
                 self._train_rw(splits, foldidx, val_m_t_edge_index_homo)
-                self._get_node_emb(homo_data=homo_data) #logging purposes
+                self._get_node_emb(homo_data=fold_homo_data) #logging purposes
 
             elif self.name == 'm2v':
                 # assert isinstance(self.data, self.pyg.data.HeteroData), f'{opentf.textcolor["red"]}Hetero graph is needed for m2v. {self.cfg.graph.structure} is NOT hetero!{opentf.textcolor["reset"]}'
@@ -167,8 +167,9 @@ class Gnn(T2v):
                 # then back ids relative to m2v indexing
                 val_m_t_edge_index_homo[0] = val_m_t_edge_index_homo[0] - offsets['member'] + self.model.start['member']
                 val_m_t_edge_index_homo[1] = val_m_t_edge_index_homo[1] - offsets['team'] + self.model.start['team']
+
                 self._train_rw(splits, foldidx, val_m_t_edge_index_homo)
-                self._get_node_emb() #logging purposes
+                self._get_node_emb(homo_data=fold_data) #logging purposes
 
             elif self.name == 'han':
                 # assert isinstance(self.data, self.pyg.data.HeteroData), f'{opentf.textcolor["red"]}Hetero graph is needed for m2v. {self.cfg.graph.structure} is NOT hetero!{opentf.textcolor["reset"]}'
@@ -182,11 +183,13 @@ class Gnn(T2v):
             # message-passing-based >> default on homo, but can be wrapped into HeteroConv
             elif self.name in {'gcn', 'gs', 'gat', 'gatv2', 'gin'}:
                 # by default, gnn methods are for homo data. We can wrap it by HeteroConv or manually simulate it >> I think Jamil did this >> future
-                train_data_homo = train_data.to_homogeneous()
+                fold_homo_data = fold_data.to_homogeneous()
                 # building multilayer gnn-based model. Shouldn't depend on data. but as our graph has no features for node (for now), we need to assign a randomly initialized embeddings as node features.
                 # so, we need the num_nodes of the graph
-                self.model = self._built_model_mp(train_data_homo.num_nodes).to(self.device)
-                self._train_mp(splits, foldidx, val_m_t_edge_index_homo, train_data_homo)
+                self.model = self._built_model_mp(fold_homo_data.num_nodes).to(self.device)
+                self._train_mp(splits, foldidx, val_m_t_edge_index_homo, fold_homo_data)
+                self._get_node_emb(homo_data=fold_homo_data) #logging purposes
+
 
         if self.w: self.w.close()
 
@@ -222,6 +225,12 @@ class Gnn(T2v):
         return Model(self.cfg, self.name, num_nodes)
 
     def _train_mp(self, splits, foldidx, val_m_t_edge_index_homo, homo_data):
+        try:
+            log.info(f'Loading the model {self.output}/f{foldidx}.pt ...')
+            return self.model.load_state_dict(Gnn.torch.load(f'{self.output}/f{foldidx}.pt', map_location=self.device)['model_state_dict'])
+        except FileNotFoundError:
+            log.info(f'{opentf.textcolor["yellow"]}File not found! Training ...{opentf.textcolor["reset"]}')
+
         train_edge_index_homo = homo_data.edge_index
         if 'supervision_edge_types' in self.cfg.model and self.cfg.model.supervision_edge_types is not None:
             etype_to_id = {etype: i for i, etype in enumerate(self.data.edge_types)}
@@ -279,11 +288,17 @@ class Gnn(T2v):
                 log.info(f'Early stopping triggered at epoch: {e}')
                 break
         #self.model.eval()
-        self.torch.save({'model_state_dict': self.model.state_dict(), 'cfg': self.cfg, 'e': e, 't_loss': t_loss, 'v_loss': v_loss}, f'{self.output}/f{foldidx}.pt') #will be fixed after fold-base
+        self.torch.save({'model_state_dict': self.model.state_dict(), 'cfg': self.cfg, 'e': e, 't_loss': t_loss, 'v_loss': v_loss}, f'{self.output}/f{foldidx}.pt')
         log.info(f'{self.name} model with {opentf.cfg2str(self.cfg.model)} saved at {self.output}.pt.')
         self.w.close()
 
     def _train_rw(self, splits, foldidx, val_m_t_edge_index_homo):
+        try:
+            log.info(f'Loading the model {self.output}/f{foldidx}.pt ...')
+            return self.model.load_state_dict(Gnn.torch.load(f'{self.output}/f{foldidx}.pt', map_location=self.device)['model_state_dict'])
+        except FileNotFoundError:
+            log.info(f'{opentf.textcolor["yellow"]}File not found! Training ...{opentf.textcolor["reset"]}')
+
         if self.w is None: self.w = self.writer(log_dir=f'{self.output}/logs4tboard/run_{int(time.time())}')
         optimizer = self.torch.optim.Adam(self.model.parameters(), lr=self.cfg.model.lr)
         scheduler = Gnn.torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.1, patience=2, verbose=True)

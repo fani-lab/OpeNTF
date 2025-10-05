@@ -1,29 +1,23 @@
-#TODO: the e2e needs data.embedding.class_method but should not re-train >> When gtf runs for test, no t2v.learn()
+#TODO: update to readme for cmn layer and main readme
+#TODO: nmt does not work with our embeddings of any kind. Can we inject our embedding for it?
+- bundle recommenders
 
-multilayer neural classifiers
+temporal/sequence
+    tNtf_{emb}_{fnn,bnn}_{train,test}
+    user-item recommender baselines:
+        - rrn?
+        - caser
+        - sasrec
+        - bert4rec
 
-    - rrn >> isn't it temporal?
-    - bundle recommenders
-
-    temporal/sequence
-        tNtf_{emb}_{fnn,bnn}_{train,test}
-        user-item recommender baselines:
-            - rrn?
-            - caser
-            - sasrec
-            - bert4rec
-
-    {emb}_{fnn,bnn}_cl_{train/test} >> future
+{emb}_{fnn,bnn}_cl_{train/test} >> future
 
 -- end2end
+- mlp-based predictor after gnn layers
+- hetero version of gnns using HeteroConv that wraps gnn methods per node type
 - inductive
-- hetero version of gnns
-Our graph are mainly hetero, but gnn methods are mainly designed for homo graph. So, we create hetero, make it to_homo(), ...
-For strict hetero, we will use HeteroConv that wraps gnn methods per node type
-Indeed, it is worth study a mixture of gnn methods for node types :D
 
-update to readme for cmn layer and main readme
-
+============
 d2v
 -- strict splits of train/valid/test. I think even if it sees everything, does not produce good embeddings
 -- skill-member as docs during the train, then skills as docs during test to find the closest experts vectors as members :DD

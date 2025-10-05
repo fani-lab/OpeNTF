@@ -28,6 +28,8 @@ class Ntf:
 
     def learn(self, teamsvecs, splits, prev_model): pass
     def test(self, teamsvecs, splits, testcfg): pass
+
+    #TODO: many code overlaps for nmt.evaluate ... for now, changes here should also apply in nmt.evaluate()
     def evaluate(self, teamsvecs, splits, evalcfg):
         assert os.path.isdir(self.output), f'{opentf.textcolor["red"]}No folder for {self.output} exist!{opentf.textcolor["reset"]}'
         pd = opentf.install_import('pandas')
@@ -54,12 +56,15 @@ class Ntf:
                     #evl.metric works on numpy or scipy.sparse. so, we need to convert Y_ which is torch.tensor, either sparse or not
                     Y_ = Y_.to_dense().numpy()
 
-                    log.info(f'{evalcfg.metrics.trec} ...')
-                    df, df_mean = metric.calculate_metrics(Y, Y_, evalcfg.topK, evalcfg.per_instance, evalcfg.metrics.trec)
+                    df, df_mean = pd.DataFrame(), pd.DataFrame()
+                    if evalcfg.metrics.trec:
+                        log.info(f'{evalcfg.metrics.trec} ...')
+                        df, df_mean = metric.calculate_metrics(Y, Y_, evalcfg.topK, evalcfg.per_instance, evalcfg.metrics.trec)
 
                     if (m:=[m for m in evalcfg.metrics.other if 'aucroc' in m]):
                         log.info(f'{m} ...')
                         aucroc, fpr_tpr = metric.calculate_auc_roc(Y, Y_, curve=True) if m[0] == 'aucroc+' else metric.calculate_auc_roc(Y, Y_)
+                        if df_mean.empty: df_mean = pd.DataFrame(columns=['mean'])
                         df_mean.loc['aucroc'] = aucroc
                         if fpr_tpr:
                             with open(f'{predfile}.eval.roc.pkl', 'wb') as outfile: pickle.dump(fpr_tpr, outfile)
@@ -69,9 +74,10 @@ class Ntf:
                         X = teamsvecs['skill'] if scipy.sparse.issparse(teamsvecs['skill']) else teamsvecs['original_skill'] #to accomodate dense emb vecs of skills
                         X = X[splits['folds'][foldidx][pred_set]] if pred_set != 'test' else X[splits['test']]
                         df_skc, df_mean_skc = metric.calculate_skill_coverage(X, Y_, teamsvecs['skillcoverage'], evalcfg.per_instance, topks=m[0].replace('skill_coverage_', ''))
-                        df_skc.columns = df.columns
-                        df = pd.concat([df, df_skc], axis=0)
-                        df_mean = pd.concat([df_mean, df_mean_skc], axis=0)
+                        if df.empty: df = df_skc
+                        else: df_skc.columns = df.columns; df = pd.concat([df, df_skc], axis=0)
+                        if df_mean.empty: df_mean = df_mean_skc
+                        else: df_mean = pd.concat([df_mean, df_mean_skc], axis=0)
 
                     if evalcfg.per_instance: df.to_csv(f'{predfile}.eval.per_instance.csv', float_format='%.5f')
                     log.info(f'Saving file per fold as {predfile}.eval.mean.csv')

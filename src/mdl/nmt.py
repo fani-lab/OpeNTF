@@ -149,12 +149,15 @@ class Nmt(Ntf):
 
                 log.info(f'Evaluating predictions at {self.output}/{predfile} ... for {evalcfg.metrics}')
 
-                log.info(f'{evalcfg.metrics.trec} ...')
-                df, df_mean = metric.calculate_metrics(Y, Y_, evalcfg.topK, evalcfg.per_instance, evalcfg.metrics.trec)
+                df, df_mean = pd.DataFrame(), pd.DataFrame()
+                if evalcfg.metrics.trec:
+                    log.info(f'{evalcfg.metrics.trec} ...')
+                    df, df_mean = metric.calculate_metrics(Y, Y_, evalcfg.topK, evalcfg.per_instance, evalcfg.metrics.trec)
 
                 if 'aucroc' in evalcfg.metrics.other:
                     log.info("['aucroc'] and curve values (fpr, tpr) ...")
                     aucroc, fpr_tpr = metric.calculate_auc_roc(Y, Y_)
+                    if df_mean.empty: df_mean = pd.DataFrame(columns=['mean'])
                     df_mean.loc['aucroc'] = aucroc
                     with open(f'{self.output}/{predfile}.eval.roc.pkl', 'wb') as outfile: pickle.dump(fpr_tpr, outfile)
 
@@ -164,9 +167,10 @@ class Nmt(Ntf):
                     X = X[splits['test']]
                     #TODO: for absolute 0 all, it should be 0?
                     df_skc, df_mean_skc = metric.calculate_skill_coverage(X, Y_, teamsvecs['skillcoverage'], evalcfg.per_instance, topks=m[0].replace('skill_coverage_', ''))
-                    df_skc.columns = df.columns
-                    df = pd.concat([df, df_skc], axis=0)
-                    df_mean = pd.concat([df_mean, df_mean_skc], axis=0)
+                    if df.empty: df = df_skc
+                    else: df_skc.columns = df.columns; df = pd.concat([df, df_skc], axis=0)
+                    if df_mean.empty: df_mean = df_mean_skc
+                    else: df_mean = pd.concat([df_mean, df_mean_skc], axis=0)
 
                 if evalcfg.per_instance: df.to_csv(f'{self.output}/{predfile}.eval.per_instance.csv', float_format='%.5f')
                 log.info(f'Saving file per fold as {self.output}/{predfile}.eval.mean.csv')

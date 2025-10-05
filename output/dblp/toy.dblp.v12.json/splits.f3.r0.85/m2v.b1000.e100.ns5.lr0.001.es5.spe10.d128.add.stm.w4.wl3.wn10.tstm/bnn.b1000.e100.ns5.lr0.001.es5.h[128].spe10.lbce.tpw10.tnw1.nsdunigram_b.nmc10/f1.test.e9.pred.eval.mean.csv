@@ -1,0 +1,5 @@
+,mean
+aucroc,0.5185185185185185
+skill_coverage_2,1.0
+skill_coverage_5,1.0
+skill_coverage_10,1.0

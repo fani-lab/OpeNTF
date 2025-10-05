@@ -55,13 +55,13 @@ class D2v(T2v):
         modelpath = f'{self.output}/{modelstr}/'
         modelfile = f'{self.output}/{modelstr}/{modelstr}.pt'
         try:
-            log.info(f"Loading the model {modelfile} for {(teamsvecs['skill'].shape[0], self.cfg.d)} embeddings ...")
+            log.info(f'Loading the model {modelfile} for {(teamsvecs["skill"].shape[0], self.cfg.d)} embeddings ...')
             self.__class__.gensim = opentf.install_import('gensim')
             self.model = self.gensim.models.Doc2Vec.load(modelfile)
             assert self.model.docvecs.vectors.shape[0] == teamsvecs['skill'].shape[0], f'{opentf.textcolor["red"]}Incorrect number of embeddings per team! {self.model.docvecs.vectors.shape[0]} != {teamsvecs["skill"].shape[0]}{opentf.textcolor["reset"]}'
             return self
         except FileNotFoundError:
-            log.info(f'File not found! Training the embedding model from scratch ...')
+            log.info(f'{opentf.textcolor["yellow"]}File not found! Training the embedding model from scratch ...{opentf.textcolor["reset"]}')
             self._prep(teamsvecs, splits, time_indexes)
             self.output = modelpath
             if not os.path.isdir(self.output): os.makedirs(self.output)

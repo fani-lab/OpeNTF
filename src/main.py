@@ -105,7 +105,6 @@ def run(cfg):
             cls = get_class(cls)
             #t2v = cls(cfg.data.output, cfg.data.acceleration, method, cfg.data.embedding.config.model[cls.__name__.lower()])
             t2v = cls(cfg.data.output, cfg.acceleration, cfg.seed, cfg.data.embedding.config.model[cls.__name__.lower()], method)
-            #TODO: should be only for train but since we need t2v object later, we do it for other steps, even for eval!
             t2v.learn(teamsvecs, splits)
 
     if cfg.cmd and any(c in cfg.cmd for c in ['train', 'test', 'eval']):
@@ -149,7 +148,7 @@ def run(cfg):
             cls = get_class(cls_method[0]) # e.g., rnd, fnn, bnn, gnn, tNtf, ...
             output_ = (t2v.output if t2v else cfg.data.output)
             if cls_method[0] == 'mdl.emb.gnn.Gnn':
-                assert t2v, f'{opentf.textcolor["red"]}Training a Gnn instance needs a data.embedding.class_method! {opentf.textcolor["reset"]}'
+                assert t2v, f'{opentf.textcolor["red"]}The mdl.emb.gnn.Gnn instance needs a data.embedding.class_method! {opentf.textcolor["reset"]}'
                 models[m] = t2v
             else: models[m] = cls(output_, cfg.acceleration, cfg.seed, cfg.models.config[cls.__name__.lower()])
 
