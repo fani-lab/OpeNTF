@@ -58,7 +58,7 @@ class Fnn(Ntf):
     def ns_unigram(self, y):
         # fully batch-wise and gpu-friendly
         mask_upweight_0s = (y == 0)
-        weight_matrix = self.unigram.expand(y.shape[0], -1)
+        weight_matrix = self.unigram.expand(y.shape[0], -1) #self.unigram is already set in self.learn() or in self.ns_unigram_batch()
         sampling_weights = Ntf.torch.where(mask_upweight_0s, weight_matrix, Ntf.torch.zeros_like(weight_matrix))
 
         # RuntimeError: invalid multinomial distribution (sum of probabilities <= 0)
