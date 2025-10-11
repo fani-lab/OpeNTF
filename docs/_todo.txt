@@ -1,4 +1,14 @@
 #TODO: update to readme for cmn layer and main readme
+./readme.md
+./data/{dataset}/readme.md
+./output/readme.md
+./src/readme.md
+./src/cmn/readme.md
+./src/mdl/readme.md
+./ipynb >> python scripts
+
+#TODO: +han, +lant
+
 #TODO: nmt does not work with our embeddings of any kind. Can we inject our embedding for it?
 - bundle recommenders
 
