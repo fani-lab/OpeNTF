@@ -1,5 +1,5 @@
 # ``OpeNTF``: An Open-Source Neural Team Formation Benchmark Library 
-Team formation involves selecting a team of skillful experts who will, more likely than not, accomplish a task. Researchers have proposed a rich body of computational methods to automate the traditionally tedious and error-prone manual process. We previously released OpeNTF, an open-source framework hosting canonical neural models as the cutting-edge class of approaches, along with large-scale training datasets from varying domains. In this paper, we contribute OpeNTF2 that extends the initial release in two prime directions. (1) The first of its kind in neural team formation, we integrated `debiasing reranking algorithms` to mitigate the `popularity` and `gender` disparities in the neural models’ team recommendations based on two alternative notions of fairness: equality of opportunity and demographic parity. (2) We further contribute a `temporal` training strategy for neural models’ training to capture the evolution of experts’ skills and collaboration ties over time, as opposed to randomly shuffled training datasets. OpeNTF2 is a forward-looking effort to automate team formation via fairness-aware and time-sensitive methods. AI-ML-based solutions are increasingly impacting how resources are allocated to various groups in society, and ensuring fairness and time are systematically considered is key.
+Team formation (recommendation) involves selecting a team of skillful experts who will, more likely than not, accomplish a task. Researchers have proposed a rich body of computational methods to automate the traditionally tedious and error-prone manual process. We release `OpeNTF`, an open-source neural team formation framework hosting canonical `neural models` as the cutting-edge class of approaches, along with `large-scale` training datasets from `varying domains`. It further includes `temporal` training strategy for neural models’ training to capture the evolution of experts’ skills and collaboration ties over `time`, as opposed to randomly shuffled training datasets. OpeNTF also integrates `debiasing reranking` algorithms at its last step to mitigate the `popularity` and `gender` disparities in the neural models’ team recommendations based on two alternative notions of fairness: `equality of opportunity` and `demographic parity`. OpeNTF is a forward-looking effort to automate team formation via fairness-aware and time-sensitive methods. AI-ML-based solutions are increasingly impacting how resources are allocated to various groups in society, and ensuring fairness and time are systematically considered is key.
 
 <table border=0>
 <tr>
@@ -25,54 +25,43 @@ Team formation involves selecting a team of skillful experts who will, more like
 
 
 </td>
-<td><img src='docs/adila_flow_.png' width="600" align="right"" /></td>
+<td><img src='docs/adila_flow_.png' width="600" align="right" /></td>
 <!-- <td><img src='./src/mdl/team_inheritance_hierarchy.png' width="90%%" /></td> -->
 </tr>
 </table>
 
 
-## 1. [Setup](https://colab.research.google.com/github/fani-lab/OpeNTF/blob/main/quickstart.ipynb)
-You need to have ``Python >= 3.8`` and install the following main packages, among others listed in [``requirements.txt``](requirements.txt):
-```
-torch>=1.9.0
-pytrec-eval-terrier==0.5.2
-gensim==3.8.3
-```
-By ``pip``, clone the codebase and install required packages:
+## 1. [Setup](https://colab.research.google.com/github/fani-lab/OpeNTF/blob/main/ipynb/quickstart.ipynb)
+`OpeNTF` needs `Python >= 3.8` and installs required packages lazily and on-demand, i.e., as it goes through the steps of the pipeline, it installs a package if the package or the correct version is not available in the environment. For further details, refer to [``requirements.txt``](requirements.txt) and [``pkgmgr.py``](./src/pkgmgr.py). To setup an evnrionment:
+
 ```sh
-git clone --recursive https://github.com/Fani-Lab/opentf
-cd opentf
+#python3.8
+python -m venv opentf_venv
+source opentf_venv/bin/activate #non-windows
+#opentf_venv\Scripts\activate #windows
+pip install --upgrade pip
 pip install -r requirements.txt
 ```
-By [``conda``](https://www.anaconda.com/products/individual):
 
-```sh
-git clone --recursive https://github.com/Fani-Lab/opentf
-cd opentf
-conda env create -f environment.yml
-conda activate opentf
-```
-
-For installation of specific version of a python package due to, e.g., ``CUDA`` versions compatibility, one can edit [``requirements.txt``](requirements.txt) or [``environment.yml``](environment.yml) like as follows:
+For installation of specific version of a python package due to, e.g., ``CUDA`` versions compatibility, edit [``requirements.txt``](requirements.txt) like:
 
 ```
-# CUDA 10.1
-torch==1.6.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html
+#$ torch==2.4.1 --index-url https://download.pytorch.org/whl/cu118
 ```
-## 2. Quickstart [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/fani-lab/Adila/blob/main/quickstart.ipynb)
+## 2. Quickstart [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/fani-lab/OpeNTF/blob/main/ipynb/quickstart.ipynb)
 
 ```sh
 cd src
-python -u main.py -data ../data/raw/dblp/toy.dblp.v12.json -domain dblp -model fnn bnn -fairness det_greedy -attribute popularity
+python main.py "cmd=[prep, train, test, eval]" \
+               "models.instances=[mdl.rnd.Rnd, mdl.fnn.Fnn, mdl.bnn.Bnn]" \
+               data.domain=cmn.publication.Publication data.source=../data/dblp/toy.dblp.v12.json data.output=../output/dblp/toy.dblp.v12.json \
+               ~data.filter \
+               train.train_test_ratio=0.85 train.nfolds=3 train.save_per_epoch=3 \
+               test.per_epoch=True test.topK=100 \
+               eval.topk=\'2,5,10\'
 ```
 
-The above run, loads and preprocesses a tiny-size toy example dataset [``toy.dblp.v12.json``](data/raw/dblp/toy.dblp.v12.json) from [``dblp``](https://originalstatic.aminer.cn/misc/dblp.v12.7z) followed by _n_-fold train-evaluation on a training split and final test on the test set for ``feedforward`` and ``Bayesian`` neural models using default hyperparameters from [``./src/param.py``](./src/param.py). Then, the predictions will be passed through the `det_greedy` reranking fairness algorithm to mitigate popularity bias in teams with default `k_max`, `np_ratio` fromn [``./src/param.py``](./src/param.py).
-
-```
-python -u main.py -data ../data/raw/dblp/toy.dblp.v12.json -domain dblp -model tbnn tbnn_dt2v_emb
-```
-
-This script loads and preprocesses the same dataset [``toy.dblp.v12.json``](data/raw/dblp/toy.dblp.v12.json) from [``dblp``](https://originalstatic.aminer.cn/misc/dblp.v12.7z), takes the teams from the the last year as the test set and trains the ``Bayesian`` neural model following our proposed streaming training strategy as explained in ``3.2.2. Temporal Neural Team Formation`` with two different input representations _i_) sparse vector represntation and _ii_) temporal skill vector represntation using default hyperparameters from [``./src/param.py``](./src/param.py).
+The above run, loads and preprocesses a tiny-size toy example dataset [``toy.dblp.v12.json``](data/dblp/toy.dblp.v12.json) from [``dblp``](https://originalstatic.aminer.cn/misc/dblp.v12.7z) with `no` filtering followed by `3`-fold cross train-validation on a training split and a final test on the test set for `feedforward` and `Bayesian` neural models as well as a `random` model using default hyperparameters from [`./src/mdl/__config__.yaml`](./src/mdl/__config.yaml). Then, the predictions will be passed through the `det_greedy` reranking fairness algorithm to mitigate popularity bias in teams with default `k_max`, `np_ratio` fromn [``./src/param.py``](./src/param.py).
 
 ## 3. Features
 #### **3.1. [`Adila`](https://github.com/fani-lab/Adila): Fairness aware Team Formation**
