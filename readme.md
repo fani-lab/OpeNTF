@@ -32,7 +32,7 @@ Team formation (recommendation) involves selecting a team of skillful experts wh
 
 
 ## 1. [Setup](https://colab.research.google.com/github/fani-lab/OpeNTF/blob/main/ipynb/quickstart.ipynb)
-`OpeNTF` needs `Python >= 3.8` and installs required packages lazily and on-demand, i.e., as it goes through the steps of the pipeline, it installs a package if the package or the correct version is not available in the environment. For further details, refer to [``requirements.txt``](requirements.txt) and [``pkgmgr.py``](./src/pkgmgr.py). To setup an evnrionment:
+`OpeNTF` needs `Python >= 3.8` and installs required packages lazily and on-demand, i.e., as it goes through the steps of the pipeline, it installs a package if the package or the correct version is not available in the environment. For further details, refer to [``requirements.txt``](requirements.txt) and [``pkgmgr.py``](./src/pkgmgr.py). To set up an environment locally:
 
 ```sh
 #python3.8
@@ -43,11 +43,14 @@ pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-For installation of specific version of a python package due to, e.g., ``CUDA`` versions compatibility, edit [``requirements.txt``](requirements.txt) like:
+For installation of a specific version of a python package due to, e.g., ``CUDA`` versions compatibility, edit [``requirements.txt``](requirements.txt) like:
 
 ```
 #$ torch==2.4.1 --index-url https://download.pytorch.org/whl/cu118
 ```
+
+To run in a `container`, a docker `image` can be built and run by customizing the [`Dockerfile`](Dockerfile).
+
 ## 2. Quickstart [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/fani-lab/OpeNTF/blob/main/ipynb/quickstart.ipynb)
 
 ```sh
@@ -61,7 +64,8 @@ python main.py "cmd=[prep, train, test, eval]" \
                eval.topk=\'2,5,10\'
 ```
 
-The above run, loads and preprocesses a tiny-size toy example dataset [``toy.dblp.v12.json``](data/dblp/toy.dblp.v12.json) from [``dblp``](https://originalstatic.aminer.cn/misc/dblp.v12.7z) with `no` filtering followed by `3`-fold cross train-validation on a training split and a final test on the test set for `feedforward` and `Bayesian` neural models as well as a `random` model using default hyperparameters from [`./src/mdl/__config__.yaml`](./src/mdl/__config.yaml). 
+The above run, loads and preprocesses a tiny-size toy example dataset [``toy.dblp.v12.json``](data/dblp/toy.dblp.v12.json) from [``dblp``](https://originalstatic.aminer.cn/misc/dblp.v12.7z) with `no` filtering followed by `3`-fold cross train-validation on a training split and a final test on the test set for `feedforward` and `Bayesian` neural models as well as a `random` model using default hyperparameters from [`./src/mdl/__config__.yaml`](./src/mdl/__config.yaml). For a step-by-step guide and output trace, see our colab script [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/fani-lab/OpeNTF/blob/main/ipynb/quickstart.ipynb).
+
 
 ## 3. Features
 #### **3.1. [`Adila`](https://github.com/fani-lab/Adila): Fairness aware Team Formation**
