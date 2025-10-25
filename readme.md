@@ -61,7 +61,7 @@ python main.py "cmd=[prep, train, test, eval]" \
                eval.topk=\'2,5,10\'
 ```
 
-The above run, loads and preprocesses a tiny-size toy example dataset [``toy.dblp.v12.json``](data/dblp/toy.dblp.v12.json) from [``dblp``](https://originalstatic.aminer.cn/misc/dblp.v12.7z) with `no` filtering followed by `3`-fold cross train-validation on a training split and a final test on the test set for `feedforward` and `Bayesian` neural models as well as a `random` model using default hyperparameters from [`./src/mdl/__config__.yaml`](./src/mdl/__config.yaml). Then, the predictions will be passed through the `det_greedy` reranking fairness algorithm to mitigate popularity bias in teams with default `k_max`, `np_ratio` fromn [``./src/param.py``](./src/param.py).
+The above run, loads and preprocesses a tiny-size toy example dataset [``toy.dblp.v12.json``](data/dblp/toy.dblp.v12.json) from [``dblp``](https://originalstatic.aminer.cn/misc/dblp.v12.7z) with `no` filtering followed by `3`-fold cross train-validation on a training split and a final test on the test set for `feedforward` and `Bayesian` neural models as well as a `random` model using default hyperparameters from [`./src/mdl/__config__.yaml`](./src/mdl/__config.yaml). 
 
 ## 3. Features
 #### **3.1. [`Adila`](https://github.com/fani-lab/Adila): Fairness aware Team Formation**
