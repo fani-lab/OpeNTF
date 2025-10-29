@@ -11,7 +11,7 @@ section.active {
 }
 
 section.active .section-title {
-  color: #b83b21;
+  color: #45afcb;
   font-weight: 600;
   text-transform: uppercase;
   font-size: larger;
@@ -24,7 +24,7 @@ section:not(:first-child) {
 section.active .section-body {
   /*transition: 0.5s all ease;*/
   border-left: 2px double;
-  border-color: #b83b21;
+  border-color: #45afcb;
   padding-left: 1.5em;
 }
 
@@ -38,7 +38,7 @@ section.active .section-list {
 
 section.active .section-list li::before {
   content: "●";
-  color: #b83b21;
+  color: #45afcb;
   padding-right: 0.7rem;
 }
 
@@ -72,12 +72,12 @@ section .presenter {
 }
 
 section .presenter:not(:last-child) {
-  border-right: 1px solid #b83b21;
+  border-right: 1px solid #45afcb;
 }
 
 .email-link,
 .external-link {
-  color: #b83b21;
+  color: #45afcb;
   text-decoration: none;
   /* font-size: small; */
 }
@@ -86,7 +86,7 @@ section .presenter:not(:last-child) {
 .external-link:hover,
 .email-link:active,
 .external-link:active {
-  color: #b83b21;
+  color: #45afcb;
   text-decoration: underline;
 }
 
@@ -95,7 +95,7 @@ section .outline-topic {
 }
 
 section .outline-topic:not(:last-child) {
-  border-bottom: #b83b21 1px solid;
+  border-bottom: #45afcb 1px solid;
 }
 
 section .topic-item {
@@ -108,12 +108,12 @@ img {
 }
 
 a {
-  color: forestgreen;
+  color: #b11a48;
   text-decoration: none;
 }
 
 a:hover {
-  color: forestgreen;
+  color: #b11a48;
   text-decoration: underline;
 }
 
@@ -132,7 +132,7 @@ a:hover {
 
 .footnote:hover {
   font-size: larger;
-  color: #b83b21;
+  color: #45afcb;
   padding: none;
 }
 
@@ -159,7 +159,7 @@ a:hover {
 }
 
 #section-location {
-    color: #b83b21;
+    color: #45afcb;
 }
 
 .fs-10{
