@@ -14,14 +14,14 @@ function Sidebar() {
         <ul className="list-unstyled text-end side-menu">
             <li onClick={menuClicked} id="location" className='active'>Time and Location</li>
             <li onClick={menuClicked} id="abstract">Abstract</li>
-            <li onClick={menuClicked} id="audience">Target Audience and Prerequisites</li>
+            <li onClick={menuClicked} id="audience">Target Audience</li>
             <li onClick={menuClicked} id="outline">Outline</li>
-            <li onClick={menuClicked} id="searchbased">Subgraph Optimization</li>
-            <li onClick={menuClicked} id="learnbased">Learning-based Heuristics</li>
+            <li onClick={menuClicked} id="searchbased">Pioneering Techniques</li>
+            <li onClick={menuClicked} id="learnbased"> Neural Team Recommendation</li>
+            <li onClick={menuClicked} id="refinement">Team Refinement</li>
             <li onClick={menuClicked} id="challeng">Challenges and New Perspectives</li>
-            <li onClick={menuClicked} id="apps">Applications</li>
+            <li onClick={menuClicked} id="apps">Applications</li>  <li onClick={menuClicked} id="handson">Hands-on OpeNTF</li>
             <li onClick={menuClicked} id="presenters">Presenters</li>
-
         </ul>
     </ >;
 }
