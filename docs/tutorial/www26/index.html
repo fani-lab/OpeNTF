@@ -3,7 +3,6 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Autoplay Video Test</title>
     <style>
       body {
         margin: 0;
@@ -17,15 +16,17 @@
       video {
         max-width: 90%;
         max-height: 80vh;
+        background: #000;
       }
     </style>
   </head>
   <body>
-    <p style="color:white;">Hello World!!</p>
-    <video autoplay muted loop playsinline>
+    <!-- Added 'controls' so user can unmute or fullscreen -->
+    <video autoplay muted loop playsinline controls>
       <source src="teaser.mp4" type="video/mp4" />
       Your browser does not support the video tag.
     </video>
   </body>
 </html>
+
 
