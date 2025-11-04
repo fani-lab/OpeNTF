@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      body {
+        margin: 0;
+        background: #000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        flex-direction: column;
+      }
+      video {
+        max-width: 90%;
+        max-height: 80vh;
+        background: #000;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Added 'controls' so user can unmute or fullscreen -->
+    <video autoplay muted loop playsinline controls>
+      <source src="teaser.mp4" type="video/mp4" />
+      Your browser does not support the video tag.
+    </video>
+  </body>
+</html>
+
+
