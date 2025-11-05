@@ -1,8 +1,8 @@
 {
   "files": {
-    "main.css": "/OpeNTF/tutorial/wsdm25/static/css/main.2f44b921.css",
-    "main.js": "/OpeNTF/tutorial/wsdm25/static/js/main.3069b986.js",
-    "static/js/453.b87839ac.chunk.js": "/OpeNTF/tutorial/wsdm25/static/js/453.b87839ac.chunk.js",
+    "main.css": "/OpeNTF/tutorial/wsdm25/static/css/main.8412f5b0.css",
+    "main.js": "/OpeNTF/tutorial/wsdm25/static/js/main.de59dd16.js",
+    "static/js/453.d23db503.chunk.js": "/OpeNTF/tutorial/wsdm25/static/js/453.d23db503.chunk.js",
     "static/media/adila.png": "/OpeNTF/tutorial/wsdm25/static/media/adila.eb04c10a1c6bb9276d94.png",
     "static/media/taxonomy.png": "/OpeNTF/tutorial/wsdm25/static/media/taxonomy.55fe4da306a89e548fe6.png",
     "static/media/vivafemme.jpg": "/OpeNTF/tutorial/wsdm25/static/media/vivafemme.63a4bcf87ffb259610f1.jpg",
@@ -21,12 +21,12 @@
     "static/media/cardinal.jpg": "/OpeNTF/tutorial/wsdm25/static/media/cardinal.8741a54c4187f7f7231c.jpg",
     "static/media/sloth.jpg": "/OpeNTF/tutorial/wsdm25/static/media/sloth.810860bd0d914fe498d9.jpg",
     "index.html": "/OpeNTF/tutorial/wsdm25/index.html",
-    "main.2f44b921.css.map": "/OpeNTF/tutorial/wsdm25/static/css/main.2f44b921.css.map",
-    "main.3069b986.js.map": "/OpeNTF/tutorial/wsdm25/static/js/main.3069b986.js.map",
-    "453.b87839ac.chunk.js.map": "/OpeNTF/tutorial/wsdm25/static/js/453.b87839ac.chunk.js.map"
+    "main.8412f5b0.css.map": "/OpeNTF/tutorial/wsdm25/static/css/main.8412f5b0.css.map",
+    "main.de59dd16.js.map": "/OpeNTF/tutorial/wsdm25/static/js/main.de59dd16.js.map",
+    "453.d23db503.chunk.js.map": "/OpeNTF/tutorial/wsdm25/static/js/453.d23db503.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.2f44b921.css",
-    "static/js/main.3069b986.js"
+    "static/css/main.8412f5b0.css",
+    "static/js/main.de59dd16.js"
   ]
 }

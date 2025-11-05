@@ -59,7 +59,7 @@ function Home() {
                     <span style={{ fontSize: '14px', color: 'black' }}>
                     Prev Tutorial: <a target="_blank" href="https://fani-lab.github.io/OpeNTF/tutorial/umap24/" >UMAP24</a> ◁ [<a target="_blank" href="">Full Outline</a>]
                     [<a target="_blank" href="">Slides</a>]
-                    [<a target="_blank" style={{color: "gray"}}>Recording</a>] ▷ Next Tutorial: <a target="_blank" href="https://fani-lab.github.io/OpeNTF/tutorial/wsdm25/">WSDM25</a>
+                    [<a target="_blank" style={{color: "gray"}}>Recording</a>] ▷ Next Tutorials: <a target="_blank" href="https://fani-lab.github.io/OpeNTF/tutorial/wsdm25/">WSDM25</a> and <a target="_blank" href="https://fani-lab.github.io/OpeNTF/tutorial/cikm25/">CIKM25</a>
                     </span>
                 </div>
             </section>

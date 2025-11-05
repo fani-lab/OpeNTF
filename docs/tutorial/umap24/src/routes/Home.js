@@ -93,6 +93,7 @@ function Home() {
           Next Tutorials:
           [<a target="_blank" href="https://fani-lab.github.io/OpeNTF/tutorial/sigir-ap24/">SIGIR-AP24</a>]
           [<a target="_blank" href="https://fani-lab.github.io/OpeNTF/tutorial/wsdm25/">WSDM25</a>]
+          [<a target="_blank" href="https://fani-lab.github.io/OpeNTF/tutorial/cikm25/">CIKM25</a>]
         </div>
       </section>
       <section id="section-abstract">

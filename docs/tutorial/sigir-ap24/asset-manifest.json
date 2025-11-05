@@ -1,8 +1,8 @@
 {
   "files": {
-    "main.css": "/OpeNTF/tutorial/sigir-ap24/static/css/main.07e4e7cd.css",
-    "main.js": "/OpeNTF/tutorial/sigir-ap24/static/js/main.9e2fefbf.js",
-    "static/js/453.1274fc90.chunk.js": "/OpeNTF/tutorial/sigir-ap24/static/js/453.1274fc90.chunk.js",
+    "main.css": "/OpeNTF/tutorial/sigir-ap24/static/css/main.b27d1e81.css",
+    "main.js": "/OpeNTF/tutorial/sigir-ap24/static/js/main.e9a1e717.js",
+    "static/js/453.1650627f.chunk.js": "/OpeNTF/tutorial/sigir-ap24/static/js/453.1650627f.chunk.js",
     "static/media/mount_fuji_1.jpg": "/OpeNTF/tutorial/sigir-ap24/static/media/mount_fuji_1.47dda23496144309f241.jpg",
     "static/media/vivafemme.jpg": "/OpeNTF/tutorial/sigir-ap24/static/media/vivafemme.63a4bcf87ffb259610f1.jpg",
     "static/media/taxonomy.jpg": "/OpeNTF/tutorial/sigir-ap24/static/media/taxonomy.112cb6d1e28b8085b5cf.jpg",
@@ -18,12 +18,12 @@
     "static/media/cardinal.jpg": "/OpeNTF/tutorial/sigir-ap24/static/media/cardinal.8741a54c4187f7f7231c.jpg",
     "static/media/sloth.jpg": "/OpeNTF/tutorial/sigir-ap24/static/media/sloth.810860bd0d914fe498d9.jpg",
     "index.html": "/OpeNTF/tutorial/sigir-ap24/index.html",
-    "main.07e4e7cd.css.map": "/OpeNTF/tutorial/sigir-ap24/static/css/main.07e4e7cd.css.map",
-    "main.9e2fefbf.js.map": "/OpeNTF/tutorial/sigir-ap24/static/js/main.9e2fefbf.js.map",
-    "453.1274fc90.chunk.js.map": "/OpeNTF/tutorial/sigir-ap24/static/js/453.1274fc90.chunk.js.map"
+    "main.b27d1e81.css.map": "/OpeNTF/tutorial/sigir-ap24/static/css/main.b27d1e81.css.map",
+    "main.e9a1e717.js.map": "/OpeNTF/tutorial/sigir-ap24/static/js/main.e9a1e717.js.map",
+    "453.1650627f.chunk.js.map": "/OpeNTF/tutorial/sigir-ap24/static/js/453.1650627f.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.07e4e7cd.css",
-    "static/js/main.9e2fefbf.js"
+    "static/css/main.b27d1e81.css",
+    "static/js/main.e9a1e717.js"
   ]
 }

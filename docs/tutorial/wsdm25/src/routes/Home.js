@@ -60,7 +60,7 @@ function Home() {
                     <span style={{ fontSize: '14px', color: 'black' }}>
                         Prev Tutorials at <a target="_blank" href="https://fani-lab.github.io/OpeNTF/tutorial/umap24/" >UMAP24</a> and <a target="_blank" href="https://fani-lab.github.io/OpeNTF/tutorial/sigir-ap24/" >SIGIR-AP24</a> ◁ [<a target="_blank" href="https://hosseinfani.github.io/res/papers/2025_WSDM_Bridging_Historical_Subgraph_Optimization_and_Modern_Graph_Neural_Network_Approaches_in_Team_Recommendations.pdf">Full Outline</a>]
                         [<a target="_blank" href="https://hosseinfani.github.io/res/slides/2025_WSDM_Bridging_Historical_Subgraph_Optimization_and_Modern_Graph_Neural_Network_Approaches_in_Team_Recommendations.pdf">Slides</a>]
-                        [<a target="_blank" style={{color: "gray"}}>Recording</a>]
+                        [<a target="_blank" style={{color: "gray"}}>Recording</a>] ▷ Next Tutorials: <a target="_blank" href="https://fani-lab.github.io/OpeNTF/tutorial/cikm25/">CIKM25</a>
                     </span>
                 </div>
             </section>
