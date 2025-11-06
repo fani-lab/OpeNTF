@@ -26,7 +26,7 @@ model:
     graph:
       structure: #hydra doesn't understand tuple. So, inside code, explicit cast to tuple(...)
         #[[[member, to, member]], m] # looks like hetero but homo to have consistent pipleline for both types
-        #[[[skill, to, member]], sm) #hetero
+        #[[[skill, to, member]], sm] #hetero
         [[[skill, to, team], [member, to, team]], stm]
         #[[[skill, to, team], [member, to, team], [loc, to, team]], stml]
         #[[[skill, to, skill], [skill, to, team], [member, to, team], [loc, to, team]], sstml]
