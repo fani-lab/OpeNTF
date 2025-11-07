@@ -1,24 +1,35 @@
 # ``OpeNTF``: An Open-Source Neural Team Formation Benchmark Library 
+
+>K. Thang, H. Hosseini, H. Fani; Translative Neural Team Recommendation: From Multilabel Classification to Sequence Prediction. In the 48th International ACM SIGIR Conference on Research and Development in Information Retrieval (SIGIR), 2025. [`pdf`](https://hosseinfani.github.io/res/papers/2025_SIGIR_Translative_Neural_Team_Recommendation_From_Multilabel_Classification_to_Sequence_Prediction.pdf) [`doi`](https://doi.org/10.1145/3726302.3730259) [`reviews`](https://hosseinfani.github.io/res/papers/2025_SIGIR_Translative_Neural_Team_Recommendation_From_Multilabel_Classification_to_Sequence_Prediction.txt) [`poster`](https://hosseinfani.github.io/res/posters/2025_SIGIR_Translative_Neural_Team_Recommendation_From_Multilabel_Classification_to_Sequence_Prediction.pdf)
+
+> R. Barzegar, M. Kurepa+♥, H. Fani; Adaptive Loss-based Curricula for Neural Team Recommendation. In the 18th International Conference on Web Search and Data Mining (WSDM), 2025. [`pdf`](https://hosseinfani.github.io/res/papers/2025_WSDM_Adaptive_Loss-based_Curricula_for_Neural_Team_Recommendation.pdf) [`doi`](https://doi.org/10.1145/3701551.3703574) [`reviews`](https://hosseinfani.github.io/res/papers/2025_WSDM_Adaptive_Loss-based_Curricula_for_Neural_Team_Recommendation.txt)
+
+> H. Fani, R. Barzegar, A. Dashti, M. Saeedi; A Streaming Approach to Neural Team Formation Training. In the 46th European Conference on Information Retrieval (ECIR), 2024. [`pdf`](https://hosseinfani.github.io/res/papers/2024_ECIR_A_Streaming_Approach_to_Neural_Team_Formation_Training.pdf) [`doi`](https://doi.org/10.1007/978-3-031-56027-9_20) [`reviews`](https://hosseinfani.github.io/res/papers/2024_ECIR_A_Streaming_Approach_to_Neural_Team_Formation_Training.txt) [`ppt`](https://hosseinfani.github.io/res/slides/2024_ECIR_A_Streaming_Approach_to_Neural_Team_Formation_Training.pdf) [`video`](https://www.youtube.com/watch?v=tPP68i4ILFs)
+
+> M.J. Ahmed, M. Saeedi, H. Fani; Skill Vector Representation Learning for Collaborative Team Recommendation: A Comparative Study. In the 25th International Web Information Systems Engineering (WISE), 2024. [`pdf`](https://hosseinfani.github.io/res/papers/2024_WISE_Skill_Vector_Representation_Learning_for_Collaborative_Team_Recommendation__A_Comparative_Study.pdf) [`doi`](https://doi.org/10.1007/978-981-96-0567-5_15) [`reviews`](https://hosseinfani.github.io/res/papers/2024_WISE_Skill_Vector_Representation_Learning_for_Collaborative_Team_Recommendation__A_Comparative_Study.txt)
+
+> A. Dashti, S. Samet, H. Fani; Effective Neural Team Formation via Negative Samples. In the 31st ACM International Conference on Information and Knowledge Management (CIKM), 2022. [`pdf`](https://hosseinfani.github.io/res/papers/2022_CIKM_Effective_Neural_Team_Formation_via_Negative_Samples.pdf) [`doi`](https://dl.acm.org/doi/10.1145/3511808.3557590) [`reviews`](https://hosseinfani.github.io/res/papers/2022_CIKM_Effective_Neural_Team_Formation_via_Negative_Samples.txt)
+
+> A. Dashti, K. Saxena, D. Patel†, H. Fani; OpeNTF: A Benchmark Library for Neural Team Formation. In the 31st ACM International Conference on Information and Knowledge Management (CIKM), 2022. [`pdf`](https://hosseinfani.github.io/res/papers/2022_CIKM_OpeNTF_A_Benchmark_Library_for_Neural_Team_Formation.pdf) [`doi`](https://dl.acm.org/doi/10.1145/3511808.3557526) [`reviews`](https://hosseinfani.github.io/res/papers/2022_CIKM_OpeNTF_A_Benchmark_Library_for_Neural_Team_Formation.txt) [`video`](https://www.youtube.com/playlist?list=PLKFWrqRN8VmQBEyNBn8kXhaYpG6Gpecko)
+
 Team formation (recommendation) involves selecting a team of skillful experts who will, more likely than not, accomplish a task. Researchers have proposed a rich body of computational methods to automate the traditionally tedious and error-prone manual process. We release `OpeNTF`, an open-source neural team formation framework hosting canonical `neural models` as the cutting-edge class of approaches, along with `large-scale` training datasets from `varying domains`. It further includes `temporal` training strategy for neural models’ training to capture the evolution of experts’ skills and collaboration ties over `time`, as opposed to randomly shuffled training datasets. OpeNTF also integrates `debiasing reranking` algorithms at its last step to mitigate the `popularity` and `gender` disparities in the neural models’ team recommendations based on two alternative notions of fairness: `equality of opportunity` and `demographic parity`. OpeNTF is a forward-looking effort to automate team formation via fairness-aware and time-sensitive methods. AI-ML-based solutions are increasingly impacting how resources are allocated to various groups in society, and ensuring fairness and time are systematically considered is key.
 
 <table border=0>
 <tr>
 <td >
 
-  
 - [1. Setup](#1-setup)
 - [2. Quickstart](#2-quickstart)
 - [3. Features](#3-features)
-  * [`Neural Models`](#33-model-architecture)
+  * [`Neural Models`](#31-model-architecture)
   * [`Fairness aware Team Formation`](#31-adila-fairness-aware-team-formation)
-  * [`Temporal Team Prediction`](#34-temporal-team-prediction)
-  * [`Negative Sampling Strategies`](#35-negative-sampling-strategies)
-  * [`Datasets and Parallel Preprocessing`](#32-datasets-and-parallel-preprocessing)
+  * [`Temporal Team Prediction`](#32-temporal-team-prediction)
+  * [`Negative Sampling Strategies`](#33-negative-sampling-strategies)
+  * [`Datasets and Parallel Preprocessing`](#34-datasets-and-parallel-preprocessing)
 - [4. Results](#4-results)
-- [5. Benchmarks at Scale (Citations)](#5-benchmarks-at-scale-(citations))
-- [6. Acknowledgement](#5-acknowledgement)
-- [7. License](#6-license)
-- [8. Awards](#8-awards)
+- [5. Acknowledgement](#5-acknowledgement)
+- [6. License](#6-license)
+- [7. Awards](#7-awards)
 
 
 </td>
@@ -48,7 +59,8 @@ For installation of a specific version of a python package due to, e.g., ``CUDA`
 
 To run in a `container`, a docker `image` can be built and run by customizing the [`Dockerfile`](Dockerfile).
 
-## 2. Quickstart [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/fani-lab/OpeNTF/blob/main/ipynb/quickstart.ipynb)
+## 2. Quickstart 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/fani-lab/OpeNTF/blob/main/ipynb/quickstart.ipynb)
 
 ```sh
 cd src
@@ -150,25 +162,10 @@ We used [``pytrec_eval``](https://github.com/cvangysel/pytrec_eval) to evaluate 
 >
 > ``test.pred.eval.mean.csv`` is the average of values for evaluation metrics over all _n_ fold models.
 
-## 5. Benchmarks at Scale (Citations):
-
->K. Thang, H. Hosseini, H. Fani; Translative Neural Team Recommendation: From Multilabel Classification to Sequence Prediction. In the 48th International ACM SIGIR Conference on Research and Development in Information Retrieval (SIGIR), 2025. pdf doi reviews poster
-
-> R. Barzegar, M. Kurepa+♥, H. Fani; Adaptive Loss-based Curricula for Neural Team Recommendation. In the 18th International Conference on Web Search and Data Mining (WSDM), 2025. pdf doi reviews
-
-> H. Fani, R. Barzegar, A. Dashti, M. Saeedi; A Streaming Approach to Neural Team Formation Training. In the 46th European Conference on Information Retrieval (ECIR), 2024. pdf doi reviews ppt video
-
-> M.J. Ahmed, M. Saeedi, H. Fani; Skill Vector Representation Learning for Collaborative Team Recommendation: A Comparative Study. In the 25th International Web Information Systems Engineering (WISE), 2024. pdf doi reviews
-
-> A. Dashti, S. Samet, H. Fani; Effective Neural Team Formation via Negative Samples. In the 31st ACM International Conference on Information and Knowledge Management (CIKM), 2022. pdf doi reviews
-
-> A. Dashti, K. Saxena, D. Patel†, H. Fani; OpeNTF: A Benchmark Library for Neural Team Formation. In the 31st ACM International Conference on Information and Knowledge Management (CIKM), 2022. pdf doi reviews video
-
-
-## 6. Acknowledgement:
+## 5. Acknowledgement:
 We benefit from [``pytrec_eval``](https://github.com/cvangysel/pytrec_eval), [``gensim``](https://radimrehurek.com/gensim/), [Josh Feldman's blog](https://joshfeldman.net/WeightUncertainty/), and other libraries. We would like to thank the authors of these libraries and helpful resources.
   
-## 7. License:
+## 6. License:
 ©2025. This work is licensed under a [CC BY-NC-SA 4.0](license.txt) license.
 
 ## 7. Awards:
