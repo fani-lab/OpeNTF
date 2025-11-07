@@ -21,7 +21,7 @@ Team formation (recommendation) involves selecting a team of skillful experts wh
 - [1. Setup](#1-setup)
 - [2. Quickstart](#2-quickstart)
 - [3. Features](#3-features)
-  * [`Neural Models`](#31-model-architecture)
+  * [`Neural Models`](#31-neural-models)
   * [`Fairness aware Team Formation`](#32-adila-fairness-aware-team-formation)
   * [`Temporal Team Prediction`](#33-temporal-team-prediction)
   * [`Negative Sampling Strategies`](#34-negative-sampling-strategies)
