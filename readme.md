@@ -9,22 +9,21 @@ Team formation (recommendation) involves selecting a team of skillful experts wh
 - [1. Setup](#1-setup)
 - [2. Quickstart](#2-quickstart)
 - [3. Features](#3-features)
+  * [`Neural Models`](#33-model-architecture)
   * [`Fairness aware Team Formation`](#31-adila-fairness-aware-team-formation)
-  * [`Datasets and Parallel Preprocessing`](#32-datasets-and-parallel-preprocessing)
-  * [`Neural Models`](#35-model-architecture)
   * [`Temporal Team Prediction`](#34-temporal-team-prediction)
-  * [`Negative Sampling Strategies`](#36-negative-sampling-strategies)
+  * [`Negative Sampling Strategies`](#35-negative-sampling-strategies)
+  * [`Datasets and Parallel Preprocessing`](#32-datasets-and-parallel-preprocessing)
 - [4. Results](#4-results)
-- [5. Acknowledgement](#5-acknowledgement)
-- [6. License](#6-license)
-- [7. Citation](#7-citation)
+- [5. Benchmarks at Scale (Citations)](#5-benchmarks-at-scale-(citations))
+- [6. Acknowledgement](#5-acknowledgement)
+- [7. License](#6-license)
 - [8. Awards](#8-awards)
 
 
-
 </td>
-<td><img src='docs/adila_flow_.png' width="600" align="right" /></td>
-<!-- <td><img src='./src/mdl/team_inheritance_hierarchy.png' width="90%%" /></td> -->
+<td><img src='docs/adila_.png' width="600" align="right" /></td>
+<!-- <td><img src='docs/models_class_diagram.png' width="90%%" /></td> -->
 </tr>
 </table>
 
@@ -66,16 +65,56 @@ The above run, loads and preprocesses a tiny-size toy example dataset [``toy.dbl
 
 
 ## 3. Features
-#### **3.1. [`Adila`](https://github.com/fani-lab/Adila): Fairness aware Team Formation**
 
-Neural team formation methods largely ignore the fairness in the recommended teams of experts. In `Adila`, we study the application of `fairness-aware` re-ranking algorithms to mitigate the potential popularity or gender biases. We support two fairness notions namely, `equality of opportunity` and `demographic parity`. To achieve fairness, we utilize three deterministic greedy reranking algorithms (`det_greedy`, `det_cons`, `det_relaxed`) in addition to `fa*ir`, a probabilistic greedy reranking algorithm. 
+#### **3.1. Neural Models**
 
+<p align="center"><img src='docs/models_class_diagram.png' width="500" ></p>
 
-<p align="center"><img src='docs/adila_flow.png' width="1000" ></p>
+Each model has been defined in [``./src/mdl/``](./src/mdl/) under an inheritance hierarchy. They override abstract functions for ``train``, ``test``, ``eval``, and ``plot`` steps. For example, for our feedforward baseline [``fnn``](./src/mdl/fnn.py), the model has been implemented in [``./src/mdl/fnn.py``](src/mdl/fnn.py). Model's hyperparameters such as the learning rate (``lr``) or the number of epochs (``e``) can be set in [``./src/mdl/__config__yaml``](./src/mdl/__config__yaml), or overriden in running command as shown in the [``quickstart``](https://colab.research.google.com/github/fani-lab/OpeNTF/blob/main/ipynb/quickstart.ipynb) script.
+  
+Currently, from [``./src/mdl/``](./src/mdl/), we support 
 
-For further details and demo, please visit [Adila's submodule](https://github.com/fani-lab/Adila).
+> Neural mutlilabel classifiers including non-Bayesian feedforward [``fnn``](./src/mdl/fnn.py) and Bayesian [``bnn``](./src/mdl/bnn.py), where each expert candidate is a label and team recommendation is a multilabel classification (See [A Variational Neural Architecture for Skill-based Team Formation, TOIS23](https://dl.acm.org/doi/abs/10.1145/3589762) for details and results),
 
-#### **3.2. Datasets and Parallel Preprocessing**
+> Seq-to-seq and transformer-based models via [``nmt``](./src/mdl/nmt.py) wrapper over [`OpenNMT`](https://github.com/OpenNMT/OpenNMT-py), where the required subset of skills is mapped to the optimum subset of experts (See [Translative Neural Team Recommendation, SIGIR25](https://doi.org/10.1145/3726302.3730259) for details and results), and
+ 
+> Gnn-based models via [``gnn``](./src/mdl/gnn.py) using [`PyG`](https://pyg.org/), where the optimum subset of experts is predicted via link prediction between expert and team nodes in an expert graph, as shown in the [``gnn.ipynb``](https://colab.research.google.com/github/fani-lab/OpeNTF/blob/main/ipynb/gnn.ipynb) script. 
+
+From [``./src/mdl/emb/``](./src/mdl/emb/), we also support dense vector representation learning methods for skills to be fed into the neural mutlilabel classifiers:
+
+> [``d2v``](src/mdl/emb/d2v.py): Inspired by paragraph vectors by [Le and Mikolov](https://dl.acm.org/doi/10.5555/3044805.3045025), we consider a team as a document and skills as the document words and embed skills using [``gensim``](https://radimrehurek.com/gensim/).
+
+> [`gnn`](src/mdl/emb/gnn.py): A graph neural network can be used to embed skills in an expert graph (transfer-based). Via [`PyG`](https://pyg.org/), we implemented random-walk-based methods like `node2vec` and `metapath2vec`, or message-passing-based like 'graphsage', and many more. See [``gnn.ipynb``](https://colab.research.google.com/github/fani-lab/OpeNTF/blob/main/ipynb/gnn.ipynb) script, also [Skill Vector Representation Learning for Collaborative Team Recommendation: A Comparative Study, WISE24](https://doi.org/10.1007/978-981-96-0567-5_15) for details and results.
+
+#### **3.2. [`Adila`](https://github.com/fani-lab/Adila): Fairness aware Team Formation**
+
+<p align="center"><img src='docs/adila.png' width="500" ></p>
+
+Neural team formation methods largely ignore the fairness in the recommended teams of experts. In `Adila`, we study the application of `fairness-aware` re-ranking algorithms to mitigate the potential popularity or gender biases. We support two fairness notions namely, `equality of opportunity` and `demographic parity`. To achieve fairness, we utilize three deterministic greedy reranking algorithms (`det_greedy`, `det_cons`, `det_relaxed`) in addition to `fa*ir`, a probabilistic greedy reranking algorithm. For further details and demo, please visit [Adila's submodule](https://github.com/fani-lab/Adila).
+
+#### **3.3. Temporal Team Prediction**
+
+<p align="center"><img src='docs/temporal.jpg' width="500"></p>
+
+Team formation models generally assume that teams follow the i.i.d property and follow the bag of teams approach during training (a shuffled dataset of teams). With temporal training, we aim to predict `future` teams of experts. We sort the teams by time intervals and train a neural model incrementally through the ordered collection of teams, as seen below. To run models under temporal training strategy, set [`models.instances`](https://github.com/fani-lab/OpeNTF/blob/main/src/__config__.yaml#L57) to `[mdl.tntf.tNtf_mdl.fnn.Fnn]`, `[mdl.tntf.tNtf_mdl.bnn.Bnn]`, or both `[mdl.tntf.tNtf_mdl.fnn.Fnn, mdl.tntf.tNtf_mdl.bnn.Bnn]` in [`src/__config__.yaml`](https://github.com/fani-lab/OpeNTF/blob/main/src/__config__.yaml).
+
+See [A Streaming Approach to Neural Team Formation Training, ECIR24](https://doi.org/10.1007/978-3-031-56027-9_20) for details and results.
+
+#### **3.4. Negative Sampling Strategies**
+
+As is known, using ``unsuccessful`` teams convey complementary negative signals to the model. However, most real-world training datasets in the team formation domain do not have explicit unsuccessful teams (e.g., collections of rejected papers.) In the absence of unsuccessful training instances, we proposed negative sampling strategies based on the ``closed-world`` assumption, where no currently known successful group of experts for the required skills is assumed to be unsuccessful. We study the effect different negative sampling strategies: 
+
+> Uniform distribution (``uniform``), where subsets of experts are randomly chosen with the ``same probability`` as unsuccessful teams from the uniform distribution over all subsets of experts.
+
+> Unigram distribution (``unigram``), where subsets of experts are chosen regarding ``their frequency`` in all previous successful teams. Intuitively, teams of experts that have been more successful but for other skill subsets will be given a higher probability and chosen more frequently as a negative sample to dampen the effect of popularity bias.
+
+> Smoothed unigram distribution in each training minibatch (``unigram_b``), where we employed the ``add-1 or Laplace smoothing`` when computing the unigram distribution of the experts but in each training minibatch.
+
+To include a negative sampling strategy, set [`nsd`](https://github.com/fani-lab/OpeNTF/blob/main/src/mdl/__config__.yaml#L3) and the number of negative samples to draw [`ns`](https://github.com/fani-lab/OpeNTF/blob/main/src/mdl/__config__.yaml#L4) in [`src/mdl/__config__.yaml`](https://github.com/fani-lab/OpeNTF/blob/main/src/mdl/__config__.yaml)
+
+See [Effective Neural Team Formation via Negative Samples, CIKM22](https://dl.acm.org/doi/10.1145/3511808.3557590) for details and results.
+
+#### **3.5. Datasets and Parallel Preprocessing**
 
 Raw dataset, e.g., scholarly papers from AMiner's citation network dataset of [``dblp``](https://originalstatic.aminer.cn/misc/dblp.v12.7z), movies from [``imdb``](https://datasets.imdbws.com/), or US patents from [``uspt``](https://patentsview.org/download/data-download-tables) were assumed to be populated in [``data``](data). For the sake of integration test, tiny-size toy example datasets [``toy.dblp.v12.json``](data/dblp/toy.dblp.v12.json) from [``dblp``](https://originalstatic.aminer.cn/misc/dblp.v12.7z), [[``toy.title.basics.tsv``](data/imdb/toy.title.basics.tsv), [``toy.title.principals.tsv``](data/imdb/toy.title.principals.tsv), [``toy.name.basics.tsv``](data/imdb/toy.name.basics.tsv)] from [``imdb``](https://datasets.imdbws.com/), [``toy.repos.csv``](data/uspt/toy.repos.csv) for `github`, and [``toy.patent.tsv``](data/uspt/toy.patent.tsv) from `US patents` have been already provided.
 
@@ -99,176 +138,40 @@ The sparse matrices and the indices will be persisted in [``ouptut/{dblp,imdb,us
 
 Please note that the preprocessing step will be executed once. Subsequent runs load the persisted pickle files. In order to re-generate them, one should simply delete them. 
 
-#### **3.5. Neural Models**
-
-Each model has been defined in [``./src/mdl/``](./src/mdl/) under an inheritance hierarchy. They override abstract functions for ``train``, ``test``, ``eval``, and ``plot`` steps.
-
-For example, for our feedforward baseline [``fnn``](./src/mdl/fnn.py), the model has been implemented in [``./src/mdl/fnn.py``](src/mdl/fnn.py). Model's hyperparameters such as the learning rate (``lr``) or the number of epochs (``e``) can be set in [``./src/mdl/__config__yaml``](./src/mdl/__config__yaml), or overriden in running command as shown in the [``quickstart``](https://colab.research.google.com/github/fani-lab/OpeNTF/blob/main/ipynb/quickstart.ipynb) script.
-
-<p align="center"><img src='src/mdl/docs/team_inheritance_hierarchy.png' width="550" ></p>
-  
-Currently, from [``./src/mdl/``](./src/mdl/), we support 
-
-> Neural mutlilabel classifiers including non-Bayesian feedforward [``fnn``](./src/mdl/fnn.py) and Bayesian [``bnn``](./src/mdl/bnn.py), where each expert candidate is a label and team recommendation is a multilabel classification,
-> Seq-to-seq and transformer-based models via [``nmt``](./src/mdl/nmt.py) wrapper over [`OpenNMT`](https://github.com/OpenNMT/OpenNMT-py), where the required subset of skills is mapped to the optimum subset of experts, and
-> Gnn-based via [`PyG`](https://pyg.org/), where the optimum subset of experts is predicted via link prediction between expert and team nodes in an expert graph.
-
-From [``./src/mdl/emb/``](./src/mdl/emb/), we also support dense vector representation learning methods for skills to be fed into the neural mutlilabel classifiers:
-
-> [``d2v``](src/mdl/emb/d2v.py): Inspired by paragraph vectors by [Le and Mikolov](https://dl.acm.org/doi/10.5555/3044805.3045025), we consider a team as a document and skills as the document words and embed skills using [``gensim``](https://radimrehurek.com/gensim/).
-> [`gnn`](src/mdl/emb/gnn.py): A graph neural network can be used to embed skills in an expert graph (transfer-based). Via [`PyG`](https://pyg.org/), we implemented random-walk-based methods like `node2vec` and `metapath2vec`, or message-passing-based like 'graphsage', and many more. 
-
-#### **3.4. Temporal Team Prediction**
-
-Team formation models generally assume that teams follow the i.i.d property and follow the bag of teams approach during training (shuffled dataset of teams). With temporal training, we aim predicting _future_ teams of experts. We sort the teams by time intervals and train a neural model incrementally through the ordered collection of teams, as seen below. See [A Streaming Approach to Neural Team Formation Training, ECIR24](https://doi.org/10.1007/978-3-031-56027-9_20) for details and results.
-
-<p align="center"><img src='src/docs/temporal.jpg' width="600"></p>
-
-
-#### **3.6. Negative Sampling Strategies**
-
-As known, employing ``unsuccessful`` teams convey complementary negative signals to the model to alleviate the long-tail problem. Most real-world training datasets in the team formation domain, however, do not have explicit unsuccessful teams (e.g., collections of rejected papers.) In the absence of unsuccessful training instances, we proposed negative sampling strategies based on the ``closed-world`` assumption where no currently known successful group of experts for the required skills is assumed to be unsuccessful.  We study the effect of ``three`` different negative sampling strategies: two based on static distributions, and one based on adaptive noise distribution:
-
-1) Uniform distribution (``uniform``), where subsets of experts are randomly chosen with the ``same probability`` as unsuccessful teams from the uniform distribution over all subsets of experts.
-
-2) Unigram distribution (``unigram``), where subsets of experts are chosen regarding ``their frequency`` in all previous successful teams. Intuitively, teams of experts that have been more successful but for other skill subsets will be given a higher probability and chosen more frequently as a negative sample to dampen the effect of popularity bias.
-
-3) Smoothed unigram distribution in each training minibatch (``unigram_b``), where we employed the ``add-1 or Laplace smoothing`` when computing the unigram distribution of the experts but in each training minibatch. Minibatch stochastic gradient descent is the _de facto_ method for neural models where the data is split into batches of data, each of which is sent to the model for the partial calculation to speed up training while maintaining high accuracy. 
-
-To include a negative sampling strategy, there are two parameters for a model to set in [``./src/param.py``](src/param.py):
-- ``ns``: the negative sampling strategy which can be ``uniform``, ``unigram``, ``unigram_b`` or ``None``(no negative sampling).
-- ``nns``: number of negative samples
-
-#### **3.7. Run**
-
-The pipeline accepts three required list of values:
-1) ``-data``: list of path to the raw datafiles, e.g., ``-data ./../data/raw/dblp/dblp.v12.json``, or the main file of a dataset, e.g., ``-data ./../data/raw/imdb/title.basics.tsv``
-2) ``-domain``: list of domains of the raw data files that could be ``dblp``, ``imdb``, or `uspt`; e.g., ``-domain dblp imdb``.
-3) ``-model``: list of baseline models that could be ``fnn``, ``fnn_emb``, ``bnn``, ``bnn_emb``, ``tfnn``, ``tfnn_emb``, ``tfnn_dt2v_emb``, ``tbnn``, ``tbnn_emb``, ``tbnn_dt2v_emb``, ``random``; e.g., ``-model random fnn bnn tfnn tbnn tfnn_dt2v_emb tbnn_dt2v_emb``.
-
-Here is a brief explanation of the models:
-- ``fnn``, ``bnn``, ``fnn_emb``, ``bnn_emb``: follows the standard machine learning training procedure.
-- ``tfnn``, ``tbnn``, ``tfnn_emb``, ``tbnn_emb``: follows our proposed streaming training strategy without adding temporal information to the input of the models.
-- ``tfnn_dt2v_emb``, ``tbnn_dt2v_emb``: follows our proposed streaming training strategy and employs temporal skills as input of the models.
-
 ## 4. Results
 
-We used [``pytrec_eval``](https://github.com/cvangysel/pytrec_eval) to evaluate the performance of models on the test set as well as on their own train sets (should overfit) and validation sets. We report the predictions, evaluation metrics on each test instance, and average on all test instances in ``./output/{dataset name}/{model name}/{model's running setting}/``.  For example:
+We used [``pytrec_eval``](https://github.com/cvangysel/pytrec_eval) to evaluate the performance of models on the test set as well as on their own train sets (should overfit) and validation sets. We report the predictions, evaluation metrics on each test instance, and average on all test instances in ``./output/{domain}/{dataset}/{split}/{model}.{setting}/``.  For example, see [`output/dblp/toy.dblp.v12.json/splits.f3.r0.85/gcn.b1000.e100.ns5.lr0.001.es5.spe10.d128.add.stm.h128.nn30-20`](https://github.com/fani-lab/OpeNTF/tree/main/output/dblp/toy.dblp.v12.json/splits.f3.r0.85/gcn.b1000.e100.ns5.lr0.001.es5.spe10.d128.add.stm.h128.nn30-20), where:
 
-1) ``f0.test.pred`` is the predictions per test instance for a model which is trained folds [1,2,3,4] and validated on fold [0].
-2) ``f0.test.pred.eval.csv`` is the values of evaluation metrics for the predictions per test instance
-3) ``f0.test.pred.eval.mean.csv`` is the average of values for evaluation metrics over all test instances.
-4) ``test.pred.eval.mean.csv`` is the average of values for evaluation metrics over all _n_ fold models.
+> ``f0.test.pred`` is the predictions per test instance for a model which is trained folds [1,2,3,4] and validated on fold [0].
+>
+> ``f0.test.pred.eval.csv`` is the values of evaluation metrics for the predictions per test instance
+>
+> ``f0.test.pred.eval.mean.csv`` is the average of values for evaluation metrics over all test instances.
+>
+> ``test.pred.eval.mean.csv`` is the average of values for evaluation metrics over all _n_ fold models.
 
-**Benchmarks at Scale**
+## 5. Benchmarks at Scale (Citations):
 
-**1. Fair Team Formation Results**
-||min. #member's team: 75, min team size: 3, epochs: 20, learning rate: 0.1, hidden layer: [1, 100d], minibatch: 4096, #negative samples: 3|
-|--------|------|
-|Datasets|[dblp.v12](https://originalstatic.aminer.cn/misc/dblp.v12.7z), [imdb](https://imdb.com/interfaces/), [uspt](https://patentsview.org/download/data-download-tables) (running ...)|
-|Metrics|ndkl, map@2,5,10, ndcg@2,5,10, auc|
-|Sensitive Attributes| popularity, gender(running ...)|
-|Baselines|{bnn, random}×{sparse, emb}×{unigram_b}|
-|Results|for further details and results, please visit [Adila's submodule](https://github.com/fani-lab/Adila)|
+>K. Thang, H. Hosseini, H. Fani; Translative Neural Team Recommendation: From Multilabel Classification to Sequence Prediction. In the 48th International ACM SIGIR Conference on Research and Development in Information Retrieval (SIGIR), 2025. pdf doi reviews poster
 
-Average performance of 5-fold neural models on the test set of the `imdb`, `dblp` and `uspt` datasets. For the metrics: `ndkl`, lower values are better (↓); `skew`, values closer to 0 are better (→0); and `map` and `ndcg`, higher values are better (↑).
-<hr>
-imdb dataset
-<p align="center"><img src='docs/fair_imdb.png'></p>
-<hr>
-dblp table
-<p align="center"><img src='docs/fair_dblp.png'></p>
-<hr>
-uspt table
-<p align="center"><img src='docs/fair_uspt.png'></p>
+> R. Barzegar, M. Kurepa+♥, H. Fani; Adaptive Loss-based Curricula for Neural Team Recommendation. In the 18th International Conference on Web Search and Data Mining (WSDM), 2025. pdf doi reviews
 
-**2. Non-Temporal Neural Team Formation**
+> H. Fani, R. Barzegar, A. Dashti, M. Saeedi; A Streaming Approach to Neural Team Formation Training. In the 46th European Conference on Information Retrieval (ECIR), 2024. pdf doi reviews ppt video
 
-||min. #member's team: 75, min team size: 3, epochs: 20, learning rate: 0.1, hidden layer: [1, 100d], minibatch: 4096, #negative samples: 3|
-|--------|------|
-|Datasets|[dblp.v12](https://originalstatic.aminer.cn/misc/dblp.v12.7z), [imdb](https://imdb.com/interfaces/), [uspt](https://patentsview.org/download/data-download-tables)|
-|Metrics|recall@2,5,10, map@2,5,10, ndcg@2,5,10, p@2,5,10, auc|
-|Baselines|{fnn,bnn}×{sparse, emb}×{none, uniform, unigram, unigram_b}|
-|Results|[``./output/dblp.v12.json.filtered.mt75.ts3/``](./output/dblp.v12.json.filtered.mt75.ts3/), [``./output/title.basics.tsv.filtered.mt75.ts3/``](./output/title.basics.tsv.filtered.mt75.ts3/)|
+> M.J. Ahmed, M. Saeedi, H. Fani; Skill Vector Representation Learning for Collaborative Team Recommendation: A Comparative Study. In the 25th International Web Information Systems Engineering (WISE), 2024. pdf doi reviews
 
-<p align="center">
-<img src='https://user-images.githubusercontent.com/8619934/154041216-c80cccfb-70a2-4831-8781-cdb4718fb00e.png' >
-<img src='https://user-images.githubusercontent.com/8619934/154041087-e4d99b1e-eb6b-456a-837b-840e4bd5090a.png' >
+> A. Dashti, S. Samet, H. Fani; Effective Neural Team Formation via Negative Samples. In the 31st ACM International Conference on Information and Knowledge Management (CIKM), 2022. pdf doi reviews
 
-Full predictions of all models on test and training sets and the values of evaluation metrics, per instance and average, are available in a rar file of size ``74.8GB`` and will be delivered upon request! 
-
-**3. Temporal Neural Team Prediction**
-
-We kick-started our experiments based on the best results from the non-temporal neural team formation experiments.
-
-||min. #member's team: 75, min team size: 3, epochs: 20, learning rate: 0.1, hidden layer: [1, 128d], minibatch: 128, #negative samples: 3|
-|--------|------|
-|Datasets|[dblp.v12](https://originalstatic.aminer.cn/misc/dblp.v12.7z), [imdb](https://imdb.com/interfaces/), [uspt](https://patentsview.org/download/data-download-tables), [gith](https://codelabs.developers.google.com/codelabs/bigquery-github#0)|
-|Metrics|recall@2,5,10, map@2,5,10, ndcg@2,5,10, p@2,5,10, auc|
-|Baselines|{bnn, tbnn}×{sparse, emb, dt2v_emb}×{unigram_b},{[rrn](https://dl.acm.org/doi/10.1145/3018661.3018689)}|
-|Results|[``./output/dblp.v12.json.filtered.mt75.ts3/``](./output/dblp.v12.json.filtered.mt75.ts3/), [``./output/title.basics.tsv.filtered.mt75.ts3/``](./output/title.basics.tsv.filtered.mt75.ts3/), [``./output/patent.tsv.filtered.mt75.ts3/``](./output/patent.tsv.filtered.mt75.ts3/)|
-
-<p align="center"><img src='docs/temporal_results.png'></p>
-
-Full predictions of all models on test and training sets and the values of evaluation metrics are available in a rar file and will be delivered upon request! 
+> A. Dashti, K. Saxena, D. Patel†, H. Fani; OpeNTF: A Benchmark Library for Neural Team Formation. In the 31st ACM International Conference on Information and Knowledge Management (CIKM), 2022. pdf doi reviews video
 
 
-
-
-## 5. Acknowledgement:
+## 6. Acknowledgement:
 We benefit from [``pytrec_eval``](https://github.com/cvangysel/pytrec_eval), [``gensim``](https://radimrehurek.com/gensim/), [Josh Feldman's blog](https://joshfeldman.net/WeightUncertainty/), and other libraries. We would like to thank the authors of these libraries and helpful resources.
   
-## 6. License:
-©2024. This work is licensed under a [CC BY-NC-SA 4.0](license.txt) license.
+## 7. License:
+©2025. This work is licensed under a [CC BY-NC-SA 4.0](license.txt) license.
 
-## 7. Citation:
-```
-@inproceedings{DBLP:conf/ecir/FaniBDS24,
-  author       = {Hossein Fani and Reza Barzegar and Arman Dashti and Mahdis Saeedi},
-  title        = {A Streaming Approach to Neural Team Formation Training},
-  booktitle    = {Advances in Information Retrieval - 46th European Conference on Information Retrieval, {ECIR} 2024, Glasgow, UK, March 24-28, 2024, Proceedings, Part {I}},
-  series       = {Lecture Notes in Computer Science},
-  volume       = {14608},
-  pages        = {325--340},
-  publisher    = {Springer},
-  year         = {2024},
-  url          = {https://doi.org/10.1007/978-3-031-56027-9\_20},
-  doi          = {10.1007/978-3-031-56027-9\_20},
-  biburl       = {https://dblp.org/rec/conf/ecir/FaniBDS24.bib},
-  bibsource    = {dblp computer science bibliography, https://dblp.org}
-}
-  ```
-
-```
-@inproceedings{DBLP:conf/cikm/DashtiSF22,
-  author    = {Arman Dashti and Saeed Samet and Hossein Fani},
-  title     = {Effective Neural Team Formation via Negative Samples},
-  booktitle = {Proceedings of the 31st {ACM} International Conference on Information {\&} Knowledge Management, Atlanta, GA, USA, October 17-21, 2022},
-  pages     = {3908--3912},
-  publisher = {{ACM}},
-  year      = {2022},
-  url       = {https://doi.org/10.1145/3511808.3557590},
-  doi       = {10.1145/3511808.3557590},
-  biburl    = {https://dblp.org/rec/conf/cikm/DashtiSF22.bib},
-  bibsource = {dblp computer science bibliography, https://dblp.org}
-}
-  ```
-  ```
-@inproceedings{DBLP:conf/cikm/DashtiSPF22,
-  author    = {Arman Dashti and Karan Saxena and Dhwani Patel and Hossein Fani},
-  title     = {OpeNTF: {A} Benchmark Library for Neural Team Formation},
-  booktitle = {Proceedings of the 31st {ACM} International Conference on Information {\&} Knowledge Management, Atlanta, GA, USA, October 17-21, 2022},
-  pages     = {3913--3917},
-  publisher = {{ACM}},
-  year      = {2022},
-  url       = {https://doi.org/10.1145/3511808.3557526},
-  doi       = {10.1145/3511808.3557526},
-  biburl    = {https://dblp.org/rec/conf/cikm/DashtiSPF22.bib},
-  bibsource = {dblp computer science bibliography, https://dblp.org}
-}
-```
-
-## 8. Awards:
+## 7. Awards:
 
 > [CAD$300, Gold medalist, UWill Discover, 2022](https://scholar.uwindsor.ca/uwilldiscover/2022/2022Day3/30/)
 
