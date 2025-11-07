@@ -11,11 +11,9 @@ Team formation (recommendation) involves selecting a team of skillful experts wh
 - [3. Features](#3-features)
   * [`Fairness aware Team Formation`](#31-adila-fairness-aware-team-formation)
   * [`Datasets and Parallel Preprocessing`](#32-datasets-and-parallel-preprocessing)
-  * [`Non-Temporal Neural Team Formation`](#33-non-temporal-neural-team-formation)
-  * [`Temporal Neural Team Prediction`](#34-temporal-neural-team-prediction)
-  * [`Model Architecture`](#35-model-architecture)
+  * [`Neural Models`](#35-model-architecture)
+  * [`Temporal Team Prediction`](#34-temporal-team-prediction)
   * [`Negative Sampling Strategies`](#36-negative-sampling-strategies)
-  * [`Run`](#37-run)
 - [4. Results](#4-results)
 - [5. Acknowledgement](#5-acknowledgement)
 - [6. License](#6-license)
@@ -70,75 +68,62 @@ The above run, loads and preprocesses a tiny-size toy example dataset [``toy.dbl
 ## 3. Features
 #### **3.1. [`Adila`](https://github.com/fani-lab/Adila): Fairness aware Team Formation**
 
-While state-of-the-art neural team formation methods are able to efficiently analyze massive collections of experts to form effective collaborative teams, they largely ignore the fairness in recommended teams of experts. In `Adila`, we study the application of `fairness-aware` team formation algorithms to mitigate the potential popularity bias in the neural team formation models. We support two fairness notions namely, `equality of opportunity` and `demographic parity`. To achieve fairness, we utilize three deterministic greedy reranking algorithms (`det_greedy`, `det_cons`, `det_relaxed`) in addition to `fa*ir`, a probabilistic greedy reranking algorithm . 
+Neural team formation methods largely ignore the fairness in the recommended teams of experts. In `Adila`, we study the application of `fairness-aware` re-ranking algorithms to mitigate the potential popularity or gender biases. We support two fairness notions namely, `equality of opportunity` and `demographic parity`. To achieve fairness, we utilize three deterministic greedy reranking algorithms (`det_greedy`, `det_cons`, `det_relaxed`) in addition to `fa*ir`, a probabilistic greedy reranking algorithm. 
 
 
 <p align="center"><img src='docs/adila_flow.png' width="1000" ></p>
-
 
 For further details and demo, please visit [Adila's submodule](https://github.com/fani-lab/Adila).
 
 #### **3.2. Datasets and Parallel Preprocessing**
 
-Raw dataset, e.g., scholarly papers from AMiner's citation network dataset of [``dblp``](https://originalstatic.aminer.cn/misc/dblp.v12.7z), movies from [``imdb``](https://datasets.imdbws.com/), or US patents from [``uspt``](https://patentsview.org/download/data-download-tables) were assumed to be populated in [``data/raw``](data/raw). For the sake of integration test, tiny-size toy example datasets [``toy.dblp.v12.json``](data/raw/dblp/toy.dblp.v12.json) from [``dblp``](https://originalstatic.aminer.cn/misc/dblp.v12.7z), [[``toy.title.basics.tsv``](data/raw/imdb/toy.title.basics.tsv), [``toy.title.principals.tsv``](data/raw/imdb/toy.title.principals.tsv), [``toy.name.basics.tsv``](data/raw/imdb/toy.name.basics.tsv)] from [``imdb``](https://datasets.imdbws.com/) and [``toy.patent.tsv``](data/preprocessed/uspt/toy.patent.tsv) have been already provided.
+Raw dataset, e.g., scholarly papers from AMiner's citation network dataset of [``dblp``](https://originalstatic.aminer.cn/misc/dblp.v12.7z), movies from [``imdb``](https://datasets.imdbws.com/), or US patents from [``uspt``](https://patentsview.org/download/data-download-tables) were assumed to be populated in [``data``](data). For the sake of integration test, tiny-size toy example datasets [``toy.dblp.v12.json``](data/dblp/toy.dblp.v12.json) from [``dblp``](https://originalstatic.aminer.cn/misc/dblp.v12.7z), [[``toy.title.basics.tsv``](data/imdb/toy.title.basics.tsv), [``toy.title.principals.tsv``](data/imdb/toy.title.principals.tsv), [``toy.name.basics.tsv``](data/imdb/toy.name.basics.tsv)] from [``imdb``](https://datasets.imdbws.com/), [``toy.repos.csv``](data/uspt/toy.repos.csv) for `github`, and [``toy.patent.tsv``](data/uspt/toy.patent.tsv) from `US patents` have been already provided.
 
 <p align="center"><img src='./src/cmn/dataset_hierarchy.png' width="300" ></p>
 
 Raw data will be preprocessed into two main ``sparse`` matrices each row of which represents: 
 
->i) ``vecs['member']``: occurrence (boolean) vector representation for members of a team, e.g., authors of a paper or crew members of a movie,
+>``teamsvecs['member']``: occurrence (boolean) vector representation for members of a team, e.g., authors of a paper or crew members of a movie,
 > 
->ii) ``vecs['skill']``: occurrence (boolean) vector representation for required skills for a team, e.g., keywords of a paper or genre of a movie.
+>``teamsvecs['skill']``: occurrence (boolean) vector representation for required skills for a team, e.g., keywords of a paper or genre of a movie.
+>
+>``teamsvecs['loc']``: occurrence (boolean) vector representation for a team's location, e.g., conference/journal of a paper.
 
-Also, indexes will be created to map the vector's indexes to members' names and skills' names, i.e., ``i2c``, ``c2i``, ``i2s``, ``s2i``.
+Also, indexes will be created to map the vector's indexes to members', skills', and locations' names, i.e., ``i2c``, ``c2i``, ``i2s``, ``s2i``.
 
-The sparse matrices and the indices will be persisted in [``data/preprocessed/{dblp,imdb,uspt}/{name of dataset}``](data/preprocessed/) as pickles ``teamsvecs.pkl`` and ``indexes.pkl``. For example, the preprocessed data for our dblp toy example are [``data/preprocessed/dblp/toy.dblp.v12.json/teamsvecs.pkl``](data/preprocessed/dblp/toy.dblp.v12.json/teams.pkl) and [``data/preprocessed/dblp/toy.dblp.v12.json/indexes.pkl``](data/preprocessed/dblp/toy.dblp.v12.json/indexes.pkl).
+The sparse matrices and the indices will be persisted in [``ouptut/{dblp,imdb,uspt}/{name of dataset}``](output/) as pickles ``teamsvecs.pkl`` and ``indexes.pkl``. For example, the preprocessed data for our dblp toy example are [``output/dblp/toy.dblp.v12.json/teamsvecs.pkl``](output/dblp/toy.dblp.v12.json/teams.pkl) and [``output/dblp/toy.dblp.v12.json/indexes.pkl``](output/dblp/toy.dblp.v12.json/indexes.pkl).
 
-> Our pipeline benefits from parallel generation of sparse matrices for teams that significantly reduces the preprocessing time as shown below:
+> Our pipeline benefits from parallel generation of sparse matrices for teams, which significantly reduces the preprocessing time as shown below:
 > 
 > <p align="center"><img src="src/cmn/docs/speedup.jpg" width="200"><img src="src/cmn/docs/speedup_loglog.jpg" width="190"></p>
 
+Please note that the preprocessing step will be executed once. Subsequent runs load the persisted pickle files. In order to re-generate them, one should simply delete them. 
 
-Please note that the preprocessing step will be executed once. Subsequent runs load the persisted pickle files. In order to regenerate them, one should simply delete them. 
-
-
-#### **3.3. Non-Temporal Neural Team Formation**
-
-We randomly take ``85%`` of the dataset for the train-validation set and ``15%`` as the test set, i.e., the model never sees these instances during training or model tuning. You can change ``train_test_split`` parameter in [``./src/param.py``](./src/param.py).
-
-#### **3.4. Temporal Neural Team Prediction**
-
-Previous works in team formation presumed that teams follow the i.i.d property and hence when training their models they followed the bag of teams approach, where they train and validate their models on a shuffled dataset of teams. Moreover, they were interpolative and did not try to predict _future_ successful teams. In this work, we aim at extrapolating and predicting _future_ teams of experts. We sort the teams by time intervals and train a neural model incrementally  through the ordered collection of teams in [C<sub>0</sub>, ..C<sub>t</sub>, ..C<sub>T</sub>]. As can be seen in Figure below, after random initialization of skills’ and experts’ embeddings at t=0, we start training the model on the teams in the first time interval C<sub>0</sub> for a number of epochs, then we continue with training  on the second time interval C<sub>1</sub> using the learned embeddings from the previous time interval and so forth until we finish the training on the last training time interval C<sub>t=T</sub>. We believe that using this approach, will help the model understand how experts’ skills and collaborative ties evolve through time and the final embeddings are their optimum representation in the latent space to predict _future_ successful teams at time interval C<sub>t=T+1</sub>.
-
-<p align="center"><img src='src/mdl/docs/tntf.png' width="600"></p>
-
-
-
-#### **3.5. Model Architecture**
+#### **3.5. Neural Models**
 
 Each model has been defined in [``./src/mdl/``](./src/mdl/) under an inheritance hierarchy. They override abstract functions for ``train``, ``test``, ``eval``, and ``plot`` steps.
 
-For example, for our feedforward baseline [``fnn``](./src/mdl/fnn.py), the model has been implemented in [``./src/mdl/fnn.py``](src/mdl/fnn.py). Model's hyperparameters such as the learning rate (``lr``) or the number of epochs (``e``) can be set in [``./src/param.py``](src/param.py).
-
+For example, for our feedforward baseline [``fnn``](./src/mdl/fnn.py), the model has been implemented in [``./src/mdl/fnn.py``](src/mdl/fnn.py). Model's hyperparameters such as the learning rate (``lr``) or the number of epochs (``e``) can be set in [``./src/mdl/__config__yaml``](./src/mdl/__config__yaml), or overriden in running command as shown in the [``quickstart``](https://colab.research.google.com/github/fani-lab/OpeNTF/blob/main/ipynb/quickstart.ipynb) script.
 
 <p align="center"><img src='src/mdl/docs/team_inheritance_hierarchy.png' width="550" ></p>
   
-Currently, we support neural models:
-1) Bayesian [``bnn``](./src/mdl/bnn.py) where model's parameter (weights) is assumed to be drawn from Gaussian (Normal) distribution and the task is to not to learn the weight but the mean (μ) and standard deviation (σ) of the distribution at each parameter.
+Currently, from [``./src/mdl/``](./src/mdl/), we support 
 
-<p align="center"><img src='./src/mdl/bnn.png' width="350" ></p>
+> Neural mutlilabel classifiers including non-Bayesian feedforward [``fnn``](./src/mdl/fnn.py) and Bayesian [``bnn``](./src/mdl/bnn.py), where each expert candidate is a label and team recommendation is a multilabel classification,
+> Seq-to-seq and transformer-based models via [``nmt``](./src/mdl/nmt.py) wrapper over [`OpenNMT`](https://github.com/OpenNMT/OpenNMT-py), where the required subset of skills is mapped to the optimum subset of experts, and
+> Gnn-based via [`PyG`](https://pyg.org/), where the optimum subset of experts is predicted via link prediction between expert and team nodes in an expert graph.
 
-2) non-Bayesian feedforward [``fnn``](./src/mdl/fnn.py) where the model's parameter (weights) is to be learnt.
+From [``./src/mdl/emb/``](./src/mdl/emb/), we also support dense vector representation learning methods for skills to be fed into the neural mutlilabel classifiers:
 
-The input to the models is the vector representations for (_temporal_) skills and the output is the vector representation for members. In another word, given the input skills, the models predict the members from the pool of candidates. We support three vector representations:
+> [``d2v``](src/mdl/emb/d2v.py): Inspired by paragraph vectors by [Le and Mikolov](https://dl.acm.org/doi/10.5555/3044805.3045025), we consider a team as a document and skills as the document words and embed skills using [``gensim``](https://radimrehurek.com/gensim/).
+> [`gnn`](src/mdl/emb/gnn.py): A graph neural network can be used to embed skills in an expert graph (transfer-based). Via [`PyG`](https://pyg.org/), we implemented random-walk-based methods like `node2vec` and `metapath2vec`, or message-passing-based like 'graphsage', and many more. 
 
-i) Sparse vector representation (occurrence or boolean vector): See preprocessing section above.
+#### **3.4. Temporal Team Prediction**
 
-ii) Dense vector representation ([``team2vec``](src/mdl/team2vec/team2doc2vec.py)): Inspired by paragraph vectors by [Le and Mikolov](https://cs.stanford.edu/~quocle/paragraph_vector.pdf), we consider a team as a document and skills as the document words (``embtype == 'skill'``). Using distributed memory model, we map skills into a real-valued embedding space. Likewise and separately, we consider members as the document words and map members into real-valued vectors (``embtype == 'member'``). We also consider mapping skills and members into the same embedding space (``embtype == 'joint'``). Our embedding method benefits from [``gensim``](https://radimrehurek.com/gensim/) library.
+Team formation models generally assume that teams follow the i.i.d property and follow the bag of teams approach during training (shuffled dataset of teams). With temporal training, we aim predicting _future_ teams of experts. We sort the teams by time intervals and train a neural model incrementally through the ordered collection of teams, as seen below. See [A Streaming Approach to Neural Team Formation Training, ECIR24](https://doi.org/10.1007/978-3-031-56027-9_20) for details and results.
 
-iii) Temporal skill vector represntation ([``team2vec``](src/mdl/team2vec/team2doc2vec.py)): Inspired by [Hamilton et al.](https://aclanthology.org/P16-1141/), we also incorporate time information into the underlying neural model besides utilizing our proposed streaming training strategy. We used the distributed memory model of Doc2Vec to generate the real-valued joint embeddings of the subset of skills and time intervals, where the skills and time intervals are the words of the document (``embtype == 'dt2v'``).
+<p align="center"><img src='src/docs/temporal.jpg' width="600"></p>
 
-3) In OpeNTF2, The ``Nmt`` wrapper class is designed to make use of advanced transformer models and encoder-decoder models that include multiple ``LSTM`` or ``GRU`` cells, as well as various attention mechanisms. ``Nmt`` is responsible for preparing the necessary input and output elements and invokes the executables of ``opennmt-py`` by creating a new process using Python's ``subprocess`` module. Additionally, because the ``Nmt`` wrapper class inherits from ``Ntf``, these models can also take advantage of temporal training strategies through ``tNtf``.
 
 #### **3.6. Negative Sampling Strategies**
 
