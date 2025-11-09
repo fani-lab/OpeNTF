@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/OpeNTF/tutorial/cikm25/static/css/main.e98b016c.css",
-    "main.js": "/OpeNTF/tutorial/cikm25/static/js/main.773e3ec9.js",
+    "main.js": "/OpeNTF/tutorial/cikm25/static/js/main.5a41a085.js",
     "static/js/453.bb637ab0.chunk.js": "/OpeNTF/tutorial/cikm25/static/js/453.bb637ab0.chunk.js",
     "static/media/adila.png": "/OpeNTF/tutorial/cikm25/static/media/adila.eb04c10a1c6bb9276d94.png",
     "static/media/vivafemme.jpg": "/OpeNTF/tutorial/cikm25/static/media/vivafemme.63a4bcf87ffb259610f1.jpg",
@@ -23,11 +23,11 @@
     "static/media/sloth.jpg": "/OpeNTF/tutorial/cikm25/static/media/sloth.810860bd0d914fe498d9.jpg",
     "index.html": "/OpeNTF/tutorial/cikm25/index.html",
     "main.e98b016c.css.map": "/OpeNTF/tutorial/cikm25/static/css/main.e98b016c.css.map",
-    "main.773e3ec9.js.map": "/OpeNTF/tutorial/cikm25/static/js/main.773e3ec9.js.map",
+    "main.5a41a085.js.map": "/OpeNTF/tutorial/cikm25/static/js/main.5a41a085.js.map",
     "453.bb637ab0.chunk.js.map": "/OpeNTF/tutorial/cikm25/static/js/453.bb637ab0.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.e98b016c.css",
-    "static/js/main.773e3ec9.js"
+    "static/js/main.5a41a085.js"
   ]
 }

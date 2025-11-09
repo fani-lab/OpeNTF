@@ -55,7 +55,7 @@ function Home() {
                 <div className="section-body" style={{textAlign: "center"}}>
                     Half-day, Morning, 9:00 AM - 12:30 PM (GMT/UTC +9)<br/>
                     Monday, November 10, 2025<br/>
-                    <a target="_blank" href="https://www.coexcenter.com/">COEX</a>, Gangnam, Seoul, South Korea{" "}
+                    Room 209A, <a target="_blank" href="https://www.coexcenter.com/">COEX</a>, Gangnam, Seoul, South Korea{" "}
                     <br/><br/>
                     <span style={{ fontSize: '14px', color: 'black' }}>
                         Prev Tutorials at <a target="_blank" href="https://fani-lab.github.io/OpeNTF/tutorial/umap24/" >UMAP24</a>, <a target="_blank" href="https://fani-lab.github.io/OpeNTF/tutorial/sigir-ap24/" >SIGIR-AP24</a> and <a target="_blank" href="https://fani-lab.github.io/OpeNTF/tutorial/wsdm25/" >WSDM25</a> ◁ [<a target="_blank" href="https://hosseinfani.github.io/res/papers/2025_CIKM_Neural_Shifts_in_Collaborative_Team_Recommendation.pdf">Full Outline</a>]
