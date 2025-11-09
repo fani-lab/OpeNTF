@@ -1,7 +1,7 @@
 import './Sidebar.css'
 
 function Sidebar() {
-    const topMargin = parseInt(getComputedStyle(window.document.body).fontSize) * 10;
+    const topMargin = 10 //parseInt(getComputedStyle(window.document.body).fontSize) * 10;
 
     const menuClicked = (e) => {
         // document.getElementById(`section-${e.target.id}`).scrollIntoView()

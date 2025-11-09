@@ -11,17 +11,16 @@ function Home() {
 
     const onWindowLoaded = () => {
         const ids = ["location","abstract","audience","outline","searchbased","learnbased","refinement","challeng","apps","handson","presenters"];
-        const topMargin = parseInt(getComputedStyle(window.document.body).fontSize) * 10;
+        const topMargin = 10 //parseInt(getComputedStyle(window.document.body).fontSize) * 10;
         offsets = ids.map((id) => {
-            const offset =
-                document.getElementById("section-title-" + id)?.offsetTop - topMargin - 15;
+            const offset = document.getElementById("section-title-" + id)?.offsetTop - topMargin - 15;
             return {id, offset, endOffset: offset + document.getElementById(`section-${id}`).offsetHeight - 20,};
         });
     };
 
     const scrollToItem = (e) => {
-        const topMargin = parseInt(getComputedStyle(window.document.body).fontSize) * 6;
-        const scroll = document.getElementById(`footnote-${e.target.id}`).offsetTop;
+        const topMargin = 10 //parseInt(getComputedStyle(window.document.body).fontSize) * 10;
+        const scroll = document.getElementById(`section-title-${e.target.id}`).offsetTop;
         window.scrollTo({ top: scroll - topMargin,});
     };
 
@@ -453,7 +452,7 @@ function Home() {
 
                         <span id="section-title-handson" className="section-title">Hands-on OpeNTF </span>
                            <div className="section-body justify-paragraph">
-                                    &nbsp;In our tutorial, we introduce publicly available
+                                    In our tutorial, we introduce publicly available
                                     libraries and tools for the task of team recommendation.
                                     Notably, we provide hands-on experience with{" "}
                                     <a target="_blank" href="https://github.com/fani-lab/OpeNTF"><span className="fw-bold">
