@@ -1,7 +1,8 @@
-<p align="center"><img src="./model_inheritance_hierarchy.png" width="400"></p>
+<p align="center"><img src="../../docs/models_class_diagram.png" width="500"></p>
 
-#Bayesian Neural Network (Bnn)
-<p align="center"><img src="./bnn.png" width="400"></p>
+<p align="center"><img src="../../docs/temporal.jpg" width="500"></p>
 
-#Streaming Scenario using Temporal Neural Team Formation (tNtf)
-<p align="center"><img src="docs/tntf.png" width="700"></p>
+<p align="center"><img src="../../docs/gnn_transfer.png" width="500"></p>
+
+<p align="center"><img src="../../docs/gnn_e2e.png" width="500"></p>
+
