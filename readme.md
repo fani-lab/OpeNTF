@@ -85,9 +85,13 @@ Each model has been defined in [``./src/mdl/``](./src/mdl/) under an inheritance
   
 Currently, from [``./src/mdl/``](./src/mdl/), we support 
 
-> Neural mutlilabel classifiers including non-Bayesian feedforward [``fnn``](./src/mdl/fnn.py) and Bayesian [``bnn``](./src/mdl/bnn.py), where each expert candidate is a label and team recommendation is a multilabel classification (See [A Variational Neural Architecture for Skill-based Team Formation, TOIS23](https://dl.acm.org/doi/abs/10.1145/3589762) for details and results),
+> Neural mutlilabel classifiers including non-Bayesian feedforward [``fnn``](./src/mdl/fnn.py) and Bayesian [``bnn``](./src/mdl/bnn.py), where each expert candidate is a label and team recommendation is a multilabel classification;
+>
+> See [A Variational Neural Architecture for Skill-based Team Formation, TOIS23](https://dl.acm.org/doi/abs/10.1145/3589762) for details and results.
 
-> Seq-to-seq and transformer-based models via [``nmt``](./src/mdl/nmt.py) wrapper over [`OpenNMT`](https://github.com/OpenNMT/OpenNMT-py), where the required subset of skills is mapped to the optimum subset of experts (See [Translative Neural Team Recommendation, SIGIR25](https://doi.org/10.1145/3726302.3730259) for details and results), and
+> Seq-to-seq and transformer-based models via [``nmt``](./src/mdl/nmt.py) wrapper over [`OpenNMT`](https://github.com/OpenNMT/OpenNMT-py), where the required subset of skills is mapped to the optimum subset of experts;
+>
+> See [Translative Neural Team Recommendation, SIGIR25](https://doi.org/10.1145/3726302.3730259) for details and results.
  
 > Gnn-based models via [``gnn``](./src/mdl/gnn.py) using [`PyG`](https://pyg.org/), where the optimum subset of experts is predicted via link prediction between expert and team nodes in an expert graph, as shown in our colab script [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/fani-lab/OpeNTF/blob/main/ipynb/gnn.ipynb). 
 
@@ -95,7 +99,9 @@ From [``./src/mdl/emb/``](./src/mdl/emb/), we also support dense vector represen
 
 > [``d2v``](src/mdl/emb/d2v.py): Inspired by paragraph vectors by [Le and Mikolov](https://dl.acm.org/doi/10.5555/3044805.3045025), we consider a team as a document and skills as the document words and embed skills using [``gensim``](https://radimrehurek.com/gensim/).
 
-> [`gnn`](src/mdl/emb/gnn.py): A graph neural network can be used to embed skills in an expert graph (transfer-based). Via [`PyG`](https://pyg.org/), we implemented random-walk-based methods like `node2vec` and `metapath2vec`, or message-passing-based like 'graphsage', and many more. See [``gnn.ipynb``](https://colab.research.google.com/github/fani-lab/OpeNTF/blob/main/ipynb/gnn.ipynb) script, also [Skill Vector Representation Learning for Collaborative Team Recommendation: A Comparative Study, WISE24](https://doi.org/10.1007/978-981-96-0567-5_15) for details and results.
+> [`gnn`](src/mdl/emb/gnn.py): A graph neural network can be used to embed skills in an expert graph (transfer-based). Via [`PyG`](https://pyg.org/), we implemented random-walk-based methods like `node2vec` and `metapath2vec`, or message-passing-based like 'graphsage', and many more. See [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/fani-lab/OpeNTF/blob/main/ipynb/gnn.ipynb).
+>
+> See [Skill Vector Representation Learning for Collaborative Team Recommendation: A Comparative Study, WISE24](https://doi.org/10.1007/978-981-96-0567-5_15) for details and results.
 
 #### **3.2. [`Adila`](https://github.com/fani-lab/Adila): Fairness aware Team Formation**
 
