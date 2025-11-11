@@ -135,7 +135,7 @@ See [Effective Neural Team Formation via Negative Samples, CIKM22](https://dl.ac
 
 Raw dataset, e.g., scholarly papers from AMiner's citation network dataset of [``dblp``](https://originalstatic.aminer.cn/misc/dblp.v12.7z), movies from [``imdb``](https://datasets.imdbws.com/), or US patents from [``uspt``](https://patentsview.org/download/data-download-tables) were assumed to be populated in [``data``](data). For the sake of integration test, tiny-size toy example datasets [``toy.dblp.v12.json``](data/dblp/toy.dblp.v12.json) from [``dblp``](https://originalstatic.aminer.cn/misc/dblp.v12.7z), [[``toy.title.basics.tsv``](data/imdb/toy.title.basics.tsv), [``toy.title.principals.tsv``](data/imdb/toy.title.principals.tsv), [``toy.name.basics.tsv``](data/imdb/toy.name.basics.tsv)] from [``imdb``](https://datasets.imdbws.com/), [``toy.repos.csv``](data/uspt/toy.repos.csv) for `github`, and [``toy.patent.tsv``](data/uspt/toy.patent.tsv) from `US patents` have been already provided.
 
-<p align="center"><img src='docs/datasets_class_diagram.png' width="300" ></p>
+<p align="center"><img src='docs/datasets_class_diagram.png' width="500" ></p>
 
 Raw data will be preprocessed into two main ``sparse`` matrices each row of which represents: 
 
