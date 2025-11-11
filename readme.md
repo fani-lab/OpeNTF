@@ -135,7 +135,7 @@ See [Effective Neural Team Formation via Negative Samples, CIKM22](https://dl.ac
 
 Raw dataset, e.g., scholarly papers from AMiner's citation network dataset of [``dblp``](https://originalstatic.aminer.cn/misc/dblp.v12.7z), movies from [``imdb``](https://datasets.imdbws.com/), or US patents from [``uspt``](https://patentsview.org/download/data-download-tables) were assumed to be populated in [``data``](data). For the sake of integration test, tiny-size toy example datasets [``toy.dblp.v12.json``](data/dblp/toy.dblp.v12.json) from [``dblp``](https://originalstatic.aminer.cn/misc/dblp.v12.7z), [[``toy.title.basics.tsv``](data/imdb/toy.title.basics.tsv), [``toy.title.principals.tsv``](data/imdb/toy.title.principals.tsv), [``toy.name.basics.tsv``](data/imdb/toy.name.basics.tsv)] from [``imdb``](https://datasets.imdbws.com/), [``toy.repos.csv``](data/uspt/toy.repos.csv) for `github`, and [``toy.patent.tsv``](data/uspt/toy.patent.tsv) from `US patents` have been already provided.
 
-<p align="center"><img src='./src/cmn/dataset_hierarchy.png' width="300" ></p>
+<p align="center"><img src='docs/datasets_class_diagram.png' width="300" ></p>
 
 Raw data will be preprocessed into two main ``sparse`` matrices each row of which represents: 
 
@@ -151,7 +151,7 @@ The sparse matrices and the indices will be persisted in [``ouptut/{dblp,imdb,us
 
 > Our pipeline benefits from parallel generation of sparse matrices for teams, which significantly reduces the preprocessing time as shown below:
 > 
-> <p align="center"><img src="src/cmn/docs/speedup.jpg" width="200"><img src="src/cmn/docs/speedup_loglog.jpg" width="190"></p>
+> <p align="center"><img src="docs/speedup.jpg" width="200"><img src="docs/speedup_loglog.jpg" width="190"></p>
 
 Please note that the preprocessing step will be executed once. Subsequent runs load the persisted pickle files. In order to re-generate them, one should simply delete them. 
 
