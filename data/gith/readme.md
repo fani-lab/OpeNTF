@@ -1,4 +1,19 @@
-File structure:
+`links.csv` is the result of a repo list generated using `BigQuery`
+
+Steps to obtain this data:
+1. Ensure you have a Google account
+2. Open https://console.cloud.google.com/bigquery. Create a new project to enable access to the query.
+3. Open https://console.cloud.google.com/bigquery?p=bigquery-public-data&d=github_repos to access the editor
+4. Type the following into the editor
+
+```
+SELECT DISTINCT repo.name as repo FROM `githubarchive.day.2020*`
+WHERE type = 'MemberEvent'
+```
+
+5. The sql query above will look at all github MemberEvent data from 2020 (starting on Jan 1). MemberEvents are recorded every time a new person becomes a contributor to a repo.
+7. Once result is generated, click save result and export to google drive and download the csv file as links.csv.
+8. Then, run [`github_crawler.py`](../../src/_msc/github_crawler.py) to crawl the detail information of each repo link, which saves `repos.csv` in the following file structure:
 
 ```
 repo, collabs

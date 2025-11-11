@@ -1,41 +1,25 @@
-import csv, requests, traceback, time
-import pandas as pd
-import os
-import schedule #conda install --channel=conda-forge schedule
+import os, csv, requests, traceback, time, pandas as pd, schedule #conda install --channel=conda-forge schedule
 
 from team import Team
 
-
 class Repo(Team):
-
     last_index = 0
-
     @staticmethod
     def check_previous_indexes(log_file):
         """
-
-        Args:
-            log_file: log file as csv
-
-        Returns:
-            int: index of the last crawled repo or 1 in case the log file does not exist
+        Args: log_file: log file as csv
+        Returns: int: index of the last crawled repo or 1 in case the log file does not exist
         """
         try:
             with open(log_file, mode='rb') as file:
                 file.seek(-2, os.SEEK_END)
-                while file.read(1) != b'\n':
-                    file.seek(-2, os.SEEK_CUR)
+                while file.read(1) != b'\n': file.seek(-2, os.SEEK_CUR)
                 last_index = file.readline().decode().split(sep=',')[0]
-
-            if 0 < int(last_index):
-                return int(last_index)
-            else:
-                return 1
-
+            if 0 < int(last_index): return int(last_index)
+            else: return 1
         except FileNotFoundError:
             print('Log file not found')
             with open(log_file, mode='w', newline='') as log_indexes:
-
                 fieldnames = ['index', 'repo']
                 writer = csv.DictWriter(log_indexes, fieldnames=fieldnames)
                 writer.writeheader()
@@ -67,19 +51,17 @@ class Repo(Team):
                     index_writer.writerow( {'index': Repo.last_index, 'repo': repo} )
                     Repo.last_index += 1
 
-            except KeyError:
-                print('The following error has occurred: {}'.format(general_repo_info['message']))
-
+            except KeyError: print('The following error has occurred: {}'.format(general_repo_info['message']))
         except:
             print(f'Error occured for repo: {repo}')
             traceback.print_exc()
 
     @staticmethod
     def crawl_github(input, output,log_file, access_token, nseconds):
-        """"
-        data.csv is where the output of the data is stored
+        """
+        repos.csv is where the output of the data is stored
 
-        repos.csv is the result of a repo list generated using BigQuery
+        links.csv is the result of a repo list generated using BigQuery
         Steps to obtain this data:
         1. Ensure you have a Google account
         2. Open https://console.cloud.google.com/bigquery. Create a new project to enable access to the query.
@@ -88,8 +70,8 @@ class Repo(Team):
         SELECT DISTINCT repo.name as repo FROM `githubarchive.day.2020*`
         WHERE type = 'MemberEvent'
 
-        5. The program above will look at all github MemberEvent data from 2020 (starting on Jan 1). MemberEvents are recorded every time a new person becomes a contributor to a repo.
-        6. Once result is generated, click save result and export to google drive and download the csv file as repos.csv.
+        5. The sql query above will look at all github MemberEvent data from 2020 (starting on Jan 1). MemberEvents are recorded every time a new person becomes a contributor to a repo.
+        6. Once result is generated, click save result and export to google drive and download the csv file as links.csv.
         """
         # logging.basicConfig()
         # schedule_logger = logging.getLogger('schedule')
@@ -98,17 +80,11 @@ class Repo(Team):
         header = {'Authorization': "Token " + access_token}
         Repo.last_index = Repo.check_previous_indexes(log_file)
 
-        if Repo.last_index == 1:
-            file_open_mode = 'w'
-        else:
-            file_open_mode = 'a'
-
+        if Repo.last_index == 1: file_open_mode = 'w'
+        else: file_open_mode = 'a'
 
         with open(input, 'r') as reader, open(output, file_open_mode, newline='') as output_csv:
-
-            for i in range(1, Repo.last_index):
-                reader.readline() #bypass the header 'repo' and crawled repos
-
+            for i in range(1, Repo.last_index): reader.readline() #bypass the header 'repo' and crawled repos
             if file_open_mode == 'w':
                 w = csv.DictWriter(output_csv, ['repo', 'collabs', 'langs', 'rels', 'stargazers_count', 'forks_count', 'created_at', 'pushed_at'])
                 w.writeheader()
@@ -120,6 +96,5 @@ class Repo(Team):
                 schedule.run_pending()
                 if not schedule.jobs: return
                 time.sleep(1)
-
 
 Repo.crawl_github(input='./../../data/raw/gith/links.csv', output='./../../data/raw/gith/repos.csv', log_file='./../../data/raw/gith/log_index.csv', access_token='', nseconds=8)

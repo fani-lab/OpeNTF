@@ -1,13 +1,13 @@
 #TODO: update to readme for cmn layer and main readme
-./readme.md
-./data/{dataset}/readme.md
-./output/readme.md
-./src/readme.md
-./src/cmn/readme.md
-./src/mdl/readme.md
-./ipynb >> python scripts
+./readme.md >> new models class hierarchy and dataset hierarchy
 
-#TODO: +han, +lant
+./data/{dataset}/readme.md
+    github >> explain how it is collected and where to find/dl it
+
+./output/readme.md
+./ipynb >> extension.ipynb
+
+#TODO: +han, +lant(not pyg friendly)
 
 #TODO: nmt does not work with our embeddings of any kind. Can we inject our embedding for it?
 - bundle recommenders
@@ -30,6 +30,7 @@ temporal/sequence
 ============
 d2v
 -- strict splits of train/valid/test. I think even if it sees everything, does not produce good embeddings
+why not d2v when we have team, skill, and member vectors?
 -- skill-member as docs during the train, then skills as docs during test to find the closest experts vectors as members :DD
 -- may not worth it as the seq2seq is more powerful (document completion using pre-words of skills with members)
 
@@ -44,20 +45,9 @@ def evaluate_model(model, val_corpus):
     return sum(sims) / len(sims) >> a doc, when in test, should return the same doc if in train, or the most similar one (textoverlap?)
 
 =========
-hetero versions of gcn, gs, gat, gatv2, gin
-han >> pure hetero like m2v
-
-lant >> not pyg friendly
-gine >> edge-based. not relevant for now as we don't have edge attributes
-
-node2vec >> we don't have it! but we can, right?
-metapath2vec >> we didnot have it! but we can, right?
-why not d2v when we have team, skill, and member vectors?
 
 update/check cmn.team.Team.get_stats()
 update/check cmn.patent.Patent.get_stats()
-make cmn.team.Team.get_stats() gpu-friendly
-
 =======================================================
 
 -- contextual embeddings (transfer or preinit e2e)>> llm-based >> sentencetranformer
