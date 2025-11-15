@@ -32,6 +32,7 @@ numpy==1.24.4 #cannot go above for gensim
 ## cmn.patent.Patent.read_data()
 ## mdl.ntf.Ntf.evaluate()
 ## evl.metric.calculate_metrics()
+## main.aggregate()
 
 #$ matplotlib==3.7.5
 ## cmn.team.Team.plot_stats()

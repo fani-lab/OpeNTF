@@ -12,9 +12,7 @@ cmd:
   #- prep
   #- train
   #- test
-  #- eval
-  #- plot
-  #- agg
+  - eval
   #- fair
 data: #required for 'prep' step
   hf: True

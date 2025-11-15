@@ -36,35 +36,39 @@ def get_splits(n_sample, n_folds, train_ratio, output, seed, year_idx=None, step
         return splits
 
 def aggregate(output):
-    import pandas as pd
+    import re
+    pd = opentf.install_import('pandas')
+    pattern = re.compile(r'(?<!f\d\.)test\.pred\.eval\.mean\.csv$')
     files = list()
-    for dirpath, dirnames, filenames in os.walk(output):
-        if not dirnames: files += [os.path.join(os.path.normpath(dirpath), file).split(os.sep) for file in filenames if file.endswith("pred.eval.mean.csv")]
+    for dirpath, dirnames, filenames in os.walk(output): files += [os.path.join(os.path.normpath(dirpath), file).split(os.sep) for file in filenames if pattern.search(file)]
 
-    #concate the year folder to setting for temporal baselines
-    for file in files:
-        if file[3].startswith('t'):
-            file[4] += '/' + file[5]
-            del file[5]
+    for row in files:
+        if len(row) > 7: #to accomodate submodels in emb/transfer-based results
+            row[-3], row[-2] = row[-3] + '@' + row[-2], row[-1]
+            del row[-1]
 
-    files = pd.DataFrame(files, columns=['', '', 'domain', 'baseline', 'setting', 'rfile'])
+    files = pd.DataFrame(files, columns=['', '', 'domain', 'dataset', 'split', 'model-setting', 'rfile'])
     rfiles = files.groupby('rfile')
     for rf, r in rfiles:
         dfff = pd.DataFrame()
-        rdomains = r.groupby('domain')
-        for rd, rr in rdomains:
-            names = ['metrics']
+        rsplits = r.groupby('split')
+        for rs, rr in rsplits:
+            names = []
             dff = pd.DataFrame()
-            df = rdomains.get_group(rd)
-            hr = False
+            df = rsplits.get_group(rs)
+            dfs = []
+            log.info(f'{opentf.textcolor["green"]}{output}/{rs} ... {opentf.textcolor["reset"]}')
             for i, row in df.iterrows():
-                if not hr:
-                    dff = pd.concat([dff, pd.read_csv(f"{output}{rd}/{row['baseline']}/{row['setting']}/{rf}", usecols=[0])], axis=1, ignore_index=True)
-                    hr = True
-                dff = pd.concat([dff, pd.read_csv(f"{output}{rd}/{row['baseline']}/{row['setting']}/{rf}", usecols=[1])], axis=1, ignore_index=True)
-                names += [row['baseline'] + '.' + row['setting']]
-            dff.set_axis(names, axis=1, inplace=True)
-            dff.to_csv(f"{output}{rd}/{rf.replace('.csv', '.agg.csv')}", index=False)
+                rfilename = f'{output}/{rs}/{row["model-setting"]}/{rf}'.replace('@', '/')
+                log.info(rfilename)
+                df = pd.read_csv(rfilename, names=["metric", "mean", 'std'], skiprows=1)
+                df = df.set_index("metric")
+                dfs.append(df)
+                names += [row['model-setting'] + '-mean', row['model-setting'] + '-std']
+            dfs = pd.concat(dfs, axis=1)
+            dfs = dfs.set_axis(names, axis=1)
+            dfs.to_csv(f"{output}/{rs}/test.pred.eval.mean.agg.csv", index=True)
+            log.info(f'{opentf.textcolor["green"]}Saved at {output}/{rs}/test.pred.eval.mean.agg.csv. {opentf.textcolor["reset"]}')
 
 @hydra.main(version_base=None, config_path='.', config_name='__config__')
 def run(cfg):
@@ -170,50 +174,12 @@ def run(cfg):
                 for key in cfg.eval.metrics: cfg.eval.metrics[key] = [m.replace('topk', cfg.eval.topk) for m in cfg.eval.metrics[key]]
                 models[m].evaluate(teamsvecs, splits, cfg.eval)
 
-            # if m_name.endswith('a1'): vecs_['skill'] = lil_matrix(scipy.sparse.hstack((vecs_['skill'], lil_matrix(np.ones((vecs_['skill'].shape[0], 1))))))
             # make_popular_and_nonpopular_matrix(vecs_, data_list[0])
 
-        # # streaming scenario (no vector for time)
-        # if 'tfnn' in model_list: models['tfnn'] = tNtf(Fnn(), cfg.train.nfolds, cfg.train.step_ahead)
-        # if 'tbnn' in model_list: models['tbnn'] = tNtf(Bnn(), cfg.train.nfolds, cfg.train.step_ahead)
-        # if 'tfnn_emb' in model_list: models['tfnn_emb'] = tNtf(Fnn(), cfg.train.nfolds, cfg.train.step_ahead)
-        # if 'tbnn_emb' in model_list: models['tbnn_emb'] = tNtf(Bnn(), cfg.train.nfolds, cfg.train.step_ahead)
-        # if 'tnmt' in model_list: models['tnmt'] = tNmt(cfg.train.nfolds, cfg.train.step_ahead)
-        #
-        # # streaming scenario with adding one 1 to the input (time as aspect/vector for time)
-        # if 'tfnn_a1' in model_list: models['tfnn_a1'] = tNtf(Fnn(), cfg.train.nfolds, cfg.train.step_ahead)
-        # if 'tbnn_a1' in model_list: models['tbnn_a1'] = tNtf(Bnn(), cfg.train.nfolds, cfg.train.step_ahead)
-        # if 'tfnn_emb_a1' in model_list: models['tfnn_emb_a1'] = tNtf(Fnn(), cfg.train.nfolds, cfg.train.step_ahead)
-        # if 'tbnn_emb_a1' in model_list: models['tbnn_emb_a1'] = tNtf(Bnn(), cfg.train.nfolds, cfg.train.step_ahead)
-        #
-        # # streaming scenario with adding the year to the doc2vec training (temporal dense skill vecs in input)
-        # if 'tfnn_dt2v_emb' in model_list: models['tfnn_dt2v_emb'] = tNtf(Fnn(), cfg.train.nfolds, cfg.train.step_ahead)
-        # if 'tbnn_dt2v_emb' in model_list: models['tbnn_dt2v_emb'] = tNtf(Bnn(), cfg.train.nfolds, cfg.train.step_ahead)
-
-        # # todo: temporal: time as an input feature
-
-        # # temporal recommender systems
-        # if 'caser' in model_list: models['caser'] = Caser(settings['model']['step_ahead'])
-        # if 'rrn' in model_list: models['rrn'] = Rrn(settings['model']['baseline']['rrn']['with_zero'], settings['model']['step_ahead'])
-
-    # if 'eval' in cmd: self.evaluate(output, splits, vecs, on_train_valid_set, per_instance, per_epoch)
-    # if 'plot' in cmd: self.plot_roc(output, splits, on_train_valid_set)
     # if 'fair' in cmd: self.fair(output, vecs, splits, fair_settings)
 
-    # for temporal
-    # year_idx = indexes['i2y']
-    # output_ = f'{output}/{year_idx[-self.step_ahead - 1][1]}'  # this folder will be created by the last model training
-
-    #if 'test' in cmd:# todo: the prediction of each step ahead should be seperate
-    #   # for i, v in enumerate(year_idx[-self.step_ahead:]):  # the last years are for test.
-    #   #     tsplits['test'] = np.arange(year_idx[i][0], year_idx[i + 1][0] if i < len(year_idx) else len(indexes['i2t']))
-    #   self.model.test(output_, splits, indexes, vecs, settings, on_train_valid_set, per_epoch)
-    #
-    #         # todo: the evaluation of each step ahead should be seperate
-    #   if 'eval' in cmd: self.model.evaluate(output_, splits, vecs, on_train_valid_set, per_instance, per_epoch)
-    #   if 'plot' in cmd: self.model.plot_roc(output_, splits, on_train_valid_set)
-
-    # if 'agg' in cfg.cmd: aggregate(cfg.data.output)
+    log.info(f'{opentf.textcolor["green"]}Aggregating the test results from test.pred.eval.mean.csv files ... {opentf.textcolor["reset"]}')
+    aggregate(cfg.data.output)
 
 # sample runs for different configs, including different prep, embeddings, model training, ..., are available as unit-test in
 # ./github/workflows/*.yml

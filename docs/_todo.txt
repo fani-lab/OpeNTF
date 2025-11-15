@@ -1,10 +1,8 @@
+#TODO: Adila >> now that we have coin revision
+#TODO: leaderboard src/web #192 integration
+
 #TODO: update to readme for cmn layer and main readme
-./readme.md >> new models class hierarchy and dataset hierarchy
-
-./data/{dataset}/readme.md
-    github >> explain how it is collected and where to find/dl it
-
-./output/readme.md
+./readme.md >> new models class hierarchy
 ./ipynb >> extension.ipynb
 
 #TODO: +han, +lant(not pyg friendly)
@@ -13,8 +11,29 @@
 - bundle recommenders
 
 temporal/sequence
-    tNtf_{emb}_{fnn,bnn}_{train,test}
+
+    tNtf_{emb}_{fnn,bnn}_{a1}_{train,test}
+    a1: adding one 1 to the input (time as aspect/vector for time)
+    dt2v_emb: adding the year to the doc2vec training (temporal dense skill vecs in input)
+
+    # for temporal
+    # year_idx = indexes['i2y']
+    # output_ = f'{output}/{year_idx[-self.step_ahead - 1][1]}'  # this folder will be created by the last model training
+
+    #if 'test' in cmd:# todo: the prediction of each step ahead should be seperate
+    #   # for i, v in enumerate(year_idx[-self.step_ahead:]):  # the last years are for test.
+    #   #     tsplits['test'] = np.arange(year_idx[i][0], year_idx[i + 1][0] if i < len(year_idx) else len(indexes['i2t']))
+    #   self.model.test(output_, splits, indexes, vecs, settings, on_train_valid_set, per_epoch)
+    #
+    #         # todo: the evaluation of each step ahead should be seperate
+    #   if 'eval' in cmd: self.model.evaluate(output_, splits, vecs, on_train_valid_set, per_instance, per_epoch)
+    #   if 'plot' in cmd: self.model.plot_roc(output_, splits, on_train_valid_set)
+            # if m_name.endswith('a1'): vecs_['skill'] = lil_matrix(scipy.sparse.hstack((vecs_['skill'], lil_matrix(np.ones((vecs_['skill'].shape[0], 1))))))
+
     user-item recommender baselines:
+        # # temporal recommender systems
+        # if 'caser' in model_list: models['caser'] = Caser(settings['model']['step_ahead'])
+        # if 'rrn' in model_list: models['rrn'] = Rrn(settings['model']['baseline']['rrn']['with_zero'], settings['model']['step_ahead'])
         - rrn?
         - caser
         - sasrec
