@@ -39,8 +39,10 @@ def aggregate(output):
     import re
     pd = opentf.install_import('pandas')
     pattern = re.compile(r'(?<!f\d\.)test\.pred\.eval\.mean\.csv$')
-    files = list()
+    files = []
     for dirpath, dirnames, filenames in os.walk(output): files += [os.path.join(os.path.normpath(dirpath), file).split(os.sep) for file in filenames if pattern.search(file)]
+
+    if not files: log.info(f'{opentf.textcolor["yellow"]}Nothing found! {opentf.textcolor["reset"]}')
 
     for row in files:
         if len(row) > 7: #to accomodate submodels in emb/transfer-based results
@@ -48,27 +50,24 @@ def aggregate(output):
             del row[-1]
 
     files = pd.DataFrame(files, columns=['', '', 'domain', 'dataset', 'split', 'model-setting', 'rfile'])
-    rfiles = files.groupby('rfile')
-    for rf, r in rfiles:
-        dfff = pd.DataFrame()
-        rsplits = r.groupby('split')
-        for rs, rr in rsplits:
-            names = []
-            dff = pd.DataFrame()
-            df = rsplits.get_group(rs)
-            dfs = []
-            log.info(f'{opentf.textcolor["green"]}{output}/{rs} ... {opentf.textcolor["reset"]}')
-            for i, row in df.iterrows():
-                rfilename = f'{output}/{rs}/{row["model-setting"]}/{rf}'.replace('@', '/')
-                log.info(rfilename)
-                df = pd.read_csv(rfilename, names=['metric', 'mean', 'std'], skiprows=1)
-                df = df.set_index("metric")
-                dfs.append(df)
-                names += [row['model-setting'] + '-mean', row['model-setting'] + '-std']
-            dfs = pd.concat(dfs, axis=1)
-            dfs = dfs.set_axis(names, axis=1)
-            dfs.to_csv(f"{output}/{rs}/test.pred.eval.mean.agg.csv", index=True)
-            log.info(f'{opentf.textcolor["green"]}Saved at {output}/{rs}/test.pred.eval.mean.agg.csv. {opentf.textcolor["reset"]}')
+    # rfiles = files.groupby('rfile') # if we want to aggregate per folds too
+    # for rf, r in rfiles:
+    rsplits = files.groupby('split')
+    for rs, rr in rsplits:
+        names = []; dfs = []
+        df = rsplits.get_group(rs)
+        log.info(f'{opentf.textcolor["green"]}{output}/{rs} ... {opentf.textcolor["reset"]}')
+        for i, row in df.iterrows():
+            rfilename = f'{output}/{rs}/{row["model-setting"]}/{row["rfile"]}'.replace('@', '/')
+            log.info(rfilename)
+            df = pd.read_csv(rfilename, names=['metric', 'mean', 'std'], skiprows=1)
+            df = df.set_index('metric')
+            dfs.append(df)
+            names += [row['model-setting'] + '-mean', row['model-setting'] + '-std']
+        dfs = pd.concat(dfs, axis=1)
+        dfs = dfs.set_axis(names, axis=1)
+        dfs.to_csv(f"{output}/{rs}/test.pred.eval.mean.agg.csv", index=True)
+        log.info(f'{opentf.textcolor["green"]}Saved at {output}/{rs}/test.pred.eval.mean.agg.csv. {opentf.textcolor["reset"]}')
 
 @hydra.main(version_base=None, config_path='.', config_name='__config__')
 def run(cfg):
@@ -180,7 +179,7 @@ def run(cfg):
 
     # if 'fair' in cmd: self.fair(output, vecs, splits, fair_settings)
 
-    log.info(f'{opentf.textcolor["green"]}Aggregating the test results from test.pred.eval.mean.csv files ... {opentf.textcolor["reset"]}')
+    log.info(f'{opentf.textcolor["green"]}Aggregating the test results under {cfg.data.output} per splits from test.pred.eval.mean.csv files ... {opentf.textcolor["reset"]}')
     aggregate(cfg.data.output)
 
 # sample runs for different configs, including different prep, embeddings, model training, ..., are available as unit-test in
