@@ -1,4 +1,12 @@
-# ``OpeNTF``: An Open-Source Neural Team Formation Benchmark Library 
+# ``OpeNTF``: An Open-Source Neural Team Formation Benchmark Library ![Python Version](https://img.shields.io/badge/python-3.8-blue) [![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+
+[![All Tests](https://img.shields.io/github/checks-status/fani-lab/OpeNTF/main)](https://github.com/fani-lab/OpeNTF/actions)
+[![inclusive-tests-preps-toys-main](https://github.com/fani-lab/OpeNTF/actions/workflows/inclusive-tests-preps-toys-main.yml/badge.svg?branch=main)](https://github.com/fani-lab/OpeNTF/actions/workflows/inclusive-tests-preps-toys-main.yml)
+[![inclusive-tests-embs-toys-main](https://github.com/fani-lab/OpeNTF/actions/workflows/inclusive-tests-embs-toys-main.yml/badge.svg?branch=main)](https://github.com/fani-lab/OpeNTF/actions/workflows/inclusive-tests-embs-toys-main.yml)
+[![inclusive-tests-models-toys-main](https://github.com/fani-lab/OpeNTF/actions/workflows/inclusive-tests-models-toys-main.yml/badge.svg?branch=main)](https://github.com/fani-lab/OpeNTF/actions/workflows/inclusive-tests-models-toys-main.yml)
+
+
+
 
 >Translative Neural Team Recommendation. SIGIR, 2025. [`pdf`](https://hosseinfani.github.io/res/papers/2025_SIGIR_Translative_Neural_Team_Recommendation_From_Multilabel_Classification_to_Sequence_Prediction.pdf) [`doi`](https://doi.org/10.1145/3726302.3730259) [`reviews`](https://hosseinfani.github.io/res/papers/2025_SIGIR_Translative_Neural_Team_Recommendation_From_Multilabel_Classification_to_Sequence_Prediction.txt) [`poster`](https://hosseinfani.github.io/res/posters/2025_SIGIR_Translative_Neural_Team_Recommendation_From_Multilabel_Classification_to_Sequence_Prediction.pdf)
 
