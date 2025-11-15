@@ -57,9 +57,9 @@ def aggregate(output):
             dff = pd.DataFrame()
             df = rsplits.get_group(rs)
             dfs = []
-            log.info(f'{opentf.textcolor["green"]}{output}/ ... {opentf.textcolor["reset"]}')
+            log.info(f'{opentf.textcolor["green"]}{output}/{rs} ... {opentf.textcolor["reset"]}')
             for i, row in df.iterrows():
-                rfilename = f'{output}/{row["model-setting"]}/{rf}'.replace('@', '/')
+                rfilename = f'{output}/{rs}/{row["model-setting"]}/{rf}'.replace('@', '/')
                 log.info(rfilename)
                 df = pd.read_csv(rfilename, names=['metric', 'mean', 'std'], skiprows=1)
                 df = df.set_index("metric")
@@ -67,8 +67,8 @@ def aggregate(output):
                 names += [row['model-setting'] + '-mean', row['model-setting'] + '-std']
             dfs = pd.concat(dfs, axis=1)
             dfs = dfs.set_axis(names, axis=1)
-            dfs.to_csv(f"{output}/test.pred.eval.mean.agg.csv", index=True)
-            log.info(f'{opentf.textcolor["green"]}Saved at {output}/test.pred.eval.mean.agg.csv. {opentf.textcolor["reset"]}')
+            dfs.to_csv(f"{output}/{rs}/test.pred.eval.mean.agg.csv", index=True)
+            log.info(f'{opentf.textcolor["green"]}Saved at {output}/{rs}/test.pred.eval.mean.agg.csv. {opentf.textcolor["reset"]}')
 
 @hydra.main(version_base=None, config_path='.', config_name='__config__')
 def run(cfg):
@@ -78,37 +78,40 @@ def run(cfg):
     cfg.data.output += f'.mt{cfg.data.filter.min_nteam}.ts{cfg.data.filter.min_team_size}' if 'filter' in cfg.data and cfg.data.filter else ''
     if not os.path.isdir(cfg.data.output): os.makedirs(cfg.data.output)
 
-    # this will call the Team.generate_sparse_vectors(), which itself may (lazy) call Team.read_data(), which itself may (lazy) call {Publication|Movie|Repo|Patent}.read_data()
-    teamsvecs, indexes = domain_cls.gen_teamsvecs(cfg.data.source, cfg.data.output, cfg.data)
+    if cfg.cmd and any(c in cfg.cmd for c in ['prep', 'train', 'test', 'eval']):
 
-    year_idx = []
-    for i in range(1, len(indexes['i2y'])): #e.g, [(0, 1900), (6, 1903), (14, 1906)] => the i shows the starting index for teams of the year
-        if indexes['i2y'][i][0] - indexes['i2y'][i-1][0] > cfg.train.nfolds: year_idx.append(indexes['i2y'][i-1])
-    year_idx.append(indexes['i2y'][-1])
-    indexes['i2y'] = year_idx
+        # this will call the Team.generate_sparse_vectors(), which itself may (lazy) call Team.read_data(), which itself may (lazy) call {Publication|Movie|Repo|Patent}.read_data()
+        teamsvecs, indexes = domain_cls.gen_teamsvecs(cfg.data.source, cfg.data.output, cfg.data)
 
-    splitstr = f'/splits.f{cfg.train.nfolds}.r{cfg.train.train_test_ratio}'
-    splits = get_splits(teamsvecs['skill'].shape[0], cfg.train.nfolds, cfg.train.train_test_ratio, f'{cfg.data.output}{splitstr}.pkl', cfg.seed, indexes['i2y'] if cfg.train.step_ahead else None, step_ahead=cfg.train.step_ahead)
+        year_idx = []
+        for i in range(1, len(indexes['i2y'])): #e.g, [(0, 1900), (6, 1903), (14, 1906)] => the i shows the starting index for teams of the year
+            if indexes['i2y'][i][0] - indexes['i2y'][i-1][0] > cfg.train.nfolds: year_idx.append(indexes['i2y'][i-1])
+        year_idx.append(indexes['i2y'][-1])
+        indexes['i2y'] = year_idx
 
-    # move this call for evaluation part?
-    # skill coverage metric, all skills of each expert, all expert of each skills (supports of each skill, like in RarestFirst)
-    teamsvecs['skillcoverage'] = domain_cls.gen_skill_coverage(teamsvecs, cfg.data.output, skipteams=splits['test'])
-    cfg.data.output += splitstr #all models of anytype should be under a split strategy
+        splitstr = f'/splits.f{cfg.train.nfolds}.r{cfg.train.train_test_ratio}'
+        splits = get_splits(teamsvecs['skill'].shape[0], cfg.train.nfolds, cfg.train.train_test_ratio, f'{cfg.data.output}{splitstr}.pkl', cfg.seed, indexes['i2y'] if cfg.train.step_ahead else None, step_ahead=cfg.train.step_ahead)
 
-    if 'embedding' in cfg.data and cfg.data.embedding.class_method:
-        # Get command-line overrides for embedding. Kinda tricky as we dynamically override a subconfig.
-        # Use '+data.embedding.{...}=value' to override
-        # Use '+data.embedding.{...}=null' to drop. The '~data.embedding.{...}' cannot be used here.
-        emb_overrides = [o.replace('+data.embedding.', '') for o in HydraConfig.get().overrides.task if '+data.embedding.' in o]
-        embcfg = OmegaConf.merge(OmegaConf.load(cfg.data.embedding.config), OmegaConf.from_dotlist(emb_overrides))
-        embcfg.model.spe = cfg.train.save_per_epoch
-        OmegaConf.resolve(embcfg)
-        cfg.data.embedding.config = embcfg
-        cls, method = cfg.data.embedding.class_method.split('_') if cfg.data.embedding.class_method.find('_') else (cfg.data.embedding.class_method, None)
-        cls = get_class(cls)
-        #t2v = cls(cfg.data.output, cfg.data.acceleration, method, cfg.data.embedding.config.model[cls.__name__.lower()])
-        t2v = cls(cfg.data.output, cfg.acceleration, cfg.seed, cfg.data.embedding.config.model[cls.__name__.lower()], method)
-        t2v.learn(teamsvecs, splits)
+        # move this call for evaluation part?
+        # skill coverage metric, all skills of each expert, all expert of each skills (supports of each skill, like in RarestFirst)
+        # it must be after split to mask the test teams (they should be unknown)
+        teamsvecs['skillcoverage'] = domain_cls.gen_skill_coverage(teamsvecs, cfg.data.output, skipteams=splits['test'])
+        output_split = cfg.data.output + splitstr #all models of anytype should be under a split strategy
+
+        if 'embedding' in cfg.data and cfg.data.embedding.class_method:
+            # Get command-line overrides for embedding. Kinda tricky as we dynamically override a subconfig.
+            # Use '+data.embedding.{...}=value' to override
+            # Use '+data.embedding.{...}=null' to drop. The '~data.embedding.{...}' cannot be used here.
+            emb_overrides = [o.replace('+data.embedding.', '') for o in HydraConfig.get().overrides.task if '+data.embedding.' in o]
+            embcfg = OmegaConf.merge(OmegaConf.load(cfg.data.embedding.config), OmegaConf.from_dotlist(emb_overrides))
+            embcfg.model.spe = cfg.train.save_per_epoch
+            OmegaConf.resolve(embcfg)
+            cfg.data.embedding.config = embcfg
+            cls, method = cfg.data.embedding.class_method.split('_') if cfg.data.embedding.class_method.find('_') else (cfg.data.embedding.class_method, None)
+            cls = get_class(cls)
+            #t2v = cls(output_split, cfg.data.acceleration, method, cfg.data.embedding.config.model[cls.__name__.lower()])
+            t2v = cls(output_split, cfg.acceleration, cfg.seed, cfg.data.embedding.config.model[cls.__name__.lower()], method)
+            t2v.learn(teamsvecs, splits)
 
     if cfg.cmd and any(c in cfg.cmd for c in ['train', 'test', 'eval']):
 
@@ -149,7 +152,7 @@ def run(cfg):
         for m in cfg.models.instances:
             cls_method = m.split('_')
             cls = get_class(cls_method[0]) # e.g., rnd, fnn, bnn, gnn, tNtf, ...
-            output_ = (t2v.output if t2v else cfg.data.output)
+            output_ = (t2v.output if t2v else output_split)
             if cls_method[0] == 'mdl.emb.gnn.Gnn':
                 assert t2v, f'{opentf.textcolor["red"]}The mdl.emb.gnn.Gnn instance needs a data.embedding.class_method! {opentf.textcolor["reset"]}'
                 models[m] = t2v
