@@ -1,1 +1,1 @@
-<p align="center"><img src="../../docs/datasets_class_diagram.png" width="500"></p>
+<p align="center"><img src="../../docs/figs/datasets_class_diagram.png" width="500"></p>

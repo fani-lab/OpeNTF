@@ -17,7 +17,7 @@ For each dataset, preprocessed files are created such that all models will be us
 
 Our pipeline benefits from the parallel generation of sparse matrices for teams, which significantly reduces the preprocessing time as shown below:
 
-<p align="center"><img src="../docs/speedup.jpg" width="200"><img src="../docs/speedup_loglog.jpg" width="190"></p>
+<p align="center"><img src="../docs/figs/speedup.jpg" width="200"><img src="../docs/figs/speedup_loglog.jpg" width="190"></p>
 
 3. `splits.f{nfolds}.r{train_test_ratio}`, the subfolder that contains the models' footprint for train-test splits based on `train_test_ratio` and `nfolds` cross-validation during training, like [`./dblp/toy.dblp.v12.json/splits.f3.r0.85`](./dblp/toy.dblp.v12.json/splits.f3.r0.85)
 

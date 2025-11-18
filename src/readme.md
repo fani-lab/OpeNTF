@@ -10,7 +10,7 @@ This folder contains our implementation of neural team formation, including all 
    4) [``patent.py``](./cmn/patent.py) is the definition for the `Patent` class, where patents are teams, inventors are members, and patents' class/subclasses are skills like in [``data/uspt``](data/uspt)
    5) [``repository.py``](./cmn/repository.py) is the definition for the `Repository` class, where software repos in github are teams, software developers are members, and programming languages are skills like in [``data/gith``](data/gith)
   
-<p align="center"><img src='../docs/datasets_class_diagram.png' width="500" ></p>
+<p align="center"><img src='../docs/figs/datasets_class_diagram.png' width="500" ></p>
     
 4) [``./mdl/``](./mdl), we have implemented the neural models here:
    1) [``ntf.py``](./mdl/ntf.py), the parent abstract class definition of a team formation model, to be overriden/realized by machine learning models 
@@ -19,6 +19,6 @@ This folder contains our implementation of neural team formation, including all 
    4) [``nmt.py``](./mdl/nmt.py), the wrapper class over [`OpenNMT`](https://github.com/OpenNMT/OpenNMT-py) for `translative` models like `seq-2-seq` and `transformers` models, where the required subset of `skills` is mapped to the optimum subset of `members`
    5) [``tntf.py``](./mdl/tntf.py), the wrapper class over [``ntf.py``](./mdl/ntf.py) for streaming/temporal training of a model
 
-<p align="center"><img src='../docs/models_class_diagram.png' width="500" ></p>
+<p align="center"><img src='../docs/figs/models_class_diagram.png' width="500" ></p>
 
 5) [``./eval/``](./eval), we report evaluation of models based on quantitative metrics (classification and ranking metrics) as well as qualitative metrics here.

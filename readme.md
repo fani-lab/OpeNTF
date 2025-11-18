@@ -34,7 +34,7 @@ Team formation (recommendation) involves selecting a team of skillful experts wh
 
 
 </td>
-<td><img src='docs/adila_.png' width="500" align="right" /></td>
+<td><img src='docs/figs/adila_.png' width="500" align="right" /></td>
 <!-- <td><img src='docs/models_class_diagram.png' width="90%%" /></td> -->
 </tr>
 </table>
@@ -80,7 +80,7 @@ The above run, loads and preprocesses a tiny-size toy example dataset [``toy.dbl
 
 #### **3.1. Neural Models**
 
-<p align="center"><img src='docs/models_class_diagram.png' width="500" ></p>
+<p align="center"><img src='docs/figs/models_class_diagram.png' width="500" ></p>
 
 Each model has been defined in [``./src/mdl/``](./src/mdl/) under an inheritance hierarchy. They override abstract functions for ``train``, ``test``, ``eval``, and ``plot`` steps. For example, for our feedforward baseline [``fnn``](./src/mdl/fnn.py), the model has been implemented in [``./src/mdl/fnn.py``](src/mdl/fnn.py). Model's hyperparameters such as the learning rate (``lr``) or the number of epochs (``e``) can be set in [``./src/mdl/__config__yaml``](./src/mdl/__config__yaml), or overriden in running command as shown in the [``quickstart``](https://colab.research.google.com/github/fani-lab/OpeNTF/blob/main/ipynb/quickstart.ipynb) script.
   
@@ -106,13 +106,13 @@ From [``./src/mdl/emb/``](./src/mdl/emb/), we also support dense vector represen
 
 #### **3.2. [`Adila`](https://github.com/fani-lab/Adila): Fairness aware Team Formation**
 
-<p align="center"><img src='docs/adila.png' width="500" ></p>
+<p align="center"><img src='docs/figs/adila.png' width="500" ></p>
 
 Neural team formation methods largely ignore the fairness in the recommended teams of experts. In `Adila`, we study the application of `fairness-aware` re-ranking algorithms to mitigate the potential popularity or gender biases. We support two fairness notions namely, `equality of opportunity` and `demographic parity`. To achieve fairness, we utilize three deterministic greedy reranking algorithms (`det_greedy`, `det_cons`, `det_relaxed`) in addition to `fa*ir`, a probabilistic greedy reranking algorithm. For further details and demo, please visit [Adila's submodule](https://github.com/fani-lab/Adila).
 
 #### **3.3. Temporal Team Prediction**
 
-<p align="center"><img src='docs/temporal.jpg' width="500"></p>
+<p align="center"><img src='docs/figs/temporal.jpg' width="500"></p>
 
 Team formation models generally assume that teams follow the i.i.d property and follow the bag of teams approach during training (a shuffled dataset of teams). With temporal training, we aim to predict `future` teams of experts. We sort the teams by time intervals and train a neural model incrementally through the ordered collection of teams, as seen below. To run models under temporal training strategy, set [`models.instances`](https://github.com/fani-lab/OpeNTF/blob/main/src/__config__.yaml#L57) to `[mdl.tntf.tNtf_mdl.fnn.Fnn]`, `[mdl.tntf.tNtf_mdl.bnn.Bnn]`, or both `[mdl.tntf.tNtf_mdl.fnn.Fnn, mdl.tntf.tNtf_mdl.bnn.Bnn]` in [`src/__config__.yaml`](https://github.com/fani-lab/OpeNTF/blob/main/src/__config__.yaml).
 
@@ -136,7 +136,7 @@ See [Effective Neural Team Formation via Negative Samples, CIKM22](https://dl.ac
 
 Raw dataset, e.g., scholarly papers from AMiner's citation network dataset of [``dblp``](https://originalstatic.aminer.cn/misc/dblp.v12.7z), movies from [``imdb``](https://datasets.imdbws.com/), or US patents from [``uspt``](https://patentsview.org/download/data-download-tables) were assumed to be populated in [``data``](data). For the sake of integration test, tiny-size toy example datasets [``toy.dblp.v12.json``](data/dblp/toy.dblp.v12.json) from [``dblp``](https://originalstatic.aminer.cn/misc/dblp.v12.7z), [[``toy.title.basics.tsv``](data/imdb/toy.title.basics.tsv), [``toy.title.principals.tsv``](data/imdb/toy.title.principals.tsv), [``toy.name.basics.tsv``](data/imdb/toy.name.basics.tsv)] from [``imdb``](https://datasets.imdbws.com/), [``toy.repos.csv``](data/uspt/toy.repos.csv) for `github`, and [``toy.patent.tsv``](data/uspt/toy.patent.tsv) from `US patents` have been already provided.
 
-<p align="center"><img src='docs/datasets_class_diagram.png' width="500" ></p>
+<p align="center"><img src='docs/figs/datasets_class_diagram.png' width="500" ></p>
 
 Raw data will be preprocessed into two main ``sparse`` matrices each row of which represents: 
 
@@ -152,7 +152,7 @@ The sparse matrices and the indices will be persisted in [``ouptut/{dblp,imdb,us
 
 > Our pipeline benefits from parallel generation of sparse matrices for teams, which significantly reduces the preprocessing time as shown below:
 > 
-> <p align="center"><img src="docs/speedup.jpg" width="200"><img src="docs/speedup_loglog.jpg" width="190"></p>
+> <p align="center"><img src="docs/figs/speedup.jpg" width="200"><img src="docs/figs/speedup_loglog.jpg" width="190"></p>
 
 Please note that the preprocessing step will be executed once. Subsequent runs load the persisted pickle files. In order to re-generate them, one should simply delete them. 
 
