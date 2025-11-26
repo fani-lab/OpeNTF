@@ -67,7 +67,10 @@ def get_req_dict(req_file):
         ver_num = "([0-9]+[0-9\.\*]*)"
 
         out = []
-        for pkg in re.findall(f"{package_name}[\s]*{comp}[\s]*{ver_num}", line): out.append((pkg[0], (line, pkg[2])))
+        for pkg in re.findall(f"{package_name}[\s]*{comp}[\s]*{ver_num}", line):
+            # in case a specific target repo is needed
+            if '@git+https://github.com/' in line: line = line.replace('==' + pkg[2], '') # 'fairsearchcore==1.0.4@git...' >> fairsearchcore@git...
+            out.append((pkg[0], (line, pkg[2])))
         return out # [(package_name, (line, ver_num)), ...])]
     
     with open(req_file, 'r') as f: pkg_req_dict = dict(chain.from_iterable(map(lambda line: extract_package_info_from_line(line), filter(lambda x: x.startswith("#$"), f.readlines()))))
