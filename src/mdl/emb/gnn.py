@@ -282,14 +282,14 @@ class Gnn(T2v):
             if self.cfg.model.spe and (e == 0 or ((e + 1) % self.cfg.model.spe) == 0):
                 #self.model.eval()
                 self.torch.save({'model_state_dict': self.model.state_dict(), 'cfg': self.cfg, 'e': e, 't_loss': t_loss, 'v_loss': v_loss}, f'{self.output}/f{foldidx}.e{e}.pt')
-                log.info(f'{self.name} model with {opentf.cfg2str(self.cfg.model)} saved at {self.output}.e{e}.pt')
+                log.info(f'{self.name} model with {opentf.cfg2str(self.cfg.model)} saved at {self.output}/f{foldidx}.e{e}.pt')
 
             if earlystopping(v_loss, self.model).early_stop:
                 log.info(f'Early stopping triggered at epoch: {e}')
                 break
         #self.model.eval()
         self.torch.save({'model_state_dict': self.model.state_dict(), 'cfg': self.cfg, 'e': e, 't_loss': t_loss, 'v_loss': v_loss}, f'{self.output}/f{foldidx}.pt')
-        log.info(f'{self.name} model with {opentf.cfg2str(self.cfg.model)} saved at {self.output}.pt.')
+        log.info(f'{self.name} model with {opentf.cfg2str(self.cfg.model)} saved at {self.output}/f{foldidx}.pt.')
         self.w.close()
 
     def _train_rw(self, splits, foldidx, val_m_t_edge_index_homo):
