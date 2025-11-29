@@ -45,11 +45,11 @@ def aggregate(output):
     if not files: log.info(f'{opentf.textcolor["yellow"]}Nothing found! {opentf.textcolor["reset"]}')
 
     for row in files:
-        if len(row) > 7: #to accomodate submodels in emb/transfer-based results
+        if len(row) - len(output.split(os.sep)) > 3: #to accomodate submodels in emb/transfer-based results
             row[-3], row[-2] = row[-3] + '@' + row[-2], row[-1]
             del row[-1]
 
-    files = pd.DataFrame(files, columns=['', '', 'domain', 'dataset', 'split', 'model-setting', 'rfile'])
+    files = pd.DataFrame(files, columns=output.split(os.sep) + ['split', 'model-setting', 'rfile'])
     # rfiles = files.groupby('rfile') # if we want to aggregate per folds too
     # for rf, r in rfiles:
     rsplits = files.groupby('split')

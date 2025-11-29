@@ -79,7 +79,7 @@ class Gnn(T2v):
         self.output += f'{".pre" if self.cfg.graph.pre else ""}'
         if self.name == 'n2v': self.output += f'.w{self.cfg.model.w}.wl{self.cfg.model.wl}.wn{self.cfg.model.wn}'
         elif self.name == 'm2v': self.output += f'.w{self.cfg.model.w}.wl{self.cfg.model.wl}.wn{self.cfg.model.wn}.{self.cfg.model.metapath_name[1]}'  # should be fixed
-        elif self.name in {'gcn', 'gs', 'gat', 'gatv2', 'gin'}: self.output += f'.h{"-".join([str(i) for i in self.cfg.model.h])}.nn{"-".join([str(i) for i in self.cfg.model.nn])}'
+        elif self.name in {'gcn', 'gs', 'gat', 'gatv2', 'gin'}: self.output += f'.h{"-".join([str(i) for i in self.cfg.model.h]) if self.cfg.model.h and len(self.cfg.model.h) > 0 else None}.nn{"-".join([str(i) for i in self.cfg.model.nn])}'
 
         # replace the 1 dimensional node features with pretrained d2v skill vectors of required dimension
         if self.cfg.graph.pre: self._init_d2v_node_features(teamsvecs)
