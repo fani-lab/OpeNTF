@@ -1,0 +1,22 @@
+s6
+s0 s2 s40
+s6 s7
+s2
+s2
+s8 s35 s44 s45 s48
+s5
+s0 s9
+s0 s2 s6 s29 s46
+s10
+s0 s2 s6 s7 s9 s12 s16 s17 s18 s19 s20 s21 s22 s23 s24 s25 s26 s27 s28 s29 s30 s31 s32 s33 s34 s35 s36 s37 s38
+s6 s7 s9
+s0 s10 s11
+s8
+s0 s4 s6 s7 s9 s14 s15 s16
+s3 s4
+s12
+s0 s6 s7 s9
+s10
+s6 s7 s9
+s6 s7 s9 s16 s42
+s6 s7 s8 s9

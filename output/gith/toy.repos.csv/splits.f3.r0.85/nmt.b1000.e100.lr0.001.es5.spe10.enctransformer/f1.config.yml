@@ -1,0 +1,56 @@
+data:
+  corpus_1:
+    path_src: ../output/gith/toy.repos.csv/splits.f3.r0.85/nmt.b1000.e100.lr0.001.es5.spe10.enctransformer/f1.src-train.txt
+    path_tgt: ../output/gith/toy.repos.csv/splits.f3.r0.85/nmt.b1000.e100.lr0.001.es5.spe10.enctransformer/f1.tgt-train.txt
+    transforms: []
+  valid:
+    path_src: ../output/gith/toy.repos.csv/splits.f3.r0.85/nmt.b1000.e100.lr0.001.es5.spe10.enctransformer/f1.src-valid.txt
+    path_tgt: ../output/gith/toy.repos.csv/splits.f3.r0.85/nmt.b1000.e100.lr0.001.es5.spe10.enctransformer/f1.tgt-valid.txt
+src_vocab: ../output/gith/toy.repos.csv/splits.f3.r0.85/nmt.b1000.e100.lr0.001.es5.spe10.enctransformer/f1.vocab.src
+tgt_vocab: ../output/gith/toy.repos.csv/splits.f3.r0.85/nmt.b1000.e100.lr0.001.es5.spe10.enctransformer/f1.vocab.tgt
+overwrite: true
+vocab_sample_limit: -1
+save_data: ../output/gith/toy.repos.csv/splits.f3.r0.85/nmt.b1000.e100.lr0.001.es5.spe10.enctransformer/f1.
+save_model: ../output/gith/toy.repos.csv/splits.f3.r0.85/nmt.b1000.e100.lr0.001.es5.spe10.enctransformer/f1.
+seed: 0
+early_stopping: 5
+early_stopping_criteria: accuracy
+dropout: 0.2
+word_vec_size: 128
+world_size: 1
+gpu_ranks: []
+num_workers: 0
+batch_size: 1000
+batch_type: sents
+bucket_size: 23
+keep_checkpoint: -1
+train_steps: 100
+save_checkpoint_steps: 10
+valid_steps: 1
+report_every: 1
+model_dtype: fp16
+optim: adam
+weight_decay: 0.0001
+learning_rate: 0.001
+adam_beta1: 0.9
+adam_beta2: 0.98
+encoder_type: transformer
+decoder_type: transformer
+cnn_size: 128
+cnn_kernel_width: 3
+layers: 4
+rnn_type: LSTM
+rnn_size: 128
+input_feed: 1
+enc_layers: 4
+dec_layers: 4
+warmup_steps: 501
+position_encoding: false
+hidden_size: 128
+transformer_ff: 512
+attention_dropout: 0.2
+heads: 8
+beam_size: 10
+n_best: 1
+min_length: 2
+max_length: 100
