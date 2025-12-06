@@ -172,7 +172,7 @@ class Nmt(Ntf):
                     if df_mean.empty: df_mean = df_mean_skc
                     else: df_mean = pd.concat([df_mean, df_mean_skc], axis=0)
 
-                if evalcfg.per_instance: df.to_csv(f'{self.output}/{predfile}.eval.per_instance.csv', float_format='%.5f')
+                if evalcfg.per_instance: df.to_csv(f'{self.output}/{predfile}.eval.instance.csv', float_format='%.5f')
                 log.info(f'Saving file per fold as {self.output}/{predfile}.eval.mean.csv')
                 df_mean.to_csv(f'{self.output}/{predfile}.eval.mean.csv')
                 if i == 0:  # non-epoch-based only, as there is different number of epochs for each fold model due to earlystopping
@@ -182,6 +182,6 @@ class Nmt(Ntf):
         mean_std['std'] = fold_mean.std(axis=1)
         log.info(f'Saving mean evaluation file over {len(splits["folds"])} folds as {self.output}/test.pred.eval.mean.csv')
         mean_std.to_csv(f'{self.output}/test.pred.eval.mean.csv')
-        if evalcfg.per_instance: fold_mean_per_instance.truediv(len(splits['folds'].keys())).to_csv(f'{self.output}/test.pred.eval.per_instance_mean.csv')
+        if evalcfg.per_instance: fold_mean_per_instance.truediv(len(splits['folds'].keys())).to_csv(f'{self.output}/test.pred.eval.instance.mean.csv')
 
 
