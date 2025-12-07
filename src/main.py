@@ -94,8 +94,8 @@ def run(cfg):
         # move this call for evaluation part?
         # skill coverage metric, all skills of each expert, all expert of each skills (supports of each skill, like in RarestFirst)
         # it must be after split to mask the test teams (they should be unknown)
-        teamsvecs['skillcoverage'] = domain_cls.gen_skill_coverage(teamsvecs, cfg.data.output, skipteams=splits['test'])
         output_split = cfg.data.output + splitstr #all models of anytype should be under a split strategy
+        teamsvecs['skillcoverage'] = domain_cls.gen_skill_coverage(teamsvecs, output_split, skipteams=splits['test'])
 
         if 'embedding' in cfg.data and cfg.data.embedding.class_method:
             # Get command-line overrides for embedding. Kinda tricky as we dynamically override a subconfig.
