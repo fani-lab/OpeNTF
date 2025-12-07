@@ -15,8 +15,8 @@ def calculate_metrics(Y, Y_, topK=None, per_instance=False, metrics=['P_2,5', 'r
             qrel['q' + str(i)] = {'d' + str(idx): 1 for idx in Y[i].nonzero()[1]}
             run['q' + str(i)] = {'d' + str(idx): float(Y_[i][topk_idxes[i][j]]) for j, idx in enumerate(topk_idxes[i])}
             pbar.update(1)
-    df = pd.DataFrame.from_dict(pytrec_eval.RelevanceEvaluator(qrel, set(metrics)).evaluate(run))
-    df_mean = df.mean(axis=1).to_frame('mean')
+    df = pd.DataFrame.from_dict(pytrec_eval.RelevanceEvaluator(qrel, set(metrics)).evaluate(run)).transpose()
+    df_mean = df.mean().to_frame('mean').rename_axis('metrics')
     return df if per_instance else None, df_mean
 
 def calculate_auc_roc(Y, Y_, curve=False):
@@ -52,6 +52,5 @@ def calculate_skill_coverage(X, Y_, expertskillvecs, per_instance=False, topks='
             pbar.update(1)
 
     pd = opentf.install_import('pandas')
-    df_skc = pd.DataFrame(data=[v for v in skill_coverages.values()], index=[f'skill_coverage_{k}' for k in skill_coverages.keys()])
-    return df_skc, df_skc.mean(axis=1).to_frame('mean')
-
+    df_skc = pd.DataFrame(data=[v for v in skill_coverages.values()], index=[f'skill_coverage_{k}' for k in skill_coverages.keys()]).transpose()
+    return df_skc, df_skc.mean().to_frame('mean').rename_axis('metrics')

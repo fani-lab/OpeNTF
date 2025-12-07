@@ -75,11 +75,11 @@ class Ntf:
                         X = X[splits['folds'][foldidx][pred_set]] if pred_set != 'test' else X[splits['test']]
                         df_skc, df_mean_skc = metric.calculate_skill_coverage(X, Y_, teamsvecs['skillcoverage'], evalcfg.per_instance, topks=m[0].replace('skill_coverage_', ''))
                         if df.empty: df = df_skc
-                        else: df_skc.columns = df.columns; df = pd.concat([df, df_skc], axis=0)
+                        else: df = pd.concat([df.reset_index(drop=True), df_skc.reset_index(drop=True)], axis=1)
                         if df_mean.empty: df_mean = df_mean_skc
                         else: df_mean = pd.concat([df_mean, df_mean_skc], axis=0)
 
-                    if evalcfg.per_instance: df.to_csv(f'{predfile}.eval.instance.csv', float_format='%.5f')
+                    if evalcfg.per_instance: df.to_csv(f'{predfile}.eval.instance.csv', float_format='%.5f', index=False)
                     log.info(f'Saving file per fold as {predfile}.eval.mean.csv')
                     df_mean.to_csv(f'{predfile}.eval.mean.csv')
                     if i == 0: # non-epoch-based only, as there is different number of epochs for each fold model due to earlystopping
@@ -89,7 +89,7 @@ class Ntf:
             mean_std['std'] = fold_mean.std(axis=1)
             log.info(f'Saving mean evaluation file over {len(splits["folds"])} folds as {self.output}/{pred_set}.pred.eval.mean.csv')
             mean_std.to_csv(f'{self.output}/{pred_set}.pred.eval.mean.csv')
-            if evalcfg.per_instance: fold_mean_per_instance.truediv(len(splits['folds'].keys())).to_csv(f'{self.output}/{pred_set}.pred.eval.instance_mean.csv')
+            if evalcfg.per_instance: fold_mean_per_instance.truediv(len(splits['folds'].keys())).to_csv(f'{self.output}/{pred_set}.pred.eval.instance_mean.csv', index=False)
     def plot_roc(self, splits, on_train=False):
         plt = opentf.install_import('matplotlib')
         for pred_set in (['test', 'train', 'valid'] if on_train else ['test']):
