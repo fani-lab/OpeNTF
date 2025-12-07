@@ -314,7 +314,7 @@ class Team(object):
         e2 -> s0 (2 times), s1 (1 time)
         e3 -> s2 (5 times)
         '''
-
+        if not os.path.isdir(output): os.makedirs(output)
         filepath = f'{output}/skillcoverage.pkl'
         try :
             log.info(f'Loading member-skill co-occurrence matrix ({teamsvecs["member"].shape[1]}, {teamsvecs["skill"].shape[1]}) from {filepath} ...')

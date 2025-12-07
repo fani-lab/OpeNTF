@@ -42,7 +42,7 @@ def aggregate(output):
     files = []
     for dirpath, dirnames, filenames in os.walk(output): files += [os.path.join(os.path.normpath(dirpath), file).split(os.sep) for file in filenames if pattern.search(file)]
 
-    if not files: log.info(f'{opentf.textcolor["yellow"]}Nothing found! {opentf.textcolor["reset"]}')
+    if not files: log.info(f'{opentf.textcolor["yellow"]}Nothing found! {opentf.textcolor["reset"]}'); return;
 
     for row in files:
         if len(row) - len(output.split(os.sep)) > 3: #to accomodate submodels in emb/transfer-based results
