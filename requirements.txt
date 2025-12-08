@@ -66,6 +66,8 @@ numpy==1.24.4 #cannot go above for gensim
 ## mdl.nmt.__init__()
 
 ######Adila submodule
-######reranking==0.3.6
-######fairsearchcore==1.0.4
-######schedule
+#$ reranking==0.3.6 #https://pypi.org/project/reranking/ #https://github.com/yuanlonghao/reranking
+#$ fairsearchcore==1.0.4@git+https://github.com/fani-lab/fairsearch-fair-python.git # till pr merge, due to the __hash__ bug explained in https://github.com/fair-search/fairsearch-fair-python/issues/4
+##$ fairsearchcore==1.0.4 #https://github.com/fair-search/fairsearch-fair-python
+##$ FairRankTune #https://pypi.org/project/FairRankTune/ #https://github.com/KCachel/FairRankTune #python 3.9+
+

@@ -48,6 +48,24 @@ def install_import(pkg_name, import_path=None, from_module=None):
     if from_module: return getattr(module, from_module)
     return module
 
+def wget_import(import_path, url):# url = "https://raw.githubusercontent.com/username/other-repo/main/mymodule.py"
+    try: return importlib.import_module(import_path)
+    except ImportError: pass
+    import sys, requests, tempfile, os
+    response = requests.get(url)
+    response.raise_for_status()  # Raise an exception for bad status codes
+    with tempfile.NamedTemporaryFile(mode='w+', delete=False, suffix=".py") as temp_file:
+        temp_file.write(response.text)
+        temp_path = temp_file.name
+    module_name = os.path.splitext(os.path.basename(url))[0]
+    spec = importlib.util.spec_from_file_location(module_name, temp_path)
+    if spec is None: raise ImportError(f'Could not create spec for module {module_name} from {url}')
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[module_name] = module
+    spec.loader.exec_module(module)
+    if temp_file.name in locals() and os.path.exists(temp_file.name): os.remove(temp_file.name)
+    return module
+
 pkg_req_dict = {}
 def get_req_dict(req_file):
     """
