@@ -51,11 +51,10 @@ def install_import(pkg_name, import_path=None, from_module=None):
 def wget_import(import_path, url):# url = "https://raw.githubusercontent.com/username/other-repo/main/mymodule.py"
     try: return importlib.import_module(import_path)
     except ImportError: pass
-    import sys, requests, tempfile, os
-    response = requests.get(url)
-    response.raise_for_status()  # Raise an exception for bad status codes
+    import sys, urllib.request, tempfile, os
+    with urllib.request.urlopen(url) as f: source_code = f.read().decode("utf-8")
     with tempfile.NamedTemporaryFile(mode='w+', delete=False, suffix=".py") as temp_file:
-        temp_file.write(response.text)
+        temp_file.write(source_code)
         temp_path = temp_file.name
     module_name = os.path.splitext(os.path.basename(url))[0]
     spec = importlib.util.spec_from_file_location(module_name, temp_path)
