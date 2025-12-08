@@ -1,7 +1,8 @@
 # ``OpeNTF``: An Open-Source Neural Team Formation Benchmark Library 
 ![Python Version](https://img.shields.io/badge/python-3.8-blue) [![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/) [![All Tests](https://img.shields.io/github/check-runs/fani-lab/OpeNTF/main)](https://github.com/fani-lab/OpeNTF/actions)
 
-
+<sub>
+ 
 >Translative Neural Team Recommendation. SIGIR, 2025. [`pdf`](https://hosseinfani.github.io/res/papers/2025_SIGIR_Translative_Neural_Team_Recommendation_From_Multilabel_Classification_to_Sequence_Prediction.pdf) [`doi`](https://doi.org/10.1145/3726302.3730259) [`reviews`](https://hosseinfani.github.io/res/papers/2025_SIGIR_Translative_Neural_Team_Recommendation_From_Multilabel_Classification_to_Sequence_Prediction.txt) [`poster`](https://hosseinfani.github.io/res/posters/2025_SIGIR_Translative_Neural_Team_Recommendation_From_Multilabel_Classification_to_Sequence_Prediction.pdf)
 
 > Adaptive Loss-based Curricula for Neural Team Recommendation. WSDM, 2025. [`pdf`](https://hosseinfani.github.io/res/papers/2025_WSDM_Adaptive_Loss-based_Curricula_for_Neural_Team_Recommendation.pdf) [`doi`](https://doi.org/10.1145/3701551.3703574) [`reviews`](https://hosseinfani.github.io/res/papers/2025_WSDM_Adaptive_Loss-based_Curricula_for_Neural_Team_Recommendation.txt)
@@ -14,6 +15,19 @@
 
 > OpeNTF: A Benchmark Library for Neural Team Formation. CIKM, 2022. [`pdf`](https://hosseinfani.github.io/res/papers/2022_CIKM_OpeNTF_A_Benchmark_Library_for_Neural_Team_Formation.pdf) [`doi`](https://dl.acm.org/doi/10.1145/3511808.3557526) [`reviews`](https://hosseinfani.github.io/res/papers/2022_CIKM_OpeNTF_A_Benchmark_Library_for_Neural_Team_Formation.txt) [`video`](https://www.youtube.com/playlist?list=PLKFWrqRN8VmQBEyNBn8kXhaYpG6Gpecko)
 
+---
+
+> Learning Collaborative Teams via Social Information Retrieval. WWW, 2026. [`pdf`](https://hosseinfani.github.io/res/papers/2026_Learning_Collaborative_Teams_via_Social_Information_Retrieval.pdf) [`web`](https://fani-lab.github.io/OpeNTF/tutorial/www26/)
+
+> Neural Shifts in Collaborative Team Recommendation. CIKM, 2025. [`pdf`](https://hosseinfani.github.io/res/papers/2025_CIKM_Neural_Shifts_in_Collaborative_Team_Recommendation.pdf) [`web`](https://fani-lab.github.io/OpeNTF/tutorial/cikm25/)
+
+> Bridging Historical Subgraph Optimization and Modern Graph Neural Network Approaches in Team Recommendations. WSDM, 2025. [`pdf`](https://hosseinfani.github.io/res/papers/2025_WSDM_Bridging_Historical_Subgraph_Optimization_and_Modern_Graph_Neural_Network_Approaches_in_Team_Recommendations.pdf) [`web`](https://fani-lab.github.io/OpeNTF/tutorial/wsdm25/) [`doi`](https://dl.acm.org/doi/10.1145/3701551.3703483) [`ppt`](https://hosseinfani.github.io/res/slides/2025_WSDM_Bridging_Historical_Subgraph_Optimization_and_Modern_Graph_Neural_Network_Approaches_in_Team_Recommendations.pdf)
+
+> Paradigm Shifts in Team Recommendation: From Historical Subgraph Optimization to Emerging Graph Neural Network. SIGIR-AP, 2024. [`pdf`](https://hosseinfani.github.io/res/papers/2024_SIGIRAP_Paradigm_Shifts_in_Team_Recommendation_From_Historical_Subgraph_Optimization_to_Emerging_Graph_Neural_Network.pdf) [`web`](https://fani-lab.github.io/OpeNTF/tutorial/sigir-ap24/) [`doi`](https://doi.org/10.1145/3673791.3698440) [`ppt`](https://hosseinfani.github.io/res/slides/2024_SIGIRAP_Paradigm_Shifts_in_Team_Recommendation_From_Historical_Subgraph_Optimization_to_Emerging_Graph_Neural_Network.pdf) [`video`](https://www.youtube.com/playlist?list=PLKFWrqRN8VmSOQA74QRJRwwYDyp1YNZE-)
+
+> Collaborative Team Recommendation for Skilled Users: Objectives, Techniques, and New Perspectives. UMAP, 2024. [`pdf`](https://hosseinfani.github.io/res/papers/2024_UMAP_Collaborative_Team_Recommendation_for_Skilled_Users_Objectives_Techniques_and_New_Perspectives.pdf) [`web`](https://fani-lab.github.io/OpeNTF/tutorial/umap24/) [`doi`](https://dl.acm.org/doi/10.1145/3631700.3658521) [`ppt`](https://www.slideshare.net/slideshow/collaborative-team-recommendation-for-skilled-users-objectives-techniques-and-new-perspectives/270130704) [`video`](https://www.youtube.com/playlist?list=PLKFWrqRN8VmRmxwDKlaA7Moa_Wv0li7ex)
+---
+</sub>
 Team formation (recommendation) involves selecting a team of skillful experts who will, more likely than not, accomplish a task. Researchers have proposed a rich body of computational methods to automate the traditionally tedious and error-prone manual process. We release `OpeNTF`, an open-source neural team formation framework hosting canonical `neural models` as the cutting-edge class of approaches, along with `large-scale` training datasets from `varying domains`. It further includes `temporal` training strategy for neural models’ training to capture the evolution of experts’ skills and collaboration ties over `time`, as opposed to randomly shuffled training datasets. OpeNTF also integrates `debiasing reranking` algorithms at its last step to mitigate the `popularity` and `gender` disparities in the neural models’ team recommendations based on two alternative notions of fairness: `equality of opportunity` and `demographic parity`. OpeNTF is a forward-looking effort to automate team formation via fairness-aware and time-sensitive methods. AI-ML-based solutions are increasingly impacting how resources are allocated to various groups in society, and ensuring fairness and time are systematically considered is key.
 
 <table border=0>
