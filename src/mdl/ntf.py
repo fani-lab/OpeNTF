@@ -108,7 +108,7 @@ class Ntf:
     def adila(self, teamsvecs, splits, faircfg):
         from Adila.src.adila import Adila
         from Adila.src.main import _
-        if not scipy.sparse.issparse(teamsvecs['skill']): teamsvecs['skill'] = self.teamsvecs['original_skill']  # to accomodate dense emb vecs of skills
+        if not scipy.sparse.issparse(teamsvecs['skill']): teamsvecs['skill'] = teamsvecs['original_skill']  # to accomodate dense emb vecs of skills
         adila = Adila(teamsvecs, splits, faircfg.fgender)
         for attribute in faircfg.attribute:
             for notion in faircfg.notion:
