@@ -76,6 +76,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Update submodules to latest main
+        run: |
+          git submodule update --remote --merge
 
       - name: Set up Python
         uses: actions/setup-python@v4
