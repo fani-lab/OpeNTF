@@ -1,4 +1,4 @@
-import subprocess, sys, importlib, random, numpy, logging, re
+import subprocess, sys, importlib, random, numpy, logging, re, os
 log = logging.getLogger(__name__)
 from omegaconf import OmegaConf
 from itertools import chain
@@ -35,10 +35,11 @@ def install_import(pkg_name, import_path=None, from_module=None):
     import_path = import_path or pkg_name
     try: 
         module = importlib.import_module(import_path)
-        if(not is_version_equal(version(pkg_name), pkg_req_dict[pkg_name][1])):
-            log.info(f'{textcolor["yellow"]}Version mismatch detected. {pkg_name} version {version(pkg_name)} is installed, but {pkg_req_dict[pkg_name][1]} is required.{textcolor["reset"]}')
-            reinstall_pkg(pkg_name)
-            module = importlib.import_module(import_path)
+        if not os.path.realpath(module.__file__).startswith(os.path.realpath(os.getcwd())): # bypass those internally import like evl.metric, as in Adila submodule
+            if(not is_version_equal(version(pkg_name), pkg_req_dict[pkg_name][1])):
+                log.info(f'{textcolor["yellow"]}Version mismatch detected. {pkg_name} version {version(pkg_name)} is installed, but {pkg_req_dict[pkg_name][1]} is required.{textcolor["reset"]}')
+                reinstall_pkg(pkg_name)
+                module = importlib.import_module(import_path)
 
     except ImportError:
        log.info(f'{import_path} not found.')
@@ -46,23 +47,6 @@ def install_import(pkg_name, import_path=None, from_module=None):
        module = importlib.import_module(import_path)
 
     if from_module: return getattr(module, from_module)
-    return module
-
-def wget_import(import_path, url):# url = "https://raw.githubusercontent.com/username/other-repo/main/mymodule.py"
-    try: return importlib.import_module(import_path)
-    except ImportError: pass
-    import sys, urllib.request, tempfile, os
-    with urllib.request.urlopen(url) as f: source_code = f.read().decode("utf-8")
-    with tempfile.NamedTemporaryFile(mode='w+', delete=False, suffix=".py") as temp_file:
-        temp_file.write(source_code)
-        temp_path = temp_file.name
-    module_name = os.path.splitext(os.path.basename(url))[0]
-    spec = importlib.util.spec_from_file_location(module_name, temp_path)
-    if spec is None: raise ImportError(f'Could not create spec for module {module_name} from {url}')
-    module = importlib.util.module_from_spec(spec)
-    sys.modules[module_name] = module
-    spec.loader.exec_module(module)
-    if temp_file.name in locals() and os.path.exists(temp_file.name): os.remove(temp_file.name)
     return module
 
 pkg_req_dict = {}
@@ -77,7 +61,7 @@ def get_req_dict(req_file):
 
     def extract_package_info_from_line(line):
         """ line: a string from the requirements file that starts with "#$" """
-        line = line[2:] # Remove the "#$"
+        line = line[2:] if line[:2] == '#$' else line
         line = line.split("#")[0].strip()  # Remove comments
         package_name = "([-A-Za-z0-9_\.]+)"
         comp = "(==|!=|<=|>=|<|>|~=|===)"
@@ -90,7 +74,7 @@ def get_req_dict(req_file):
             out.append((pkg[0], (line, pkg[2])))
         return out # [(package_name, (line, ver_num)), ...])]
     
-    with open(req_file, 'r') as f: pkg_req_dict = dict(chain.from_iterable(map(lambda line: extract_package_info_from_line(line), filter(lambda x: x.startswith("#$"), f.readlines()))))
+    with open(req_file, 'r') as f: pkg_req_dict = dict(chain.from_iterable(map(lambda line: extract_package_info_from_line(line), filter(lambda x: not x.strip() or not x.strip().startswith('##') or x.startswith('#$'), f.readlines()))))
     # log.info(f'Required packages: {pkg_req_dict}')
 get_req_dict('../requirements.txt')
 
@@ -125,6 +109,7 @@ textcolor = {
     'yellow': '\033[93m',
     'red':    '\033[91m',
     'magenta':'\033[95m',
+    'cyan':   '\033[96m',
     'reset':  '\033[0m'
 }
 

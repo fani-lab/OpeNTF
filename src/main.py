@@ -77,7 +77,7 @@ def run(cfg):
     cfg.data.output += f'.mt{cfg.data.filter.min_nteam}.ts{cfg.data.filter.min_team_size}' if 'filter' in cfg.data and cfg.data.filter else ''
     if not os.path.isdir(cfg.data.output): os.makedirs(cfg.data.output)
 
-    if cfg.cmd and any(c in cfg.cmd for c in ['prep', 'train', 'test', 'eval']):
+    if cfg.cmd and any(c in cfg.cmd for c in ['prep', 'train', 'test', 'eval', 'fair']):
 
         # this will call the Team.generate_sparse_vectors(), which itself may (lazy) call Team.read_data(), which itself may (lazy) call {Publication|Movie|Repo|Patent}.read_data()
         teamsvecs, indexes = domain_cls.gen_teamsvecs(cfg.data.source, cfg.data.output, cfg.data)
@@ -112,7 +112,7 @@ def run(cfg):
             t2v = cls(output_split, cfg.acceleration, cfg.seed, cfg.data.embedding.config.model[cls.__name__.lower()], method)
             t2v.learn(teamsvecs, splits)
 
-    if cfg.cmd and any(c in cfg.cmd for c in ['train', 'test', 'eval']):
+    if cfg.cmd and any(c in cfg.cmd for c in ['train', 'test', 'eval', 'fair']):
 
         # if a list, all see the exact splits of teams.
         # if individual, they see different teams in splits. But as we show the average results, no big deal, esp., as we do n-fold
@@ -172,12 +172,13 @@ def run(cfg):
 
             if 'eval'  in cfg.cmd:
                 log.info(f'{opentf.textcolor["magenta"]}Evaluating team recommender instance {m} ... {opentf.textcolor["reset"]}')
-                for key in cfg.eval.metrics: cfg.eval.metrics[key] = [m.replace('topk', cfg.eval.topk) for m in cfg.eval.metrics[key]]
+                for key in cfg.eval.metrics:
+                    if key != 'topk': cfg.eval.metrics[key] = [m.replace('topk', cfg.eval.metrics.topk) for m in cfg.eval.metrics[key]]
                 models[m].evaluate(teamsvecs, splits, cfg.eval)
 
-            # make_popular_and_nonpopular_matrix(vecs_, data_list[0])
-
-    # if 'fair' in cmd: self.fair(output, vecs, splits, fair_settings)
+            if 'fair' in cfg.cmd:
+                log.info(f'{opentf.textcolor["cyan"]}Fair-rerank team recommender instance {m} ... {opentf.textcolor["reset"]}')
+                models[m].adila(teamsvecs, splits, cfg.fair)
 
     log.info(f'{opentf.textcolor["green"]}Aggregating the test results under {cfg.data.output} per splits from test.pred.eval.mean.csv files ... {opentf.textcolor["reset"]}')
     aggregate(cfg.data.output)

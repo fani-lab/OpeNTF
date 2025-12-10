@@ -15,6 +15,7 @@ class Gnn(T2v):
         self.writer = opentf.install_import('tensorboardX', from_module='SummaryWriter')
         self.w = None
         self.decoder = None
+        self.device = self.device.replace('cpu:', 'cpu') # 'cpu:{number}' is not recognizable in torch
 
     def _prep(self, teamsvecs, splits=None, time_indexes=None):
         #NOTE: for any change, unit test using https://github.com/fani-lab/OpeNTF/issues/280
@@ -443,3 +444,8 @@ class Gnn(T2v):
         ntfobj.output = self.output # to override the trailing class name ntf
         ntfobj.evaluate(teamsvecs, splits, evalcfg)
 
+    def adila(self, teamsvecs, splits, faircfg):
+        from mdl.ntf import Ntf
+        ntfobj = Ntf(self.output, self.device, self.seed, None)
+        ntfobj.output = self.output # to override the trailing class name ntf
+        ntfobj.adila(teamsvecs, splits, faircfg)

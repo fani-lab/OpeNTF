@@ -7,13 +7,13 @@ hydra:
     dir: . #unix or macos
     #dir: /dev/null # windows
 seed: 0
-acceleration: 'cpu' #cpu for all cores minus one, cpu:3 for 3 cores, 'cuda' or 'cuda:0' for the only available gpu, 'cuda:3' for gpu3 >> TODO: multiple gpus
+acceleration: 'cpu:1' #cpu for all cores minus one, cpu:3 for 3 cores, 'cuda' or 'cuda:0' for the only available gpu, 'cuda:3' for gpu3 >> TODO: multiple gpus
 cmd:
   - prep
   - train
   - test
   - eval
-  #- fair
+  - fair
 data: #required for 'prep' step
   hf: True
   domain:
@@ -83,8 +83,9 @@ test:
 
 eval:
   topK: ${test.topK} # first stage retrieval to enhance efficiency
-  topk: '2,5,10'
   metrics:
+    fair: [ndkl, skew] #, exp, expu >> python 3.9+ from FairRankTune
+    topk: '2,5,10'
     trec: [P_topk, recall_topk, ndcg_cut_topk, map_cut_topk, success_topk] # see trec_eval for a complete list or trec_* metrics https://github.com/terrierteam/pytrec_eval/blob/master/tests/pytrec_eval_tests.py
     other: [skill_coverage_topk, aucroc] #aucroc+ includes the tpr-fpr curve points and may not be a good one as the number of classes are number of experts; very large
   on_train: ${test.on_train}
@@ -92,7 +93,14 @@ eval:
   per_instance: True # needed for paired significance tests
 
 fair: #post-hoc reranks of the prediction list
-  np_ratio: #desired ratio of non-popular experts after reranking; if None, based on distribution in dataset; default: None; Eg. 0.5
-  fairness: det_greedy #reranking algorithm from {det_greedy, det_cons, det_relaxed}; required; Eg. det_cons
-  k_max: #cutoff for the reranking algorithms; default: None
-  attribute: #the set of our sensitive attributes')
+  fgender: ../output/dblp/toy.dblp.v12.json/females.csv
+  algorithm: [fa-ir, det_greedy, det_relaxed, det_const_sort, det_cons] #reranking algorithms
+  notion: [eo,dp] # equality of odds (eo), demographic parity (dp)
+  attribute: [gender, popularity] #the sensitive attribute(s)
+  k_max: 5 #cutoff for the reranking algorithms; default: None
+  dp_ratio: #hard ratio for desired (e.g., female or non-popular) experts after reranking for dp; if None, based on distribution in dataset; default: None; Eg. 0.5
+  is_popular_alg: [avg, auc] #popularity status based on `avg` teams per experts, i.e., whoever above this value is popular, or whoever is in the head of `auc` distribution figure
+  is_popular_coef: 1.5
+  alpha: 0.1 #the significance value for fa-ir algorithm
+  eval: ${eval}
+

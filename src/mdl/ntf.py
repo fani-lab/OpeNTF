@@ -105,66 +105,16 @@ class Ntf:
             plt.savefig(f'{self.output}/{pred_set}.roc.png', dpi=100, bbox_inches='tight')
             # plt.show()
 
-    def fair(self, model_path, teamsvecs, splits, settings):
-        import multiprocessing
-        from functools import partial
-        from Adila.src import main as adila
-        if os.path.isfile(model_path):
-            adila.Reranking.run(fpred=model_path,
-                                output=model_path,
-                                teamsvecs=teamsvecs,
-                                splits=splits,
-                                np_ratio=settings['np_ratio'],
-                                algorithm=settings['algorithm'],
-                                k_max=settings['k_max'],
-                                fairness_metrics=settings['fairness_metrics'],
-                                eq_op=settings['eq_op'],
-                                utility_metrics=settings['utility_metrics'],
-                                )
-            exit(0)
-
-        if os.path.isdir(model_path):
-            # given a root folder, we can crawl the folder to find *.pred files and run the pipeline for all
-            files = list()
-            for dirpath, dirnames, filenames in os.walk(model_path): files += [
-                os.path.join(os.path.normpath(dirpath), file).split(os.sep) for file in filenames if
-                file.endswith("pred") and 'rerank' not in file]
-
-            files = pd.DataFrame(files, columns=['.', '..', 'domain', 'baseline', 'setting', 'setting_', 'rfile'])
-            address_list = list()
-
-            pairs = []
-            for i, row in files.iterrows():
-                output = f"{row['.']}/{row['..']}/{row['domain']}/{row['baseline']}/{row['setting']}/{row['setting_']}/"
-                pairs.append((f'{output}{row["rfile"]}', f'{output}rerank/'))
-
-            if settings['mode'] == 0:  # sequential run
-                for algorithm in settings['fairness']:
-                    for att in settings['attribute']:
-                        for fpred, output in pairs: adila.Reranking.run(fpred=fpred,
-                                                                        output=output,
-                                                                        teamsvecs=teamsvecs,
-                                                                        splits=splits,
-                                                                        np_ratio=settings['np_ratio'],
-                                                                        algorithm=algorithm,
-                                                                        k_max=settings['k_max'],
-                                                                        fairness_metrics=settings['fairness_metrics'],
-                                                                        eq_op=settings['eq_op'],
-                                                                        utility_metrics=settings['utility_metrics'],
-                                                                        att=att)
-            elif settings['mode'] == 1:  # parallel run
-                print(f'Parallel run started ...')
-                for algorithm in settings['fairness']:
-                    for att in settings['attribute']:
-                        with multiprocessing.Pool(
-                                multiprocessing.cpu_count() if settings['core'] < 0 else settings['core']) as executor:
-                            executor.starmap(partial(adila.Reranking.run,
-                                                     teamsvecs=teamsvecs,
-                                                     splits=splits,
-                                                     np_ratio=settings['np_ratio'],
-                                                     algorithm=algorithm,
-                                                     k_max=settings['k_max'],
-                                                     fairness_metrics=settings['fairness_metrics'],
-                                                     utility_metrics=settings['utility_metrics'],
-                                                     eq_op=settings['eq_op'],
-                                                     att=att), pairs)
+    def adila(self, teamsvecs, splits, faircfg):
+        from Adila.src.adila import Adila
+        from Adila.src.main import _
+        if not scipy.sparse.issparse(teamsvecs['skill']): teamsvecs['skill'] = self.teamsvecs['original_skill']  # to accomodate dense emb vecs of skills
+        adila = Adila(teamsvecs, splits, faircfg.fgender)
+        for attribute in faircfg.attribute:
+            for notion in faircfg.notion:
+                for is_popular_alg in [None] if attribute == 'gender' else faircfg.is_popular_alg:  # is_popular_alg has nothing to do with gender debiasing, so single default value
+                    plot = opentf.install_import('', 'Adila.src.plot') if is_popular_alg == 'auc' else None
+                    stats, minorities, ratios = adila.prep(self.output, notion, attribute, is_popular_alg, faircfg.is_popular_coef, plot)
+                    if notion == 'dp' and faircfg.dp_ratio: ratios = [1 - faircfg.ratio if attribute == 'popularity' else faircfg.ratio]
+                    for algorithm in faircfg.algorithm:
+                        _(adila, self.output, minorities, ratios, algorithm, faircfg.k_max, faircfg.alpha, self.device.replace('gpu', 'cpu'), faircfg.eval)
