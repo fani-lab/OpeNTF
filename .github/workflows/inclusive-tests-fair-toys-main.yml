@@ -1,0 +1,69 @@
+name: inclusive-tests-models-toys-main
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test-toy-configs:
+    runs-on: ubuntu-latest
+    if: ${{ !contains(github.event.head_commit.message, 'skip-ci') }}
+
+    strategy:
+      matrix:
+        include:
+          - config: '+id=000 "cmd=[train,test,eval,fair]" "models.instances=[mdl.rnd.Rnd]" data.domain=cmn.publication.Publication data.source=../data/dblp/toy.dblp.v12.json data.output=../output/dblp/toy.dblp.v12.json ~data.filter ~data.embedding fair.fgender=../data/dblp/toy.dblp.v12.json.females.csv'
+          - config: '+id=005 "cmd=[train,test,eval,fair]" "models.instances=[mdl.fnn.Fnn]" data.domain=cmn.publication.Publication data.source=../data/dblp/toy.dblp.v12.json data.output=../output/dblp/toy.dblp.v12.json ~data.filter train.save_per_epoch=3 test.on_train=True fair.fgender=../data/dblp/toy.dblp.v12.json.females.csv'
+          - config: '+id=006 "cmd=[train,test,eval,fair]" "models.instances=[mdl.bnn.Bnn]" data.domain=cmn.publication.Publication data.source=../data/dblp/toy.dblp.v12.json data.output=../output/dblp/toy.dblp.v12.json ~data.filter ~data.embedding +models.batch_size=2 +models.nsd=uniform fair.fgender=../data/dblp/toy.dblp.v12.json.females.csv'
+          - config: '+id=007 "cmd=[train,test,eval,fair]" "models.instances=[mdl.nmt.Nmt]" data.domain=cmn.publication.Publication data.source=../data/dblp/toy.dblp.v12.json data.output=../output/dblp/toy.dblp.v12.json ~data.filter fair.fgender=../data/dblp/toy.dblp.v12.json.females.csv'
+
+          - config: '+id=009 "cmd=[train,test,eval,fair]" "models.instances=[mdl.fnn.Fnn]" data.domain=cmn.publication.Publication data.source=../data/dblp/toy.dblp.v12.json data.output=../output/dblp/toy.dblp.v12.json ~data.filter data.embedding.class_method=mdl.emb.d2v.D2v_d2v +models.batch_size=2 +models.nsd=unigram_b fair.fgender=../data/dblp/toy.dblp.v12.json.females.csv'
+          - config: '+id=012 "cmd=[train,test,eval,fair]" "models.instances=[mdl.fnn.Fnn]" data.domain=cmn.publication.Publication data.source=../data/dblp/toy.dblp.v12.json data.output=../output/dblp/toy.dblp.v12.json ~data.filter data.embedding.class_method=mdl.emb.gnn.Gnn_gcn +models.batch_size=2 +models.nsd=unigram_b fair.fgender=../data/dblp/toy.dblp.v12.json.females.csv'
+          - config: '+id=010 "cmd=[train,test,eval,fair]" "models.instances=[mdl.bnn.Bnn]" data.domain=cmn.publication.Publication data.source=../data/dblp/toy.dblp.v12.json data.output=../output/dblp/toy.dblp.v12.json ~data.filter data.embedding.class_method=mdl.emb.gnn.Gnn_n2v +models.batch_size=2 +models.nsd=unigram_b fair.fgender=../data/dblp/toy.dblp.v12.json.females.csv'
+          - config: '+id=012 "cmd=[train,test,eval,fair]" "models.instances=[mdl.bnn.Bnn]" data.domain=cmn.publication.Publication data.source=../data/dblp/toy.dblp.v12.json data.output=../output/dblp/toy.dblp.v12.json ~data.filter data.embedding.class_method=mdl.emb.gnn.Gnn_gcn +models.batch_size=2 +models.nsd=unigram_b fair.fgender=../data/dblp/toy.dblp.v12.json.females.csv'
+
+          - config: '+id=011 "cmd=[train,test,eval,fair]" "models.instances=[mdl.emb.gnn.Gnn]" data.domain=cmn.publication.Publication data.source=../data/dblp/toy.dblp.v12.json data.output=../output/dblp/toy.dblp.v12.json ~data.filter data.embedding.class_method=mdl.emb.gnn.Gnn_n2v +models.batch_size=2 +models.nsd=unigram_b fair.fgender=../data/dblp/toy.dblp.v12.json.females.csv'
+          - config: '+id=011 "cmd=[train,test,eval,fair]" "models.instances=[mdl.emb.gnn.Gnn]" data.domain=cmn.publication.Publication data.source=../data/dblp/toy.dblp.v12.json data.output=../output/dblp/toy.dblp.v12.json ~data.filter data.embedding.class_method=mdl.emb.gnn.Gnn_m2v +models.batch_size=2 +models.nsd=unigram_b fair.fgender=../data/dblp/toy.dblp.v12.json.females.csv'
+          - config: '+id=012 "cmd=[train,test,eval,fair]" "models.instances=[mdl.emb.gnn.Gnn]" data.domain=cmn.publication.Publication data.source=../data/dblp/toy.dblp.v12.json data.output=../output/dblp/toy.dblp.v12.json ~data.filter data.embedding.class_method=mdl.emb.gnn.Gnn_gcn +models.batch_size=2 +models.nsd=unigram_b fair.fgender=../data/dblp/toy.dblp.v12.json.females.csv'
+          - config: '+id=013 "cmd=[train,test,eval,fair]" "models.instances=[mdl.emb.gnn.Gnn]" data.domain=cmn.publication.Publication data.source=../data/dblp/toy.dblp.v12.json data.output=../output/dblp/toy.dblp.v12.json ~data.filter data.embedding.class_method=mdl.emb.gnn.Gnn_gs +models.batch_size=2 +models.nsd=unigram_b fair.fgender=../data/dblp/toy.dblp.v12.json.females.csv'
+          - config: '+id=014 "cmd=[train,test,eval,fair]" "models.instances=[mdl.emb.gnn.Gnn]" data.domain=cmn.publication.Publication data.source=../data/dblp/toy.dblp.v12.json data.output=../output/dblp/toy.dblp.v12.json ~data.filter data.embedding.class_method=mdl.emb.gnn.Gnn_gat +models.batch_size=2 +models.nsd=unigram_b fair.fgender=../data/dblp/toy.dblp.v12.json.females.csv'
+          - config: '+id=015 "cmd=[train,test,eval,fair]" "models.instances=[mdl.emb.gnn.Gnn]" data.domain=cmn.publication.Publication data.source=../data/dblp/toy.dblp.v12.json data.output=../output/dblp/toy.dblp.v12.json ~data.filter data.embedding.class_method=mdl.emb.gnn.Gnn_gin +models.batch_size=2 +models.nsd=unigram_b fair.fgender=../data/dblp/toy.dblp.v12.json.females.csv'
+          - config: '+id=016 "cmd=[train,test,eval,fair]" "models.instances=[mdl.emb.gnn.Gnn]" data.domain=cmn.publication.Publication data.source=../data/dblp/toy.dblp.v12.json data.output=../output/dblp/toy.dblp.v12.json ~data.filter data.embedding.class_method=mdl.emb.gnn.Gnn_gatv2 +models.batch_size=2 +models.nsd=unigram_b fair.fgender=../data/dblp/toy.dblp.v12.json.females.csv'
+      # Set to false if you want parallel runs:
+      fail-fast: false
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Update submodules to latest main
+        run: |
+          git submodule update --remote --checkout
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Clean up previous outputs
+        run: rm -rf output/
+
+      - name: Echo config index
+        run: |
+          echo 'Config index: ${{ matrix.index }}'
+
+      - name: Run config ${{ matrix.config }}
+        run: |
+          python main.py ${{ matrix.config }}
+        working-directory: ./src
+        continue-on-error: ${{ matrix.label == 'fail.teamsvecs.validate' || matrix.label == 'fail.teamsvecs.validate.nogpu' }}
+
