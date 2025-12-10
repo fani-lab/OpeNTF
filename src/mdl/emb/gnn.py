@@ -15,7 +15,6 @@ class Gnn(T2v):
         self.writer = opentf.install_import('tensorboardX', from_module='SummaryWriter')
         self.w = None
         self.decoder = None
-        if 'cpu:' in self.device: self.device = 'cpu' # 'cpu:{number}' is not recognizable in torch
 
     def _prep(self, teamsvecs, splits=None, time_indexes=None):
         #NOTE: for any change, unit test using https://github.com/fani-lab/OpeNTF/issues/280

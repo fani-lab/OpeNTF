@@ -7,7 +7,7 @@ hydra:
     dir: . #unix or macos
     #dir: /dev/null # windows
 seed: 0
-acceleration: 'cpu:1' #cpu for all cores minus one, cpu:3 for 3 cores, 'cuda' or 'cuda:0' for the only available gpu, 'cuda:3' for gpu3 >> TODO: multiple gpus
+acceleration: 'cpu' #cpu for all cores minus one, 'cuda' or 'cuda:0' for the only available gpu, 'cuda:3' for gpu3 >> TODO: multiple gpus
 cmd:
   - prep
   - train
@@ -107,4 +107,4 @@ fair: #post-hoc reranks of the prediction list
   is_popular_coef: 1.5
   alpha: 0.1 #the significance value for fa-ir algorithm
   eval: ${eval}
-
+  acceleration: 'cpu:1'

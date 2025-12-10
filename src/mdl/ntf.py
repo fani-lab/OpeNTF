@@ -117,4 +117,4 @@ class Ntf:
                     stats, minorities, ratios = adila.prep(self.output, notion, attribute, is_popular_alg, faircfg.is_popular_coef, plot)
                     if notion == 'dp' and faircfg.dp_ratio: ratios = [1 - faircfg.ratio if attribute == 'popularity' else faircfg.ratio]
                     for algorithm in faircfg.algorithm:
-                        _(adila, self.output, minorities, ratios, algorithm, faircfg.k_max, faircfg.alpha, self.device.replace('gpu', 'cpu'), faircfg.eval)
+                        _(adila, self.output, minorities, ratios, algorithm, faircfg.k_max, faircfg.alpha, faircfg.acceleration, faircfg.eval)
