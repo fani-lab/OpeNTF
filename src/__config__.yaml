@@ -93,7 +93,11 @@ eval:
   per_instance: True # needed for paired significance tests
 
 fair: #post-hoc reranks of the prediction list
-  fgender: ../output/dblp/toy.dblp.v12.json/females.csv
+  fgender: ../data/dblp/toy.dblp.v12.json.females.csv
+  #fgender: ../data/imdb/toy.title.basics.tsv.females.csv
+  #fgender: ../data/gith/toy.repos.csv.females.csv
+  #fgender: ../data/uspt/toy.patent.tsv.females.csv
+
   algorithm: [fa-ir, det_greedy, det_relaxed, det_const_sort, det_cons] #reranking algorithms
   notion: [eo,dp] # equality of odds (eo), demographic parity (dp)
   attribute: [gender, popularity] #the sensitive attribute(s)

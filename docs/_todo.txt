@@ -1,4 +1,4 @@
-#TODO: Adila >> now that we have coin revision
+#TODO: seperate script for adila's submodule of opentf
 #TODO: leaderboard src/web #192 integration
 
 #TODO: update to readme for cmn layer and main readme
