@@ -12,6 +12,7 @@ jobs:
     if: ${{ !contains(github.event.head_commit.message, 'skip-ci') }}
 
     strategy:
+      max-parallel: 1
       matrix:
         include:
           - config: '+id=000 "cmd=[train,test,eval,fair]" "models.instances=[mdl.rnd.Rnd, mdl.fnn.Fnn, mdl.bnn.Bnn, mdl.nmt.Nmt]" data.domain=cmn.publication.Publication data.source=../data/dblp/toy.dblp.v12.json data.output=../output/dblp/toy.dblp.v12.json ~data.filter ~data.embedding'
@@ -70,7 +71,6 @@ jobs:
           - config: '+id=047 "cmd=[train,test,eval,fair]" "models.instances=[mdl.rnd.Rnd, mdl.fnn.Fnn, mdl.bnn.Bnn, mdl.nmt.Nmt, mdl.emb.gnn.Gnn]" data.domain=cmn.patent.Patent data.source=../data/uspt/toy.patent.tsv data.output=../output/uspt/toy.patent.tsv ~data.filter data.embedding.class_method=mdl.emb.gnn.Gnn_gin +models.batch_size=2 +models.nsd=unigram_b'
           - config: '+id=048 "cmd=[train,test,eval,fair]" "models.instances=[mdl.rnd.Rnd, mdl.fnn.Fnn, mdl.bnn.Bnn, mdl.nmt.Nmt, mdl.emb.gnn.Gnn]" data.domain=cmn.patent.Patent data.source=../data/uspt/toy.patent.tsv data.output=../output/uspt/toy.patent.tsv ~data.filter data.embedding.class_method=mdl.emb.gnn.Gnn_gatv2 +models.batch_size=2 +models.nsd=unigram_b'
 
-      # Set to false if you want parallel runs:
       fail-fast: false
 
     steps:
