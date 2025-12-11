@@ -1,4 +1,4 @@
-#TODO: seperate script for adila's submodule of opentf
+#TODO: nmt's *.pred files are csv >> needs to be probs >> I did in nmt.evaluate on the fly for eval
 #TODO: leaderboard src/web #192 integration
 
 #TODO: update to readme for cmn layer and main readme
