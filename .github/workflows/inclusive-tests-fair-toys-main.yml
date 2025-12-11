@@ -12,7 +12,6 @@ jobs:
     if: ${{ !contains(github.event.head_commit.message, 'skip-ci') }}
 
     strategy:
-      max-parallel: 1
       matrix:
         include:
           - config: '+id=000 "cmd=[train,test,eval,fair]" "models.instances=[mdl.rnd.Rnd]" data.domain=cmn.publication.Publication data.source=../data/dblp/toy.dblp.v12.json data.output=../output/dblp/toy.dblp.v12.json ~data.filter ~data.embedding fair.fgender=../data/dblp/toy.dblp.v12.json.females.csv'
@@ -36,6 +35,13 @@ jobs:
       fail-fast: false
 
     steps:
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
+          sudo apt-get clean
+
       - name: Checkout
         uses: actions/checkout@v3
         with:
