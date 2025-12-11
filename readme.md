@@ -38,7 +38,7 @@ Team formation (recommendation) involves selecting a team of skillful experts wh
 - [2. Quickstart](#2-quickstart)
 - [3. Features](#3-features)
   * [`Neural Models`](#31-neural-models)
-  * [`Fairness aware Team Formation`](#32-adila-fairness-aware-team-formation)
+  * [`Fairness-aware Team Formation`](#32-adila-fairness-aware-team-formation)
   * [`Temporal Team Prediction`](#33-temporal-team-prediction)
   * [`Negative Sampling Strategies`](#34-negative-sampling-strategies)
   * [`Datasets and Parallel Preprocessing`](#35-datasets-and-parallel-preprocessing)
@@ -119,11 +119,13 @@ From [``./src/mdl/emb/``](./src/mdl/emb/), we also support dense vector represen
 >
 > See [Skill Vector Representation Learning for Collaborative Team Recommendation: A Comparative Study, WISE24](https://doi.org/10.1007/978-981-96-0567-5_15) for details and results.
 
-#### **3.2. [`Adila`](https://github.com/fani-lab/Adila): Fairness aware Team Formation**
+#### **3.2. [`Adila`](https://github.com/fani-lab/Adila): Fairness-aware Team Formation**
 
 <p align="center"><img src='docs/figs/adila.png' width="500" ></p>
 
-Neural team formation methods largely ignore the fairness in the recommended teams of experts. In `Adila`, we study the application of `fairness-aware` re-ranking algorithms to mitigate the potential popularity or gender biases. We support two fairness notions namely, `equality of opportunity` and `demographic parity`. To achieve fairness, we utilize three deterministic greedy reranking algorithms (`det_greedy`, `det_cons`, `det_relaxed`) in addition to `fa*ir`, a probabilistic greedy reranking algorithm. For further details and demo, please visit [Adila's submodule](https://github.com/fani-lab/Adila).
+Neural team formation methods largely ignore the fairness in the recommended teams of experts. We study the application of fairness-aware re-ranking algorithms to mitigate the potential `popularity` or `gender` biases in [`Adila`](https://github.com/fani-lab/Adila) and integrate it as submodule in `OpeNTF`. We support fairness notions `equality of opportunity` and `demographic parity`. To achieve fairness, we utilize post-hoc reranking algorithms (`det_greedy`, `det_cons`, `det_relaxed`, `fa*ir`). For sample run, see [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/fani-lab/OpeNTF/blob/main/ipynb/fair.ipynb).
+
+> See [Bootless Application of Greedy Re-ranking Algorithms in Fair Neural Team Formation. BIAS-ECIR23](https://doi.org/10.1007/978-3-031-37249-0_9) for details and results.
 
 #### **3.3. Temporal Team Prediction**
 
