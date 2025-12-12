@@ -1,4 +1,3 @@
-#TODO: nmt's *.pred files are csv >> needs to be probs >> I did in nmt.evaluate on the fly for eval
 #TODO: leaderboard src/web #192 integration
 
 #TODO: update to readme for cmn layer and main readme
@@ -9,6 +8,8 @@
 
 #TODO: nmt does not work with our embeddings of any kind. Can we inject our embedding for it?
 - bundle recommenders
+
+- cl
 
 temporal/sequence
 
@@ -33,8 +34,6 @@ temporal/sequence
     user-item recommender baselines:
         # # temporal recommender systems
         # if 'caser' in model_list: models['caser'] = Caser(settings['model']['step_ahead'])
-        # if 'rrn' in model_list: models['rrn'] = Rrn(settings['model']['baseline']['rrn']['with_zero'], settings['model']['step_ahead'])
-        - rrn?
         - caser
         - sasrec
         - bert4rec
