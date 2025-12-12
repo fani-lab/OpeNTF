@@ -9,7 +9,7 @@ on:
 jobs:
   test-toy-configs:
     runs-on: ubuntu-latest
-    if: ${{ !contains(github.event.head_commit.message, 'skip-ci') }}
+    if: ${{ !contains(github.event.head_commit.message, 'skip-ci-fair') }}
 
     strategy:
       matrix:
@@ -17,8 +17,8 @@ jobs:
           - config: '+id=000 "cmd=[train,test,eval,fair]" "models.instances=[mdl.rnd.Rnd]" data.domain=cmn.publication.Publication data.source=../data/dblp/toy.dblp.v12.json data.output=../output/dblp/toy.dblp.v12.json ~data.filter ~data.embedding fair.fgender=../data/dblp/toy.dblp.v12.json.females.csv'
           - config: '+id=005 "cmd=[train,test,eval,fair]" "models.instances=[mdl.fnn.Fnn]" data.domain=cmn.publication.Publication data.source=../data/dblp/toy.dblp.v12.json data.output=../output/dblp/toy.dblp.v12.json ~data.filter train.save_per_epoch=3 test.on_train=True fair.fgender=../data/dblp/toy.dblp.v12.json.females.csv'
           - config: '+id=006 "cmd=[train,test,eval,fair]" "models.instances=[mdl.bnn.Bnn]" data.domain=cmn.publication.Publication data.source=../data/dblp/toy.dblp.v12.json data.output=../output/dblp/toy.dblp.v12.json ~data.filter ~data.embedding +models.batch_size=2 +models.nsd=uniform fair.fgender=../data/dblp/toy.dblp.v12.json.females.csv'
-          - config: '+id=007 "cmd=[train,test,eval]" "models.instances=[mdl.nmt.Nmt]" data.domain=cmn.publication.Publication data.source=../data/dblp/toy.dblp.v12.json data.output=../output/dblp/toy.dblp.v12.json ~data.filter train.save_per_epoch=3 fair.fgender=../data/dblp/toy.dblp.v12.json.females.csv'
-          - config: '+id=007 "cmd=[train,test,eval,fair]" "models.instances=[mdl.nmt.Nmt]" data.domain=cmn.publication.Publication data.source=../data/dblp/toy.dblp.v12.json data.output=../output/dblp/toy.dblp.v12.json ~data.filter train.save_per_epoch=3 test.on_train=True fair.fgender=../data/dblp/toy.dblp.v12.json.females.csv'
+          - config: '+id=007 "cmd=[train,test,eval,fair]" "models.instances=[mdl.rnd.Rnd, mdl.nmt.Nmt]" data.domain=cmn.publication.Publication data.source=../data/dblp/toy.dblp.v12.json data.output=../output/dblp/toy.dblp.v12.json ~data.filter train.save_per_epoch=3 fair.fgender=../data/dblp/toy.dblp.v12.json.females.csv'
+          - config: '+id=007 "cmd=[train,test,eval,fair]" "models.instances=[mdl.rnd.Rnd, mdl.nmt.Nmt]" data.domain=cmn.publication.Publication data.source=../data/dblp/toy.dblp.v12.json data.output=../output/dblp/toy.dblp.v12.json ~data.filter train.save_per_epoch=3 test.on_train=True fair.fgender=../data/dblp/toy.dblp.v12.json.females.csv'
 
           - config: '+id=009 "cmd=[train,test,eval,fair]" "models.instances=[mdl.fnn.Fnn]" data.domain=cmn.publication.Publication data.source=../data/dblp/toy.dblp.v12.json data.output=../output/dblp/toy.dblp.v12.json ~data.filter data.embedding.class_method=mdl.emb.d2v.D2v_d2v +models.batch_size=2 +models.nsd=unigram_b fair.fgender=../data/dblp/toy.dblp.v12.json.females.csv'
           - config: '+id=012 "cmd=[train,test,eval,fair]" "models.instances=[mdl.fnn.Fnn]" data.domain=cmn.publication.Publication data.source=../data/dblp/toy.dblp.v12.json data.output=../output/dblp/toy.dblp.v12.json ~data.filter data.embedding.class_method=mdl.emb.gnn.Gnn_gcn +models.batch_size=2 +models.nsd=unigram_b fair.fgender=../data/dblp/toy.dblp.v12.json.females.csv'
