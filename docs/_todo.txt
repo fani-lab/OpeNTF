@@ -7,9 +7,10 @@
 #TODO: +han, +lant(not pyg friendly)
 
 #TODO: nmt does not work with our embeddings of any kind. Can we inject our embedding for it?
-- bundle recommenders
 
-- cl
+#TODO: - bundle recommenders
+
+#TODO: - cl
 
 temporal/sequence
 
