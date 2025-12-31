@@ -52,7 +52,8 @@ class Movie(Team):
 
             movies_crewids_crew.dropna(subset=['genres'], inplace=True)
             movies_crewids_crew.sort_values(by=['tconst'], inplace=True)
-            movies_crewids_crew.loc[len(movies_crewids_crew)] = [None] * len(movies_crewids_crew.columns) #last empty row to break the following loop
+            movies_crewids_crew.loc[len(movies_crewids_crew)] = pd.NA  #last empty row to break the following loop
+            movies_crewids_crew = movies_crewids_crew.astype({'tconst':'UInt64', 'nconst':'UInt64'}) # pd.NA or None upcast int to float to make it nullable!
 
             log.info('Reading data to objects ...')
             teams = {}; candidates = {}; n_row = 0
