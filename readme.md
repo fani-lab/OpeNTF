@@ -187,7 +187,7 @@ We used [``pytrec_eval``](https://github.com/cvangysel/pytrec_eval) to evaluate 
 > ``test.pred.eval.mean.csv`` is the average of values for evaluation metrics over all _n_ fold models.
 
 ## 5. Acknowledgement:
-We benefit from [``pytrec_eval``](https://github.com/cvangysel/pytrec_eval), [``gensim``](https://radimrehurek.com/gensim/), [Josh Feldman's blog](https://joshfeldman.net/WeightUncertainty/), and other libraries. We would like to thank the authors of these libraries and helpful resources.
+We benefit from [`bayesian-torch`](https://github.com/IntelLabs/bayesian-torch), [`OpenNMT-py`](https://github.com/OpenNMT/OpenNMT-py), [``reranking``](https://github.com/yuanlonghao/reranking) and [`fairsearchcore`](https://github.com/fair-search/fairsearch-fair-python), [``pytrec_eval``](https://github.com/cvangysel/pytrec_eval), and other libraries. We would like to thank the authors of these libraries and helpful resources.
   
 ## 6. License:
 ©2025. This work is licensed under a [CC BY-NC-SA 4.0](license.txt) license.
