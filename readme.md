@@ -9,7 +9,9 @@
 
  ---
  
->2025, SIGIR, Translative Neural Team Recommendation. [`pdf`](https://hosseinfani.github.io/res/papers/2025_SIGIR_Translative_Neural_Team_Recommendation_From_Multilabel_Classification_to_Sequence_Prediction.pdf) [`doi`](https://doi.org/10.1145/3726302.3730259) [`reviews`](https://hosseinfani.github.io/res/papers/2025_SIGIR_Translative_Neural_Team_Recommendation_From_Multilabel_Classification_to_Sequence_Prediction.txt) [`poster`](https://hosseinfani.github.io/res/posters/2025_SIGIR_Translative_Neural_Team_Recommendation_From_Multilabel_Classification_to_Sequence_Prediction.pdf)
+> 2026, XXXX, Graph Neural Team Recommendation: An Integrated Approach. `Under Review` [`pdf`](https://hosseinfani.github.io/res/papers/Graph_Neural_Team_Recommendation_An_Integrated_Approach.pdf) 
+ 
+> 2025, SIGIR, Translative Neural Team Recommendation. [`pdf`](https://hosseinfani.github.io/res/papers/2025_SIGIR_Translative_Neural_Team_Recommendation_From_Multilabel_Classification_to_Sequence_Prediction.pdf) [`doi`](https://doi.org/10.1145/3726302.3730259) [`reviews`](https://hosseinfani.github.io/res/papers/2025_SIGIR_Translative_Neural_Team_Recommendation_From_Multilabel_Classification_to_Sequence_Prediction.txt) [`poster`](https://hosseinfani.github.io/res/posters/2025_SIGIR_Translative_Neural_Team_Recommendation_From_Multilabel_Classification_to_Sequence_Prediction.pdf)
 
 > 2025, WSDM, Adaptive Loss-based Curricula for Neural Team Recommendation. [`pdf`](https://hosseinfani.github.io/res/papers/2025_WSDM_Adaptive_Loss-based_Curricula_for_Neural_Team_Recommendation.pdf) [`doi`](https://doi.org/10.1145/3701551.3703574) [`reviews`](https://hosseinfani.github.io/res/papers/2025_WSDM_Adaptive_Loss-based_Curricula_for_Neural_Team_Recommendation.txt)
 
