@@ -58,8 +58,8 @@ Team formation (recommendation) involves selecting a team of skillful experts wh
 
 
 </td>
-<td><img src='docs/figs/adila_.png' width="500" align="right" /></td>
-<!-- <td><img src='docs/models_class_diagram.png' width="90%%" /></td> -->
+<td><img src='docs/figs/uml.png' align="right" /></td>
+<!-- <td><img src='docs/figs/uml.png' width="90%%" /></td> -->
 </tr>
 </table>
 
