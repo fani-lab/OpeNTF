@@ -104,7 +104,7 @@ The above run, loads and preprocesses a tiny-size toy example dataset [``toy.dbl
 
 #### **3.1. Neural Models**
 
-<p align="center"><img src='docs/figs/models_class_diagram.png' width="500" ></p>
+<p align="center"><img src='docs/figs/mdl.png' width="700" ></p>
 
 Each model has been defined in [``./src/mdl/``](./src/mdl/) under an inheritance hierarchy. They override abstract functions for ``train``, ``test``, ``eval``, and ``plot`` steps. For example, for our feedforward baseline [``fnn``](./src/mdl/fnn.py), the model has been implemented in [``./src/mdl/fnn.py``](src/mdl/fnn.py). Model's hyperparameters such as the learning rate (``lr``) or the number of epochs (``e``) can be set in [``./src/mdl/__config__yaml``](./src/mdl/__config__yaml), or overriden in running command as shown in the [``quickstart``](https://colab.research.google.com/github/fani-lab/OpeNTF/blob/main/ipynb/quickstart.ipynb) script.
   
