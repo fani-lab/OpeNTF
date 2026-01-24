@@ -63,6 +63,8 @@ models:
 
     ## NOTE: temporal baselines should not be mixed with non-temporal ones as the training/test splits are temporal based on train.step_ahead
     #- mdl.tntf.tNtf_mdl.rnd.Rnd   #underlying base model could be fnn and bnn. future: tgnn?. train.step_ahead must be set.
+    #- mdl.tntf.tNtf_mdl.fnn.Fnn
+    #- mdl.tntf.tNtf_mdl.bnn.Bnn
     #- mdl.tnmt.tNmt
     #- mdl.rrn.Rrn     #external baseline >> isn't it temporal?
     #- mdl.caser.Caser #external baseline
@@ -73,7 +75,7 @@ train:
   nfolds: 3 #ends with {nfolds} models each with nfolds-1 train splits and one fold valid split, nfolds results, averaged on a single test split
   train_test_ratio: 0.85 #the nfolds will be on the trainig part.
   merge_teams_w_same_skills: False # for explanation >> https://github.com/fani-lab/OpeNTF/issues/156
-  step_ahead: #NOTE: setting this tag trigger temporal train/test splits for tNtf: streaming/temporal training. for now, it means that whatever are in the last [step_ahead] time interval will be the test set!
+  step_ahead: #temporal train/test splits for tNtf: streaming/temporal training. for now, it means that whatever are in the last [step_ahead] time interval will be the test set!
   save_per_epoch: 10 # if 0, no per epoch save, if nonzero x, every x epoch. Also, due to early stopping the number of files could be less than the max training epoch
 
 test:

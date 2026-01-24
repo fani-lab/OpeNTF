@@ -98,7 +98,7 @@ class Fnn(Ntf):
 
             # Initialize network
             self.init(input_size=input_size, output_size=output_size)
-            if prev_model: self.model.load_state_dict(Ntf.torch.load(prev_model[foldidx], map_location=self.device))
+            if prev_model: self.model.load_state_dict(Ntf.torch.load(prev_model[foldidx], map_location=self.device)['model_state_dict'])
             self.model.to(self.device)
 
             optimizer = Ntf.torch.optim.Adam(self.model.parameters(), lr=self.cfg.lr)

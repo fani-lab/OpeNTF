@@ -88,7 +88,7 @@ def run(cfg):
         year_idx.append(indexes['i2y'][-1])
         indexes['i2y'] = year_idx
 
-        splitstr = f'/splits.f{cfg.train.nfolds}.r{cfg.train.train_test_ratio}'
+        splitstr = f'/splits.f{cfg.train.nfolds}.r{cfg.train.train_test_ratio}' + (f'.t{cfg.train.step_ahead}' if cfg.train.step_ahead else '')
         splits = get_splits(teamsvecs['skill'].shape[0], cfg.train.nfolds, cfg.train.train_test_ratio, f'{cfg.data.output}{splitstr}.pkl', cfg.seed, indexes['i2y'] if cfg.train.step_ahead else None, step_ahead=cfg.train.step_ahead)
 
         # move this call for evaluation part?
@@ -155,16 +155,22 @@ def run(cfg):
             if cls_method[0] == 'mdl.emb.gnn.Gnn':
                 assert t2v, f'{opentf.textcolor["red"]}The mdl.emb.gnn.Gnn instance needs a data.embedding.class_method! {opentf.textcolor["reset"]}'
                 models[m] = t2v
-            else: models[m] = cls(output_, cfg.acceleration, cfg.seed, cfg.models.config[cls.__name__.lower()])
 
-            if len(cls_method) > 1: #for those wrappers that need internal model like in tNtf
+            elif len(cls_method) > 1: #for those wrappers that need internal model like in tNtf
                 inner_cls = get_class(cls_method[1]) # e.g., rnd, fnn, bnn,
-                models[m].model = inner_cls(output_, cfg.acceleration, cfg.seed, cfg.models.config[inner_cls.__name__.lower()])
+                if cls_method[0] == 'mdl.tntf.tNtf':
+                    assert cfg.train.step_ahead and cfg.train.step_ahead > 0, f'{opentf.textcolor["red"]}The config train.step_ahead must be set to a positive integer number for temporal training! Check ./src/__config__.yaml ... {opentf.textcolor["reset"]}'
+
+                    models[m] = cls(output_, cfg.acceleration, cfg.seed, cfg.models.config[cls.__name__.lower()],
+                                    inner_cls(output_, cfg.acceleration, cfg.seed, cfg.models.config[inner_cls.__name__.lower()]),
+                                    indexes['i2y'])
+                else: pass
+            else: models[m] = cls(output_, cfg.acceleration, cfg.seed, cfg.models.config[cls.__name__.lower()])
 
             if 'train' in cfg.cmd:
                 log.info(f'{opentf.textcolor["blue"]}Training team recommender instance {m} ... {opentf.textcolor["reset"]}')
-                if cls_method[0] != 'mdl.emb.gnn.Gnn': models[m].learn(teamsvecs, splits, None)
-                else: log.info(f'{opentf.textcolor["yellow"]}Training a Gnn instance is through data.embedding.class_method! {opentf.textcolor["reset"]}')
+                if cls_method[0] == 'mdl.emb.gnn.Gnn': log.info(f'{opentf.textcolor["yellow"]}Training a Gnn instance is through data.embedding.class_method! {opentf.textcolor["reset"]}')
+                else: models[m].learn(teamsvecs, splits, None)
 
             if 'test'  in cfg.cmd:
                 log.info(f'{opentf.textcolor["green"]}Testing team recommender instance {m} ... {opentf.textcolor["reset"]}')

@@ -29,7 +29,6 @@ class Ntf:
     def learn(self, teamsvecs, splits, prev_model): pass
     def test(self, teamsvecs, splits, testcfg): pass
 
-    #TODO: many code overlaps for nmt.evaluate ... for now, changes here should also apply in nmt.evaluate()
     def evaluate(self, teamsvecs, splits, evalcfg):
         assert os.path.isdir(self.output), f'{opentf.textcolor["red"]}No folder for {self.output} exist!{opentf.textcolor["reset"]}'
         pd = opentf.install_import('pandas')
