@@ -103,7 +103,7 @@ fair: #post-hoc reranks of the prediction list
   algorithm: [fa-ir, det_greedy, det_relaxed, det_const_sort, det_cons] #reranking algorithms
   notion: [eo,dp] # equality of odds (eo), demographic parity (dp)
   attribute: [gender, popularity] #the sensitive attribute(s)
-  k_max: 5 #cutoff for the reranking algorithms; default: None
+  k_max: ${test.topK} #cutoff for the reranking algorithms; default: topK first stage probs (the rest are zero for sparse pred file)
   dp_ratio: #hard ratio for desired (e.g., female or non-popular) experts after reranking for dp; if None, based on distribution in dataset; default: None; Eg. 0.5
   is_popular_alg: [avg, auc] #popularity status based on `avg` teams per experts, i.e., whoever above this value is popular, or whoever is in the head of `auc` distribution figure
   is_popular_coef: 1.5
