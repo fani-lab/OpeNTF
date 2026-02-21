@@ -1,7 +1,5 @@
 #TODO: leaderboard src/web #192 integration
 
-#TODO: update to readme for cmn layer and main readme
-./readme.md >> new models class hierarchy
 ./ipynb >> extension.ipynb
 
 #TODO: +han, +lant(not pyg friendly)
@@ -11,15 +9,14 @@
 #TODO: - bundle recommenders
 
 #TODO: - cl
+    {emb}_{fnn,bnn}_cl_{train/test} >> future
 
-temporal/sequence
 
+#TODO: temporal/sequence
     tNtf_{emb}_{fnn,bnn}_{a1}_{train,test}
     a1: adding one 1 to the input (time as aspect/vector for time)
     dt2v_emb: adding the year to the doc2vec training (temporal dense skill vecs in input)
 
-    # for temporal
-    # year_idx = indexes['i2y']
     # output_ = f'{output}/{year_idx[-self.step_ahead - 1][1]}'  # this folder will be created by the last model training
 
     #if 'test' in cmd:# todo: the prediction of each step ahead should be seperate
@@ -39,7 +36,6 @@ temporal/sequence
         - sasrec
         - bert4rec
 
-{emb}_{fnn,bnn}_cl_{train/test} >> future
 
 -- end2end
 - mlp-based predictor after gnn layers
