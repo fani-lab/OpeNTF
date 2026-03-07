@@ -3,7 +3,7 @@
 
 <sub>
  
-> 2026, COIN, A Probabilistic Greedy Attempt to be Fair in Neural Team Recommendation. `Under Review: Revision Requested` [`pdf`](https://hosseinfani.github.io/res/papers/2026_COIN_A_Probabilistic_Greedy_Attempt_to_be_Fair_in_Neural_Team_Recommendation.pdf) [`reviews`](https://hosseinfani.github.io/res/papers/2026_COIN_A_Probabilistic_Greedy_Attempt_to_be_Fair_in_Neural_Team_Recommendation_R1.pdf)
+> 2026, COIN, A Probabilistic Greedy Attempt to be Fair in Neural Team Recommendation. `Just Accepted` [`pdf`](https://hosseinfani.github.io/res/papers/2026_COIN_A_Probabilistic_Greedy_Attempt_to_be_Fair_in_Neural_Team_Recommendation.pdf) [`major`](https://hosseinfani.github.io/res/papers/2026_COIN_R1_A_Probabilistic_Greedy_Attempt_to_be_Fair_in_Neural_Team_Recommendation.pdf) [`minor`](https://hosseinfani.github.io/res/papers/2026_COIN_R2_A_Probabilistic_Greedy_Attempt_to_be_Fair_in_Neural_Team_Recommendation.pdf)
 
 > 2023, BIAS-ECIR, Bootless Application of Greedy Re-ranking Algorithms in Fair Neural Team Formation.[`pdf`](https://hosseinfani.github.io/res/papers/2023_BIAS_ECIR_Bootless_Application_of_Greedy_Re-ranking_Algorithms_in_Fair_Neural_Team_Formation.pdf) [`doi`](https://doi.org/10.1007/978-3-031-37249-0_9) [`reviews`](https://hosseinfani.github.io/res/papers/2023_BIAS_ECIR_Bootless_Application_of_Greedy_Re-ranking_Algorithms_in_Fair_Neural_Team_Formation.txt) [`video`](https://www.youtube.com/watch?v=EmAFvANqzBM)
 
