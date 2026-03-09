@@ -105,6 +105,20 @@ class Ntf:
             # plt.show()
 
     def adila(self, teamsvecs, splits, faircfg):
+        def _avg_per_fold(files):
+            from pathlib import Path;
+            pd = opentf.install_import('pandas')
+            files = [f for f in files if not re.search(r'\.e\d+\.', os.path.basename(f))] #filter out per epoch files
+            for kind in ['fair', 'utility']:
+                dfs = []
+                for fold in splits['folds'].keys():
+                    fold_file = [f'{f}.eval.{kind}.mean.csv' for f in files if Path(f).name.startswith(f'f{fold}.')]
+                    if len(fold_file) != 1: raise ValueError(f'Expected one file for fold {fold} ({kind}), found {len(fold_file)}!')
+                    dfs.append(pd.read_csv(fold_file[0], index_col=0))
+                combined = pd.concat(dfs)
+                mean_df = combined.groupby(combined.index).mean()
+                mean_df.to_csv(fold_file[0].replace(f'f{fold}.', ''))
+
         from Adila.src.adila import Adila
         from Adila.src.main import _
         if not scipy.sparse.issparse(teamsvecs['skill']): teamsvecs['skill'] = teamsvecs['original_skill']  # to accomodate dense emb vecs of skills
@@ -116,4 +130,5 @@ class Ntf:
                     stats, minorities, ratios = adila.prep(self.output, notion, attribute, is_popular_alg, faircfg.is_popular_coef, plot)
                     if notion == 'dp' and faircfg.dp_ratio: ratios = [1 - faircfg.ratio if attribute == 'popularity' else faircfg.ratio]
                     for algorithm in faircfg.algorithm:
-                        _(adila, self.output, minorities, ratios, algorithm, faircfg.k_max, faircfg.alpha, faircfg.acceleration, faircfg.eval)
+                        outputs = _(adila, self.output, minorities, ratios, algorithm, faircfg.k_max, faircfg.alpha, faircfg.acceleration, faircfg.eval)
+                        _avg_per_fold(outputs) # ideally, all the outputs should be in the same folder/path.

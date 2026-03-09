@@ -117,10 +117,6 @@ def run(cfg):
         # if a list, all see the exact splits of teams.
         # if individual, they see different teams in splits. But as we show the average results, no big deal, esp., as we do n-fold
         models = {}
-        # model names t* will follow the streaming scenario
-        # model names *_ts have timestamp (year) as a single added feature
-        # model names *_ts2v learn temporal skill vectors via d2v when each doc is a stream of (skills: year of the team)
-        # non-temporal (no streaming scenario, bag of teams)
         assert len(cfg.models.instances) > 0, f'{opentf.textcolor["red"]}No model instance for training! Check ./src/__config__.yaml and models.instances ... {opentf.textcolor["reset"]}'
 
         # Get command-line overrides for models. Kinda tricky as we dynamically override a subconfig.
@@ -145,7 +141,7 @@ def run(cfg):
             # t2v object knows the embedding method and ...
             skill_vecs = t2v.get_dense_vecs(teamsvecs, vectype='skill')
             assert skill_vecs.shape[0] == teamsvecs['skill'].shape[0], f'{opentf.textcolor["red"]}Incorrect number of embeddings for teams subset of skills!{opentf.textcolor["reset"]}'
-            teamsvecs['original_skill'] = teamsvecs['skill'] #to accomodate skill_coverage metric and future use cases like in nmt
+            teamsvecs['original_skill'] = teamsvecs['skill'] #to accommodate skill_coverage metric and future use cases like in nmt
             teamsvecs['skill'] = skill_vecs
 
         for m in cfg.models.instances:
@@ -189,8 +185,9 @@ def run(cfg):
     log.info(f'{opentf.textcolor["green"]}Aggregating the test results under {cfg.data.output} per splits from test.pred.eval.mean.csv files ... {opentf.textcolor["reset"]}')
     aggregate(cfg.data.output)
 
-# sample runs for different configs, including different prep, embeddings, model training, ..., are available as unit-test in
+# sample runs for different configs, including different prep, embeddings, model training, ..., see unit-tests and scripts in
 # ./github/workflows/*.yml
+# ./ipynb/*.ipynb
 
 # To run on compute canada servers you can use the following command: (time is in minutes)
 #sbatch --account=def-hfani --mem=96000MB --time=2880 computecanada.sh
