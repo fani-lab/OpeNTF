@@ -132,3 +132,12 @@ def topk_sparse(torch, probs, k, type='coo'):
     if type == 'csr': return sparse.to_sparse_csr()
     if type == 'csc': return sparse.to_sparse_csc()  # cse is on cpu in torch?
     else: return sparse
+
+def torch_sparse_2_scipy_sparse(Y_, type='coo'):
+    import scipy.sparse
+    if len(Y_.size()) != 2: raise ValueError(f'SciPy sparse matrices must be 2D, but got {len(Y_.size())}D tensor.')
+    Y_ = Y_.coalesce()  # ensure unique indices
+    indices = Y_.indices().cpu().numpy()
+    values = Y_.values().cpu().numpy()
+    if type == 'coo': return scipy.sparse.coo_matrix((values, (indices[0], indices[1])), shape=tuple(Y_.size()))
+    if type == 'csr': return scipy.sparse.csr_matrix((values, (indices[0], indices[1])), shape=tuple(Y_.size()))

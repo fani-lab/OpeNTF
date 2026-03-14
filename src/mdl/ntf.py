@@ -53,7 +53,7 @@ class Ntf:
                     log.info(f'Evaluating predictions at {predfile} ... for {evalcfg.metrics}')
 
                     #evl.metric works on numpy or scipy.sparse. so, we need to convert Y_ which is torch.tensor, either sparse or not
-                    Y_ = Y_.to_dense().numpy()
+                    Y_ = opentf.torch_sparse_2_scipy_sparse(Y_, 'csr') if Y_.is_sparse else Y_.cpu().numpy()
 
                     df, df_mean = pd.DataFrame(), pd.DataFrame()
                     if evalcfg.metrics.trec:
