@@ -27,7 +27,7 @@ def calculate_metrics(Y, Y_, topK=None, per_instance=False, metrics=['P_2,5', 'r
                 top_cols, top_vals = idx, row[idx]
 
             qrel['q' + str(i)] = {'d' + str(idx): 1 for idx in Y[i].nonzero()[1]}
-            run['q' + str(i)] = {'d' + str(idx): float(Y_[i][topk_idxes[i][j]]) for j, idx in enumerate(topk_idxes[i])}
+            run['q' + str(i)] = {'d' + str(c): float(v) for c, v in zip(top_cols, top_vals)}
             pbar.update(1)
     df = pd.DataFrame.from_dict(pytrec_eval.RelevanceEvaluator(qrel, set(metrics)).evaluate(run)).transpose()
     df_mean = df.mean().to_frame('mean').rename_axis('metrics')

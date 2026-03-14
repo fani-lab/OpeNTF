@@ -172,10 +172,12 @@ def run(cfg):
                 log.info(f'{opentf.textcolor["green"]}Testing team recommender instance {m} ... {opentf.textcolor["reset"]}')
                 models[m].test(teamsvecs, splits, cfg.test)
 
+            # for both eval and fair steps
+            for key in cfg.eval.metrics:
+                if key != 'topk': cfg.eval.metrics[key] = [m.replace('topk', cfg.eval.metrics.topk) for m in cfg.eval.metrics[key]]
+
             if 'eval'  in cfg.cmd:
                 log.info(f'{opentf.textcolor["magenta"]}Evaluating team recommender instance {m} ... {opentf.textcolor["reset"]}')
-                for key in cfg.eval.metrics:
-                    if key != 'topk': cfg.eval.metrics[key] = [m.replace('topk', cfg.eval.metrics.topk) for m in cfg.eval.metrics[key]]
                 models[m].evaluate(teamsvecs, splits, cfg.eval)
 
             if 'fair' in cfg.cmd:
