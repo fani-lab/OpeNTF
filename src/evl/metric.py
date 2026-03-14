@@ -1,4 +1,4 @@
-import logging, numpy as np
+import logging, numpy as np, scipy.sparse as sp
 log = logging.getLogger(__name__)
 
 import pkgmgr as opentf
@@ -11,7 +11,7 @@ def calculate_metrics(Y, Y_, topK=None, per_instance=False, metrics=['P_2,5', 'r
     k = min(topK, Y_.shape[1]) if topK else Y_.shape[1] #first stage topK for efficiency in space and speed
     with tqdm(total=Y.shape[0]) as pbar:
         for i in range(Y.shape[0]):
-            if sp.issparse(Y_): #
+            if sp.issparse(Y_):
                 assert sp.isspmatrix_csr(Y_), f'{opentf.textcolor["red"]}For sparse pred files, it must be in csr!{opentf.textcolor["reset"]}'
                 start, end = Y_.indptr[i], Y_.indptr[i + 1]
                 cols, vals = Y_.indices[start:end], Y_.data[start:end]
