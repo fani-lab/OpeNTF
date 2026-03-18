@@ -10,8 +10,6 @@ def calculate_metrics(Y, Y_, topK=None, per_instance=False, metrics=['P_2,5', 'r
     qrel = dict(); run = dict()
     log.info(f'Building pytrec_eval input for {Y.shape[0]} instances ...')
     k = min(topK, Y_.shape[1]) if topK else Y_.shape[1] #first stage topK for efficiency in space and speed
-    with tqdm(total=Y.shape[0]) as pbar:
-        for i in range(Y.shape[0]):
     with tqdm(total=Y_.shape[0]) as pbar:
         for i in range(Y_.shape[0]):
             if sp.issparse(Y_):
