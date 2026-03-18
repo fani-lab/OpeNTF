@@ -42,7 +42,7 @@ def calculate_auc_roc(Y, Y_, curve=False):
     return auc, (fpr, tpr) if curve else None
 
 def calculate_skill_coverage(X, Y_, expertskillvecs, per_instance=False, topks='2,5,10'):#skillcoveragevecs: ExS, X: BatchxS, Y_: BatchxE
-    assert X.shape == Y_.shape, f'{opentf.textcolor["red"]}Shape mismatch between true skills in X {X.shape} vs experts (skill holders) in preds Y_ {Y_.shape}!{opentf.textcolor["reset"]}'
+    assert X.shape[0] == Y_.shape[0], f'{opentf.textcolor["red"]}Shape[0] mismatch for number of teams in true skills in X {X.shape} vs experts (skill holders) in preds Y_ {Y_.shape}!{opentf.textcolor["reset"]}'
     tqdm = opentf.install_import('tqdm', from_module='tqdm')
     pd = opentf.install_import('pandas')
 
