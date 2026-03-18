@@ -4,9 +4,13 @@
 
 #TODO: +han, +lant(not pyg friendly)
 
-#TODO: nmt does not work with our embeddings of any kind. Can we inject our embedding for it?
+#TODO:
+    -- end2end
+    - mlp-based predictor after gnn layers >> attaching the fnn/bnn in the gnn optimization
+    - hetero version of gnns using HeteroConv that wraps gnn methods per node type
+    - inductive
 
-#TODO: - bundle recommenders
+#TODO: nmt does not work with our embeddings of any kind. Can we inject our embedding for it?
 
 #TODO: - cl
     {emb}_{fnn,bnn}_cl_{train/test} >> future
@@ -29,18 +33,6 @@
     #   if 'plot' in cmd: self.model.plot_roc(output_, splits, on_train_valid_set)
             # if m_name.endswith('a1'): vecs_['skill'] = lil_matrix(scipy.sparse.hstack((vecs_['skill'], lil_matrix(np.ones((vecs_['skill'].shape[0], 1))))))
 
-    user-item recommender baselines:
-        # # temporal recommender systems
-        # if 'caser' in model_list: models['caser'] = Caser(settings['model']['step_ahead'])
-        - caser
-        - sasrec
-        - bert4rec
-
-
--- end2end
-- mlp-based predictor after gnn layers
-- hetero version of gnns using HeteroConv that wraps gnn methods per node type
-- inductive
 
 ============
 d2v
@@ -78,3 +70,18 @@ new change to the skill subset >> skill list for each team, ordered skills
 lazy load update -- when doing the filtering, we read from scratch. We can load the teams.pkl and filter, and update it. >> messy and confusing, not worth it
 - embeddings for experts. in future may want to do skill-experts in input ...)
 --------------------------------------------------------
+
+
+#NOT-TODO
+    user-item recommender baselines: >> single user 2 single item >> but we have subset of skills 2 subset of experts
+        # # temporal recommender systems
+        # if 'caser' in model_list: models['caser'] = Caser(settings['model']['step_ahead'])
+        - caser
+    # sequence (next-item) recommendation >> subset of items 2 single item >> but we have subset of skills 2 subset of experts (two different domains)
+    - sasrec
+    - bert4rec
+
+#NOT-TODO: - bundle recommenders >> recommending subset of skills a bundle of experts >> not applicable, because:
+    -- the input is a single user there, but here we have a subset (skill subset)
+    -- the bundles (like music album or collection as in RadioJavan/Spotify) are disjoint or near disjoint there, but here we have subset of experts as teams that overlaps a lot
+    -- the number of bundles are limited there, but here the bundles becomes teams and we have many teams (bundles)

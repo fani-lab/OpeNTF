@@ -54,6 +54,7 @@ class Ntf:
 
                     #evl.metric works on numpy or scipy.sparse. so, we need to convert Y_ which is torch.tensor, either sparse or not
                     Y_ = opentf.torch_sparse_2_scipy_sparse(Y_, 'csr') if Y_.is_sparse else Y_.cpu().numpy()
+                    assert Y.shape == Y_.shape, f'{opentf.textcolor["red"]}Shape mismatch between truth Y {Y.shape} vs preds Y_ {Y_.shape}!{opentf.textcolor["reset"]}'
 
                     df, df_mean = pd.DataFrame(), pd.DataFrame()
                     if evalcfg.metrics.trec:
@@ -71,7 +72,7 @@ class Ntf:
                     if (m:=[m for m in evalcfg.metrics.other if 'skill_coverage' in m]): #since this metric comes with topks str like 'skill_coverage_2,5,10'
                         log.info(f'{m} ...')
                         X = teamsvecs['skill'] if scipy.sparse.issparse(teamsvecs['skill']) else teamsvecs['original_skill'] #to accomodate dense emb vecs of skills
-                        X = X[splits['folds'][foldidx][pred_set]] if pred_set != 'test' else X[splits['test']]
+                        X = X[splits['test']] if pred_set == 'test' else X[splits['folds'][foldidx][pred_set]]
                         df_skc, df_mean_skc = metric.calculate_skill_coverage(X, Y_, teamsvecs['skillcoverage'], evalcfg.per_instance, topks=m[0].replace('skill_coverage_', ''))
                         if df.empty: df = df_skc
                         else: df = pd.concat([df.reset_index(drop=True), df_skc.reset_index(drop=True)], axis=1)

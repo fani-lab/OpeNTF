@@ -3,6 +3,7 @@ log = logging.getLogger(__name__)
 
 import pkgmgr as opentf
 def calculate_metrics(Y, Y_, topK=None, per_instance=False, metrics=['P_2,5', 'recall_2,5', 'ndcg_cut_2,5']):
+    assert Y.shape == Y_.shape, f'{opentf.textcolor["red"]}Shape mismatch between truth Y {Y.shape} vs preds Y_ {Y_.shape}!{opentf.textcolor["reset"]}'
     pd = opentf.install_import('pandas')
     tqdm = opentf.install_import('tqdm', from_module='tqdm')
     pytrec_eval = opentf.install_import('pytrec-eval-terrier', 'pytrec_eval')
@@ -11,6 +12,8 @@ def calculate_metrics(Y, Y_, topK=None, per_instance=False, metrics=['P_2,5', 'r
     k = min(topK, Y_.shape[1]) if topK else Y_.shape[1] #first stage topK for efficiency in space and speed
     with tqdm(total=Y.shape[0]) as pbar:
         for i in range(Y.shape[0]):
+    with tqdm(total=Y_.shape[0]) as pbar:
+        for i in range(Y_.shape[0]):
             if sp.issparse(Y_):
                 assert sp.isspmatrix_csr(Y_), f'{opentf.textcolor["red"]}For sparse pred files, it must be in csr!{opentf.textcolor["reset"]}'
                 start, end = Y_.indptr[i], Y_.indptr[i + 1]
@@ -34,12 +37,14 @@ def calculate_metrics(Y, Y_, topK=None, per_instance=False, metrics=['P_2,5', 'r
     return df if per_instance else None, df_mean
 
 def calculate_auc_roc(Y, Y_, curve=False):
+    assert Y.shape == Y_.shape, f'{opentf.textcolor["red"]}Shape mismatch between truth Y {Y.shape} vs preds Y_ {Y_.shape}!{opentf.textcolor["reset"]}'
     scikit = opentf.install_import('scikit-learn', 'sklearn.metrics')
     auc = scikit.roc_auc_score(Y.toarray(), Y_.toarray() if sp.issparse(Y_) else Y_, average='micro', multi_class='ovr')
     if curve: fpr, tpr, _ = scikit.roc_curve(Y.toarray().ravel(), Y_.ravel())
     return auc, (fpr, tpr) if curve else None
 
 def calculate_skill_coverage(X, Y_, expertskillvecs, per_instance=False, topks='2,5,10'):#skillcoveragevecs: ExS, X: BatchxS, Y_: BatchxE
+    assert X.shape == Y_.shape, f'{opentf.textcolor["red"]}Shape mismatch between true skills in X {X.shape} vs experts (skill holders) in preds Y_ {Y_.shape}!{opentf.textcolor["reset"]}'
     tqdm = opentf.install_import('tqdm', from_module='tqdm')
     pd = opentf.install_import('pandas')
 
