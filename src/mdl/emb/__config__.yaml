@@ -112,7 +112,10 @@ model:
       spe: ${model.spe}
       h: # hidden dimension, if empty, means 1-hop: [${dim}, ${dim}], otherwise means len(hd)+1 hop: [${dim}, hd[0], hd[1], ..., ${dim}]
         - ${dim} # hydra cannot interpolate in a list like [${dim}]. So, each item per line
-      nn: [30, 20] # number of neighbors in each hop ([20, 10] -> 20 neighbors in 1-hop, 10 neighbors in 2-hop). Should match hd
+      nn: [30, 20] # number of neighbors in each hop ([30, 20] -> 30 neighbors in 1-hop, 20 neighbors in 2-hop). See https://pytorch-geometric.readthedocs.io/en/2.5.2/modules/loader.html
+      #nn: None # --> [-1, -1] # If set -1, all neighbors included.
+      #nn: [] #--> [0, 0]
+      #nn: [-1] or [-1, -1, -1] # If not matched with h, the last number is repeated or extra numbers truncated. all neighbors for all hops
       supervision_edge_types: # if not set, all edge_types as supervision edges.
         - ['member', 'to', 'team']
         - ['team', 'rev_to', 'member']
@@ -146,7 +149,8 @@ model:
         - ${dim} # hydra cannot interpolate in a list like [${dim}]. So, each item per line
       nn: [30, 20] # number of neighbors in each hop ([20, 10] -> 20 neighbors in 1-hop, 10 neighbors in 2-hop). Should match hd
       supervision_edge_types: # if not set, all edge_types as supervision edges.
-        #([('member', 'to', 'team')], 'stm')
+        - [ 'member', 'to', 'team' ]
+        - [ 'team', 'rev_to', 'member' ]
       ah: 2 # number of attention heads (if applicable)
       cat: True # multi-head attention aggregation, True: concat, False: mean
 
