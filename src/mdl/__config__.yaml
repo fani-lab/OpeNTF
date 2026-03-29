@@ -41,7 +41,7 @@ bnn:
   tpw: 10 # 10–20 (start), tune carefully up to 1/p where p is the average ratio of TP labels (true experts), emphasizes rare positives.
   tnw: 1 # usually leave as is, or reduce slightly
   nsd: ${nsd} # negetative sampling distribution (heuristics): uniform, unigram, unigram_b
-  nmc: 2 # num_monte_carlo, the *.pred files include 'uncertainty' to log the 'pred' and 'model' uncertainties. Both lower, the better (pred has less std and model is confident) but it may be overconfident!
+  nmc: 2 # num_monte_carlo, during test, the *.pred files include 'uncertainty' to log the 'pred' and 'model' uncertainties. Both lower, the better (pred has less std and model is confident) but it may be overconfident!
 
 # Thang, Hosseini, Fani; Translative Neural Team Recommendation: From Multilabel Classification to Sequence Prediction. SIGIR2025. https://doi.org/10.1145/3726302.3730259
 nmt: #see __config__.nmt.yaml for the rest of hyperparameters, esp., encoder specific settings

@@ -117,7 +117,7 @@ class Ntf:
                     if len(fold_file) != 1: raise ValueError(f'Expected one file for fold {fold} ({kind}), found {len(fold_file)}!')
                     dfs.append(pd.read_csv(fold_file[0], index_col=0))
                 combined = pd.concat(dfs)
-                mean_df = combined.groupby(combined.index).mean()
+                mean_df = combined.groupby(combined.index, sort=False).mean()
                 mean_df.to_csv(fold_file[0].replace(f'f{fold}.', ''))
 
         from Adila.src.adila import Adila
