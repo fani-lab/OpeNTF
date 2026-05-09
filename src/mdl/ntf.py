@@ -129,7 +129,7 @@ class Ntf:
                 for is_popular_alg in [None] if attribute == 'gender' else faircfg.is_popular_alg:  # is_popular_alg has nothing to do with gender debiasing, so single default value
                     plot = opentf.install_import('', 'Adila.src.plot') if is_popular_alg == 'auc' else None
                     stats, minorities, ratios = adila.prep(self.output, notion, attribute, is_popular_alg, faircfg.is_popular_coef, plot)
-                    if notion == 'dp' and faircfg.dp_ratio: ratios = [1 - faircfg.ratio if attribute == 'popularity' else faircfg.ratio]
+                    if notion == 'dp' and faircfg.dp_ratio: ratios = [1 - faircfg.dp_ratio if attribute == 'popularity' else faircfg.dp_ratio]
                     for algorithm in faircfg.algorithm:
                         outputs = _(adila, self.output, minorities, ratios, algorithm, faircfg.k_max, faircfg.alpha, faircfg.acceleration, faircfg.eval)
                         _avg_per_fold(outputs) # ideally, all the outputs should be in the same folder/path.
