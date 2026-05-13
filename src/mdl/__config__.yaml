@@ -1,11 +1,15 @@
 batch_size: 1000 # batch_size for loaders
 epochs: 100 # num max epochs
-nsd: unigram_b # negetative sampling distribution (heuristics): uniform, unigram, unigram_b
-ns: 5 # number of negative experts to upweight
 lr: 0.001 # learning rate
 es: 5 # earlystopping's patience. to bypass, set it to a higher value than epoch
 h: [128] #linear layers
 spe: # will be overriden dynamically in ./src/main.py from root ./__config__.yaml
+nsd: uniform # negative sampling distribution (heuristics): uniform, unigram, unigram_b
+ns: 5 # number of negative experts to upweight within a single team, the upweight is the same as tpw, so in tpw=tnw=1, nsd has no impact!
+#tpw1.tnw0.nsdNone (no tnw)
+#tpw1.tnw0.nsd (few (ns number) tnw)
+#tpw1.tnw1.* (all tnw)
+#tpw100.tnw1.nsd (all tnw but few of them (ns number) upweighted as tpw)
 
 rnd:
   b: ${batch_size}
