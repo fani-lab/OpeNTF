@@ -1,7 +1,0 @@
-110--2002--Random graph models of social networks.pdf
-111--2001--The structure of scientific collaboration networks.pdf
-31--2003 Team Formation in Complex Networks.pdf
-33--2004 SNA AAAI Adapting Network Structure for Efficient Team Formation.pdf
-36--2006 SNA Application of Social Network Analysis to Collaborative Team Formation.pdf
-43--2010 A multi-level study of free-loading in dynamic groups the importance of initial network topology.pdf
-44--2010 ACM Trans The small-world effect The influence of macro-level properties of developer collaboration networks on open-source project success.pdf

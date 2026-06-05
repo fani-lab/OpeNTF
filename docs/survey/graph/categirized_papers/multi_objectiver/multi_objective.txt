@@ -1,9 +1,0 @@
-18--2021 A unified framework for effective team formation in social networks.pdf
-23--2018 A Multi-objective Formulation of the Team Formation Problem.pdf
-40--2014 Two-Phase Pareto Set Discovery for Team Formation2014( related to 6).pdf
-47--P-2017 SNA EDBT Authority-based Team Discovery in Social Networks(related to 6).pdf
-48--2013 Finding Affordable and Collaborative Teams (related to 6).pdf
-49--2012 Efficient Bi-objective Team Formation  (related to 6).pdf
-6--2018 SNA Effective Team Formation in Expert Networks.pdf
-64--2012 Capacitated Team Formation Problem on Social Networks.pdf
-83--2013--Affordable and Collaborative Team Formation in an Expert.pdf

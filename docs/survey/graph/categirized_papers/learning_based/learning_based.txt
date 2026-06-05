@@ -1,9 +1,0 @@
-10--2021 Retrieving Skill-Based Teams from Collaboration Networks.pdf
-103--n3--2022--Effective Neural Team Formation via Negative Samples.pdf
-104--n6--2022--A Benchmark Library for Neural Team Formation.pdf
-105--n1--2021--PyTFL A Python-based Neural Team Formation Toolkit.pdf
-106--n7--2022--A Neural Approach to Forming Coherent Teams in.pdf
-107--n8--2022--Subgraph Representation Learning for Team Mining.pdf
-11--2020--Learning to Form Skill-based Teams of Experts.pdf
-73--n2--2019 Deep Neural Networks for Optimal.pdf
-
