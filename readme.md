@@ -217,17 +217,6 @@ We used [``pytrec_eval_terrier``](https://pypi.org/project/pytrec-eval-terrier/)
 
 For ease of summarization, we put the entire set of average results (over all folds) across all methods and all dimensions in xlsx files mentioned in the next table.
 
-**Benchmarks at Scale**
-
-**Neural Team Formation w/o Transfer Learning**
-
-|              | min. #member's team: 120 (dblp) and 75 (imdb), min team size: 3, epochs: 25, learning rate: 0.0001 (fnn), 0.01 (bnn), hidden layer: [1, 128d], minibatch: 2048, #negative samples: 3           |
-|--------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Datasets     | [dblp.v12](https://originalstatic.aminer.cn/misc/dblp.v12.7z), [imdb](https://imdb.com/interfaces/)                                                                                            |
-| Metrics      | recall@2,5,10, map@2,5,10, ndcg@2,5,10, p@2,5,10, auc                                                                                                                                          |
-| Baselines    | {fnn,bnn}×{sparse,{emb}×{d2v,m2v,gs,gat,gatv2,han,gin,gine}}×{uniform}                                                                                                                         |
-| Full Results | [``./output/dblp.v12.json.filtered.mt120.ts3/``](./output/dblp.v12.json.filtered.mt120.ts3/), [``./output/title.basics.tsv.filtered.mt75.ts3/``](./output/title.basics.tsv.filtered.mt75.ts3/) |
-
 ## 5. Acknowledgement:
 We benefit from  bayesian-torch (https://github.com/IntelLabs/bayesian-torch), PyG (https://github.com/pyg-team/pytorch_geometric), [``pytrec_eval``](https://github.com/cvangysel/pytrec_eval), [``gensim``](https://radimrehurek.com/gensim/), [Josh Feldman's blog](https://joshfeldman.net/WeightUncertainty/) and other valuable libraries. We would like to thank the authors of these libraries and helpful resources.
   
