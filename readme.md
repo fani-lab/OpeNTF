@@ -115,7 +115,7 @@ effective team formation results. As demonstrated by the figure below, the gnn p
 
 A gnn method can directly predict expert-team links to recommend top-k expert members of a team, skipping the underlying multilabel classifier, as shown below. During inference, given a test team with its subset of required skills yet unseen expert members, the gnn predicts links between expert nodes and the team's node. In contrast with transfer-based, the end-to-end approach avoids two disjoint learning processes, i.e., pretraining of a graph neural network and fine-tuning for an underlying multilabel classifier, also alleviates the curse of sparsity in multilabel classifier's output layer (there is no classifier). Our experiments reveal that employing GNN directly produces the most effective team formation results. 
 
-<img width="2880" height="808" alt="image" src="https://github.com/user-attachments/assets/7e6b9d6a-e869-40dd-8878-0176bbf316a6" />
+<img width="1000" alt="image" src="https://github.com/user-attachments/assets/7e6b9d6a-e869-40dd-8878-0176bbf316a6" />
 
 
 #### **3.3. Neural Team Formation**
