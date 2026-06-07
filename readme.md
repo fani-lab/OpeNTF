@@ -1,22 +1,22 @@
-# ``GNN Transferred OpeNTF``: An Open-Source Neural Team Formation Benchmark Library Enhanced by Transfer Learning with Graph Neural Networks 
+# ``GNN Transferred vs. End-to-End OpeNTF``: An Open-Source Neural Team Formation Benchmark Library Enhanced by Graph Neural Networks 
 Formation of a competent team with skillful experts to achieve success in a project is a crucial task.
-The Neural team recommenders by researchers have shown unprecedented success over tediously computational methods
+Neural team recommenders have shown unprecedented success over tediously computational methods
 in the past. With the recent progress in this line of research, the neural team recommenders now employ 
-transferred graph representation learning to surpass any previous methods in forming expert teams 
+ graph representation learning to surpass any previous methods in forming expert teams 
 that are almost surely successful in completing the specific task in question. 
 These models treat the problem as an expert recommendation task, where the required skills' dense 
 vector representations are derived from a graph neural network applied to a collaboration graph. 
 However, there has not been a systematic comparative study on the effects of 
 (1) the structure of the collaboration graph, 
-(2) the node representation learning technique, and 
-(3) the architecture of the final neural recommender on the effectiveness of the recommended teams.
+(2) the node representation learning technique,  
+(3) the architecture of the final neural recommender on the effectiveness of the recommended teams, and
+(4) the end-to-end link prediction in the collaborative graph as the final neural recommender.
 
 We previously released OpeNTF, an open-source framework hosting canonical neural models as the cutting-edge 
 class of approaches, along with large-scale training datasets from varying domains. 
-In this paper, we augment the neural benchmark with transfer learning from GNN methods. This encompasses 
+In this paper, we augment the neural benchmark with transfer and end-to-end learning from GNN methods. This encompasses 
 two types of heterogeneous collaboration graphs representing skill-expert and skill-team-expert connections and 
-seven graph representation learning techniques (GNN and Random Walk based) to obtain dense vector representations of skills for 
-both variational and non-variational neural recommenders.
+seven graph representation learning techniques (GNN and Random Walk-based).
 
 
 <table border=0>
@@ -28,7 +28,7 @@ both variational and non-variational neural recommenders.
 - [2. Quickstart](#2-quickstart)
 - [3. Features](#3-features)
   * [`Datasets and Parallel Preprocessing`](#31-datasets-and-parallel-preprocessing)
-  * [`Transfer Learning with GNN`](#32-gnn-transfer-learning)
+  * [`Transfer and End-to-End Learning with GNN`](#32-gnn-transfer-learning)
   * [`Neural Team Formation`](#33-neural-team-formation)
   * [`Model Architecture`](#35-model-architecture)
   * [`Run`](#36-run)
@@ -103,14 +103,20 @@ The sparse matrices and the indices will be persisted in [``data/preprocessed/{d
 
 Please note that the preprocessing step will be executed once. Subsequent runs load the persisted pickle files. In order to regenerate them, one should simply delete them. 
 
-#### **3.2. Transfer Learning with GNN**
+#### **3.2. Transfer and End-to-End Learning with GNN**
 
 Although we can successfully predict efficient teams with neural models trained on sparse matrices, previous experiments showed that applying transfer learning with generated skill embeddings 
 is more efficacious in predicting teams of experts. With this line of thought, we conducted thorough experiments to segregate the embedding generation methods, as well as compared 
-the results from each of the distinct methods (transfer or non-transfer learning) based on predefined metrics. Our experiments reveal that employing transfer learning with GNN produces the most
+the results from each of the distinct methods (transfer or non-transfer learning) based on predefined metrics. Our experiments reveal that employing transfer learning with GNN produces more
 effective team formation results. As demonstrated by the figure below, the gnn part encompasses learning vector representations through message passing strategies with the aid of the models.
 
 <p align="center"><img src='gnn_pipeline.jpg' width="1000" ></p>
+
+
+A gnn method can directly predict expert-team links to recommend top-k expert members of a team, skipping the underlying multilabel classifier, as shown below. During inference, given a test team with its subset of required skills yet unseen expert members, the gnn predicts links between expert nodes and the team's node. In contrast with transfer-based, the end-to-end approach avoids two disjoint learning processes, i.e., pretraining of a graph neural network and fine-tuning for an underlying multilabel classifier, also alleviates the curse of sparsity in multilabel classifier's output layer (there is no classifier). Our experiments reveal that employing GNN directly produces the most effective team formation results. 
+
+<img width="2880" height="808" alt="image" src="https://github.com/user-attachments/assets/7e6b9d6a-e869-40dd-8878-0176bbf316a6" />
+
 
 #### **3.3. Neural Team Formation**
 
