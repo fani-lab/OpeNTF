@@ -110,6 +110,14 @@ def run(cfg):
             cls = get_class(cls)
             #t2v = cls(output_split, cfg.data.acceleration, method, cfg.data.embedding.config.model[cls.__name__.lower()])
             t2v = cls(output_split, cfg.acceleration, cfg.seed, cfg.data.embedding.config.model[cls.__name__.lower()], method)
+            # # NOTE: for any change in gnn.py, unit test using https://github.com/fani-lab/OpeNTF/issues/280
+            # import numpy as np; from scipy.sparse import lil_matrix
+            # teamsvecs = {}
+            # teamsvecs['skill'] = lil_matrix(np.array([[1, 1, 0], [1, 0, 1], [1, 1, 1]]))
+            # teamsvecs['member'] = lil_matrix(np.array([[1, 0, 1, 0], [1, 1, 0, 0], [0, 1, 0, 1]]))
+            # teamsvecs['loc'] = lil_matrix(np.array([[1, 0], [0, 1], [1, 0]]))
+            # splits = {'folds': {0: {'train': [0, 1], 'valid': [2]}, 1: {'train': [1, 2], 'valid': [1]}}, 'test': [0]}
+
             t2v.learn(teamsvecs, splits)
 
     if cfg.cmd and any(c in cfg.cmd for c in ['train', 'test', 'eval', 'fair']):
