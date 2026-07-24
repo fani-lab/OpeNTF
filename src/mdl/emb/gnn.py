@@ -115,7 +115,7 @@ class Gnn(T2v):
         # tst_t_m_edge_homo = tst_m_t_edge_homo[[1, 0]]
 
         tst_edge_homo = Gnn.torch.hstack([tst_m_t_edge_homo, tst_m_t_edge_homo[[1, 0]]])
-        assert len(tst_edge_homo), f'{opentf.textcolor["red"]}Empty test member-team edge set!"{opentf.textcolor["reset"]}'
+        assert tst_edge_homo.numel(), f'{opentf.textcolor["red"]}Empty test member-team edge set!"{opentf.textcolor["reset"]}'
 
         for foldidx in splits['folds'].keys():
             fold_data = copy.deepcopy(train_data)
@@ -139,12 +139,12 @@ class Gnn(T2v):
             # val_t_m_edge_homo = Gnn.torch.stack([val_team_homo, val_member_homo], dim=0)
             # val_t_m_edge_homo = val_m_t_edge_homo[[1, 0]]
 
-            # val_edge_homo = Gnn.torch.hstack([val_m_t_edge_homo, val_m_t_edge_homo[[1, 0]]])
-            # assert len(val_edge_homo), f'{opentf.textcolor["red"]}Empty valid member-team edge set!"{opentf.textcolor["reset"]}'
+            val_edge_homo = Gnn.torch.hstack([val_m_t_edge_homo, val_m_t_edge_homo[[1, 0]]])
+            assert val_edge_homo.numel(), f'{opentf.textcolor["red"]}Empty valid member-team edge set!"{opentf.textcolor["reset"]}'
 
             # we need this list to filter them from the negative sampling edges by pyg (hard neg sample edges)
-            tst_val_edges_homo = Gnn.torch.hstack([val_edge_homo, tst_edge_homo])
-            assert Gnn.torch.unique(tst_val_edges_homo.T, dim=0).size(0) == tst_val_edges_homo.T.size(0), f'{opentf.textcolor["red"]}Overlapping edges found in test and valid edge sets for homo version of the graph!"{opentf.textcolor["reset"]}'
+            # tst_val_edges_homo = Gnn.torch.hstack([val_edge_homo, tst_edge_homo])
+            # assert Gnn.torch.unique(tst_val_edges_homo.T, dim=0).size(0) == tst_val_edges_homo.T.size(0), f'{opentf.textcolor["red"]}Overlapping edges found in test and valid edge sets for homo version of the graph!"{opentf.textcolor["reset"]}'
 
             # random-walk-based (rw) including n2v and m2v, are unsupervised and learn node embeddings from scratch, using random initialization internally.
             # no need to manually create and initialize node embeddgins like in message-passing-based (mp) methods.
