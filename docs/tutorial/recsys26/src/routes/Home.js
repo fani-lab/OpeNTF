@@ -52,11 +52,9 @@ function Home() {
             <section id="section-location" class="active">
             <span id="section-title-location" className="section-title">Time and Location</span>
                 <div className="section-body" style={{textAlign: "center"}}>
-                    {/*Half-day, Morning, 9:00 AM - 12:30 PM (GMT/UTC +9)<br/>*/}
-                    {/*Monday, November 10, 2025<br/>*/}
-                    {/*Room 209A, <a target="_blank" href="https://www.coexcenter.com/">COEX</a>, */}
-                    Minneapolis, Minnesota, USA, September 28, 2026{" "}
-                    <br/><br/>
+                    Half-day, Afternoon, 1:30 PM - 5:30 PM (GMT/UTC -6), Monday, September 28, 2026<br/>
+                    <a target="_blank" href="https://programs.sigchi.org/recsys/2026/maps/10565?roomName=Elk%2FDeer%20Lake">Elk/Deer Lake (4th floor)</a>, <a target="_blank" href="https://www.marriott.com/en-us/hotels/mspcc-minneapolis-marriott-city-center/overview/">Marriott City Center</a>, Downtown, Minneapolis, Minnesota, USA{" "}
+                    <br/>
                     <span style={{ fontSize: '14px', color: 'black' }}>
                         Prev Tutorials at <a target="_blank" href="https://fani-lab.github.io/OpeNTF/tutorial/umap24/" >UMAP24</a>,
                         <a target="_blank" href="https://fani-lab.github.io/OpeNTF/tutorial/sigir-ap24/" >SIGIR-AP24</a>, and <a target="_blank" href="https://fani-lab.github.io/OpeNTF/tutorial/wsdm25/" >WSDM25</a>, and <a target="_blank" href="https://fani-lab.github.io/OpeNTF/tutorial/cikm25/" >CIKM25</a> ◁ [<a target="_blank" href="https://hosseinfani.github.io/res/papers/2026_RecSys_Beyond_Searching_a_Village_Learning_to_Recommend_Diverse_and_Successful_Collaborative_Teams.pdf">Full Outline</a>]

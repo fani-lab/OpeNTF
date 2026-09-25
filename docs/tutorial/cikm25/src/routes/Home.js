@@ -60,6 +60,7 @@ function Home() {
                         Prev Tutorials at <a target="_blank" href="https://fani-lab.github.io/OpeNTF/tutorial/umap24/" >UMAP24</a>, <a target="_blank" href="https://fani-lab.github.io/OpeNTF/tutorial/sigir-ap24/" >SIGIR-AP24</a> and <a target="_blank" href="https://fani-lab.github.io/OpeNTF/tutorial/wsdm25/" >WSDM25</a> ◁ [<a target="_blank" href="https://hosseinfani.github.io/res/papers/2025_CIKM_Neural_Shifts_in_Collaborative_Team_Recommendation.pdf">Full Outline</a>]
                         [<a target="_blank" style={{color: "gray"}}>Slides</a>]
                         [<a target="_blank" style={{color: "gray"}}>Recording</a>]
+                        ▷ Next Tutorials: <a target="_blank" href="https://fani-lab.github.io/OpeNTF/tutorial/recsys26/">RecSys26</a>
                     </span>
                 </div>
             </section>
