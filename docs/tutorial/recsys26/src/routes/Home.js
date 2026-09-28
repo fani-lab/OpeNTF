@@ -56,8 +56,7 @@ function Home() {
                     <a target="_blank" href="https://programs.sigchi.org/recsys/2026/maps/10565?roomName=Elk%2FDeer%20Lake">Elk/Deer Lake (4th floor)</a>, <a target="_blank" href="https://www.marriott.com/en-us/hotels/mspcc-minneapolis-marriott-city-center/overview/">Marriott City Center</a>, Downtown, Minneapolis, Minnesota, USA{" "}
                     <br/>
                     <span style={{ fontSize: '14px', color: 'black' }}>
-                        Prev Tutorials at <a target="_blank" href="https://fani-lab.github.io/OpeNTF/tutorial/umap24/" >UMAP24</a>,
-                        <a target="_blank" href="https://fani-lab.github.io/OpeNTF/tutorial/sigir-ap24/" >SIGIR-AP24</a>, and <a target="_blank" href="https://fani-lab.github.io/OpeNTF/tutorial/wsdm25/" >WSDM25</a>, and <a target="_blank" href="https://fani-lab.github.io/OpeNTF/tutorial/cikm25/" >CIKM25</a> ◁ [<a target="_blank" href="https://hosseinfani.github.io/res/papers/2026_RecSys_Beyond_Searching_a_Village_Learning_to_Recommend_Diverse_and_Successful_Collaborative_Teams.pdf">Full Outline</a>]
+                        Prev Tutorials at [<a target="_blank" href="https://fani-lab.github.io/OpeNTF/tutorial/umap24/" >UMAP24</a>], [<a target="_blank" href="https://fani-lab.github.io/OpeNTF/tutorial/sigir-ap24/" >SIGIR-AP24</a>], [<a target="_blank" href="https://fani-lab.github.io/OpeNTF/tutorial/wsdm25/" >WSDM25</a>], [<a target="_blank" href="https://fani-lab.github.io/OpeNTF/tutorial/cikm25/" >CIKM25</a>] ◁ [<a target="_blank" href="https://hosseinfani.github.io/res/papers/2026_RecSys_Beyond_Searching_a_Village_Learning_to_Recommend_Diverse_and_Successful_Collaborative_Teams.pdf">Full Outline</a>]
                         [<a target="_blank" style={{color: "gray"}}>Slides</a>]
                         [<a target="_blank" style={{color: "gray"}}>Recording</a>]
                     </span>
